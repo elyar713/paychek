@@ -10,6 +10,15 @@ import 'package:share_plus/share_plus.dart';
 
 import '../shared/ios_share_origin.dart';
 
+Future<Directory> _iosPdfExportDirectory() async {
+  final base = await getApplicationDocumentsDirectory();
+  final dir = Directory(p.join(base.path, 'paychek_exports'));
+  if (!await dir.exists()) {
+    await dir.create(recursive: true);
+  }
+  return dir;
+}
+
 /// Bureau : dialogue « Enregistrer sous ».
 /// Android / iOS : PDF temporaire + feuille de partage ([Share]) — sans plugin `printing`.
 Future<bool> trySaveReportPdfOnPlatform(
@@ -44,18 +53,33 @@ Future<bool> trySaveReportPdfOnPlatform(
     final origin = resolveSharePositionOrigin(context: shareContext);
     final data = Uint8List.fromList(bytes);
 
-    // iOS (simulateur inclus) : bytes en mémoire — évite « error fetching item for URL file://… ».
+    // iOS : chemin explicite dans Documents (évite Caches + « error fetching item for URL »).
     if (t == TargetPlatform.iOS) {
+      final exportDir = await _iosPdfExportDirectory();
+      var outPath = p.join(exportDir.path, safeName);
+      if (await File(outPath).exists()) {
+        final stem = p.basenameWithoutExtension(safeName);
+        outPath = p.join(
+          exportDir.path,
+          '${stem}_${DateTime.now().millisecondsSinceEpoch}.pdf',
+        );
+      }
+      final file = File(outPath);
+      await file.writeAsBytes(data, flush: true);
+      if (!await file.exists() || await file.length() == 0) {
+        return false;
+      }
       await Share.shareXFiles(
         <XFile>[
-          XFile.fromData(
-            data,
+          XFile(
+            file.path,
             mimeType: 'application/pdf',
             name: safeName,
           ),
         ],
         subject: safeName,
         sharePositionOrigin: origin,
+        fileNameOverrides: [safeName],
       );
       return true;
     }
