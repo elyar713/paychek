@@ -1,6 +1,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -29,7 +30,8 @@ String _p(Locale locale, String fr, String en, String es, String de, String pt, 
 /// True pendant [buildPerformancePdf] si locale coréenne et chargement Noto Sans KR OK.
 bool _pdfHangulMode = false;
 
-Future<void> exportPerformancePdf({
+Future<void> exportPerformancePdf(
+  BuildContext context, {
   required List<Trade> disciplineTrades,
   required List<Trade> visibleTradesForAssets,
   required PerformancePeriodFilter periodFilter,
@@ -58,7 +60,11 @@ Future<void> exportPerformancePdf({
     );
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = 'performance_journal_$stamp.pdf';
-    final ok = await pdf_platform.trySaveReportPdfOnPlatform(bytes, name);
+    final ok = await pdf_platform.trySaveReportPdfOnPlatform(
+      bytes,
+      name,
+      shareContext: context,
+    );
     if (!ok && kDebugMode) {
       debugPrint('exportPerformancePdf: enregistrement annule ou echoue');
     }

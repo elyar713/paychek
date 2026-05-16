@@ -482,6 +482,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
     final capStore = UserCapitalScope.of(context);
     final capital = UserPortfolioScope.of(context).effectiveCapitalAmount(capStore);
     await exportPerformancePdf(
+      context,
       disciplineTrades: _disciplineVisibleTrades,
       visibleTradesForAssets: _visibleTrades,
       periodFilter: _periodFilter,

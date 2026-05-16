@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -37,12 +38,33 @@ Future<bool> trySaveReportPdfOnPlatform(
   }
 
   if (t == TargetPlatform.android || t == TargetPlatform.iOS) {
+    if (bytes.isEmpty) return false;
     final safeName =
         filename.replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1f]'), '_');
+    final origin = resolveSharePositionOrigin(context: shareContext);
+    final data = Uint8List.fromList(bytes);
+
+    // iOS (simulateur inclus) : bytes en mémoire — évite « error fetching item for URL file://… ».
+    if (t == TargetPlatform.iOS) {
+      await Share.shareXFiles(
+        <XFile>[
+          XFile.fromData(
+            data,
+            mimeType: 'application/pdf',
+            name: safeName,
+          ),
+        ],
+        subject: safeName,
+        sharePositionOrigin: origin,
+      );
+      return true;
+    }
+
     final dir = await getTemporaryDirectory();
     final outPath = p.join(dir.path, safeName);
     final file = File(outPath);
-    await file.writeAsBytes(bytes, flush: true);
+    await file.writeAsBytes(data, flush: true);
+    if (!file.existsSync()) return false;
     await Share.shareXFiles(
       <XFile>[
         XFile(
@@ -52,7 +74,7 @@ Future<bool> trySaveReportPdfOnPlatform(
         ),
       ],
       subject: safeName,
-      sharePositionOrigin: resolveSharePositionOrigin(context: shareContext),
+      sharePositionOrigin: origin,
     );
     return true;
   }
