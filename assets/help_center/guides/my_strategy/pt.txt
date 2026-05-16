@@ -1,0 +1,62 @@
+Guide: My Strategy — Paychek playbook
+
+🎯 My Strategy: your trading playbook
+The My Strategy page is the command centre for your trading. This is where you define strict rules. Paychek uses them to analyse your discipline automatically and highlight gaps in performance reports.
+
+[img:assets/help_center/strategy_dashboard_dark.png]
+
+App overview (dark theme): Golden Rules, Risk Management, Hours & Sessions, Setups & Templates, Trade Calendar — plus the PDF button top right.
+
+1. Golden Rules 🏆
+Capture your fundamental psychological and technical rules (e.g. “never chase price”).
+
+[img:assets/help_center/strategy_playbook_light_overview.png]
+
+Light “playbook” example: same blocks (golden rules, risk, hours, setup).
+
+Impact: Rules appear when adding a trade.
+
+Discipline tracking: Mark a rule broken on a trade and Paychek counts it in Performance.
+
+2. Risk Management 🛡️
+Protect capital.
+
+Set risk per trade (e.g. 1%), max daily loss (e.g. 3%), max trades per day.
+
+Paychek flags breaches; Performance shows how often you violated rules by day/week/month.
+
+3. Hours & Sessions 🕒
+Tune when you trade.
+
+Sessions: Set start/end (London, New York, etc.).
+
+If you trade outside those hours (red zone), Paychek records a session breach in statistics.
+
+4. Setups & Templates 📑
+Document each setup (e.g. Breakout with Volume).
+
+Fields: Timeframes, indicators, patterns, alert signals.
+
+Trade management: Entries, exits, invalidation (stop), break-even moves.
+
+Fully editable setups.
+
+[img:assets/help_center/strategy_edit_setup_modal.png]
+
+Edit sheet: theme, colour, timeframes, indicators, pattern, alert — Save or Cancel.
+
+5. Trade Calendar 📅
+See how often you use each setup.
+
+Colour dots show which strategy ran on entry dates (from your trades).
+
+Pro tip: Give each strategy its own colour to see habits instantly.
+
+🛠️ Customisation & PDF export
+Use the ⋯ menu on any card to edit, add, or delete as your methodology evolves.
+
+[img:assets/help_center/strategy_card_overflow_menu.png]
+
+Typical menu: Edit, Add, Delete (labels follow app language).
+
+Export PDF 📄 : One-click full strategy PDF — keep it next to your screens during sessions.

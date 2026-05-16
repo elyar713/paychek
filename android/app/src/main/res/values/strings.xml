@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Meta Developer → appli Facebook → ID numérique + Jeton client (Settings → Advanced). -->
+    <!-- Remplace les trois lignes par tes vraies valeurs (même ID dans facebook_app_id et dans fb… ). -->
+    <string name="facebook_app_id">967493382672804</string>
+    <string name="fb_login_protocol_scheme">fb967493382672804</string>
+    <string name="facebook_client_token">99746c74cf052ffd54c3a5a4d7dba7bc</string>
+</resources>

@@ -1,0 +1,44 @@
+---
+description: CTA Upgrade — bouton compact + paywall Gold Flutter
+globs:
+  - lib/**/*.dart
+  - docs/templates/**/*.html
+alwaysApply: false
+---
+
+# Upgrade Paychek — prompt type + templates
+
+## Deux flux produit (ne pas les confondre)
+
+| Contexte | Comportement |
+|------------|----------------|
+| **Upgrade volontaire** (bouton hero accueil, Compte : lien Upgrade + CTA souscription) | Feuille [`showPaychekGoldUpgradeSheet`](lib/reglage/paychek_gold_upgrade_sheet.dart) : contenu **100 % Flutter** [`GoldUpgradeFlutterPaywall`](lib/reglage/gold_upgrade/gold_upgrade_flutter_paywall.dart) (or, Lite vs Pro, prix, CTA) — **pas de HTML / WebView dans l’app**. |
+| **Après essai — pages non autorisées en Lite** (`liteFreemiumRestricted`, menu Plus, raccourcis accueil…) | [`TrialPaywallOverlay`](lib/reglage/trial_paywall_overlay.dart) via `_showLitePaywallSheet` sur [`DashboardPage`](lib/dashboard_page.dart) : prompt classique (essai terminé, comparaison emerald, restauration). |
+
+## Maquette HTML (référence **hors** runtime)
+
+Fichier **non** embarqué dans l’APK / le binaire Flutter : `docs/templates/trading_journal_upgrade_gold_edition.html` — inspiration design uniquement ; l’implémentation in-app est [`GoldUpgradeFlutterPaywall`](lib/reglage/gold_upgrade/gold_upgrade_flutter_paywall.dart) + clés l10n `paywallGold*`.
+
+## Prompt type — **bouton compact** in-app (header, compte, etc.)
+
+> Pour tout **petit** bouton ou lien **Upgrade** dans l’app Flutter : utiliser **uniquement** `PaychekMinimalUpgradeButton` (`lib/widgets/paychek_minimal_upgrade_button.dart`). Ne pas recréer de pastille « glass », ni un second style. Libellé : `AppLocalizations.of(context)!.profileUpgradeLabel` (ou clé l10n équivalente). `onTap` : `VoidCallback` ; si async → `unawaited(...)` (`dart:async`). Références code : `DashboardHomeHero`, `ReglageProfileViewPage`.
+
+## Prompt type — **paywall Gold volontaire** (Flutter)
+
+> Aligner [`GoldUpgradeFlutterPaywall`](lib/reglage/gold_upgrade/gold_upgrade_flutter_paywall.dart) sur la maquette `docs/templates/...html` (couleurs, hiérarchie). Textes marketing : clés **`paywallGold*`** + comparaison **`paywallLiteFeature*`** / **`paywallProFeature*`** ; prix : **`paywallPriceAnnualHighlight`** ; CTA : **`paywallSubscribeButton`**.
+
+## Règles code (bouton compact)
+
+- Import : `.../widgets/paychek_minimal_upgrade_button.dart`.
+- Usage : `PaychekMinimalUpgradeButton(label: l10n.profileUpgradeLabel, onTap: ...)`.
+- Ne pas dupliquer le markup du bouton minimal ; pas de surcouche de couleur/icône sans modifier le widget partagé.
+- Optionnel : `Semantics(button: true, label: …, child: …)`.
+
+## Fichiers Flutter de référence
+
+- `lib/widgets/paychek_minimal_upgrade_button.dart`
+- `lib/dashboard/widgets/dashboard_home_hero.dart`
+- `lib/reglage/reglage_profile_view_page.dart`
+- `lib/reglage/paychek_gold_upgrade_sheet.dart`
+- `lib/reglage/gold_upgrade/gold_upgrade_embed.dart` + `gold_upgrade_flutter_paywall.dart`
+- `lib/reglage/trial_paywall_overlay.dart` (blocage Lite)

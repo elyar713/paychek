@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAYCHEK | Transformez vos données en profits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --pure-black: #000000;
+            --soft-black: #050505;
+            --card-black: #0a0a0a;
+            --accent-blue: #3b82f6;
+        }
+
+        .bg-card-black { background-color: var(--card-black); }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--pure-black);
+            color: #ffffff;
+            scroll-behavior: smooth;
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* Évite bandes / « trous » sur le texte (iframe + GPU / background-clip). */
+        .gradient-text {
+            display: inline;
+            font-style: italic;
+            color: #94a3b8;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+        }
+
+        @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+            .gradient-text {
+                color: transparent;
+            }
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 100vw;
+            height: 600px;
+            background: radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Au-dessus du glow (z-index 0) — ne pas toucher au `position: sticky` de la nav. */
+        body > header,
+        body > footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-nav {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-primary {
+            background: #ffffff;
+            color: #000000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .explorer-tab {
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        
+        .explorer-tab.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Conteneur aperçu : sans fond ni cadre, image centrée */
+        .preview-frame {
+            position: relative;
+            overflow: visible;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .preview-frame #preview-img {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: min(1040px, 96svh);
+            object-fit: contain;
+            object-position: center;
+            margin-left: auto;
+            margin-right: auto;
+            transition: opacity 1.5s cubic-bezier(0.33, 0, 0.2, 1);
+        }
+
+        /* Dernière capture « rapport » (Mon analyse) : plus compacte */
+        .preview-frame #preview-img.preview-img-slim {
+            max-height: min(640px, 72svh) !important;
+            max-width: min(880px, 88vw) !important;
+        }
+
+        .preview-frame #preview-img.preview-img-clickable {
+            cursor: zoom-in;
+        }
+
+        /* Lightbox : taille intrinsèque du fichier (écrase le preflight img max-width:100%) */
+        #preview-lightbox-scroll img#preview-lightbox-img {
+            max-width: none;
+            width: auto;
+            height: auto;
+        }
+
+        /* Flèches carrousel : visibles au survol de la photo (souris) ; toujours visibles au toucher */
+        @media (hover: hover) and (pointer: fine) {
+            .preview-frame #preview-carousel-controls button {
+                opacity: 0;
+                transition: opacity 0.22s ease;
+            }
+
+            .preview-frame:hover #preview-carousel-controls button {
+                opacity: 1;
+            }
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-8px);
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .step-image-wrapper {
+            height: 160px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            transition: opacity 0.4s ease;
+        }
+
+        .step-card:hover .step-image-wrapper img {
+            opacity: 0.7;
+        }
+
+        .step-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, var(--pure-black), transparent);
+        }
+
+        /* Pricing Styles */
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .pricing-card.featured {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.02);
+        }
+
+        /* FAQ Styles */
+        .faq-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .faq-trigger {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 2rem;
+            color: #94a3b8;
+            text-align: left;
+        }
+
+        .faq-item.active .faq-content {
+            max-height: 2000px;
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+            color: #3b82f6;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .flag-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Barre d’onglets : scroll horizontal sans barre visible + glisser à la souris */
+        .preview-tabs-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            cursor: grab;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .preview-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .preview-tabs-scroll.is-grabbing {
+            cursor: grabbing;
+            scroll-behavior: auto;
+            user-select: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .btn-trial {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            transition: all 0.3s ease;
+        }
+
+        .btn-trial:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #ffffff;
+            transform: scale(1.02);
+        }
+
+        footer a {
+            transition: color 0.2s ease;
+        }
+        
+        footer a:hover {
+            color: #ffffff;
+        }
+
+        /* Iframe + Flutter : le blur de la nav peut corrompre les calques du texte en dessous. */
+        body.paychek-in-app-shell .glass-nav {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.92);
+        }
+
+        .paychek-hero-title {
+            -webkit-font-smoothing: antialiased;
+            text-rendering: geometricPrecision;
+        }
+
+        .paychek-hero-tagline {
+            text-wrap: balance;
+        }
+
+        /* Badges Store : même emprise visuelle, pas de fond / cadre ajouté par le site. */
+        .paychek-store-badge-slot {
+            box-sizing: border-box;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            height: 76px;
+            width: 248px;
+            padding: 0 6px;
+            -webkit-tap-highlight-color: transparent;
+            overflow: visible;
+        }
+
+        .paychek-store-badge-slot img {
+            display: block;
+            height: 100%;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        @media (min-width: 640px) {
+            .paychek-store-badge-slot {
+                height: 88px;
+                width: 288px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .paychek-store-badge-slot {
+                height: 96px;
+                width: 312px;
+            }
+        }
+
+        /* Badge App Store : logo + texte en blanc sur fond noir (fichier souvent sombre). */
+        .paychek-store-badge-appstore img {
+            filter: brightness(0) invert(1);
+        }
+
+        .paychek-store-badge-appstore:hover img {
+            filter: brightness(0) invert(1) brightness(1.12);
+        }
+
+        /* Google Play : agrandissement dans le cadre (1.56 × 1.07). */
+        .paychek-store-badge-google img {
+            transform: scale(1.6692);
+            transform-origin: center center;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <div class="hero-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 group cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.35)]" aria-hidden="true">
+                    <i class="fas fa-arrow-trend-up text-sm opacity-90"></i>
+                </div>
+                <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+            </div>
+            
+            <div class="hidden lg:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
+                <a href="#preview-section" class="hover:text-white transition">Aperçu</a>
+                <a href="#processus" class="hover:text-white transition">Processus</a>
+                <a href="#pricing" class="hover:text-white transition">Tarifs</a>
+                <a href="#faq" class="hover:text-white transition">FAQ</a>
+            </div>
+
+            <div class="flex items-center gap-4 sm:gap-5 shrink-0">
+                <!-- Langue + auth regroupés (même bloc visuel) -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="relative group hidden sm:block">
+                        <button type="button" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn">
+                            <img id="lang-trigger-flag" src="https://flagcdn.com/w40/fr.png" alt="FR" class="flag-icon">
+                            <span id="lang-trigger-code">FR</span>
+                            <i class="fas fa-chevron-down text-[8px] opacity-50"></i>
+                        </button>
+                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]">
+                            <a href="#" onclick="landingSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="fr">
+                                <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
+                            </a>
+                            <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="en">
+                                <img src="https://flagcdn.com/w40/gb.png" alt="" class="flag-icon"> ENGLISH
+                            </a>
+                            <a href="#" onclick="landingSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
+                                <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
+                            </a>
+                            <a href="#" onclick="landingSelectLang('es', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="es">
+                                <img src="https://flagcdn.com/w40/es.png" alt="" class="flag-icon"> ESPAÑOL
+                            </a>
+                            <a href="#" onclick="landingSelectLang('pt', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="pt">
+                                <img src="https://flagcdn.com/w40/pt.png" alt="" class="flag-icon"> PORTUGUÊS
+                            </a>
+                            <a href="#" onclick="landingSelectLang('ko', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="ko">
+                                <img src="https://flagcdn.com/w40/kr.png" alt="" class="flag-icon"> 한국어
+                            </a>
+                        </div>
+                    </div>
+                    <span class="hidden sm:inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
+                    <button type="button" onclick="paychekNotifyParentAuth('login')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition whitespace-nowrap">Connexion</button>
+                    <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                        S'inscrire
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="max-w-7xl mx-auto px-6 pt-32 text-center relative">
+        <div class="flex flex-wrap items-center justify-center gap-5 sm:gap-7 mb-8 md:mb-10" role="navigation" aria-label="Télécharger l'application">
+            <a href="https://play.google.com/store/apps/details?id=pro.paychek.app" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-google inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:brightness-110 hover:scale-[1.02]" aria-label="Télécharger sur Google Play">
+                <img src="images/badge-google-play-hero.png" alt="" decoding="async">
+            </a>
+            <a href="https://apps.apple.com/app/paychek/id0000000000" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-appstore inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:scale-[1.02]" aria-label="Télécharger sur l'App Store">
+                <img src="images/badge-app-store-hero.png" alt="" decoding="async">
+            </a>
+        </div>
+        <h1 class="text-6xl md:text-8xl font-bold mb-6 md:mb-7 tracking-tighter leading-[0.9] paychek-hero-title">
+            TRANSFORMEZ VOS <br> <span class="gradient-text">DONNÉES</span> EN PROFITS.
+        </h1>
+        <p class="paychek-hero-tagline max-w-[36rem] mx-auto mb-10 md:mb-12 px-4 text-base sm:text-lg md:text-xl font-medium leading-snug md:leading-relaxed text-gray-400/95 tracking-tight">
+            Le journal de trading conçu pour transformer votre <span class="text-white font-semibold">discipline</span> en <span class="font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent">avantage statistique</span>
+        </p>
+        <div class="flex flex-col sm:flex-row gap-5 justify-center mb-32">
+            <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest">
+                Démarrer mon journal
+            </button>
+            <button onclick="document.getElementById('preview-section').scrollIntoView({behavior: 'smooth'})" class="btn-secondary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest hover:text-white">
+                Explorer l'interface
+            </button>
+        </div>
+
+        <!-- SECTION APERÇU -->
+        <section id="preview-section" class="max-w-7xl mx-auto scroll-mt-32 pb-20">
+            <!-- Navigation des modules -->
+            <div id="preview-tabs-scroll" class="preview-tabs-scroll flex flex-nowrap gap-2 mb-16 p-1.5 bg-[#080808] rounded-2xl border border-white/5 max-w-7xl mx-auto">
+                <button onclick="switchPreview('dashboard')" id="tab-dashboard" class="explorer-tab active px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Dashboard</button>
+                <button onclick="switchPreview('checklist')" id="tab-checklist" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Checklist</button>
+                <button onclick="switchPreview('mental')" id="tab-mental" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">État Mental</button>
+                <button onclick="switchPreview('analyse')" id="tab-analyse" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Mon analyse</button>
+                <button onclick="switchPreview('strategie')" id="tab-strategie" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">My Strategy</button>
+                <button onclick="switchPreview('performance')" id="tab-performance" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Performance</button>
+                <button onclick="switchPreview('calendrier')" id="tab-calendrier" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Calendrier</button>
+                <button onclick="switchPreview('trade')" id="tab-trade" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Trade</button>
+                <button onclick="switchPreview('ajouter')" id="tab-ajouter" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-blue-400">Ajouter</button>
+                <button onclick="switchPreview('pdf')" id="tab-pdf" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Export PDF</button>
+                <button onclick="switchPreview('csv')" id="tab-csv" class="explorer-tab px-6 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">Import CSV</button>
+            </div>
+
+            <!-- Image ~2/3, texte ~1/3 sur grand écran -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-center min-h-[500px] mb-32">
+                <div class="relative order-2 lg:order-1 lg:col-span-8">
+                    <div id="preview-container-img" class="transition-all duration-700 opacity-100">
+                        <div class="preview-frame">
+                            <img id="preview-img" role="button" tabindex="0" title="Cliquer pour agrandir" aria-label="Agrandir l'aperçu" onclick="openPreviewLightbox(event)" onkeydown="previewImgKeydown(event)" src="images/landing-preview-dashboard.png" alt="Aperçu du terminal PAYCHEK — Dashboard" class="preview-img-clickable block rounded-lg">
+                            <div id="preview-carousel-controls" class="hidden absolute inset-0 flex items-center justify-between px-1 sm:px-2 z-10 pointer-events-none">
+                                <button type="button" onclick="previewCarouselStep(-1)" class="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-black/65 hover:bg-black/85 border border-white/20 text-white flex items-center justify-center transition shadow-lg" title="Image précédente" aria-label="Image précédente">
+                                    <i class="fas fa-chevron-left text-xs sm:text-sm"></i>
+                                </button>
+                                <button type="button" onclick="previewCarouselStep(1)" class="pointer-events-auto w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-black/65 hover:bg-black/85 border border-white/20 text-white flex items-center justify-center transition shadow-lg" title="Image suivante" aria-label="Image suivante">
+                                    <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-left lg:pl-6 xl:pl-8 order-1 lg:order-2 lg:col-span-4">
+                    <div id="preview-container-text" class="transition-all duration-700 opacity-100 max-w-md sm:max-w-lg lg:max-w-none mx-auto lg:mx-0">
+                        <h4 id="preview-title" class="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold mb-3 tracking-tight leading-tight text-white">Dashboard</h4>
+                        <p id="preview-lead" class="text-gray-400 italic font-medium text-base sm:text-lg leading-snug mb-4">Tradez avec la discipline d'un pro, pas avec vos émotions.</p>
+                        <div id="preview-desc" class="text-sm sm:text-base leading-relaxed"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION : PROCESSUS AVEC PHOTOS -->
+            <div id="processus" class="max-w-6xl mx-auto border-t border-white/5 pt-20 mb-32 scroll-mt-32">
+                <div class="text-center mb-16">
+                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em]">Votre Parcours Vers le Sommet</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="step-card rounded-[2.5rem] relative z-10 flex flex-col h-full">
+                        <div class="step-image-wrapper">
+                            <img src="images/landing-parcours-etape1-add-trade.png" alt="PAYCHEK — Ajouter un trade : saisie Buy/Long, actif, lots, entrée et sortie">
+                            <div class="step-image-overlay"></div>
+                        </div>
+                        <div class="p-8 pt-0 text-center flex-grow">
+                            <div class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">1</div>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Ajoutez votre trade</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed">Saisissez vos positions en quelques secondes. Une interface pensée pour la rapidité.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card rounded-[2.5rem] relative z-10 flex flex-col h-full">
+                        <div class="step-image-wrapper">
+                            <img src="images/landing-parcours-etape2-validation.png" alt="PAYCHEK — Validation du plan : Principe / Feeling, stratégie et règles">
+                            <div class="step-image-overlay"></div>
+                        </div>
+                        <div class="p-8 pt-0 text-center flex-grow">
+                            <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">2</div>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Faites les points</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed">Analysez chaque setup. Identifiez vos points forts et corrigez vos erreurs récurrentes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card rounded-[2.5rem] relative z-10 flex flex-col h-full">
+                        <div class="step-image-wrapper">
+                            <img src="images/landing-parcours-etape3-lens.png" alt="PAYCHEK Lens — analyse de la discipline, scores stratégie et alertes de seuils">
+                            <div class="step-image-overlay"></div>
+                        </div>
+                        <div class="p-8 pt-0 text-center flex-grow">
+                            <div class="w-10 h-10 border-2 border-white/20 text-white rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">3</div>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Obtenez la performance</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed">Visualisez votre progression. Prenez des décisions basées sur des données réelles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION : TARIFS -->
+            <section id="pricing" class="max-w-4xl mx-auto pt-20 scroll-mt-32">
+                <div class="text-center mb-16">
+                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em] mb-4">Prêt à passer au niveau supérieur ?</h3>
+                    <p class="text-gray-500 text-sm">Choisissez le plan qui correspond à votre ambition.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Lite Plan -->
+                    <div class="pricing-card p-10 rounded-[3rem] flex flex-col">
+                        <div class="mb-8">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lite</span>
+                            </div>
+                            <div class="flex items-baseline gap-1 mt-2">
+                                <span class="text-5xl font-bold">0$</span>
+                                <span class="text-gray-600 text-xs uppercase font-bold tracking-widest">/ à vie</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 mb-10 flex-grow">
+                            <li class="flex items-center gap-3 text-xs text-gray-400">
+                                <i class="fas fa-check text-blue-500"></i> 30 trades / mois maximum
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400">
+                                <i class="fas fa-check text-blue-500"></i> Saisie manuelle uniquement
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400">
+                                <i class="fas fa-check text-blue-500"></i> Calendrier standard
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> Checklist
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> Générateur d'analyse
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> Page Stratégie
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> Statistiques performance
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> État mental
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
+                                <i class="fas fa-times"></i> Export PDF
+                            </li>
+                        </ul>
+                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-secondary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Commencer gratuitement</button>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="pricing-card featured p-10 rounded-[3rem] flex flex-col relative overflow-hidden">
+                        <div class="absolute top-6 right-8 bg-blue-600 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Populaire</div>
+                        <div class="mb-8">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Pro</span>
+                            </div>
+                            <div class="flex flex-col gap-1 mt-2">
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-5xl font-bold">49.90$</span>
+                                    <span class="text-gray-600 text-xs uppercase font-bold tracking-widest">/ an</span>
+                                </div>
+                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500/80 ml-1 mt-1">Sans engagement</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 mb-10 flex-grow">
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Trades illimités
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Import CSV + saisie manuelle
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Calendrier Pro
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Checklist
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Générateur d'analyse
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Page Stratégie
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Statistiques performance
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> État mental
+                            </li>
+                            <li class="flex items-center gap-3 text-xs text-white">
+                                <i class="fas fa-check text-blue-400"></i> Export PDF
+                            </li>
+                        </ul>
+                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-white/10">Devenir Pro</button>
+                    </div>
+                </div>
+
+                <!-- Bouton d'essai gratuit -->
+                <div class="mt-12 flex flex-col items-center">
+                    <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-trial px-8 py-4 rounded-full flex items-center gap-4 group">
+                        <span class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-play text-white text-[10px] ml-0.5"></i>
+                        </span>
+                        <div class="text-left">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-white leading-none mb-1">Démarrer mon essai gratuit</p>
+                            <p class="text-[9px] font-bold uppercase tracking-widest text-blue-400/80 leading-none">Accès complet pendant 7 jours</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-blue-400 text-xs ml-4 transition-transform group-hover:translate-x-1"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION : FAQ -->
+            <section id="faq" class="max-w-3xl mx-auto pt-32 pb-20 scroll-mt-32">
+                <div class="text-center mb-16">
+                    <h3 class="text-xl font-bold uppercase tracking-[0.3em] mb-4">Questions Fréquentes</h3>
+                    <p class="text-gray-500 text-xs uppercase tracking-widest">Tout ce que vous devez savoir sur PAYCHEK</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">PAYCHEK est-il un journal de trading simple ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <div class="text-xs leading-relaxed font-medium space-y-3 text-left" lang="fr">
+                                <p>Oui et non.</p>
+                                <p><span class="text-gray-500 select-none" aria-hidden="true">•</span> Oui, car son interface est épurée pour vous simplifier la tâche. En quelques secondes, vous journalisez vos trades sur le Forex, la Crypto ou les Indices sans la lourdeur d'un fichier Excel.</p>
+                                <p><span class="text-gray-500 select-none" aria-hidden="true">•</span> Non, car derrière cette simplicité se cache un moteur d'analyse puissant. PAYCHEK transforme vos saisies en statistiques de performance avancées et audite votre discipline pour identifier précisément vos forces et vos faiblesses psychologiques.</p>
+                                <p>En résumé : La saisie est simple, mais les résultats sont professionnels.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">Mes données sont-elles sécurisées ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <p class="text-xs leading-relaxed font-medium">Absolument. Vos données sont chiffrées de bout en bout. Nous ne partageons jamais vos statistiques de trading et vous restez le seul propriétaire de vos informations.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">Comment fonctionne l'essai gratuit ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <p class="text-xs leading-relaxed font-medium">Lors de votre inscription, vous bénéficiez de 7 jours d'accès complet à toutes les fonctionnalités Pro. À la fin de l'essai, vous pouvez choisir de passer au plan Pro ou de rester sur la version Lite gratuite.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">Puis-je annuler mon abonnement ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <p class="text-xs leading-relaxed font-medium">Oui, PAYCHEK est sans engagement. Vous pouvez annuler votre abonnement Pro à tout moment depuis vos paramètres de compte. Vous conserverez vos accès jusqu'à la fin de la période payée.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">Sur quels marchés puis-je utiliser PAYCHEK ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <p class="text-xs leading-relaxed font-medium">Partout. Que vous soyez sur le Forex, les Cryptos, les Indices, les Matières premières ou les Actions, l'application s'adapte à votre actif pour suivre vos performances avec précision.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 6 -->
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-trigger">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-white">L'application est-elle disponible sur mobile ?</span>
+                            <i class="fas fa-plus faq-icon text-[10px] text-gray-500"></i>
+                        </div>
+                        <div class="faq-content">
+                            <p class="text-xs leading-relaxed font-medium">Oui, PAYCHEK est conçu pour vous accompagner partout. Journalisez vos trades instantanément depuis votre smartphone et retrouvez vos analyses synchronisées en temps réel.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </header>
+
+    <!-- FOOTER RÉORGANISÉ -->
+    <footer class="pt-32 pb-20 border-t border-white/5 mt-32 bg-black">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                <!-- Gauche : Logo & Slogan -->
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center gap-3 group cursor-pointer">
+                        <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-transform group-hover:scale-110" aria-hidden="true">
+                            <i class="fas fa-arrow-trend-up text-sm opacity-90"></i>
+                        </div>
+                        <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+                    </div>
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] leading-loose max-w-sm">
+                        Le terminal ultime pour les traders sérieux qui souhaitent transformer leurs données en stratégie rentable.
+                    </p>
+                    <div class="flex gap-4 mt-4">
+                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-twitter text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-discord text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-instagram text-xs"></i></a>
+                    </div>
+                </div>
+
+                <!-- Droite : Liens colonnes -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+                    <!-- Produit -->
+                    <div class="flex flex-col gap-6">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Produit</h6>
+                        <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                            <li><a href="#preview-section">Fonctionnalités</a></li>
+                            <li><a href="#pricing">Tarifs</a></li>
+                            <li><a href="#faq">FAQ</a></li>
+                            <li><a href="#">Mises à jour</a></li>
+                        </ul>
+                    </div>
+                    <!-- Entreprise -->
+                    <div class="flex flex-col gap-6">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Société</h6>
+                        <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                            <li><a href="#">À propos</a></li>
+                            <li><a href="#">Carrières</a></li>
+                            <li><a href="#">Affiliation</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <!-- Ressources -->
+                    <div class="flex flex-col gap-6">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Ressources</h6>
+                        <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Guide Trading</a></li>
+                            <li><a href="#">Webinaires</a></li>
+                            <li><a href="#">Documentation</a></li>
+                        </ul>
+                    </div>
+                    <!-- Légal -->
+                    <div class="flex flex-col gap-6">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Légal</h6>
+                        <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                            <li><a href="privacy.html">Confidentialité</a></li>
+                            <li><a href="terms.html">Conditions</a></li>
+                            <li><a href="#">Sécurité</a></li>
+                            <li><a href="#">Cookies</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-gray-800 text-[9px] font-bold uppercase tracking-[0.4em]">
+                    © 2024 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.
+                </p>
+                <p class="text-gray-800 text-[9px] font-bold uppercase tracking-[0.4em]">
+                    DESIGNED FOR PERFORMANCE.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="preview-lightbox" class="fixed inset-0 z-[105] hidden flex flex-col bg-black/95 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Aperçu agrandi" onclick="if(event.target===this)closePreviewLightbox()">
+        <div class="relative z-20 flex shrink-0 justify-end p-4 sm:p-6">
+            <button type="button" onclick="event.stopPropagation(); closePreviewLightbox()" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="Fermer">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div id="preview-lightbox-scroll" class="flex-1 min-h-0 overflow-auto overscroll-contain px-4 pb-8 flex items-start justify-center" onclick="if(event.target===this)closePreviewLightbox()">
+            <img id="preview-lightbox-img" src="" alt="" class="block h-auto w-auto max-w-none max-h-none shrink-0 rounded-lg shadow-2xl select-none" decoding="async" />
+        </div>
+    </div>
+
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm" onclick="if(event.target===this)toggleModal('login-modal')">
+        <div class="bg-card-black border border-white/10 w-full max-w-md rounded-[2.5rem] p-10 relative" onclick="event.stopPropagation()">
+            <button onclick="toggleModal('login-modal')" class="absolute top-8 right-8 text-gray-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+            <h2 class="text-2xl font-bold mb-8 text-white">Connexion</h2>
+            <div class="space-y-4">
+                <input type="email" placeholder="Email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
+                <input type="password" placeholder="Mot de passe" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
+                <button type="button" class="w-full btn-primary py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest mt-4" onclick="paychekNotifyParentAuth('login'); toggleModal('login-modal');">Entrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="signup-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm" onclick="if(event.target===this)toggleModal('signup-modal')">
+        <div class="bg-card-black border border-white/10 w-full max-w-md rounded-[2.5rem] p-10 relative" onclick="event.stopPropagation()">
+            <button onclick="toggleModal('signup-modal')" class="absolute top-8 right-8 text-gray-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+            <h2 class="text-2xl font-bold mb-4 text-white">Inscription</h2>
+            <p class="text-[9px] text-blue-500 font-bold uppercase tracking-widest mb-8"><i class="fas fa-gift mr-2"></i> Votre essai de 7 jours sera activé automatiquement</p>
+            <div class="space-y-4">
+                <input type="text" placeholder="Nom complet" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
+                <input type="email" placeholder="Email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
+                <input type="password" placeholder="Mot de passe" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
+                <button type="button" class="w-full btn-primary py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest mt-4" onclick="paychekNotifyParentAuth('signup'); toggleModal('signup-modal');">Créer mon compte</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const previewData = {
+            'dashboard': {
+                title: 'Dashboard',
+                lead: "Tradez avec la discipline d'un pro, pas avec vos émotions.",
+                descPoints: [
+                    { icon: 'fa-chart-line', label: 'Capital & Balance :', body: 'Votre santé financière immédiatement visible.' },
+                    { icon: 'fa-sticky-note', label: 'Votre analyse :', body: "Ne cherchez plus vos notes. Votre analyse est affichée clairement pour valider votre biais en une seconde." },
+                    { icon: 'fa-clipboard-check', label: 'Checklist :', body: "Cliquez et validez vos règles de stratégie directement sur l'écran principal." },
+                    { icon: 'fa-gauge', label: 'État Mental :', body: "Une jauge visuelle pour savoir si vous êtes en état de cliquer ou s'il faut s'arrêter." },
+                    { icon: 'fa-calendar-alt', label: 'Calendrier :', body: 'Votre progression gravée dans le temps.' },
+                    { icon: 'fa-chess-knight', label: 'Votre Stratégie :', body: 'Toujours sous vos yeux.' }
+                ],
+                imgs: [
+                    'images/landing-preview-dashboard.png',
+                    'images/landing-preview-dashboard-2.png'
+                ],
+                imgAlts: [
+                    'Aperçu du terminal PAYCHEK — Dashboard',
+                    'Aperçu PAYCHEK — état mental, stratégie et calendrier'
+                ]
+            },
+            'checklist': {
+                title: 'Checklist',
+                lead: 'Votre "Feu Vert" avant chaque trade',
+                descPoints: [
+                    { icon: 'fa-sliders', label: 'Validation 360° :', body: 'Technique, Risque, Psychologie. Vérifiez tous vos paramètres avant de cliquer.' },
+                    { icon: 'fa-circle-notch', label: 'Progression Visuelle :', body: 'Le cercle se remplit à mesure que vous validez vos étapes. Ne cliquez sur "Buy" ou "Sell" que lorsque le cercle est complet.' },
+                    { icon: 'fa-link', label: 'Zéro Oubli :', body: 'Vos règles de gestion sont gravées dans votre routine.' },
+                    { icon: 'fa-file-pdf', label: 'Export PDF :', body: 'Gardez une preuve de votre discipline pour vos bilans.' }
+                ],
+                img: 'images/landing-preview-checklist.png',
+                imgAlt: 'Aperçu du module Checklist PAYCHEK'
+            },
+            'mental': {
+                title: 'Mental State',
+                lead: 'Le marché ne pardonne pas la fatigue. Paychek vous donne le feu vert psychologique pour trader avec une discipline de fer',
+                descPoints: [
+                    { icon: 'fa-chart-line', label: 'Indicateur de Performance :', body: 'Un score global basé sur vos habitudes. Sommeil, sport, méditation : sachez instantanément si vous êtes en "Peak Form" pour dominer le marché.' },
+                    { icon: 'fa-sliders', label: 'Analyse du Moment :', body: 'Évaluez votre Focus, votre Énergie et votre Stress en un glissement de doigt. Si vos jauges sont dans le rouge, le Dashboard vous avertit avant l\'erreur.' },
+                    { icon: 'fa-face-smile', label: 'Gestion des Émotions :', body: 'Excited ? Frustrated ? Neutral ? Identifiez vos biais émotionnels pour éviter le "Revenge Trading" ou l\'euphorie toxique.' },
+                    { icon: 'fa-clipboard-check', label: 'Routine de Pro :', body: 'Validez vos rituels avant-session. Un trader préparé est un trader qui encaisse.' }
+                ],
+                img: 'images/landing-preview-mental.png',
+                imgAlt: 'Aperçu du module État mental PAYCHEK'
+            },
+            'analyse': {
+                title: 'Mon analyse',
+                lead: 'Gérez vos analyses et stratégies en temps réel : plan de trade, blocs détaillés et rapport de synthèse.',
+                descPoints: [
+                    { icon: 'fa-file-lines', label: 'Feuille de plan :', body: 'Direction, timeframes, tendance, phase de marché et niveau de confiance sur un seul écran.' },
+                    { icon: 'fa-layer-group', label: 'Blocs détaillés :', body: 'Structure, indicateurs, SMC & liquidité, volume profile et capture graphique.' },
+                    { icon: 'fa-file-export', label: 'Rapport :', body: 'Vue synthèse avec confiance globale avant d\'enregistrer dans votre historique lié à l\'actif.' }
+                ],
+                imgs: [
+                    'images/landing-preview-analyse-1.png',
+                    'images/landing-preview-analyse-2.png',
+                    'images/landing-preview-analyse-3.png',
+                    'images/landing-preview-analyse-4.png'
+                ],
+                imgAlts: [
+                    'PAYCHEK — rapport d\'analyse (Weekly Swing)',
+                    'PAYCHEK — fiches Structure, Indicateurs, SMC, Volume',
+                    'PAYCHEK — feuille de plan Trading',
+                    'PAYCHEK — résumé confiance et rapport'
+                ]
+            },
+            'strategie': {
+                title: 'My Strategy',
+                lead: "La plupart des traders oublient leur plan dans le feu de l'action. Paychek l'affiche en permanence pour garantir votre discipline",
+                descPoints: [
+                    { icon: 'fa-sliders', label: 'Configuration personnalisée :', body: "Définissez vos propres piliers techniques. C'est votre stratégie, pas celle d'un autre." },
+                    { icon: 'fa-pen-to-square', label: 'Arguments de conviction :', body: 'Notez vos arguments pour chaque trade.' },
+                    { icon: 'fa-bullseye', label: 'Focus immédiat :', body: "Ne perdez plus de temps à chercher votre plan. Il est affiché sur votre Dashboard pour vous garder aligné avec vos règles à chaque session." },
+                    { icon: 'fa-chart-line', label: 'Score de confiance :', body: 'Évaluez la qualité de votre setup avant de l\'exécuter pour éviter les trades de « basse qualité ».' }
+                ],
+                img: 'images/landing-preview-strategie.png',
+                imgAlt: 'Aperçu module Stratégie PAYCHEK — playbook, risque, sessions et setups'
+            },
+            'performance': {
+                title: 'Performance',
+                lead: 'Ne devinez plus vos erreurs, mesurez-les',
+                descPoints: [
+                    { icon: 'fa-brain', label: 'Analyse du Mindset :', body: 'Visualisez l\'impact réel de vos émotions sur vos profits en comparant vos trades par « Principe » et au « Feeling ».' },
+                    { icon: 'fa-clock', label: 'Golden Hours :', body: 'Découvrez vos heures les plus rentables pour concentrer vos efforts sur les moments où vous gagnez vraiment.' },
+                    { icon: 'fa-chart-column', label: 'Statistiques de Session :', body: 'Maîtrisez vos données de performance (Win Rate, RR, Volume) pour ajuster votre stratégie comme un professionnel.' },
+                    { icon: 'fa-layer-group', label: 'Intensité de Trading :', body: 'Déterminez votre nombre de trades idéal par jour pour éviter l\'overtrading et protéger votre capital.' }
+                ],
+                imgs: [
+                    'images/landing-preview-performance-2.png',
+                    'images/landing-preview-performance-3.png',
+                    'images/landing-preview-performance-4.png'
+                ],
+                imgAlts: [
+                    'PAYCHEK — Performance : volume, lots et actifs les plus tradés',
+                    'PAYCHEK — Performance : day & volume, performance hours et durée de position',
+                    'PAYCHEK — Performance : discipline & impact, mindset et stratégie execution'
+                ]
+            },
+            'calendrier': {
+                title: 'Calendrier',
+                lead: 'Un historique visuel complet pour identifier vos forces et corriger vos erreurs passées.',
+                desc: 'Une vue mensuelle de vos gains et pertes. Visualisez vos séries de victoires et apprenez de vos jours rouges.',
+                img: 'images/landing-preview-calendrier.png',
+                imgAlt: 'PAYCHEK — Calendrier : vue mensuelle, cumul, métriques et récapitulatif'
+            },
+            'trade': {
+                title: 'Trade page',
+                lead: 'Ne vous contentez pas de passer des ordres. Archivez votre succès.',
+                descPoints: [
+                    { icon: 'fa-book', label: 'Le Journal de Bord :', body: 'Retrouvez l\'historique complet de vos positions avec un calcul automatique de votre rentabilité nette.' },
+                    { icon: 'fa-chart-line', label: 'Analyse Technique :', body: 'Documentez vos setups avec vos graphiques et vos arguments techniques pour ne jamais oublier le contexte d\'un trade.' },
+                    { icon: 'fa-clipboard-check', label: 'Bilan de Discipline :', body: 'Identifiez immédiatement quelles règles de votre stratégie ont été respectées ou ignorées pour chaque position.' },
+                    { icon: 'fa-pen', label: 'Notes Personnelles :', body: 'Gardez une trace de vos émotions et de vos intuitions pour transformer chaque séance en une leçon de progression.' },
+                    { icon: 'fa-chart-column', label: 'Statistiques de Trade :', body: 'Maîtrisez vos chiffres clés : Risk/Reward réel, durée d\'exposition et impact des commissions sur votre capital.' }
+                ],
+                imgs: [
+                    'images/landing-preview-trade-1.png',
+                    'images/landing-preview-trade-2.png',
+                    'images/landing-preview-trade-3.png'
+                ],
+                imgAlts: [
+                    'PAYCHEK — Trade : liste, filtres et P&L',
+                    'PAYCHEK — Trade : fiche détaillée d\'un trade',
+                    'PAYCHEK — Trade : récapitulatif hebdomadaire et sessions'
+                ]
+            },
+            'pdf': {
+                title: 'Export PDF',
+                lead: 'Générez des rapports professionnels pour auditer votre progression et prouver votre régularité.',
+                descPoints: [
+                    { icon: 'fa-chess-knight', label: 'Stratégie Personnalisée :', body: 'Exportez vos règles et vos piliers techniques pour conserver une trace officielle de votre plan de trading.' },
+                    { icon: 'fa-chart-line', label: 'Analyse d\'Actif :', body: 'Archivez vos scénarios et vos captures de graphiques pour chaque actif travaillé durant la session.' },
+                    { icon: 'fa-file-lines', label: 'Détails du Trade :', body: 'Obtenez une fiche individuelle pour chaque position, incluant vos notes, votre setup et votre score de discipline.' },
+                    { icon: 'fa-calendar-week', label: 'Revues Périodiques :', body: 'Générez des rapports détaillés de vos trades de la semaine pour une analyse post-session approfondie.' },
+                    { icon: 'fa-chart-column', label: 'Suivi de Performance :', body: 'Compilez vos résultats journaliers, hebdomadaires et mensuels dans un document clair et structuré.' }
+                ],
+                imgs: [
+                    'images/landing-preview-pdf-1.png',
+                    'images/landing-preview-pdf-2.png',
+                    'images/landing-preview-pdf-3.png',
+                    'images/landing-preview-pdf-4.png',
+                    'images/landing-preview-pdf-5.png'
+                ],
+                imgAlts: [
+                    'PAYCHEK — Export PDF : performance journal (résumé + discipline)',
+                    'PAYCHEK — Export PDF : rapport d\'analyse (exécutif, structure, indicateurs)',
+                    'PAYCHEK — Export PDF : playbook stratégie (règles, risk management, sessions)',
+                    'PAYCHEK — Export PDF : trades week (récap et qualité)',
+                    'PAYCHEK — Export PDF : détails d\'un trade (discipline, stats, review)'
+                ]
+            },
+            'csv': {
+                title: 'Import CSV',
+                lead: '9 logiciels acceptés : choisissez votre plateforme, importez votre export, Paychek reconnaît le format.',
+                descPoints: [
+                    { icon: 'fa-file-csv', label: 'Formats pris en charge :', body: 'MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, Quantower, ATAS, Rithmic.' },
+                    { icon: 'fa-wand-magic-sparkles', label: 'Import guidé :', body: 'Sélection du logiciel dans la liste, puis fichier adapté à chaque source (CSV, HTML, etc.).' },
+                    { icon: 'fa-chart-line', label: 'Historique dans le journal :', body: 'Vos positions importées rejoignent le journal pour stats, performance et exports PDF.' }
+                ],
+                img: 'images/landing-preview-csv.png',
+                imgAlt: 'PAYCHEK — Import CSV : choix du logiciel (MT4, MT5, TradingView, Tradovate, cTrader…)'
+            },
+            'ajouter': {
+                title: 'Page Trade',
+                lead: 'Saisissez vos trades avec la précision d\'un algorithme et la clarté d\'un professionnel.',
+                descPoints: [
+                    { icon: 'fa-bolt', label: 'Ajouter un Trade :', body: 'Enregistrez vos positions en quelques secondes avec une interface intuitive conçue pour la rapidité d\'exécution.' },
+                    { icon: 'fa-calculator', label: 'Saisie Intelligente :', body: 'Renseignez vos entrées, sorties et frais pour obtenir un calcul automatique et précis de votre profit net.' },
+                    { icon: 'fa-clipboard-check', label: 'Validation du Plan :', body: 'Identifiez immédiatement si votre trade respecte vos règles ou s\'il s\'agit d\'une décision impulsive (Feeling).' }
+                ],
+                imgs: [
+                    'images/landing-preview-ajouter-1.png',
+                    'images/landing-preview-ajouter-2.png'
+                ],
+                imgAlts: [
+                    'PAYCHEK — Ajouter : saisie du trade (actif, lots, entrée/sortie, date)',
+                    'PAYCHEK — Ajouter : principe/feeling, stratégie et checklist'
+                ]
+            }
+        };
+
+        var previewCarouselIndex = 0;
+        /** Module dont le carrousel multi-images est actif (`dashboard`, `analyse`, ou null). */
+        var previewCarouselKey = 'dashboard';
+        var previewCarouselAutoId = null;
+        var PREVIEW_CAROUSEL_MS = 10000;
+        /** Moitié du fondu image → image (~3 s au total : sortie 1,5 s + entrée 1,5 s), aligné sur le CSS */
+        var PREVIEW_IMG_FADE_MS = 1500;
+
+        function stopPreviewCarouselAuto() {
+            if (previewCarouselAutoId !== null) {
+                clearInterval(previewCarouselAutoId);
+                previewCarouselAutoId = null;
+            }
+        }
+
+        function startPreviewCarouselAuto() {
+            stopPreviewCarouselAuto();
+            if (!previewCarouselKey) return;
+            var d = previewData[previewCarouselKey];
+            if (!d || !d.imgs || d.imgs.length < 2) return;
+            var tab = document.getElementById('tab-' + previewCarouselKey);
+            if (!tab || !tab.classList.contains('active')) return;
+            previewCarouselAutoId = setInterval(function () {
+                previewCarouselStep(1, true);
+            }, PREVIEW_CAROUSEL_MS);
+        }
+
+        function paychekPostToFlutterHost(payload) {
+            var targets = [];
+            try {
+                if (window.parent && window.parent !== window) targets.push(window.parent);
+                if (window.top && window.top !== window && targets.indexOf(window.top) < 0) {
+                    targets.push(window.top);
+                }
+                for (var i = 0; i < targets.length; i++) {
+                    try {
+                        targets[i].postMessage(payload, '*');
+                    } catch (e) {
+                        console.warn('[paychek] postMessage', e);
+                    }
+                }
+            } catch (e) {
+                console.warn('[paychek] paychekPostToFlutterHost', e);
+            }
+        }
+
+        function previewCarouselApplyIndex() {
+            if (!previewCarouselKey) return;
+            var d = previewData[previewCarouselKey];
+            if (!d || !d.imgs || !d.imgs.length) return;
+            var n = d.imgs.length;
+            var i = ((previewCarouselIndex % n) + n) % n;
+            var imgEl = document.getElementById('preview-img');
+            imgEl.src = d.imgs[i];
+            imgEl.alt = (d.imgAlts && d.imgAlts[i]) ? d.imgAlts[i] : 'PAYCHEK';
+            if (d.imgs[i].indexOf('analyse-4') >= 0) {
+                imgEl.classList.add('preview-img-slim');
+            } else {
+                imgEl.classList.remove('preview-img-slim');
+            }
+        }
+
+        function paychekNotifyParentAuth(mode) {
+            paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
+        }
+
+        /** Codes alignés sur l’app Flutter ([ReglageLanguagePrefs.availableCodes]). */
+        var LANDING_LANG_META = {
+            fr: { flag: 'fr', trigger: 'FR' },
+            en: { flag: 'gb', trigger: 'EN' },
+            de: { flag: 'de', trigger: 'DE' },
+            es: { flag: 'es', trigger: 'ES' },
+            pt: { flag: 'pt', trigger: 'PT' },
+            ko: { flag: 'kr', trigger: 'KO' }
+        };
+
+        function applyLandingLocaleUI(code) {
+            var meta = LANDING_LANG_META[code];
+            if (!meta) return;
+            var img = document.getElementById('lang-trigger-flag');
+            var span = document.getElementById('lang-trigger-code');
+            if (img) {
+                img.src = 'https://flagcdn.com/w40/' + meta.flag + '.png';
+                img.alt = meta.trigger;
+            }
+            if (span) span.textContent = meta.trigger;
+            document.querySelectorAll('[data-landing-lang]').forEach(function (el) {
+                var c = el.getAttribute('data-landing-lang');
+                if (c === code) {
+                    el.classList.remove('text-gray-400');
+                    el.classList.add('text-white');
+                } else {
+                    el.classList.add('text-gray-400');
+                    el.classList.remove('text-white');
+                }
+            });
+        }
+
+        function paychekNotifyParentLocale(code) {
+            paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-locale', code: code }));
+        }
+
+        function landingSelectLang(code, ev) {
+            if (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            applyLandingLocaleUI(code);
+            paychekNotifyParentLocale(code);
+        }
+
+        window.addEventListener('message', function (event) {
+            try {
+                if (typeof event.data !== 'string') return;
+                var data = JSON.parse(event.data);
+                if (!data || data.type !== 'paychek-locale-sync' || !data.code) return;
+                applyLandingLocaleUI(data.code);
+            } catch (e) {}
+        });
+
+        function initPreviewTabsDragScroll() {
+            var el = document.getElementById('preview-tabs-scroll');
+            if (!el) return;
+            var down = false;
+            var startPageX = 0;
+            var startScrollLeft = 0;
+            var dragged = false;
+            var threshold = 6;
+
+            function onMove(e) {
+                if (!down) return;
+                var dx = e.pageX - startPageX;
+                if (Math.abs(dx) > threshold) {
+                    dragged = true;
+                    el.classList.add('is-grabbing');
+                }
+                el.scrollLeft = startScrollLeft - dx;
+            }
+
+            function onUp() {
+                if (!down) return;
+                down = false;
+                el.classList.remove('is-grabbing');
+                if (dragged) {
+                    el.addEventListener('click', function killGhostClick(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        ev.stopImmediatePropagation();
+                    }, { capture: true, once: true });
+                }
+                dragged = false;
+            }
+
+            el.addEventListener('mousedown', function (e) {
+                if (e.button !== 0) return;
+                down = true;
+                dragged = false;
+                startPageX = e.pageX;
+                startScrollLeft = el.scrollLeft;
+            });
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+            window.addEventListener('blur', onUp);
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            try {
+                if (window.parent !== window) {
+                    document.body.classList.add('paychek-in-app-shell');
+                }
+            } catch (e) {}
+            paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-ready' }));
+            previewCarouselIndex = 0;
+            var dashTab = document.getElementById('tab-dashboard');
+            if (dashTab && dashTab.classList.contains('active')) {
+                previewCarouselApplyIndex();
+                setPreviewCarouselControlsVisible(true);
+                startPreviewCarouselAuto();
+                setPreviewDesc(previewData['dashboard']);
+            } else {
+                setPreviewCarouselControlsVisible(false);
+            }
+            initPreviewTabsDragScroll();
+        });
+
+        function setPreviewCarouselControlsVisible(show) {
+            var ctrl = document.getElementById('preview-carousel-controls');
+            if (!ctrl) return;
+            if (show) {
+                ctrl.classList.remove('hidden');
+            } else {
+                ctrl.classList.add('hidden');
+            }
+        }
+
+        function previewCarouselStep(delta, fromAuto) {
+            if (!previewCarouselKey) return;
+            var tab = document.getElementById('tab-' + previewCarouselKey);
+            if (!tab || !tab.classList.contains('active')) return;
+            var d = previewData[previewCarouselKey];
+            if (!d || !d.imgs || d.imgs.length < 2) return;
+            previewCarouselIndex = (previewCarouselIndex + delta + d.imgs.length) % d.imgs.length;
+            var imgEl = document.getElementById('preview-img');
+            imgEl.style.opacity = '0';
+            setTimeout(function () {
+                previewCarouselApplyIndex();
+                imgEl.style.opacity = '1';
+                if (!fromAuto) startPreviewCarouselAuto();
+            }, PREVIEW_IMG_FADE_MS);
+        }
+
+        function setPreviewDesc(d) {
+            var el = document.getElementById('preview-desc');
+            if (!el) return;
+            el.innerHTML = '';
+            el.className = 'text-sm sm:text-base leading-relaxed';
+            if (d.descPoints && d.descPoints.length) {
+                var ul = document.createElement('ul');
+                ul.className = 'm-0 list-none space-y-4 p-0';
+                for (var i = 0; i < d.descPoints.length; i++) {
+                    var item = d.descPoints[i];
+                    var li = document.createElement('li');
+                    li.className = 'flex gap-3 items-start';
+                    if (typeof item === 'string') {
+                        var dot = document.createElement('span');
+                        dot.className = 'text-blue-500 shrink-0 select-none';
+                        dot.setAttribute('aria-hidden', 'true');
+                        dot.textContent = '•';
+                        var span = document.createElement('span');
+                        span.className = 'text-gray-400';
+                        span.textContent = item;
+                        li.appendChild(dot);
+                        li.appendChild(span);
+                    } else {
+                        var iconWrap = document.createElement('span');
+                        iconWrap.className = 'text-blue-500 shrink-0 w-7 text-center text-[15px] sm:text-base leading-none mt-0.5';
+                        iconWrap.setAttribute('aria-hidden', 'true');
+                        var ic = document.createElement('i');
+                        ic.className = 'fas ' + item.icon;
+                        iconWrap.appendChild(ic);
+                        var textCol = document.createElement('div');
+                        textCol.className = 'min-w-0 flex-1 leading-relaxed';
+                        var lab = document.createElement('span');
+                        lab.className = 'text-gray-300 font-semibold';
+                        lab.textContent = item.label;
+                        var sp = document.createElement('span');
+                        sp.className = 'text-gray-500';
+                        sp.textContent = '\u00a0' + item.body;
+                        textCol.appendChild(lab);
+                        textCol.appendChild(sp);
+                        li.appendChild(iconWrap);
+                        li.appendChild(textCol);
+                    }
+                    ul.appendChild(li);
+                }
+                el.appendChild(ul);
+            } else {
+                var p = document.createElement('p');
+                p.className = 'm-0 text-gray-400';
+                p.textContent = d.desc || '';
+                el.appendChild(p);
+            }
+        }
+
+        function switchPreview(key) {
+            stopPreviewCarouselAuto();
+            document.querySelectorAll('.explorer-tab').forEach(tab => tab.classList.remove('active'));
+            const activeTab = document.getElementById('tab-' + key);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                var strip = document.getElementById('preview-tabs-scroll');
+                if (strip) {
+                    try {
+                        var pad = 16;
+                        var tL = activeTab.offsetLeft;
+                        var tR = tL + activeTab.offsetWidth;
+                        var vL = strip.scrollLeft;
+                        var vR = vL + strip.clientWidth;
+                        if (tL < vL + pad) {
+                            strip.scrollTo({ left: Math.max(0, tL - pad), behavior: 'smooth' });
+                        } else if (tR > vR - pad) {
+                            strip.scrollTo({ left: tR - strip.clientWidth + pad, behavior: 'smooth' });
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            const imgContainer = document.getElementById('preview-container-img');
+            const textContainer = document.getElementById('preview-container-text');
+            
+            imgContainer.style.opacity = '0';
+            textContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                var primary = document.getElementById('preview-img');
+                var d = previewData[key];
+                var useCarousel = (key === 'dashboard' || key === 'analyse' || key === 'performance' || key === 'trade' || key === 'ajouter' || key === 'pdf') && d.imgs && d.imgs.length > 1;
+                if (useCarousel) {
+                    previewCarouselKey = key;
+                    previewCarouselIndex = 0;
+                    previewCarouselApplyIndex();
+                    setPreviewCarouselControlsVisible(true);
+                    startPreviewCarouselAuto();
+                } else {
+                    previewCarouselKey = null;
+                    if (d.imgs && d.imgs.length === 1) {
+                        primary.src = d.imgs[0];
+                        primary.alt = (d.imgAlts && d.imgAlts[0]) ? d.imgAlts[0] : 'PAYCHEK';
+                        primary.classList.remove('preview-img-slim');
+                        setPreviewCarouselControlsVisible(false);
+                    } else {
+                        primary.src = d.img;
+                        primary.alt = d.imgAlt ? d.imgAlt : 'PAYCHEK';
+                        primary.classList.remove('preview-img-slim');
+                        setPreviewCarouselControlsVisible(false);
+                    }
+                }
+                document.getElementById('preview-title').innerText = d.title;
+                var leadEl = document.getElementById('preview-lead');
+                if (leadEl) {
+                    if (d.lead) {
+                        leadEl.textContent = d.lead;
+                        leadEl.classList.remove('hidden');
+                    } else {
+                        leadEl.textContent = '';
+                        leadEl.classList.add('hidden');
+                    }
+                }
+                setPreviewDesc(d);
+                
+                imgContainer.style.opacity = '1';
+                textContainer.style.opacity = '1';
+            }, 300);
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            const willOpen = modal.classList.contains('hidden');
+            modal.classList.toggle('hidden');
+            document.body.style.overflow = willOpen ? 'hidden' : 'auto';
+        }
+
+        function openPreviewLightbox(ev) {
+            if (ev && ev.stopPropagation) ev.stopPropagation();
+            var srcEl = document.getElementById('preview-img');
+            var lb = document.getElementById('preview-lightbox');
+            var lbImg = document.getElementById('preview-lightbox-img');
+            if (!srcEl || !lb || !lbImg) return;
+            lbImg.src = srcEl.currentSrc || srcEl.src;
+            lbImg.alt = srcEl.alt || 'PAYCHEK';
+            lbImg.removeAttribute('width');
+            lbImg.removeAttribute('height');
+            lbImg.style.width = '';
+            lbImg.style.height = '';
+            lb.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreviewLightbox() {
+            var lb = document.getElementById('preview-lightbox');
+            if (!lb || lb.classList.contains('hidden')) return;
+            lb.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function previewImgKeydown(ev) {
+            if (!ev) return;
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                openPreviewLightbox(ev);
+            }
+        }
+
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key !== 'Escape') return;
+            var lb = document.getElementById('preview-lightbox');
+            if (lb && !lb.classList.contains('hidden')) {
+                ev.preventDefault();
+                closePreviewLightbox();
+            }
+        });
+
+        function toggleFaq(element) {
+            const isActive = element.classList.contains('active');
+            
+            // Fermer tous les autres
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Basculer l'actuel
+            if (!isActive) {
+                element.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

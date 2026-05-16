@@ -1,0 +1,213 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /subscriber_entitlements/{userId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || request.auth.token.admin == true
+      );
+      // Stripe webhook (Admin SDK) ou console admin (claim `admin`).
+      allow create, update: if request.auth != null && request.auth.token.admin == true
+        && request.resource.data.active is bool
+        && (!('provider' in request.resource.data)
+          || request.resource.data.provider is string);
+      allow delete: if false;
+    }
+
+    // Facturation web (Stripe) : URL Payment Link + interrupteur — écriture admin uniquement.
+    match /paychek_app_config/billing {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.token.admin == true
+        && request.resource.data.keys().hasOnly(['stripeCheckoutUrl', 'stripeBillingEnabled', 'updatedAt'])
+        && (!('stripeCheckoutUrl' in request.resource.data) || (
+          request.resource.data.stripeCheckoutUrl is string
+          && request.resource.data.stripeCheckoutUrl.size() < 2100
+          && (
+            request.resource.data.stripeCheckoutUrl == ''
+            || request.resource.data.stripeCheckoutUrl.matches('^https://.+')
+          )
+        ))
+        && (!('stripeBillingEnabled' in request.resource.data)
+          || request.resource.data.stripeBillingEnabled is bool)
+        && (!('updatedAt' in request.resource.data)
+          || request.resource.data.updatedAt is timestamp);
+      allow delete: if false;
+    }
+
+    // Modèles HTML des e-mails support — lecture / écriture admin uniquement.
+    match /paychek_app_config/email_templates {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow create, update: if request.auth != null && request.auth.token.admin == true
+        && request.resource.data.keys().hasOnly([
+          'userAcknowledgmentHtml',
+          'staffSupportReplyHtml',
+          'proAccessConfirmedHtml',
+          'welcomeSignupHtml',
+          'updatedAt',
+        ])
+        && (!('userAcknowledgmentHtml' in request.resource.data)
+          || (
+            request.resource.data.userAcknowledgmentHtml is string
+            && request.resource.data.userAcknowledgmentHtml.size() < 480000
+          ))
+        && (!('staffSupportReplyHtml' in request.resource.data)
+          || (
+            request.resource.data.staffSupportReplyHtml is string
+            && request.resource.data.staffSupportReplyHtml.size() < 480000
+          ))
+        && (!('proAccessConfirmedHtml' in request.resource.data)
+          || (
+            request.resource.data.proAccessConfirmedHtml is string
+            && request.resource.data.proAccessConfirmedHtml.size() < 480000
+          ))
+        && (!('welcomeSignupHtml' in request.resource.data)
+          || (
+            request.resource.data.welcomeSignupHtml is string
+            && request.resource.data.welcomeSignupHtml.size() < 480000
+          ))
+        && (!('updatedAt' in request.resource.data)
+          || request.resource.data.updatedAt is timestamp);
+      allow delete: if false;
+    }
+
+    // Tickets formulaire Support (piece jointe optionnelle Firebase Storage).
+    match /paychek_support_tickets/{ticketId} {
+      // staffNotifyEmail : unique boîte Amen — [lib/reglage/paychek_support_public_inbox.dart].
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && (
+          !('staffNotifyEmail' in request.resource.data)
+          || request.resource.data.staffNotifyEmail == 'contact@paychek.pro'
+        );
+
+      allow read: if request.auth != null &&
+        (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+
+      // Client : même userId. Admin : mise à jour (statut, etc.) sans changer le demandeur.
+      allow update: if request.auth != null && (
+          (
+            resource.data.userId == request.auth.uid
+            && request.resource.data.userId == resource.data.userId
+          )
+          || (
+            request.auth.token.admin == true
+            && request.resource.data.userId == resource.data.userId
+          )
+        );
+
+      allow delete: if request.auth != null && request.auth.token.admin == true;
+
+      // Fil de conversation (premier message créé avec le ticket depuis l’app).
+      match /messages/{messageId} {
+        allow read: if request.auth != null && (
+          request.auth.token.admin == true ||
+          get(/databases/$(database)/documents/paychek_support_tickets/$(ticketId)).data.userId == request.auth.uid
+        );
+
+        // getAfter(parent) : même batch ticket + 1er message (exists() sur le parent peut être faux).
+        allow create: if request.auth != null
+          && request.resource.data.body is string
+          && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() < 20000
+          && (
+            (
+              request.auth.token.admin == true
+              && request.resource.data.sender == 'staff'
+              && exists(/databases/$(database)/documents/paychek_support_tickets/$(ticketId))
+              && (
+                !('attachmentStoragePath' in request.resource.data)
+                || (
+                  request.resource.data.attachmentStoragePath is string
+                  && request.resource.data.attachmentStoragePath.size() < 520
+                  && request.resource.data.attachmentStoragePath.matches(
+                    '^support_staff_attachments/.+$'
+                  )
+                )
+              )
+              && (
+                !('attachmentFileName' in request.resource.data)
+                || (
+                  request.resource.data.attachmentFileName is string
+                  && request.resource.data.attachmentFileName.size() > 0
+                  && request.resource.data.attachmentFileName.size() < 420
+                )
+              )
+              && (
+                !('attachmentContentType' in request.resource.data)
+                || (
+                  request.resource.data.attachmentContentType is string
+                  && request.resource.data.attachmentContentType.size() < 220
+                )
+              )
+            )
+            || (
+              request.resource.data.sender == 'user'
+              && getAfter(/databases/$(database)/documents/paychek_support_tickets/$(ticketId)).data.userId
+                == request.auth.uid
+              && !('attachmentStoragePath' in request.resource.data)
+              && !('attachmentFileName' in request.resource.data)
+              && !('attachmentContentType' in request.resource.data)
+            )
+          );
+
+        allow update: if false;
+        allow delete: if request.auth != null &&
+          request.auth.token.admin == true;
+      }
+    }
+
+    // Profils staff console admin (formulaire Identité dans le rail).
+    match /paychek_admin_profiles/{staffUid} {
+      allow read, create, update: if request.auth != null
+        && request.auth.token.admin == true
+        && request.auth.uid == staffUid;
+      allow delete: if false;
+    }
+
+    // Profils (sync inscription / connexion) — lecture liste réservée au claim admin
+    match /paychek_users/{userId} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || request.auth.token.admin == true);
+
+      // Champ `trialFreemiumOverrideUntil` : réservé à l’admin (création / mise à jour).
+      allow create: if request.auth != null && (
+        request.auth.token.admin == true
+        || (
+          request.auth.uid == userId
+          && !request.resource.data.keys().hasAny([
+            'trialFreemiumOverrideUntil',
+            'subscriptionCurrentPeriodEnd',
+            'subscriptionProSinceUtc',
+          ])
+        )
+      );
+
+      allow update: if request.auth != null && (
+        request.auth.token.admin == true
+        || (
+          request.auth.uid == userId
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'trialFreemiumOverrideUntil',
+            'subscriptionCurrentPeriodEnd',
+            'subscriptionProSinceUtc',
+          ])
+        )
+      );
+
+      allow delete: if false;
+
+      match /csv_imports/{eventId} {
+        allow read: if request.auth != null &&
+          (request.auth.uid == userId || request.auth.token.admin == true);
+        allow create: if request.auth != null && request.auth.uid == userId;
+        allow update, delete: if false;
+      }
+
+      // Données sync app (journal trades, etc.) — même compte web + mobile.
+      match /sync_data/{docId} {
+        allow read, create, update, delete: if request.auth != null &&
+          request.auth.uid == userId;
+      }
+    }
+  }
+}

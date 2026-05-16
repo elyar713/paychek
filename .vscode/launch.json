@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Paychek (Chrome + Stripe test)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--dart-define=PAYCHEK_STRIPE_CHECKOUT_URL=https://buy.stripe.com/test_5kQ3cv7Wo0F559u0mcaVa00"
+      ]
+    },
+    {
+      "name": "Paychek Admin (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/admin/main_admin.dart",
+      "deviceId": "chrome"
+    }
+  ]
+}

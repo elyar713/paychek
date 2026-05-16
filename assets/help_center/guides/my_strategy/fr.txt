@@ -1,0 +1,62 @@
+﻿Guide : My Strategy — playbook Paychek
+
+🎯 My Strategy : votre playbook de trading
+La page « My Strategy » est le centre de commandement de votre trading. C'est ici que vous définissez vos règles strictes. Paychek utilise ces données pour analyser automatiquement votre discipline et signaler vos écarts dans vos rapports de performance.
+
+[img:assets/help_center/strategy_dashboard_dark.png]
+
+Vue d'ensemble dans l'application (thème sombre) : Golden Rules, Risk Management, Hours & Sessions, Setups & Templates, Trade Calendar — et le bouton PDF en haut à droite.
+
+1. Golden Rules (Règles d'Or) 🏆
+Cette carte vous permet de graver vos règles psychologiques et techniques fondamentales (ex. : « Ne jamais chasser le prix »).
+
+[img:assets/help_center/strategy_playbook_light_overview.png]
+
+Exemple de lecture « playbook » (maquette claire) : les mêmes blocs structurés (règles d'or, risque, horaires, setup).
+
+Impact direct : ces règles s'affichent lors de l'ajout d'un trade.
+
+Suivi de discipline : si vous cochez une règle comme « non respectée » lors d'un trade, l'infraction sera automatiquement comptabilisée et analysée dans votre page Performance.
+
+2. Risk Management (Gestion du risque) 🛡️
+Fixez vos limites pour protéger votre capital.
+
+Paramètres libres : définissez votre risque par trade (ex. : 1 %), votre perte max journalière (ex. : 3 %) ou votre nombre maximum de trades par jour.
+
+Détection d'erreurs : Paychek surveille vos imports. Si vous dépassez vos limites, la page Performance indiquera précisément combien de fois vous avez enfreint vos règles par jour, semaine ou mois.
+
+3. Hours & Sessions (Horaires de trading) 🕒
+Optimisez votre temps de présence sur les marchés.
+
+Sessions personnalisées : fixez vos heures de début et de fin pour vos sessions (Londres, New York, etc.).
+
+Calcul automatique : si vous prenez un trade en dehors de ces heures (zone rouge), Paychek le comptabilisera comme erreur de session dans vos statistiques globales.
+
+4. Setups & Templates (Stratégies techniques) 📑
+Documentez vos méthodes avec précision pour chaque setup (ex. : Breakout with Volume).
+
+Configuration : timeframes, indicateurs, patterns préférés et signaux d'alerte.
+
+Gestion du trade : éditez vos conditions d'entrée, de sortie, d'invalidation (stop loss) et de mise au break-even.
+
+Édition totale : chaque setup est entièrement personnalisable pour coller à votre méthode.
+
+[img:assets/help_center/strategy_edit_setup_modal.png]
+
+La feuille d'édition d'un setup (modèle, couleur, timeframes, indicateurs, figure, signal d'alerte) — puis enregistrer ou annuler.
+
+5. Trade Calendar (Calendrier des stratégies) 📅
+Visualisez la répétitivité de vos setups.
+
+Référez-vous à la grande capture tout en haut : le calendrier en bas à droite affiche un point couleur par stratégie utilisée ce jour-là (d'après vos trades — date d'entrée, ajout trade).
+
+Conseil de pro : attribuez une couleur spécifique à chaque stratégie (ex. bleu pour le breakout, orange pour le SMC) pour identifier vos habitudes visuellement en un clin d'œil.
+
+🛠️ Personnalisation & export PDF
+Gestion flexible : toutes les cartes peuvent être modifiées, ajoutées ou supprimées via le menu trois points (...) pour s'adapter à l'évolution de votre trading.
+
+[img:assets/help_center/strategy_card_overflow_menu.png]
+
+Menu contextuel typique sur une carte : modifier, ajouter, supprimer (les libellés peuvent suivre la langue de l'application).
+
+Export PDF 📄 : générez en un clic un document PDF complet de votre stratégie. C'est votre « plan de guerre » physique, idéal à garder à côté de vos écrans pendant vos sessions.

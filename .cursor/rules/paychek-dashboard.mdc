@@ -1,0 +1,27 @@
+---
+description: Paychek — design vs code, attaches de données, navigation (dashboard)
+globs: lib/**/*.dart
+alwaysApply: true
+---
+
+# Exclusion visuelle (captures / maquettes)
+
+Lors de l’analyse d’images ou de fichiers de design, **ignorer** systématiquement :
+
+- les barres de menu (**bottom navigation**)
+- les **en-têtes** visibles sur l’image
+
+Ne prendre en compte que le **contenu central** (cartes, graphiques, listes). La navigation est **uniquement** celle définie dans `lib/dashboard_page.dart` (`_currentIndex`, `IndexedStack`, `bottomNavigationBar`, `endDrawer`). **Ne pas recopier** la structure de navigation depuis les visuels.
+
+# Attaches de données (composants soudés)
+
+- **Capital & Winrate** : le solde total et le pourcentage de winrate (cercle) restent **dans la même carte**, construite par `_buildCapitalCard()` dans l’état du contenu accueil.
+- **Checklist** : les tâches sont liées à une liste **`List<bool> _checklist`** ; les cases reflètent et mettent à jour cet état (`setState`).
+- **Stats (Psychologie & Stratégie)** : les deux cercles de statistiques restent **ensemble** dans une **`GridView` à 2 colonnes** (une cellule par cercle).
+- **Index ↔ page** : chaque icône de la barre du bas correspond à un **index fixe** (`0` Accueil, `1` Stats, `2` Trade, `3` Journal, `4` Plus) via **`_currentIndex`** — ne pas dupliquer ou réinventer la barre depuis les maquettes.
+- **Menu Plus** : le **`endDrawer`** (liste type Dashboard, etc.) s’ouvre depuis l’onglet **Plus** (icône **trois points** `Icons.more_vert` en bas) — **pas** de menu hamburger en en-tête sur l’accueil.
+
+# Hiérarchie Flutter
+
+- Le contenu des onglets s’adapte au **`Scaffold` existant** dans `DashboardPage` : **pas** de second `Scaffold` « par-dessus » pour l’app shell.
+- Si une section est déplacée ou renommée, déplacer **toute** la logique associée (ex. `_buildChecklist` et `_checklist` ensemble).

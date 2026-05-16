@@ -1,0 +1,1333 @@
+{
+  "@@locale": "ko",
+  "actionAdd": "추가",
+  "addPortfolio": "포트폴리오 추가",
+  "ajouterTradeCapitalRequiredHint": "계산을 위해 자본(설문)을 설정하세요.",
+  "ajouterTradeCapitalGainEnterExitToShowPnl": "손익을 보려면 청산가를 입력하세요.",
+  "ajouterTradeCapitalGainOpenPositionNote": "미청산 포지션: 청산 시 추정 손익이 표시됩니다.",
+  "ajouterTradeCommissionFeesLabel": "수수료(커미션)",
+  "ajouterTradeFillSuggestedLot": "로트 채우기",
+  "ajouterTradeSizingEstimationFootnote": "* 추정은 저장된 자본을 사용합니다. 계약/CFD 수치는 대략적입니다.",
+  "ajouterTradeScreenshotHelp": "차트 또는 셋업 스크린샷 추가(선택).",
+  "ajouterTradePageTitle": "거래 추가",
+  "ajouterTradeErrorQtyPositive": "0보다 큰 포지션 크기를 입력하세요.",
+  "ajouterTradeErrorEntryPrice": "유효한 진입가(0보다 큼)를 입력하세요.",
+  "ajouterTradeErrorExitOrFlags": "유효한 청산가를 입력하거나, 청산가를 모를 때 본전/미청산을 선택하세요.",
+  "ajouterTradePsychTagBlind": "맹목",
+  "ajouterTradeCapitalGainHeading": "자본 & 손익",
+  "ajouterTradeMindsetPrompt": "이 거래를 이런 상태로 했습니다:",
+  "ajouterTradeDisciplineSettingsTooltip": "설정: 감정 및 활성 섹션.",
+  "ajouterTradeSaveAndNext": "저장 후 다음",
+  "ajouterTradeLiteMonthlyLimitReached": "Lite: 한 달(달력 기준)에 최대 {max}건까지 기록할 수 있습니다. 무제한은 Pro로 업그레이드하세요.",
+  "@ajouterTradeLiteMonthlyLimitReached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeLiteMonthlyLimitImportSkipped": "{skipped}건이 가져오지 않았습니다. Lite는 한 달에 최대 {max}건까지 허용됩니다.",
+  "@ajouterTradeLiteMonthlyLimitImportSkipped": {
+    "placeholders": {
+      "skipped": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSectionEtatMoment": "현재 상태",
+  "ajouterTradeImagePickerClose": "닫기",
+  "ajouterTradeImagePickerTitle": "이미지 출처",
+  "ajouterTradeGallery": "갤러리",
+  "ajouterTradeCamera": "카메라",
+  "ajouterTradeFeedbackAlmost100": "거의 100%입니다. 항목을 계속 지키세요.",
+  "ajouterTradeFeedbackTickEach": "해당하는 항목을 모두 체크하세요(복수 선택).",
+  "ajouterTradeChoicesSaved": "저장된 선택:",
+  "ajouterTradeNonRespectedSemantic": "미준수: {label}",
+  "@ajouterTradeNonRespectedSemantic": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "ajouterTradeDisciplineRespectBase": "준수 {pct}%",
+  "@ajouterTradeDisciplineRespectBase": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeDisciplineRespectNonList": " · 미준수: {items}{more}",
+  "@ajouterTradeDisciplineRespectNonList": {
+    "placeholders": {
+      "items": {},
+      "more": {}
+    }
+  },
+  "ajouterTradeFieldActif": "종목",
+  "ajouterTradeFieldEntree": "진입",
+  "ajouterTradeFieldSortie": "청산",
+  "ajouterTradeCheckboxBreakeven": "본전",
+  "ajouterTradeCheckboxPositionOpen": "미청산 포지션",
+  "ajouterTradeCheckboxAvantNews": "뉴스 전",
+  "ajouterTradeCheckboxApresNews": "뉴스 후",
+  "ajouterTradeDirectionBuyLong": "매수 · 롱",
+  "ajouterTradeDirectionSellShort": "매도 · 숏",
+  "ajouterTradeEntryExitDateHint": "팁: 진입·청산 날짜와 시간을 설정하세요. 성과 페이지에서 보유 시간과 손익을 연결합니다.",
+  "ajouterTradeQtyLots": "크기(로트)",
+  "ajouterTradeQtyContracts": "크기(계약)",
+  "ajouterTradeQtyUnits": "크기(단위)",
+  "ajouterTradeQtyShares": "크기(주)",
+  "ajouterTradeShortcutsLots": "로트 단축",
+  "ajouterTradeShortcutsContracts": "계약 단축",
+  "ajouterTradeShortcutsQty": "크기 단축",
+  "ajouterTradeShortcutsCommonSizes": "단축(일반 크기)",
+  "ajouterTradeLotHintMini": "예: 0.1 = 일반적인 미니 로트.",
+  "ajouterTradeLotFieldHintForex": "예: 0.1",
+  "ajouterTradeLotFieldHintContracts": "예: 2",
+  "ajouterTradeLotFieldHintUnits": "예: 1",
+  "ajouterTradeLotFieldHintShares": "예: 10",
+  "ajouterTradeDisciplineSettingsTitle": "규율 설정",
+  "ajouterTradeDisciplineSettingsSubtitle": "이 거래에서 활성화할 섹션을 선택하세요.",
+  "ajouterTradeDisciplineFeelingModeTitle": "감정 모드",
+  "ajouterTradeDisciplineFeelingAllowSubtitle": "아래 섹션을 채울 수 있게 합니다.",
+  "ajouterTradeDisciplineSectionsHeading": "섹션",
+  "ajouterTradeDisciplineStrategieTitle": "전략",
+  "ajouterTradeDisciplineStrategieSubtitle": "셋업, 피드백",
+  "ajouterTradeDisciplinePlanTitle": "분석 계획",
+  "ajouterTradeDisciplinePlanSubtitle": "리포트, 피드백",
+  "ajouterTradeDisciplineChecklistTitle": "체크리스트",
+  "ajouterTradeDisciplineChecklistSubtitle": "지킬 포인트",
+  "ajouterTradeDisciplineEtatTitle": "현재 상태",
+  "ajouterTradeDisciplineEtatSubtitle": "순간과 감정",
+  "ajouterTradeDisciplineSliderStrategieRespected": "전략 준수",
+  "ajouterTradePositionSettingsTitle": "포지션 설정",
+  "ajouterTradeStrategieFeedbackBravo": "잘했어요! 전략을 완전히 지켰습니다.",
+  "ajouterTradeStrategieFeedbackWhichMissed": "전략 중 어떤 부분을 지키지 못했나요?",
+  "ajouterTradeStrategieGoldRules": "황금 규칙",
+  "ajouterTradeStrategieRuleN": "규칙 {n}",
+  "@ajouterTradeStrategieRuleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeStrategieSetupTimeframesRow": "시간봉: {value}",
+  "@ajouterTradeStrategieSetupTimeframesRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupIndicatorsRow": "지표: {value}",
+  "@ajouterTradeStrategieSetupIndicatorsRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupPatternRow": "패턴: {value}",
+  "@ajouterTradeStrategieSetupPatternRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupSignalRow": "시그널: {value}",
+  "@ajouterTradeStrategieSetupSignalRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieRiskManagement": "리스크 관리",
+  "ajouterTradeStrategieHoursSessions": "시간 & 세션",
+  "ajouterTradeStrategieSetupModels": "셋업 & 모델",
+  "ajouterTradeStrategieSetupModelsWithTitle": "셋업 & 모델 — {title}",
+  "@ajouterTradeStrategieSetupModelsWithTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "ajouterTradeStrategiePickStrategyHint": "위 목록에서 전략을 선택하면 셋업 상세(진입, 손절, 목표, 포지션 관리 등)가 표시됩니다.",
+  "ajouterTradeStrategieRowPattern": "패턴",
+  "ajouterTradeStrategieRowSignal": "시그널",
+  "ajouterTradeStrategieClosedLabel100": "좋아요, 전략 준수",
+  "ajouterTradeStrategieClosedLabel95": "거의 모두 준수",
+  "ajouterTradeStrategieClosedLabelLow": "복습할 포인트",
+  "ajouterTradePlanPickReportAbove": "위 필드에서 리포트를 선택하세요.",
+  "ajouterTradePlanFeedbackAlmost100": "거의 100%입니다. 분석 계획의 모든 항목을 계속 지키세요.",
+  "ajouterTradePlanFeedbackBravo": "잘했어요! 분석 계획을 모두 지켰습니다.",
+  "ajouterTradePlanFeedbackWhichMissed": "분석 계획 중 어떤 부분을 지키지 못했나요?",
+  "ajouterTradePlanClosedLabel100": "좋아요, 계획 준수",
+  "ajouterTradePlanClosedLabelLow": "피드백",
+  "ajouterTradeChecklistFeedbackAlmost100": "거의 100%입니다. 항목을 계속 지키세요.",
+  "ajouterTradeChecklistFeedbackBravo": "잘했어요! 체크리스트를 모두 지켰습니다.",
+  "ajouterTradeChecklistFeedbackWhichMissed": "체크리스트 중 어떤 부분을 지키지 못했나요?",
+  "ajouterTradeChecklistClosedLabel100": "좋아요, 체크리스트 준수",
+  "ajouterTradeChecklistClosedLabelLow": "체크리스트",
+  "ajouterTradeEtatFeelingPrompt": "어떤 감정이 떠올랐나요?",
+  "ajouterTradeEtatFeedbackAlmost100": "거의 100%입니다. 항목을 계속 지키세요.",
+  "ajouterTradeEtatClosedLabel100": "네, 힘들죠. 잘했어요!",
+  "ajouterTradeEtatClosedLabelLow": "현재 상태",
+  "ajouterTradeEtatHeaderMoment": "나의 상태",
+  "ajouterTradeEtatHeaderEmotions": "감정",
+  "ajouterTradeScreenshotLoadError": "이미지를 표시할 수 없습니다",
+  "ajouterTradeScreenshotChangeImage": "이미지 변경",
+  "ajouterTradeScreenshotTapToAdd": "탭하여 이미지 추가",
+  "ajouterTradeScreenshotRemove": "제거",
+  "ajouterTradePlanRowBias": "편향",
+  "ajouterTradePlanRowTimeframeHtf": "상위 시간봉",
+  "ajouterTradePlanRowPhase": "페이즈",
+  "ajouterTradePlanRowNotes": "메모",
+  "ajouterTradePlanRowLastPoint": "마지막 스윙 포인트",
+  "ajouterTradePlanRowExtraSupport": "추가 지지 {n}",
+  "@ajouterTradePlanRowExtraSupport": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradePlanRowExtraResistance": "추가 저항 {n}",
+  "@ajouterTradePlanRowExtraResistance": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradePlanRowOutils": "도구",
+  "ajouterTradePlanRowLiquidity": "유동성",
+  "ajouterTradePlanRowFibPrice": "피보나치 가격",
+  "ajouterTradePlanSectionVolume": "거래량",
+  "analyseAddField": "+ 필드 추가",
+  "analyseAddPhaseTitle": "페이즈 추가",
+  "analyseAddResist": "+ 저항 추가",
+  "analyseAddShort": "+ 추가",
+  "analyseAddSupport": "+ 지지 추가",
+  "analyseAddTimeframeTitle": "시간봉 추가",
+  "analyseAddTrendTitle": "추세 추가",
+  "analyseReportScreenshotSectionTitle": "스크린샷",
+  "analyseReportScreenshotAddCapture": "스크린샷 추가",
+  "analyseReportScreenshotChooseImage": "이미지 선택",
+  "analyseReportScreenshotSubtitleWeb": "이미지 파일",
+  "analyseReportScreenshotSubtitleFilePicker": "갤러리 또는 탐색기",
+  "analyseReportScreenshotCamera": "카메라",
+  "analyseReportScreenshotHintWithCamera": "파일, 갤러리 또는 카메라",
+  "analyseReportScreenshotHintNoCamera": "이 기기에서 이미지 선택",
+  "analyseReportScreenshotErrorPlugin": "이 대상에서는 이미지 선택을 사용할 수 없습니다. «이미지 선택»을 사용하거나 앱을 다시 빌드하세요.",
+  "analyseReportScreenshotErrorGeneric": "스크린샷을 추가할 수 없습니다.",
+  "analyseCardIndicators": "지표",
+  "analyseCardSmcLiquidity": "SMC & 유동성",
+  "analyseCardVolumeProfile": "거래량 프로파일",
+  "analysePageHeroTitle": "내 분석",
+  "analysePageHeroSubtitle": "분석과 전략을 실시간으로 관리하세요.",
+  "analyseSidebarConfidenceSummary": "요약",
+  "analyseSidebarConfidenceLabel": "전체 신뢰도",
+  "analyseSidebarReportHint": "보고서는 연결된 자산과 함께 기록에 저장됩니다.",
+  "analyseSidebarPreviewStyle": "스타일 미리보기",
+  "analyseConfidenceHigh": "높음",
+  "analyseConfidenceLevelTitle": "신뢰 수준",
+  "analyseConfidenceLow": "낮음",
+  "analyseCopyLabel": "{label} 복사",
+  "analyseCopyNumber": "{n} 복사",
+  "analyseCurrentMarketPhase": "현재 시장 페이즈",
+  "analyseCurrentTrend": "현재 추세",
+  "analyseDeleteTemplateTitle": "이 템플릿을 삭제할까요?",
+  "analyseDirectionLabel": "방향",
+  "analyseDraftLabelHint": "라벨…",
+  "analyseExtraBroken": "이탈",
+  "analyseExtraHeld": "유지",
+  "analyseExtraPriceHint": "가격",
+  "analyseFeuillePlanTitle": "트레이딩 플랜 시트",
+  "analyseFibLevel": "피보나치 레벨",
+  "analyseFibShort": "피보나치",
+  "analyseFreeFields": "자유 필드",
+  "analyseFvg": "공정가치 갭(FVG)",
+  "analyseHintActifExamples": "예: 나스닥, EUR/USD…",
+  "analyseHintDetailsDots": "상세…",
+  "analyseHintHtfChipExample": "예: 주간",
+  "analyseHintImbalance": "불균형…",
+  "analyseHintNotesDots": "메모…",
+  "analyseHintPriceDots": "가격…",
+  "analyseHintStops": "스탑은 어디? (예: 매수측)",
+  "analyseHintTextDots": "텍스트…",
+  "analyseHintTfExamples": "예: MN, 3D…",
+  "analyseHintZoneHtf": "HTF 구간…",
+  "analyseHtfTimeframe": "분석 시간봉(HTF)",
+  "analyseImpactFeuille": "시트 영향",
+  "analyseImpactIndicators": "지표 영향",
+  "analyseImpactLine": "영향: {percent}%",
+  "analyseImpactModalBlurb": "네 영향 합계는 100%입니다. 슬라이더를 움직이면 나머지가 비례 조정됩니다.",
+  "analyseImpactModalTitle": "영향 조정",
+  "analyseImpactShort": "영향",
+  "analyseImpactSmc": "SMC 영향",
+  "analyseLastPointHint": "마지막 포인트…",
+  "analyseLiquidityPools": "유동성 풀",
+  "analyseMovementDetailsHint": "움직임 상세…",
+  "analyseNameFieldHint": "분석 이름…",
+  "analyseNameFieldLabel": "분석 이름",
+  "analyseNoTemplatesSaved": "저장된 템플릿 없음",
+  "analyseNote": "메모",
+  "analyseNotesIndicators": "메모(지표)",
+  "analyseNotesSmcExample": "예: FVG 전 유동성 스윕…",
+  "analyseNotesSmcLiq": "메모(SMC & 유동성)",
+  "analyseNotesVolumeProfile": "메모(거래량 프로파일)",
+  "analyseOrderBlock": "오더 블록(OB)",
+  "analysePhase": "페이즈",
+  "analyseReportCellFvg": "FVG",
+  "analyseReportCellLiqPools": "유동성 풀",
+  "analyseReportCellOrderBlock": "오더 블록",
+  "analyseResistLower": "저항",
+  "analyseResistShort": "저항",
+  "analyseSetup": "셋업",
+  "analyseSideBuy": "매수",
+  "analyseSideSell": "매도",
+  "analyseSideWatch": "관망",
+  "analyseSmcAdds": "SMC 추가",
+  "analyseStructTagResist": "R",
+  "analyseStructTagSupport": "S",
+  "analyseStructure": "구조",
+  "analyseStructureSectionTitle": "구조",
+  "analyseSupport": "지지",
+  "analyseSupportLower": "지지",
+  "analyseTemplateApplied": "템플릿 «{name}» 적용됨",
+  "analyseTemplateNameHint": "새 이름…",
+  "analyseTemplateRenameDialogTitle": "템플릿 이름 바꾸기",
+  "analyseTemplateSaveDialogTitle": "템플릿 이름",
+  "analyseTemplateStyleHint": "예: 스윙, 스캘핑…",
+  "analyseTestedTwice": "2회 테스트",
+  "analyseTimeframeLabelShort": "시간봉",
+  "analyseTooltipPickTemplate": "저장된 템플릿 선택",
+  "analyseTooltipSaveTemplatePills": "이름으로 저장(습관)",
+  "analyseTrend": "추세",
+  "analyseTrendLabel": "추세",
+  "analyseVolumePoc": "POC",
+  "analyseVolumeProfile": "거래량 프로파일",
+  "analyseVolumeProfileDefaultLabel": "거래량 프로파일",
+  "analyseVolumeVah": "VAH",
+  "analyseVolumeVal": "VAL",
+  "appBrandName": "PAYCHEK",
+  "buttonCalculate": "계산",
+  "calAmountLabel": "금액",
+  "calMonthlyObjectiveTitle": "월간 목표",
+  "calPageTitle": "캘린더",
+  "calObjectiveLabel": "목표",
+  "calCumulativePerformanceTitle": "누적 성과",
+  "calBestDay": "최고의 날",
+  "calTradingDays": "매매 일수",
+  "calAverageShort": "평균",
+  "calPnlShort": "손익",
+  "calCapitalChangePct": "자본 %",
+  "calAveragePerDay": "일평균",
+  "calObjectiveShort": "목표",
+  "calChartError": "오류: {message}",
+  "@calChartError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "calDayTradesCount": "{count, plural, =0{거래 없음} =1{1건} other{{count}건}}",
+  "@calDayTradesCount": {
+    "description": "Number of trades on a calendar day (tooltip or cell).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthJanuary": "1월",
+  "monthFebruary": "2월",
+  "monthMarch": "3월",
+  "monthApril": "4월",
+  "monthMay": "5월",
+  "monthJune": "6월",
+  "monthJuly": "7월",
+  "monthAugust": "8월",
+  "monthSeptember": "9월",
+  "monthOctober": "10월",
+  "monthNovember": "11월",
+  "monthDecember": "12월",
+  "monthAbbrJanuary": "1월",
+  "monthAbbrFebruary": "2월",
+  "monthAbbrMarch": "3월",
+  "monthAbbrApril": "4월",
+  "monthAbbrMay": "5월",
+  "monthAbbrJune": "6월",
+  "monthAbbrJuly": "7월",
+  "monthAbbrAugust": "8월",
+  "monthAbbrSeptember": "9월",
+  "monthAbbrOctober": "10월",
+  "monthAbbrNovember": "11월",
+  "monthAbbrDecember": "12월",
+  "calcBestBalance": "최고 잔고",
+  "calcEndBalance": "기말 잔고",
+  "calcEquityCurveTitle": "트레이드 수익률 곡선",
+  "calcLabelEntry": "진입가",
+  "calcLabelRiskShort": "리스크",
+  "calcLabelSl": "손절",
+  "calcLabelStartBalance": "기초 잔고",
+  "calcLabelTp": "익절",
+  "calcLabelTradesShort": "거래",
+  "calcLabelWinRateShort": "승률",
+  "calcLoss": "손실",
+  "calcMaxDrawdown": "최대 낙폭",
+  "calcProfitFactor": "손익비",
+  "calcRatioSectionTitle": "비율",
+  "calcResult": "결과",
+  "calcResultOfCalculation": "계산 결과",
+  "calcRowGain": "수익:",
+  "calcRowSl": "SL:",
+  "calcRowVsCapital": "자본 대비",
+  "calcSettingsTitle": "설정",
+  "calcTotalGainLabel": "총 수익",
+  "calcTradeReturnTableTitle": "트레이드 수익률 결과",
+  "calcWin": "승",
+  "calcWinsLosses": "승 / 패",
+  "calcWorstBalance": "최저 잔고",
+  "calculateRatio": "비율 계산",
+  "cancel": "취소",
+  "capitalAmountLabel": "자본 금액",
+  "capitalCurrencyTitle": "통화",
+  "capitalEllipsis": "…",
+  "capitalHintAmount": "예: 10 450",
+  "capitalInitialTitle": "초기 자본",
+  "capitalLabel": "자본",
+  "capitalOther": "기타",
+  "capitalTooltip": "자본 및 통화(메인 계정)",
+  "checklistAddSection": "섹션 추가",
+  "checklistDefaultNewSection": "새 섹션",
+  "checklistDeleteSectionBody": "이 섹션에 대해 되돌릴 수 없습니다.",
+  "checklistDeleteSectionTitle": "섹션을 삭제할까요?",
+  "checklistEditSectionHint": "제목",
+  "checklistIntroBody": "포지션에 들어가기 전에 트레이딩 플랜의 모든 기준을 확인하세요.",
+  "checklistItemAnalyse1": "배경 추세(HTF)가 나의 아이디어와 맞습니다.",
+  "checklistItemAnalyse2": "가격이 핵심 구간(지지/저항, 오더 블록)에 있습니다.",
+  "checklistItemAnalyse3": "명확한 진입 확인(패턴, 다이버전스)이 있습니다.",
+  "checklistItemHint": "기준 입력",
+  "checklistItemPsy1": "중립적 마음으로 매매합니다(복수 매매 없음).",
+  "checklistItemPsy2": "진입 전 잠재 손실을 수용합니다.",
+  "checklistItemPsy3": "연패 후에도 계획을 지킵니다.",
+  "checklistItemRisque1": "손절은 기술적으로 설정했습니다(임의 아님).",
+  "checklistItemRisque2": "리스크는 자본의 1%를 넘지 않습니다.",
+  "checklistItemRisque3": "손익비는 최소 1:2입니다.",
+  "checklistMenuEdit": "편집",
+  "checklistPageTitle": "체크리스트",
+  "checklistProgressCl": "CL",
+  "checklistSectionAnalyse": "기술적 분석",
+  "checklistSectionPsy": "심리",
+  "checklistSectionRisque": "리스크 관리",
+  "clearAll": "모두 지우기",
+  "confirm": "확인",
+  "currencyNameHint": "예: CHF, XOF",
+  "currencyNameLabel": "통화 이름",
+  "customCurrencyTitle": "기타 통화",
+  "dashboardAiAnalyze": "분석",
+  "dashboardAiCoachBody": "«분석»을 눌러 주간 통계(승률, 시간, 요인)를 AI가 검토하고 맞춤 심리 조언을 받으세요.",
+  "dashboardAiCoachTitle": "PAYCHEK AI 코치",
+  "dashboardAnalyseShortcutTitle": "내 분석",
+  "dashboardBestTradeLabel": "최고 거래",
+  "dashboardCapitalBalanceHeader": "자본 / 잔고",
+  "dashboardCapitalEvolutionTitle": "자본 변화",
+  "dashboardChecklistHeading": "체크리스트",
+  "dashboardChecklistSeeRest": "더보기 >",
+  "dashboardChecklistAllDoneBravo": "좋은 거래 되세요.",
+  "dashboardMyStateSection": "내 상태",
+  "dashboardOpenStrategyTooltip": "내 전략 열기",
+  "dashboardPerfHourWinRate": "{percent}% 승률",
+  "dashboardPerfHoursRow1": "09:00 - 11:30 (시작)",
+  "dashboardPerfHoursRow2": "14:30 - 16:30 (미국장)",
+  "dashboardPerfHoursRow3": "19:00+ (저녁)",
+  "dashboardPerfHoursTitle": "성과 시간대",
+  "dashboardRingState": "상태",
+  "dashboardRingWin": "승",
+  "dashboardSuccessFactorSample": "세션 전 운동",
+  "dashboardSuccessFactorsSubtitle": "습관이 승률에 미치는 영향을 추적하세요.",
+  "dashboardSuccessFactorsTitle": "성공 요인",
+  "dashboardTfAll": "전체",
+  "dashboardTfDay": "1일",
+  "dashboardTfMonth": "1개월",
+  "dashboardTfWeek": "1주",
+  "dashboardTradeCount": "{count}건",
+  "dashboardTradeOne": "1건",
+  "dashboardEvolutionTradesThisPeriod": "{count, plural, =0{이 기간 거래 0건} =1{이 기간 거래 1건} other{이 기간 거래 {count}건}}",
+  "dashboardEvolutionSparklineHoverOrigin": "누적 시작",
+  "dashboardEvolutionSparklineHoverNoTrade": "이 구간에 거래 없음",
+  "dashboardEvolutionSparklineHoverMore": "+{count}건 더",
+  "@dashboardEvolutionSparklineHoverMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardEvolutionSparklineTapHint": "탭하여 열기",
+  "dashboardWeekResultPrefix": "결과: ",
+  "dashboardWeekThisWeek": "이번 주",
+  "dashboardWeekdayShortFri": "금",
+  "dashboardWeekdayShortMon": "월",
+  "dashboardWeekdayShortSat": "토",
+  "dashboardWeekdayShortSun": "일",
+  "dashboardWeekdayShortThu": "목",
+  "dashboardWeekdayShortTue": "화",
+  "dashboardWeekdayShortWed": "수",
+  "dashboardWorstLossLabel": "최대 손실",
+  "delete": "삭제",
+  "deletePortfolioTitle": "«{name}»을(를) 삭제할까요?",
+  "deleteTooltip": "삭제",
+  "editPortfolioTooltip": "이름, 자본, 통화 편집",
+  "errorAmount": "유효한 금액(≥ 0)을 입력하세요.",
+  "errorInvalidAmount": "금액 또는 통화가 잘못되었습니다.",
+  "errorNameOrSymbol": "이름 또는 기호를 입력하세요.",
+  "exportPdfFailed": "PDF를 내보낼 수 없습니다.",
+  "exportPdfFailedWithError": "PDF 내보내기 실패: {error}",
+  "exportPdfUnavailable": "PDF 내보내기가 취소되었거나 사용할 수 없습니다.",
+  "homePerformance": "성과",
+  "webHomeHeroSubtitle": "환영합니다. 주간 성과입니다.",
+  "webHomeHeroWelcome": "{fullName}님, 환영합니다",
+  "@webHomeHeroWelcome": {
+    "placeholders": {
+      "fullName": {}
+    }
+  },
+  "webHomeLiveTerminal": "라이브 터미널",
+  "webHomeWelcomeBack": "다시 오신 것을 환영합니다,",
+  "webHomeUpgradeUnlockSubtitle": "실시간 기관 데이터 잠금 해제",
+  "webRailMenuHeading": "메뉴",
+  "labelActif": "종목",
+  "labelGain": "손익",
+  "labelLot": "로트",
+  "labelMarket": "시장",
+  "labelPrice": "가격",
+  "labelRiskPct": "리스크 %",
+  "labelSuggestedSize": "추천 크기",
+  "langChineseTraditional": "中文 (繁體)",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langKorean": "한국어",
+  "langPortuguese": "Português",
+  "langSpanish": "Español",
+  "languageDialogSubtitle": "인터페이스 언어",
+  "languageDialogTitle": "언어 선택",
+  "languageSection": "언어",
+  "onboardingLanguageContinue": "계속",
+  "mentalBad": "나쁨",
+  "mentalConfidence": "자신감",
+  "mentalEmotionFieldLabel": "감정 이름(예: 차분, 두려움)",
+  "mentalEmotional": "감정적",
+  "mentalEnergy": "에너지",
+  "mentalExcited": "흥분",
+  "mentalFocus": "집중",
+  "mentalFrustrated": "좌절",
+  "mentalHappy": "기쁨",
+  "mentalHintEmotion": "예: 차분, 두려움",
+  "mentalHintMetric": "예: 인내, 스트레스",
+  "mentalHintRoutine": "예: 운동, 독서",
+  "mentalMarketStudy": "시장 공부",
+  "mentalMeditation": "명상(10분)",
+  "mentalMetricFieldLabel": "지표 이름(예: 인내, 스트레스)",
+  "mentalNegative": "부정(-)",
+  "mentalNeutral": "중립",
+  "mentalNewEmotion": "새 감정",
+  "mentalNewMetric": "새 지표",
+  "mentalNewRoutine": "새 루틴",
+  "mentalPeakForm": "최상 컨디션",
+  "mentalPositive": "긍정(+)",
+  "mentalRestTitle": "휴식",
+  "mentalRiskAppetite": "두려움",
+  "mentalRoutineFieldLabel": "루틴 이름(예: 운동, 독서)",
+  "mentalGlobalScoreCalendarTitle": "일별 전체 점수",
+  "mentalSleepEnough": "충분한 수면",
+  "mentalSleepImpact": "영향: {percent}%",
+  "mentalSport": "운동 / 조깅",
+  "mentalTired": "피곤",
+  "mentalWeightGlobalImpact": "전체 영향",
+  "mentalWeightModalBlurb": "이 기준의 중요도를 조정하세요. 배수를 쓰거나 원하는 비율을 직접 설정하세요.",
+  "mentalWeightModalTitle": "영향 조정",
+  "mentalWeightNatureLabel": "영향 성격",
+  "mentalWeightPolarityHelpNegative": "이 기준 값이 높으면 전체 점수가 감소합니다.",
+  "mentalWeightPolarityHelpPositive": "이 기준 값이 높으면 전체 점수가 증가합니다.",
+  "mentalPageTitle": "멘탈 상태",
+  "mentalPageIntro": "멘탈 상태를 평가하세요. 프로필에 맞게 각 기준의 영향(가중치)을 조정하세요.",
+  "mentalGaugeStateLabel": "상태",
+  "mentalGaugeBasedOnIndicators": "{count}개 지표 기준",
+  "@mentalGaugeBasedOnIndicators": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mentalGaugeStatusStable": "균형 양호",
+  "mentalGaugeStatusFragile": "주의 필요",
+  "mentalSectionRoutinesHeading": "내 루틴",
+  "mentalSectionMomentHeading": "현재 상태",
+  "mentalSectionEmotionHeading": "감정들",
+  "modelSavedSnackbar": "템플릿 «{name}» 저장됨",
+  "navAdd": "추가",
+  "navCalendar": "캘린더",
+  "navDashboard": "대시보드",
+  "navMore": "더보기",
+  "navTrade": "거래",
+  "ok": "확인",
+  "perf0Sub": "스트레스와 피로가 승률에 미치는 영향",
+  "perf0Title": "심리: 감정 & 수면",
+  "perf1Sub": "수익성 분석(월~일)",
+  "perf1Title": "요일",
+  "perf2Sub": "가장 수익이 좋은 시간 찾기",
+  "perf2Title": "세션 시간",
+  "perf3Sub": "이 차트 패턴의 성공률",
+  "perf3Title": "패턴: 이중 천장/바닥",
+  "perf4Sub": "주요 반전 분석",
+  "perf4Title": "패턴: 헤드앤숄더",
+  "perf5Sub": "과매수/과매도 신호 검증",
+  "perf5Title": "지표: RSI 다이버전스",
+  "perf6Sub": "이동평균 교차 효과",
+  "perf6Title": "지표: MACD 교차",
+  "perf7Sub": "0.618 및 0.5 레벨에서의 반등",
+  "perf7Title": "지표: 피보나치 되돌림",
+  "perf8Sub": "오더 블록과 유동성 분석",
+  "perf8Title": "전략: 스마트 머니 컨셉(SMC)",
+  "perf9Sub": "금융 리스크가 승률에 미치는 영향",
+  "perf9Title": "거래량 & 로트 크기",
+  "perfAddWidgetButton": "위젯 추가",
+  "perfChartBar": "막대 차트",
+  "perfChartHBar": "가로 막대",
+  "perfChartHintBar": "비교에 적합(예: 요일)",
+  "perfChartHintHBar": "목록 형식, 단순",
+  "perfChartHintLine": "시간에 따른 추세",
+  "perfChartHintPie": "전체 비율용",
+  "perfChartLine": "선 차트",
+  "perfChartPie": "원 / 게이지",
+  "perfCustomizeIntro": "성과 페이지를 맞춤 설정하세요.",
+  "perfDataFootnoteDuration": "데이터: 보유 시간별 분석(CSV).",
+  "perfDataFootnoteVolume": "거래량 대리: |손익| 구간(CSV).",
+  "perfEmptyChart": "거래를 가져오거나 불러와 차트를 표시하세요(CSV).",
+  "perfLineChartCaption": "선: 누적 수익(시간순, CSV).",
+  "perfNewWidgetTitle": "새 위젯",
+  "perfNoResults": "옵션을 찾을 수 없습니다.",
+  "perfPieChartCaption": "조각 = 카테고리별 거래량; 원에서 % = 비중.",
+  "perfRemoveWidgetTooltip": "위젯 제거",
+  "perfSearchHint": "검색(예: 패턴, 심리…)",
+  "perfStep1Title": "1. 무엇을 분석할까요?",
+  "perfStep2Title": "2. 차트 유형",
+  "plusAdd": "추가",
+  "plusCalculator": "계산기",
+  "plusCalendar": "캘린더",
+  "plusChecklist": "체크리스트",
+  "plusDashboard": "대시보드",
+  "plusMentalState": "멘탈 상태",
+  "plusMyAnalysis": "내 분석",
+  "plusMyStrategy": "내 전략",
+  "plusPerformance": "성과",
+  "plusSettings": "설정",
+  "plusTrade": "거래",
+  "paychekAccessDeniedTitle": "Access restricted",
+  "paychekAccessDeniedWeb": "Web access for this account has been disabled. Contact support if needed.",
+  "paychekAccessDeniedMobile": "Mobile app access for this account has been disabled. Contact support if needed.",
+  "portfolioNameMissing": "포트폴리오 이름을 입력하세요(예: 브로커).",
+  "portfoliosLabel": "포트폴리오",
+  "q1Slogan": "접근 방식을 선택하세요",
+  "q1Title": "어떤 트레이더인가요?",
+  "q1o1s": "수 초~몇 분 포지션",
+  "q1o1t": "스캘핑",
+  "q1o2s": "세션 종료 전 모두 청산",
+  "q1o2t": "데이 트레이딩",
+  "q1o3s": "1~3일 보유",
+  "q1o3t": "인트라데이",
+  "q1o4s": "수일~수주 보유",
+  "q1o4t": "스윙",
+  "q2Slogan": "여정에서 어디에 있나요?",
+  "q2Title": "경험 프로필",
+  "q2o1s": "혼자가 아닙니다",
+  "q2o1s2": "시작했고 아직 방법을 찾는 트레이더",
+  "q2o1t": "전략이 없습니다",
+  "q2o2s": "터널 끝의 빛",
+  "q2o2s2": "기초는 있고 일관성을 원하는 분",
+  "q2o2t": "전략이 있습니다",
+  "q2o3s": "가장 어려운 부분은 지났습니다",
+  "q2o3s2": "통계를 다루는 숙련 트레이더",
+  "q2o3t": "고성과",
+  "q3Slogan": "최우선 과제를 고르세요",
+  "q3Title": "무엇을 개선하고 싶나요?",
+  "q3o1s": "오늘 크게 이겼다가 내일 다 잃는 것을 멈추기.",
+  "q3o1s2": "자산 곡선을 안정시키고 감정 롤러코스터를 피하기.",
+  "q3o1t": "롤러코스터에서 내려오기",
+  "q3o2s": "승률과 진입 정확도 향상.",
+  "q3o2s2": "더 나은 거래를 고르고 자주 이기고 싶은 분.",
+  "q3o2t": "스나이퍼가 되기",
+  "q3o3s": "규율을 익히고 감정적 결정을 멈추기.",
+  "q3o3s2": "충동 매매를 없애고 계획을 100% 지키기.",
+  "q3o3t": "냉정 유지",
+  "q3o4s": "나에게 실제로 통하는 차트 패턴을 이해하기.",
+  "q3o4s2": "나만의 수익 패턴을 찾고 전문가로 성장하기.",
+  "q3o4t": "나만의 시그니처 찾기",
+  "q4Slogan": "가장 막는 것을 찾으세요",
+  "q4Title": "가장 큰 어려움은 무엇인가요?",
+  "q4o1s": "놓칠까 두려움.",
+  "q4o1s2": "빨리! 수익 기회를 놓칠 거야!",
+  "q4o1t": "FOMO",
+  "q4o2s": "이성 대신 느낌이 앞섰습니다.",
+  "q4o2s2": "안 돼—돈을 반드시 되찾아야 해!",
+  "q4o2t": "틸트",
+  "q4o3s": "명확한 전략이나 계획이 없습니다.",
+  "q4o3s2": "잘 모르겠지만 기분은 좋아—한번 해보자.",
+  "q4o3t": "맹목적 매매",
+  "q4o4s": "끊임없는 불안.",
+  "q4o4s2": "클릭하지 않으면 일을 안 하는 것 같아요.",
+  "q4o4t": "과매매",
+  "q4o5s": "무적이라고 생각합니다.",
+  "q4o5s2": "너무 잘해—쉬운 돈! 배팅을 두 배로!",
+  "q4o5t": "과신",
+  "q4o6s": "모든 것이 두렵습니다.",
+  "q4o6s2": "잘 모르겠고 또 잃을까 봐 무섭습니다.",
+  "q4o6t": "마비",
+  "q4o7s": "러시안 룰렛을 합니다.",
+  "q4o7s2": "이 거래에 모든 것을 걸었어—성공 아니면 실패.",
+  "q4o7t": "자금 관리 없음",
+  "reglagePortfolioSheetSubtitle": "계좌 자본 및 통화",
+  "reglagePortfolioSheetTitle": "자본 & 포트폴리오",
+  "resultDontWorry": "걱정 마세요",
+  "resultHeaderSub": "이것은 프로필이 아니라 계산일 뿐입니다. 아직 실제가 아니에요. 지금부터 시작입니다.",
+  "resultLabelGlobal": "전체",
+  "resultLabelProfil": "프로필",
+  "resultLabelPsychology": "심리",
+  "resultLabelStrategy": "전략",
+  "resultStatBullet1": "이 단계의 트레이더 중 {percent}%는 수학적 엄밀함 부족으로 정체되거나 손실을 봅니다.",
+  "resultStatBullet2": "트레이더의 {percent}%가 같은 상황입니다.",
+  "resultStatBullet3": "심리가 강한 트레이더는 100가지 전략을 아는 사람보다 낫게 매매합니다.",
+  "save": "저장",
+  "screenshot": "스크린샷",
+  "accountPageTitle": "계정",
+  "mobileReconnectAfterLogoutTitle": "로그아웃되었습니다",
+  "mobileReconnectAfterLogoutBody": "클라우드 프로필과 구독 상태를 복원하려면 다시 로그인하세요. 계정 없이 이 기기에서 앱을 계속 사용할 수도 있습니다.",
+  "mobileReconnectContinueWithoutAccount": "로그인 없이 계속",
+  "profileViewDetailsSection": "프로필 정보",
+  "profileAccountStatusTitle": "계정 상태",
+  "profileAccountStatusPro": "Pro",
+  "profileAccountStatusLite": "Lite",
+  "profileTrialBadge": "체험",
+  "profileTrialDaysLeft": "{count, plural, one{무료 체험 1일 남음} other{무료 체험 {count}일 남음}}",
+  "@profileTrialDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileTrialEndsOn": "체험 종료일: {date}",
+  "@profileTrialEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileTrialEndedOn": "체험이 {date}에 종료됨",
+  "@profileTrialEndedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileProPeriodEndsOn": "갱신일: {date}",
+  "@profileProPeriodEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileSubscribeButton": "Pro로 업그레이드 (연 $49.90 구독)",
+  "profileManageSubscriptionButton": "구독 관리",
+  "profileUpgradeLabel": "업그레이드",
+  "profileEditSavedSnack": "프로필이 저장되었습니다",
+  "profileEditIncompleteFieldsSnack": "이름, 성, 이메일을 모두 입력하세요",
+  "profileEditInvalidEmailSnack": "올바른 이메일 주소를 입력하세요",
+  "accountAuthSectionTitle": "로그인",
+  "accountContinueWith": "다음으로 계속:",
+  "accountTabLogin": "로그인",
+  "accountTabSignup": "회원가입",
+  "accountFieldEmail": "이메일",
+  "accountFieldPassword": "비밀번호",
+  "accountFieldConfirmPassword": "비밀번호 확인",
+  "accountFieldBirthDate": "생년월일",
+  "accountFieldFirstName": "이름",
+  "accountFieldLastName": "성",
+  "accountLoginButton": "로그인",
+  "accountSignupButton": "계정 만들기",
+  "authTerminalTagline": "마음을 다스리고, 트레이드를 다스리다",
+  "authTerminalCtaLogin": "터미널 시작",
+  "authTerminalCtaSignup": "아이덴티티 만들기",
+  "authTerminalEncryptedPrefix": "암호화 노드:",
+  "authTerminalEncryptedStatus": "활성",
+  "authTerminalHintEmail": "name@terminal.com",
+  "authTerminalHintPassword": "••••••••",
+  "accountLoginSnackEmailMissing": "로그인: 이메일을 입력하세요",
+  "accountLoginSnackEmailReady": "로그인: 이메일 입력됨",
+  "accountSignupSnackEmailMissing": "회원가입: 이메일을 입력하세요",
+  "accountSignupSnackFirstNameMissing": "회원가입: 이름을 입력하세요",
+  "accountSignupSnackLastNameMissing": "회원가입: 성을 입력하세요",
+  "accountSignupSnackBirthDateMissing": "회원가입: 생년월일을 선택하세요",
+  "accountSignupSnackReady": "회원가입: 양식 준비 완료",
+  "accountSignupSnackPasswordMissing": "회원가입: 비밀번호를 입력하세요",
+  "accountSignupSnackPasswordMismatch": "회원가입: 비밀번호가 일치하지 않습니다",
+  "accountSignupSnackPasswordTooShort": "비밀번호는 최소 6자 이상이어야 합니다",
+  "accountLoginSnackPasswordMissing": "로그인: 비밀번호를 입력하세요",
+  "accountForgotPasswordLink": "비밀번호를 잊으셨나요?",
+  "accountForgotPasswordSnackEmailMissing": "위에 이메일을 입력하면 재설정 링크를 보내 드립니다.",
+  "accountForgotPasswordSnackSent": "해당 이메일로 가입된 계정이 있으면 새 비밀번호를 설정할 링크를 보냅니다.",
+  "accountForgotPasswordSnackTooManyRequests": "요청이 너무 많습니다. 잠시 후 다시 시도하세요.",
+  "accountPasswordResetDialogTitle": "비밀번호 재설정",
+  "accountPasswordResetDialogSubtitle": "Paychek 계정 이메일을 입력하세요. 새 비밀번호를 설정할 링크를 보냅니다.",
+  "accountPasswordResetCta": "링크 보내기",
+  "accountPasswordResetBackToLogin": "로그인으로 돌아가기",
+  "accountPasswordResetSnackEmailMissing": "이메일을 입력하세요.",
+  "accountPasswordResetSentDialogTitle": "메일함을 확인하세요",
+  "accountPasswordResetSentDialogMessage": "해당 주소로 가입된 계정이 있으면 새 비밀번호를 설정할 링크가 포함된 이메일을 보냅니다. 스팸함도 확인해 주세요.",
+  "accountPasswordResetSentDialogCta": "확인",
+  "accountAuthSignupSuccess": "계정이 생성되었습니다",
+  "accountAuthLoginSuccess": "로그인되었습니다",
+  "accountAuthErrorWeakPassword": "비밀번호가 너무 약합니다",
+  "accountAuthErrorEmailInUse": "이미 사용 중인 이메일입니다",
+  "accountAuthErrorInvalidEmail": "유효하지 않은 이메일입니다",
+  "accountAuthErrorWrongCredentials": "이메일 또는 비밀번호가 올바르지 않습니다",
+  "accountAuthErrorNetwork": "네트워크 오류입니다. 다시 시도하세요.",
+  "accountAuthErrorGeneric": "문제가 발생했습니다",
+  "accountAuthErrorRestartOrReload": "인증 연결이 끊어졌습니다. 앱을 완전히 종료한 뒤 다시 실행하세요(웹에서는 핫 리로드를 피하세요).",
+  "accountAuthErrorDifferentSignInMethod": "이 이메일은 다른 로그인 방식으로 이미 사용 중입니다.",
+  "accountAuthErrorWithFirebaseCode": "문제가 발생했습니다 ({code}).",
+  "@accountAuthErrorWithFirebaseCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "accountAuthErrorUnknownFirebaseAuth": "로그인에 실패했습니다(알 수 없는 오류). 연결을 확인하고 다시 시도하거나 Chrome에서 Paychek을 여세요. Firebase 콘솔 → Authentication에서 이메일/비밀번호와 사용 중인 제공업체를 사용 설정하세요.",
+  "accountAuthErrorSignInServerMessage": "{message}",
+  "@accountAuthErrorSignInServerMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accountAuthWindowsSignInNotice": "Windows 데스크톱 앱에서는 Firebase 로그인이 자주 불안정할 수 있습니다(Flutter/Firebase의 알려진 제한). Paychek 모바일 앱을 사용하거나 브라우저에서 로그인하세요.",
+  "accountAuthWindowsOpenWebsite": "브라우저에서 paychek.pro 열기",
+  "accountSocialAppleAndroidUseGoogle": "이 빌드에서는 Android에서 Apple 로그인이 설정되어 있지 않습니다. Google 또는 이메일을 사용하거나 웹에서 로그인하세요.",
+  "accountSocialAppleUnavailableDesktop": "Windows/Linux 데스크톱 앱에서는 Apple 로그인을 사용할 수 없습니다. 웹(Chrome), iPhone, iPad 또는 Mac을 사용하세요.",
+  "accountSocialGoogleUnavailableDesktop": "Windows/Linux에서는 Google 로그인을 사용할 수 없습니다. Chrome, Android 또는 iOS를 사용하세요.",
+  "accountSocialFacebookUnavailableDesktop": "Windows/Linux 데스크톱 앱에서는 Facebook 로그인을 사용할 수 없습니다. 웹(Chrome), Android, iOS 또는 macOS를 사용하세요.",
+  "accountSocialGoogleWebClientMissing": "모바일/태블릿에서 Google: lib/reglage/social_auth_config.dart에 웹 OAuth 클라이언트 ID를 설정하세요. Android는 Firebase(프로젝트 설정 → Android 앱)에 앱 SHA-1 지문을 등록하세요.",
+  "paywallTitle": "무료 체험이 끝났습니다",
+  "paywallHeadlineBefore": "무료 체험이 ",
+  "paywallHeadlineAccent": "종료되었습니다",
+  "paywallUpgradeSubtitle": "Pro로 업그레이드해 트레이딩 잠재력을 모두 열고 우위를 유지하세요.",
+  "paywallEndedOn": "체험 종료일: {date}.",
+  "@paywallEndedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallCompareCurrentPlan": "현재 플랜",
+  "paywallCompareRecommended": "추천",
+  "paywallPlanLiteName": "Lite",
+  "paywallPlanProName": "Pro",
+  "paywallLiteFeature1": "월 30회 트레이드",
+  "paywallLiteFeature2": "수동 입력만",
+  "paywallLiteFeature3": "기본 캘린더",
+  "paywallProFeature1": "무제한",
+  "paywallProFeature2": "CSV 가져오기 및 수동 입력",
+  "paywallProFeature3": "Pro 캘린더",
+  "paywallProFeature4": "체크리스트",
+  "paywallProFeature5": "분석 생성기",
+  "paywallProFeature6": "전략 페이지",
+  "paywallProFeature7": "성과 통계",
+  "paywallProFeature8": "멘탈 상태",
+  "paywallProFeature9": "PDF보내기",
+  "paywallPriceAnnualHighlight": "연 US$49.90",
+  "paywallPriceApproxPerMonth": "월 약 US$4.15",
+  "paywallTrialEndedBody": "신규 가입 7일 무료 체험이 {date}에 종료되었습니다. Pro가 없으면 Lite 요금제입니다.",
+  "@paywallTrialEndedBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallLiteLimitedHint": "Lite에서는 트레이드 추가와 캘린더만 사용할 수 있습니다. 나머지는 Pro 구독이 필요합니다.",
+  "paywallProPriceAnnual": "Pro: 연 US$49.90",
+  "paywallContinueFreemium": "Lite로 계속 (제한적 이용)",
+  "paywallSubscribeButton": "지금 구독",
+  "paywallRestoreButton": "이미 구독 중입니다",
+  "paywallStoreNotConfigured": "Stripe 결제 링크가 없습니다. Admin → Config → Payment Link(https://…) 설정, 결제 활성화 후 로그인 상태에서 다시 시도하세요.",
+  "paywallRestoreNothingFound": "계속 차단됨: 활성 구독이 감지되지 않았습니다.",
+  "paywallLegalFooter": "Stripe 보안 결제 • 언제든 해지 • 서비스 약관",
+  "paywallGoldPremiumPill": "프리미엄 액세스",
+  "paywallGoldMarketingHeadline": "PRO로 업그레이드",
+  "paywallGoldTagline": "수익 내는 트레이더를 위한 도구.",
+  "paywallGoldYourPlanLabel": "현재",
+  "paywallGoldLiteColumnCaption": "스탠다드",
+  "paywallGoldProColumnCaption": "무제한",
+  "settingsTitle": "설정",
+  "settingsLogoutButton": "로그아웃",
+  "settingsLogoutSnack": "로그아웃되었습니다.",
+  "settingsLogoutSnackPartial": "기기에서 프로필이 지워졌습니다. 계속 보이면 네트워크를 확인하거나 앱을 다시 시작하세요.",
+  "splashTagline": "마음을 다스리고, 트레이드를 다스리다",
+  "statsAvgGain": "평균 수익",
+  "statsPsychSub": "계획 준수",
+  "statsPsychology": "심리",
+  "statsRR": "손익비",
+  "statsSectionTitle": "통계",
+  "statsStrategy": "전략",
+  "statsStrategySub": "검증된 기준",
+  "strategieAlertSignal": "알림 시그널",
+  "strategieDescription": "설명",
+  "strategieDescriptionHint": "예: 낮은 변동성",
+  "strategieEditSessionTitle": "세션 편집",
+  "strategieHintEntry": "매수/매도를 어디서 클릭하나요?",
+  "strategieHintIndicatorTag": "예: RSI",
+  "strategieHintInvalidation": "시나리오가 틀린 곳은?",
+  "strategieHintManagement": "포지션을 어떻게 보호하나요?",
+  "strategieHintPattern": "예: 이중 바닥",
+  "strategieHintSignal": "트리거…",
+  "strategieHintTarget": "최종 목표 또는 유동성 구간",
+  "strategieHintTimeframeTag": "예: M15",
+  "strategieIndicators": "지표",
+  "strategieModelName": "모델 이름",
+  "strategieNewSessionTitle": "새 세션",
+  "strategiePatternFigure": "패턴 / 도형",
+  "strategieRuleEntryPrecise": "정확한 진입",
+  "strategieRuleInvalidation": "무효화(손절)",
+  "strategieRuleManagement": "관리(본전 / 분할청산)",
+  "strategieRuleTarget": "목표(익절)",
+  "strategieSessionName": "세션 이름",
+  "strategieSetupColor": "색",
+  "strategieSetupEditTitle": "셋업 편집",
+  "strategieSetupNewTitle": "새 셋업",
+  "strategieTimeEndOptionalLabel": "종료(선택)",
+  "strategieTimeStartLabel": "시작",
+  "strategieTimeframes": "시간봉",
+  "strategieZoneNoTrade": "매매 안 함",
+  "strategieZoneTrade": "매매",
+  "strategieZoneType": "구간 유형",
+  "strategiePagePlaybookIntro": "트레이딩 플랜(플레이북). 규율과 집중을 위해 세션 전에 이 규칙을 다시 읽으세요.",
+  "analyseReportTitle": "리포트",
+  "strategieGestionCaptionMaximum": "최대",
+  "strategieGestionCaptionMinimum": "최소",
+  "strategieSectionSetupsAndModels": "셋업 & 템플릿",
+  "strategieSectionTradeCalendar": "트레이드 캘린더",
+  "strategieCalendarNeedSetupForUsage": "위에서 셋업을 추가하면 사용한 날을 기록할 수 있습니다.",
+  "strategieCalendarUsageForSetup": "사용 기록 — {name}",
+  "@strategieCalendarUsageForSetup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "strategieCalendarUsageTooltip": "이 셋업으로 이 날짜를 표시하거나 해제합니다(트레이드 추가와 동일한 이름).",
+  "strategieCalendarDotsExplain": "해당 일에 사용한 전략마다 점이 표시됩니다(트레이드 추가, 진입일 기준).",
+  "strategieSetupNavPrevious": "이전",
+  "strategieSetupNavNext": "다음 셋업 >",
+  "strategieSheetSetupsTitle": "셋업 & 템플릿",
+  "strategieMenuDisableFactors": "비활성화",
+  "strategieManageTemplates": "템플릿 관리",
+  "strategieDuplicateSetup": "셋업 복제",
+  "strategieMesReglesDraftHint": "새 규칙…",
+  "strategieSetupRemoveFromDashboard": "대시보드에서 제거",
+  "strategieSetupShowOnDashboard": "대시보드에 표시",
+  "strategiePdfPlaybookBlurbShort": "트레이딩 플랜(플레이북). 세션 전에 이 규칙을 다시 읽으세요.",
+  "strategiePdfFooterNote": "황금 규칙: 참고 문구(저장 안 됨). 리스크, 세션, 셋업: 저장된 데이터.",
+  "strategiePdfTableSession": "세션",
+  "strategiePdfTableDescription": "설명",
+  "strategiePdfTableSchedule": "일정",
+  "strategiePdfTechnicalContext": "기술적 맥락",
+  "strategiePdfAlertSignal": "알림 시그널",
+  "strategiePdfFileNamePrefix": "my_strategy",
+  "strategiePdfExportError": "PDF를 만들 수 없습니다: {error}",
+  "@strategiePdfExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "symbolHint": "예: Fr, ₣",
+  "symbolLabel": "심볼",
+  "tradeColEndingBalance": "기말 잔고",
+  "tradeColPnl": "손익",
+  "tradeColResult": "결과",
+  "tradeColStartingBalance": "기초 잔고",
+  "tradeColTotalGain": "총 수익",
+  "tradeColTotalGainPct": "총 수익 %",
+  "tradeColTrade": "거래 #",
+  "tradeDeleteConfirmBody": "이 작업은 되돌릴 수 없습니다.",
+  "tradeDeleteConfirmTitle": "이 거래를 삭제할까요?",
+  "tradeReturn": "거래 수익률",
+  "tradeActionsTooltip": "작업",
+  "tradeAverageShort": "평균",
+  "tradeDayTradeNumber": "오늘의 거래 #{n}",
+  "tradeDurationHoursMinutes": "{hours}시간 {minutes}분",
+  "tradeDurationMinutes": "{minutes}분",
+  "tradeEditMenu": "편집",
+  "tradeExportPdfTooltip": "PDF 내보내기",
+  "tradeFilterAll": "전체",
+  "tradeFilterBreakeven": "본전",
+  "tradeFilterLoser": "손실",
+  "tradeFilterOpenPosition": "미청산",
+  "tradeFilterWinner": "수익",
+  "tradeSummaryBreakdownShort": "승:{w}  패:{l}  본:{b}",
+  "tradeSummaryBreakdownWithOpen": "승:{w}  패:{l}  본:{b}  미:{o}",
+  "tradeGainShort": "순손익",
+  "tradeLabelChecklist": "체크리스트",
+  "tradeLabelDuration": "기간",
+  "tradeLabelEntry": "진입",
+  "tradeLabelEtat": "상태",
+  "tradeLabelExit": "청산",
+  "tradeLabelHours": "시간",
+  "tradeLabelPlan": "계획",
+  "tradeLabelSession": "세션",
+  "tradeLabelStrategie": "전략",
+  "tradeLabelNews": "뉴스",
+  "tradeMindsetFeeling": "느낌",
+  "tradeMindsetPrinciple": "원칙",
+  "tradeMonthTitle": "월",
+  "tradeMostTradedHeading": "가장 많이 거래한 종목",
+  "tradeNotRespected": "미준수",
+  "tradeOpenPositionLine": "미청산 • 진입 {when}",
+  "tradePdfAnalysePostTrade": "사후 검토",
+  "tradePdfBarresSemaine": "주간 막대",
+  "tradePdfCloture": "청산됨",
+  "tradePdfPositionOpen": "미청산",
+  "tradePdfDatePrefix": "날짜: {when}",
+  "tradePdfDetailsTitle": "거래 상세 ({pair})",
+  "tradePdfEtatPsychologique": "심리 상태",
+  "tradePdfTags": "태그",
+  "tradeTagsSection": "TAG",
+  "tradePdfExportDayTitle": "거래(일)",
+  "tradePdfExportMonthTitle": "거래(월)",
+  "tradePdfExportWeekTitle": "거래(주)",
+  "tradePdfGainNet": "순손익",
+  "tradePdfImpactCapital": "자본 영향",
+  "tradePdfMoyenne": "평균",
+  "tradePdfNonRespecte": "미준수",
+  "tradePdfPeriode": "기간",
+  "tradePdfQualiteMoyennes": "품질(평균)",
+  "tradePdfScreenshotTitle": "스크린샷 — {pair}",
+  "tradePdfSessions": "세션",
+  "tradePdfSparklineMois": "월 스파크라인",
+  "tradePdfTrades": "거래",
+  "tradePdfWinRate": "승률",
+  "tradePctOfCapital": "자본의 {percent}%",
+  "tradeScreenshotLoadError": "이미지를 불러올 수 없습니다",
+  "tradeScreenshotUnavailableWeb": "스크린샷 사용 불가(웹)",
+  "tradeSectionChecklist": "체크리스트",
+  "tradeSectionEtat": "상태",
+  "tradeSectionPlan": "계획",
+  "tradeSectionStrategie": "전략",
+  "tradeStrategieNonRespectUnmapped": "전략 상세 ({id})",
+  "tradeSessionAsia": "아시아",
+  "tradeSessionEurope": "유럽",
+  "tradeSessionLate": "시간외",
+  "tradeSessionUs": "미국",
+  "tradeSideBreakevenShort": "본전",
+  "tradeSideBuyLong": "매수",
+  "tradeSideBuyShort": "매수",
+  "tradeSideSellLong": "매도",
+  "tradeSideSellShort": "매도",
+  "tradeSummaryProfitNet": "순손익",
+  "tradeSummaryTrades": "거래",
+  "tradeSummaryWinRate": "승률",
+  "tradeTotalUpper": "합계",
+  "tradeTradesListHeading": "거래",
+  "tradeTradesMonthHeading": "거래(월)",
+  "tradeTradesWeekHeading": "거래(주)",
+  "tradeWeekTitle": "주",
+  "tradeWinDayRingSubtitle": "승(일)",
+  "tradeWinrateLabel": "승률",
+  "settingsTradingWeek5": "5일 (월–금)",
+  "settingsTradingWeek7": "7일 (월–일)",
+  "settingsTradingWeekSubtitle": "전통 시장은 5일(월–금), 전체 달력 주는 7일(예: 암호화폐)로 표시합니다.",
+  "settingsTradingWeekTitle": "표시 주",
+  "settingsDashboardCardSubtitle": "홈 맞춤: 섹션 및 순서",
+  "settingsDashLayoutTitle": "홈 섹션",
+  "settingsDashLayoutReorderHint": "손잡이를 드래그해 순서를 바꾸세요. 섹션을 끄면 홈에서 숨깁니다.",
+  "settingsDashOpenHomeButton": "홈 보기",
+  "settingsDashSectionCapital": "자본 및 승률",
+  "settingsDashSectionChecklist": "체크리스트",
+  "settingsDashSectionAnalyse": "분석",
+  "settingsDashSectionEtat": "멘탈",
+  "settingsDashSectionStrategie": "전략",
+  "settingsDashSectionWeekly": "주간 성과",
+  "settingsDashSectionEvolution": "자본 변화",
+  "tradingSection": "트레이딩",
+  "settingsCgvSection": "이용 약관",
+  "settingsCgvPageTitle": "일반 판매 조건",
+  "settingsCgvRowTitle": "일반 판매 조건",
+  "settingsCgvRowSubtitle": "앱에서 전체 약관 읽기",
+  "settingsCgvDocHeading": "판매 일반 조건(CGV) - PAYCHEK",
+  "settingsCgv1Title": "1. 목적",
+  "settingsCgv1Body": "본 CGV는 트레이딩 일지 및 리스크 관리 도구인 Paychek 애플리케이션의 \"프리미엄\" 이용 구독을 규율합니다. 이용권은 매년 자동 갱신되는 연 구독으로 제공되며, 해지 시까지 갱신됩니다.",
+  "settingsCgv2Title": "2. 제공 서비스",
+  "settingsCgv2Body": "프리미엄 이용권은 앱의 모든 기능(고급 통계, 자동 리스크 계산, 데이터 내보내기)을 해제합니다. 이용권은 가입 시 생성된 사용자 계정에 연결됩니다.",
+  "settingsCgv3Title": "3. 요금 및 결제",
+  "settingsCgv3Body": "직접 구독: 가격은 연 49.90달러(USD)이며, 해지 시까지 자동 갱신됩니다.\n\n파트너 제공: 사용자가 당사 파트너(프롭 펌 또는 브로커) 중 한 곳의 추천 조건을 충족하면 무료로 제공될 수 있습니다.\n\nPaychek는 신규 고객에 대해 언제든지 가격을 변경할 권리를 보유합니다.",
+  "settingsCgv4Title": "4. 청약 철회 및 환불",
+  "settingsCgv4Body": "디지털 콘텐츠 관련 법령에 따라:\n\n서비스의 디지털적 특성 및 결제 직후 즉시 콘텐츠에 접근할 수 있음으로, 사용자는 서비스가 즉시 시작됨에 동의하며 14일 청약 철회권을 명시적으로 포기합니다.\n\n프리미엄 이용이 활성화된 후에는 앱을 사용할 수 없을 정도의 중대한 기술적 결함이 있는 경우를 제외하고 환불되지 않습니다.",
+  "settingsCgv5Title": "5. \"파트너 제공\" 특별 조항",
+  "settingsCgv5Body": "파트너를 통한 이용은 해당 파트너의 소속(제휴) 승인에 따라 제공됩니다.\n\n파트너가 소속을 거부하는 경우(입금 또는 거래 규칙 미준수 등), Paychek는 프리미엄 이용을 철회하거나 표준 요금 결제를 요구할 권리를 보유합니다.",
+  "settingsCgv6Title": "6. 리스크 고지 (트레이딩)",
+  "settingsCgv6Body": "Paychek는 금융 자문가가 아닙니다. 본 애플리케이션은 관리 및 분석을 위한 기술 도구입니다.\n\n트레이딩은 자본 손실 위험이 매우 높습니다. 사용자는 자신의 거래 결정에 대해 전적인 책임을 집니다.\n\nPaychek는 금융 시장에서 사용자에게 발생한 금전적 손실에 대해 책임지지 않습니다.",
+  "settingsCgv7Title": "7. 서비스 가용성",
+  "settingsCgv7Body": "Paychek는 24시간 접속 유지를 위해 노력합니다. 다만 유지보수 또는 제3자 서버(Firebase, Google Cloud) 장애로 인한 중단에 대해서는 책임지지 않습니다.",
+  "settingsCgv8Title": "8. 데이터 보호",
+  "settingsCgv8Body": "사용자의 트레이딩 데이터는 엄격하게 기밀이며 재판매되지 않습니다. 기술 제공업체를 통해 안전하게 저장됩니다.",
+  "settingsPrivacyRowTitle": "개인정보 처리방침",
+  "settingsPrivacyRowSubtitle": "개인정보, 쿠키 및 권리",
+  "settingsPrivacyPageTitle": "개인정보 처리방침",
+  "settingsPrivacyDocHeading": "개인정보 처리방침 — PAYCHEK",
+  "settingsDataResetSection": "데이터",
+  "settingsDataResetTitle": "로컬 데이터 모두 삭제",
+  "settingsDataResetDescription": "한동안 Paychek를 사용한 뒤 처음부터 다시 시작하려면(앱 재설치와 비슷하게) 이 기기에 저장된 데이터를 모두 지울 수 있습니다: 트레이드, 분석, 저널, 대시보드 레이아웃, 로컬 프로필, 기기의 체험 기준일 등.\n\n언어 설정과 ‘표시 주(週)’ 설정은 유지됩니다.\n\n임시 메모리(체크리스트 등)를 비우려면 앱을 완전히 종료한 뒤 다시 여세요.",
+  "settingsDataResetButton": "이 기기에서 모두 삭제",
+  "settingsDataResetDialogTitle": "로컬 데이터를 모두 삭제할까요?",
+  "settingsDataResetDialogBody": "되돌릴 수 없습니다. 이 기기의 로컬 Paychek 데이터가 삭제됩니다. Firebase 로그인 세션은 유지될 수 있으며, 로컬 복사본만 제거됩니다.\n\n캐시가 남아 있으면 앱을 다시 시작하세요.",
+  "settingsDataResetDialogCancel": "취소",
+  "settingsDataResetDialogConfirm": "모두 삭제",
+  "settingsDataResetSuccess": "로컬 데이터가 삭제되었습니다. 필요하면 앱을 다시 시작하세요.",
+  "validate": "확인",
+  "winrate": "승률",
+  "@deletePortfolioTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@resultStatBullet1": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@resultStatBullet2": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@modelSavedSnackbar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseCopyLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseTemplateApplied": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@mentalSleepImpact": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@analyseImpactLine": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@exportPdfFailedWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseCopyNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardTradeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardEvolutionTradesThisPeriod": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardPerfHourWinRate": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeDayTradeNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeOpenPositionLine": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePctOfCapital": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfDatePrefix": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfDetailsTitle": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfScreenshotTitle": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSupportSection": "지원",
+  "settingsSupportCardTitle": "지원 및 피드백",
+  "settingsSupportCardSubtitle": "이메일로 문의하고 앱 내 가이드를 확인하세요.",
+  "supportFeedbackTitleLead": "지원 & ",
+  "supportFeedbackTitleAccent": "피드백",
+  "supportFeedbackSubtitle": "질문이나 아이디어가 있나요? 기다리고 있어요.",
+  "supportFeedbackBack": "뒤로",
+  "supportActionEmailLabel": "이메일",
+  "supportActionEmailHint": "24시간 내 답변",
+  "supportActionDocsLabel": "문서",
+  "supportActionDocsHint": "이용 가이드",
+  "supportActionTwitterLabel": "X",
+  "supportActionTwitterHint": "커뮤니티",
+  "supportFormNewMessage": "새 메시지",
+  "supportFormKindLabel": "문의 유형",
+  "supportFormKindAccount": "계정",
+  "supportFormKindBilling": "결제 · 청구",
+  "supportFormKindFeature": "기능",
+  "supportFormKindOther": "기타",
+  "supportFormEmailLabel": "이메일",
+  "supportFormEmailHint": "name@example.com",
+  "supportFormDescriptionLabel": "설명",
+  "supportFormDescriptionHint": "내용을 입력하세요…",
+  "supportFormSubmit": "지금 보내기",
+  "supportFormSubmitSuccess": "감사합니다. 메시지가 성공적으로 전송되었습니다.",
+  "supportFormSubmitSuccessPartial": "감사합니다. 메시지는 전송되었지만 첨부 파일은 업로드되지 않았습니다.",
+  "supportFormSubmitDone": "메일 앱이 열리지 않으면 다시 시도하거나 직접 메일을 보내 주세요.",
+  "supportFormErrorEmail": "이메일을 입력하세요.",
+  "supportFormErrorDescription": "설명을 입력하세요.",
+  "supportFormMailSubjectPrefix": "Paychek 지원",
+  "supportFormMailBodyIntro": "Paychek 앱에서 보낸 메시지:",
+  "supportFormAttachmentLabel": "첨부(선택)",
+  "supportFormAttachmentPick": "사진 또는 PDF",
+  "supportFormAttachmentHint": "PDF 또는 이미지, 최대 10MB",
+  "supportFormAttachmentRemove": "파일 제거",
+  "supportFormAttachmentSignInHint": "첨부하려면 로그인하거나, 이메일만 보낼 수 있습니다.",
+  "supportFormAttachmentTooLarge": "10MB를 초과했습니다.",
+  "supportFormAttachmentInvalidExtension": "PDF, JPG, PNG, WebP만 가능합니다.",
+  "supportFormAttachmentReadFailed": "파일을 읽을 수 없습니다.",
+  "supportFormSubmitFirestoreDone": "감사합니다. 메시지가 저장되었습니다. 관리 콘솔에서 확인됩니다.",
+  "supportFormSubmitSending": "전송 중…",
+  "supportFormSubmitError": "전송 실패. 연결을 확인하세요.",
+  "supportFormSubmitSavedPartialAttachment": "메시지는 저장되었지만 첨부가 업로드되지 않았습니다(네트워크 또는 Storage). Firebase를 확인하세요.",
+  "supportQuickHelpTitle": "빠른 도움말",
+  "supportFaqWhereDataQ": "내 데이터는 어디에 있나요?",
+  "supportFaqWhereDataA": "이 기기에 저장됩니다(설정, 일지, 포트폴리오). 로그아웃 또는 데이터 삭제 시 사라질 수 있으며, 보관에는 PDF 내보내기를 이용하세요.",
+  "supportFaqFeatureQ": "새 기능이 필요하신가요?",
+  "supportFaqFeatureA": "위 양식에서 «기능 제안»을 선택해 보내 주세요. 모든 메시지를 확인합니다.",
+  "supportStatusLabel": "기술 상태",
+  "supportStatusOperational": "서비스 정상",
+  "helpCenterArticleAddTradeBody": "추가 탭에서 필드를 입력하세요(종목, 진입, 손절, 목표 등). 저장하면 됩니다. 필요하면 스크린샷을 첨부할 수 있습니다.",
+  "helpCenterArticleAddTradeTitle": "거래 추가",
+  "helpCenterArticleCalendarBody": "📅 Guide: Calendar & performance analysis\n\nThe Paychek Calendar is your main steering tool. It turns raw data into a visual map of your success and discipline.\n\n[img:assets/help_center/calendar_overview.png]\n\n1. Month overview\nColor coding: Green cells show net profit, red cells a loss, and gray cells days with no activity.\n\nQuick summary: Above the calendar, see your win rate, trade count, and total monthly P&L at a glance.\n\nMonthly objective: Watch the progress bar to see how far you are from your financial goal. Tap the settings icon to change your target.\n\n[img:assets/help_center/calendar_monthly_objective.png]\n\n2. Expandable menu (deep analysis)\nTap any month header to open detailed analysis.\n\n[img:assets/help_center/calendar_deep_analysis.png]\n\nDiscipline rings: View your average discipline scores for the month (plan followed, checklist completed, mental state).\n\nSession breakdown: See performance by timezone — Asia, Europe, and US. Great for spotting which part of the day pays best for you.\n\nInteractive sparkline (performance curve):\n- Hover the line to pinpoint a trade (on mobile, drag along the curve with your finger).\n- Tap a point on the curve to open that trade’s full record instantly.\n\n3. Session statistics (sidebar)\nTo the right of your calendar, your consistency stats:\n\nCumulative performance: How your capital evolves day by day.\n\nBest day: Your largest daily gain of the month.\n\nAverage day: What you gain or lose on average per day.\n\n[img:assets/help_center/calendar_trades_month_report.png]\n\n4. PDF export 📄\nAt the top right of the Calendar page, the PDF icon generates a professional report in one tap.\n\nWhat’s inside: The report includes the visual calendar, the performance curve, and a recap of your discipline averages.",
+  "helpCenterArticleCalendarTitle": "캘린더",
+  "helpCenterArticleChecklistBody": "📋 Checklist\n\n[img:assets/help_center/checklist_routine_discipline.png]\n\n1. Understanding the progress ring\nThe colored circle at the top of your screen is your readiness indicator.\n\n- Real-time progress: each ticked box moves the percentage forward.\n- Your checklist ring is not only on Routine — it stays in sync on your main Dashboard.\n- The gold standard: we recommend never opening a position unless your ring is at 100%. A trade taken with an incomplete checklist is often an emotional trade.\n\n2. Customize your routine\nEvery trader is unique. Paychek lets you build your own verification system.\n\n- Add a section: tap “+ Add a section” at the bottom to create a category (e.g. morning routine, economic news, post-session).\n- Manage items (⋯ menu):\n  - Add a task: open the three-dot menu next to a section title to insert a new checkpoint.\n  - Delete / edit: if a rule no longer fits your strategy, remove it to keep the UI clean.\n\n3. Default sections\nTo help you get started, we include three pillars:\n\n- Technical Analysis: validate your confluences (trend, S/R, indicators).\n- Risk Management: confirm your stop-loss is set and your risk per trade is respected.\n- Psychology: a quick check that you are not in revenge mode or euphoria.",
+  "helpCenterArticleChecklistTitle": "체크리스트",
+  "helpCenterArticleEditTradeBody": "Guide : Maîtriser votre Journal de Trading (Page Trade)\nLa page Trade est le centre d'archivage intelligent de Paychek. Elle ne se contente pas de lister vos opérations ; elle les organise pour vous offrir une vision claire de votre progression, du trade individuel à la performance mensuelle.\n\n[img:assets/help_center/trade_page_header_filters.png]\n\n1. Tableau de Bord de Période (Header)\nEn haut de votre journal, vous disposez d'un résumé instantané de la période sélectionnée :\n\nProfit Net : Votre résultat financier net en dollars et son impact en pourcentage sur votre capital (ex: +1070,00$ / +53,50%).\n\nLe Win Rate Ring : L'anneau central affiche votre pourcentage de réussite global. C'est l'indicateur visuel immédiat de la santé de votre trading.\n\nCompteur de Trades : Le détail précis du nombre de positions Gagnantes (G), Perdantes (P) et à l'équilibre (Br).\n\n2. Navigation et Filtres Temporels\nPersonnalisez votre vue selon votre besoin d'analyse grâce aux sélecteurs rapides :\n\nSélecteur 1D / 1S / 1M / ALL : Basculez instantanément entre une vue journalière, hebdomadaire, mensuelle ou l'historique complet.\n\nFiltres de statut : Isolez vos trades Gagnants, Perdants ou Breakeven d'un seul clic pour étudier des comportements spécifiques.\n\nActifs les plus tradés : Visualisez rapidement vos statistiques sur vos instruments préférés (ex: XAUUSD, EURUSD).\n\n[img:assets/help_center/trade_page_period_pdf_report.png]\n\n3. Structure en Accordéons et Rapports PDF\nL'interface utilise un système de \"replier/déplier\" pour une lecture fluide et des options d'exportation à tous les niveaux :\n\nRapports de Période (Jour/Semaine/Mois) : Chaque bloc de date (ex: \"14 Mars\") affiche un résumé de la performance du jour.\n\nEn cliquant sur l'icône PDF à côté de la date, vous téléchargez un rapport complet de cette période spécifique. Idéal pour vos bilans de fin de semaine ou de mois.\n\nRapports de Trade Individuel : Cliquez sur un trade pour le déplier et voir ses détails (Heures, Session, Entry/Exit).\n\nChaque trade possède son propre bouton PDF. Ce document génère une fiche technique pro avec votre graphique et vos scores de discipline.\n\n[img:assets/help_center/trade_page_rings_week_view.png]\n\n4. Analyse visuelle par Ring\nChaque ligne (journée ou trade) est accompagnée d'un Ring (anneau) :\n\nPour une journée, le ring représente le Win Rate global du jour.\n\nCela vous permet d'identifier en une seconde vos journées \"rouges\" ou \"vertes\" sans avoir à lire chaque ligne de trade.\n\n[img:assets/help_center/trade_page_options_menu.png]\n\n5. Options de Gestion et Correction (Les 3 points)\nParce qu'une erreur de saisie peut arriver, Paychek vous donne un contrôle total sur vos archives. À côté de l'icône PDF de chaque fiche trade, vous trouverez un menu \"Options\" (représenté par 3 points verticaux) :\n\nModifier le Trade : Vous permet de réouvrir le formulaire de saisie pour corriger un prix, changer l'heure, ajouter un screenshot oublié ou ajuster vos scores de discipline.\n\nSupprimer le Trade : Efface définitivement l'enregistrement de votre journal.\n\nAttention : La suppression d'un trade mettra à jour instantanément vos statistiques globales, votre Win Rate et votre capital dans les pages Trade et Performance.",
+  "helpCenterArticleEditTradeTitle": "트레이드 — 일지 화면",
+  "helpCenterArticleExportPdfBody": "트레이드 또는 퍼포먼스에서 PDF 내보내기를 사용하세요. 실패하면 권한을 확인한 뒤 다시 시도하세요.",
+  "helpCenterArticleExportPdfTitle": "PDF 내보내기",
+  "helpCenterArticleMentalStateBody": "Guide: Mental state — tailor your psychology\n\nRoughly 80% of trading success is psychology. The Mental state page lets you measure how you feel and see how emotions affect your results.\n\n[img:assets/help_center/mental_state_dashboard.png]\n\n1. Global score (The Ring)\nThe central ring shows your “Solid Balance”. It updates from all your indicators (emotions, rest, routines). The higher the score, the more you are in a mindset suited to trading.\n\n2. Personalized impact (gear ⚙️)\nEvery trader is different. Paychek lets you define your own rules:\n\n[img:assets/help_center/mental_state_adjust_impact.png]\n\n- Impact nature: open a criterion’s gear to set Positive (+) or Negative (−). Example: if excitement is dangerous for you, set it to Negative.\n\n- Global impact (%): the slider sets how much that criterion weighs on your global score. Crank it up for what matters most; lower it for secondary criteria.\n\n3. Sections & emotions\n\n[img:assets/help_center/mental_state_section_controls.png]\n\n- Edit / delete: pencil to rename an emotion or indicator; trash to remove it.\n\n- Section toggle (ON / OFF 100%): turn off an entire section (e.g. My Routines). When off, it no longer counts toward your daily global score.\n\n- Add (+): create your own indicators to match your routine.\n\n4. Score calendar & time window\nThe mini-calendar shows your mental score for past days.\n\n- Session settings (⚙️): set a start time and an end time.\n\n- Day mode: track from morning to evening (full-day style window).\n\n- Session mode: focus on trading hours only (e.g. 3:30 PM – 10:00 PM).",
+  "helpCenterArticleMentalStateTitle": "멘탈 상태",
+  "helpCenterArticleMyAnalysisBody": "🔬 My Analysis: Build Your Trading Plans\n\nThe My Analysis page lets you build a full roadmap before you enter the market. By quantifying each technical element, Paychek calculates a global confidence score to validate your setup.\n\n[img:assets/help_center/analyse_trend_sheet.png]\n\n1. Trend card (context)\nDefine the frame for your opportunity:\n\nAsset & name: Use (+) to name your analysis and the instrument (e.g. EUR/USD — Weekly Swing Plan).\n\nDirection & phase: Choose your bias (Buy, Sell, or Watch) and the current market phase (Accumulation, Impulse, Distribution).\n\nConfidence slider: Set how certain you feel for this section. Open the gear (⚙️) to adjust this card’s impact (weight %) on the final report confidence.\n\n[img:assets/help_center/analyse_card_controls.png]\n\nCustomization: Use the pencil to edit available timeframes or phases, and Duplicate to compare several analyses on different timeframes in the same section.\n\n2. Technical sections (Structure, SMC, Indicators, Volume)\nEveryone trades differently. Turn cards on or off with the ON/OFF switch:\n\n[img:assets/help_center/analyse_technical_cards.png]\n\nStructure: Log support and resistance. Tick if a level was tested more than twice to strengthen relevance.\n\nSMC & Liquidity: Record Order Blocks, Fair Value Gaps (FVG), and Fibonacci levels.\n\nIndicators & Volume profile: Detail RSI/MACD signals or Point of Control (POC) zones.\n\nScreenshot: Attach a chart capture to illustrate your plan visually.\n\n3. Generating the report\nWhen your analysis is ready, tap Report.\n\n[img:assets/help_center/analyse_summary_report.png]\n\nGlobal confidence ring: The final ring is computed from your sliders and their impact weights.\n\nDynamic color coding: The validated report at the bottom uses a color that matches your direction: green (Buy), red (Sell), or yellow (Watch).\n\n[img:assets/help_center/analyse_report_embedded.png]\n\n4. Managing reports\nHistory: Reports are saved and tied to your instruments.\n\nActions: You can edit (pencil), delete (trash), or export a professional PDF of your analysis to archive or share.\n\n[img:assets/help_center/analyse_report_pdf.png]",
+  "helpCenterArticleMyAnalysisTitle": "내 분석 — 트레이딩 플랜",
+  "helpCenterArticleMyStrategyTitle": "내 전략 — 플레이북",
+  "helpCenterArticlePerformanceTitle": "퍼포먼스 — 트레이딩 스캐너",
+  "helpCenterArticleResetDataBody": "설정 > 데이터에서 이 기기에 저장된 데이터를 지울 수 있습니다. 되돌릴 수 없으며, 이후 앱을 다시 시작하는 것이 좋습니다.",
+  "helpCenterArticleResetDataTitle": "로컬 데이터 삭제",
+  "helpCenterEmptyResults": "결과가 없습니다.",
+  "helpCenterSearchHint": "검색…",
+  "helpCenterSubtitle": "앱 사용에 대한 간단한 답변과 설명을 확인하세요.",
+  "helpCenterTitle": "고객센터",
+  "helpCenterVersionMobile": "모바일 버전",
+  "helpCenterVersionWeb": "웹 버전"
+}

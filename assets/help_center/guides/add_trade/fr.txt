@@ -1,0 +1,162 @@
+﻿Guide : Intégration de vos Trades (Partie 1)
+Cette section est le moteur de votre journal. Une saisie précise ici garantit des analyses de performance d'une fiabilité professionnelle.
+
+1. Direction du Trade
+- Buy · Long (Vert) : À utiliser si vous avez acheté l'actif.
+- Sell · Short (Noir) : À utiliser si vous avez vendu l'actif.
+
+2. Sélection de l'Actif et Personnalisation
+- Sélecteur de Marché : Choisissez la catégorie (Forex, Indice, Future, Crypto, Stock, Como).
+- Champ Asset : Sélectionnez votre symbole (ex: EUR/USD).
+- ⚙️ Note : Si votre actif n'est pas dans la liste, vous pouvez utiliser l'option de personnalisation pour l'ajouter manuellement.
+
+3. Volume et Saisie Rapide
+- Size (Lots) : Entrez votre volume.
+- Lot Shortcuts : Utilisez les boutons rapides (0.01 à 1) pour gagner du temps et éviter les erreurs de frappe.
+
+4. Prix, Temps et Contexte
+- Entry & Exit : Saisissez vos prix d'entrée et de sortie.
+- Sélecteur de Temps : Réglez l'heure exacte. Paychek utilise ces données pour calculer la durée de votre position et vos statistiques par session de marché.
+
+Checkboxes de précision :
+- Breakeven : Cochez si le trade s'est clôturé à 0.
+- Before / After News : Identifiez les trades pris durant la volatilité des annonces économiques.
+
+5. Résultat Financier (Capital & Gain)
+Visualisez en temps réel l'impact du trade sur votre compte :
+- Profit/Perte : Le montant net s'affiche dynamiquement en fonction de vos prix d'exécution.
+- ⚙️ Configuration des Frais : Cliquez sur l'engrenage à côté de P&L. Cette option vous permet de modifier et paramétrer vos commissions (Fees).
+- Analyse en Pourcentage : Paychek calcule automatiquement le gain ou la perte en pourcentage de votre capital (ex: +2,44%). C'est l'indicateur clé pour une gestion du risque professionnelle.
+
+[img:assets/help_center/performance_volume_lot_size.png]
+
+⏱️ L'importance de la précision temporelle (Entry & Exit Time)
+Pour tirer le meilleur parti de Paychek et débloquer vos analyses avancées, nous vous recommandons vivement de saisir systématiquement l'heure exacte de vos entrées et sorties.
+
+Pourquoi est-ce essentiel pour votre performance ?
+- Calcul de la Durée de Position (Hold Time) : Paychek corrèle la durée avec votre taux de réussite.
+- Analyse par Sessions de Marché : Classification des trades par sessions (Europe, US, Soir).
+- Détection des Violations de Plan : Comptabilise les trades pris hors sessions si vous avez défini des fenêtres de trading.
+
+Le conseil Paychek : Ne voyez pas la saisie de l'heure comme une contrainte, mais comme l'outil le plus puissant pour découvrir votre véritable profil de trader rentable.
+
+[img:assets/help_center/performance_before_after_news.png]
+
+────────────────────────────────────────
+
+Guide : Discipline & Stratégie (Partie 2)
+L'interface de droite est dédiée à l'analyse de votre comportement. C'est l'outil qui vous permet de différencier un gain dû à la chance d'un gain dû à votre rigueur.
+
+[img:assets/help_center/add_trade_discipline_principe.png]
+
+1. Le choix crucial : Principle vs Feeling
+Avant d'enregistrer votre trade, soyez honnête sur l'origine de votre décision :
+
+Mode Principle (Vert) : À sélectionner si vous avez ouvert votre position en suivant strictement votre plan de trading et vos règles préétablies.
+
+Mode Feeling (Rouge) : À sélectionner si le trade a été pris par émotion (FOMO, revanche), par intuition non vérifiée ou suite à une réaction impulsive face à une forte volatilité.
+
+Note : En mode Feeling, les options de stratégie se bloquent par défaut pour refléter l'absence de plan. Cependant, vous pouvez débloquer ces sections via l'engrenage "Discipline Settings" si vous souhaitez tout de même noter des points spécifiques.
+
+2. Évaluation de la Rigueur (Le Slider %)
+Même avec un plan, l'exécution n'est pas toujours parfaite. Utilisez le slider pour définir le pourcentage de respect de votre stratégie (de 0% à 100%).
+
+Cela permet de mesurer si vous avez "forcé" le trade ou si vous avez été d'une discipline exemplaire.
+
+[img:assets/help_center/add_trade_discipline_strategy_execution.png]
+
+3. Sélection de la Stratégie (Setup)
+Si vous utilisez plusieurs approches (ex: SMC - Order Block ou Breakout with Volume), sélectionnez celle qui correspond au trade.
+
+Les stratégies affichées ici sont celles que vous avez créées et personnalisées dans votre page "My Strategy".
+
+4. Points de Contrôle (Points to review)
+C'est la checklist de votre discipline. Cochez les points que vous n'avez pas respectés lors de ce trade :
+
+Exemple : "R/R Ratio 1:2 Minimum non respecté" ou "Overtrading".
+
+Les erreurs cochées apparaissent en rouge sous la section "Saved choices".
+
+Impact majeur : Ces données sont agrégées instantanément dans votre page Performance. Vous pourrez ainsi voir visuellement quelle règle non respectée vous fait perdre le plus d'argent.
+
+[img:assets/help_center/add_trade_discipline_feeling_header.png]
+
+5. Configuration de la Discipline (⚙️)
+En cliquant sur le petit engrenage du panneau de discipline, vous accédez aux "Discipline settings" :
+
+Feeling mode : Activez ou désactivez la possibilité de remplir les sections de stratégie même lorsque vous êtes en mode "Feeling".
+
+[img:assets/help_center/add_trade_discipline_settings_feeling_mode.png]
+
+"L'outil 'Principle vs Feeling' n'est pas là pour vous juger, mais pour vous montrer avec des chiffres froids que votre discipline est votre plus grand profit."
+
+────────────────────────────────────────
+
+Guide : Personnalisation & Discipline (Partie 3)
+Cette section est le cœur "intelligent" de Paychek. Elle ne vous impose pas des règles génériques, mais utilise vos propres critères pour analyser si vous restez fidèle à votre propre système de trading.
+
+[img:assets/help_center/add_trade_discipline_part3_mobile.png]
+
+1. Plan d'Analyse (My Analysis)
+Cette zone suit la rigueur technique de votre setup (ex: SMC, Chartisme, Indicateurs).
+
+- Slider de Respect (%) : Évaluez à quel point votre configuration graphique était "propre" selon vos critères.
+- Sélection Dynamique : Les points à choisir ici (ex: Resistance, Timeframe, Phase) sont ceux que vous avez définis dans votre page "My Analysis".
+- Traçabilité des erreurs : Si vous n'avez pas respecté un point précis, cochez-le dans la liste. Paychek enregistre ce "manquement" pour vous montrer, sur le long terme, quelle erreur technique vous coûte le plus cher.
+
+2. Checklist (Session Plan)
+La Checklist représente vos règles de conduite et de gestion du risque.
+
+- Respect du Plan : Utilisez le slider pour noter votre discipline globale durant la session.
+- Validation des points : Retrouvez ici la liste personnalisée créée dans votre page "Checklist" (ex: Stop Loss placé, Pas d'overtrading, Ratio R/R respecté).
+- Feedback visuel : Les points non respectés apparaissent immédiatement sous la section "Choix enregistrés" avec une croix rouge. C'est votre miroir de discipline.
+
+3. Current State (État Mental & Psychologie)
+Parce qu'un bon trader doit être conscient de ses émotions au moment du clic.
+
+- State of the moment : Choisissez l'état d'esprit qui vous habitait (ex: Confiance, Stress, Fatigue). Ces états sont personnalisables dans votre page "Mental State".
+- Lien Performance/Mental : En remplissant cette partie, Paychek est capable de vous dire : "Vous avez 80% de Win Rate quand vous êtes 'Calme', mais seulement 10% quand vous êtes 'Excité'."
+
+4. Tags Rapides (FOMO, Tilt, Revenge)
+En bas de page, marquez votre trade avec des étiquettes psychologiques instantanées :
+
+- FOMO : Peur de rater le mouvement.
+- Tilt / Revenge : Volonté de se refaire après une perte.
+- Blind : Trade pris sans analyse réelle.
+
+Analyse d'Impact : Ces tags permettent à la page Performance de chiffrer précisément le coût financier de vos émotions.
+
+[img:assets/help_center/discipline_impact_web.png]
+
+────────────────────────────────────────
+
+Guide : Preuves Visuelles, Imports & Validation (Partie 4)
+Cette dernière étape finalise votre journalisation en apportant des preuves concrètes à votre analyse et en automatisant la gestion de vos données.
+
+[img:assets/help_center/add_trade_part4_screenshot_csv_save.png]
+
+1. Screenshot (Preuve Graphique)
+Un journal de trading performant doit être visuel pour permettre une révision efficace.
+
+Ajout d'image : Cliquez sur "Tap to add an image" pour uploader la capture d'écran de votre graphique au moment du trade.
+
+Accessibilité totale : Une fois enregistrée, cette image est automatiquement intégrée :
+
+- Dans le récapitulatif de votre Page Trade.
+- Dans le PDF individuel de chaque trade, généré pour un archivage professionnel.
+- Dans vos rapports (hebdo) de performance.
+
+[img:assets/help_center/add_trade_part4_trade_recap.png]
+
+2. Import CSV (Automatisation Complète)
+Pour les traders qui ne souhaitent pas saisir manuellement chaque donnée d'exécution, Paychek propose une solution d'intégration automatique.
+
+- Logiciels compatibles : Paychek supporte l'import direct depuis plusieurs plateformes de trading.
+- Gain de temps : Sélectionnez votre logiciel dans la liste et cliquez sur "IMPORT CSV". Les prix, lots et horaires sont intégrés instantanément sans saisie manuelle.
+- Focus : Cela vous permet de vous concentrer uniquement sur l'analyse de votre discipline et de votre état mental.
+
+3. Validation et Sauvegarde
+Pour valider votre saisie, deux options s'offrent à vous :
+
+- Bouton "Save" : Enregistre votre trade actuel, génère les rapports associés (PDF) et quitte la page pour vous ramener à votre journal.
+- Bouton "Save & Next" : Enregistre le trade actuel et ouvre immédiatement un nouveau formulaire vide. Option idéale pour enregistrer une série de trades à la suite sans perdre de temps.

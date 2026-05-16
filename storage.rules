@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function paychekSupportAllowedMime(ct) {
+      return ct.matches('application/pdf')
+        || ct.matches('image/.*')
+        || ct == 'application/octet-stream';
+    }
+
+    match /support_attachments/{userId}/{ticketId}/{fileName} {
+      // Création : utilisateur connecté uniquement sous son dossier, taille et type contrôlés.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size <= 10 * 1024 * 1024
+        && (
+          request.resource.contentType == null
+          || request.resource.contentType.size() == 0
+          || paychekSupportAllowedMime(request.resource.contentType)
+        )
+        && fileName.matches('^[a-zA-Z0-9._-]{1,200}$');
+
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || request.auth.token.admin == true);
+
+      allow update, delete: if false;
+    }
+
+    // Pièces jointes envoyées par la console admin (claims admin), sous dossier utilisateur pour lecture côté app.
+    match /support_staff_attachments/{userId}/{ticketId}/{fileName} {
+      allow create: if request.auth != null
+        && request.auth.token.admin == true
+        && request.resource.size <= 10 * 1024 * 1024
+        && (
+          request.resource.contentType == null
+          || request.resource.contentType.size() == 0
+          || paychekSupportAllowedMime(request.resource.contentType)
+        )
+        && fileName.matches('^[a-zA-Z0-9._-]{1,240}$');
+
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || request.auth.token.admin == true);
+
+      allow update, delete: if false;
+    }
+  }
+}

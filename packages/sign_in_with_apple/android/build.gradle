@@ -1,0 +1,43 @@
+// Fork local : pas de buildscript kotlin-gradle-plugin:1.7.10 (évite téléchargement TLS / PKIX
+// quand le JDK ne fait pas confiance au proxy d’entreprise). Les versions viennent de
+// android/settings.gradle.kts (pluginManagement).
+
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+group 'com.aboutyou.dart_packages.sign_in_with_apple'
+version '1.0-SNAPSHOT'
+
+android {
+    namespace 'com.aboutyou.dart_packages.sign_in_with_apple'
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    lint {
+        disable 'InvalidPackage'
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'androidx.browser:browser:1.5.0'
+}

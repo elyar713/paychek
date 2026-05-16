@@ -1,0 +1,1333 @@
+{
+  "@@locale": "pt",
+  "actionAdd": "Adicionar",
+  "addPortfolio": "Adicionar portfólio",
+  "ajouterTradeCapitalRequiredHint": "Defina um capital (questionário) para permitir o cálculo.",
+  "ajouterTradeCapitalGainEnterExitToShowPnl": "Insira o preço de saída para mostrar o P&L.",
+  "ajouterTradeCapitalGainOpenPositionNote": "Posição aberta: o P&L estimado será mostrado quando você fechar.",
+  "ajouterTradeCommissionFeesLabel": "Taxas (comissão)",
+  "ajouterTradeFillSuggestedLot": "Preencher lote",
+  "ajouterTradeSizingEstimationFootnote": "* As estimativas usam capital poupado; os valores do contrato/CFD são aproximados.",
+  "ajouterTradeScreenshotHelp": "Adicione um gráfico ou configure a captura de tela (opcional).",
+  "ajouterTradePageTitle": "Adicionar negociação",
+  "ajouterTradeErrorQtyPositive": "Insira um tamanho de posição maior que 0.",
+  "ajouterTradeErrorEntryPrice": "Insira um preço de entrada válido (maior que 0).",
+  "ajouterTradeErrorExitOrFlags": "Insira um preço de saída válido ou marque a posição de equilíbrio / aberta se a saída ainda não for conhecida.",
+  "ajouterTradePsychTagBlind": "Cego",
+  "ajouterTradeCapitalGainHeading": "CAPITAL E GANHO",
+  "ajouterTradeMindsetPrompt": "Você fez esta negociação com:",
+  "ajouterTradeDisciplineSettingsTooltip": "Configurações: Seções de sentimento e ativas.",
+  "ajouterTradeSaveAndNext": "Salvar & próximo",
+  "ajouterTradeLiteMonthlyLimitReached": "Lite: você pode registrar até {max} negociações por mês civil. Faça upgrade para Pro para entradas ilimitadas.",
+  "@ajouterTradeLiteMonthlyLimitReached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeLiteMonthlyLimitImportSkipped": "{skipped} negociação(ões) não importada(s): o plano Lite permite no máximo {max} negociações por mês civil.",
+  "@ajouterTradeLiteMonthlyLimitImportSkipped": {
+    "placeholders": {
+      "skipped": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSectionEtatMoment": "ESTADO ATUAL",
+  "ajouterTradeImagePickerClose": "Fechar",
+  "ajouterTradeImagePickerTitle": "Fonte da imagem",
+  "ajouterTradeGallery": "Imagens",
+  "ajouterTradeCamera": "Câmera",
+  "ajouterTradeFeedbackAlmost100": "Você está perto de 100%: continue aplicando todos os pontos.",
+  "ajouterTradeFeedbackTickEach": "Marque cada ponto que se aplica (várias seleções).",
+  "ajouterTradeChoicesSaved": "Escolhas salvas:",
+  "ajouterTradeNonRespectedSemantic": "• Não são seguidos",
+  "@ajouterTradeNonRespectedSemantic": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "ajouterTradeDisciplineRespectBase": "Respeito",
+  "@ajouterTradeDisciplineRespectBase": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeDisciplineRespectNonList": "· Não seguido: {items}{more}",
+  "@ajouterTradeDisciplineRespectNonList": {
+    "placeholders": {
+      "items": {},
+      "more": {}
+    }
+  },
+  "ajouterTradeFieldActif": "Ativo",
+  "ajouterTradeFieldEntree": "Entrada",
+  "ajouterTradeFieldSortie": "Sair",
+  "ajouterTradeCheckboxBreakeven": "Breakeven",
+  "ajouterTradeCheckboxPositionOpen": "Posição Aberta",
+  "ajouterTradeCheckboxAvantNews": "Antes de notícias",
+  "ajouterTradeCheckboxApresNews": "Depois de notícias",
+  "ajouterTradeDirectionBuyLong": "Comprar/Long ",
+  "ajouterTradeDirectionSellShort": "Vender/Short ",
+  "ajouterTradeEntryExitDateHint": "Dica: defina a data e a hora para Entrada e Saída. Na página Desempenho, isso vincula a duração da posição ao seu lucro ou prejuízo.",
+  "ajouterTradeQtyLots": "Tamanho (lotes)",
+  "ajouterTradeQtyContracts": "Tamanho (contratos)",
+  "ajouterTradeQtyUnits": "Tamanho (unidades)",
+  "ajouterTradeQtyShares": "Tamanho (ações)",
+  "ajouterTradeShortcutsLots": "Atalhos do lote",
+  "ajouterTradeShortcutsContracts": "Atalhos de contrato",
+  "ajouterTradeShortcutsQty": "Atalhos de tamanho",
+  "ajouterTradeShortcutsCommonSizes": "Atalhos (tamanhos comuns)",
+  "ajouterTradeLotHintMini": "Por exemplo, 0,1 = mini lote típico.",
+  "ajouterTradeLotFieldHintForex": "por exemplo, 0,1",
+  "ajouterTradeLotFieldHintContracts": "e.g. 2",
+  "ajouterTradeLotFieldHintUnits": "por exemplo 1",
+  "ajouterTradeLotFieldHintShares": "[por exemplo, 10%]",
+  "ajouterTradeDisciplineSettingsTitle": "Configurações de disciplina",
+  "ajouterTradeDisciplineSettingsSubtitle": "Escolha quais seções estão ativas para esta negociação.",
+  "ajouterTradeDisciplineFeelingModeTitle": "Modo sentimento",
+  "ajouterTradeDisciplineFeelingAllowSubtitle": "Permitir o preenchimento das seções abaixo.",
+  "ajouterTradeDisciplineSectionsHeading": "SEÇÕES",
+  "ajouterTradeDisciplineStrategieTitle": "Estratégia",
+  "ajouterTradeDisciplineStrategieSubtitle": "Configuração, feedback",
+  "ajouterTradeDisciplinePlanTitle": "Analysis plan",
+  "ajouterTradeDisciplinePlanSubtitle": "Relatório, feedback",
+  "ajouterTradeDisciplineChecklistTitle": "Checklist",
+  "ajouterTradeDisciplineChecklistSubtitle": "Pontos a seguir",
+  "ajouterTradeDisciplineEtatTitle": "Estado do momento",
+  "ajouterTradeDisciplineEtatSubtitle": "Momentos e emoções",
+  "ajouterTradeDisciplineSliderStrategieRespected": "Estratégia seguida",
+  "ajouterTradePositionSettingsTitle": "Configurações de Posição",
+  "ajouterTradeStrategieFeedbackBravo": "Muito bem! Você seguiu sua estratégia completamente.",
+  "ajouterTradeStrategieFeedbackWhichMissed": "Quais partes da sua estratégia você não seguiu?",
+  "ajouterTradeStrategieGoldRules": "REGRAS DE OURO",
+  "ajouterTradeStrategieRuleN": "Regra ",
+  "@ajouterTradeStrategieRuleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeStrategieSetupTimeframesRow": "Períodos:",
+  "@ajouterTradeStrategieSetupTimeframesRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupIndicatorsRow": "Indicadores: {value}",
+  "@ajouterTradeStrategieSetupIndicatorsRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupPatternRow": "Padronizar:",
+  "@ajouterTradeStrategieSetupPatternRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieSetupSignalRow": "Sinal: {value}",
+  "@ajouterTradeStrategieSetupSignalRow": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "ajouterTradeStrategieRiskManagement": "GESTÃO DE RISCOS",
+  "ajouterTradeStrategieHoursSessions": "HORAS E SESSÕES",
+  "ajouterTradeStrategieSetupModels": "CONFIGURAÇÃO E MODELOS",
+  "ajouterTradeStrategieSetupModelsWithTitle": "CONFIGURAÇÃO E MODELOS — {title}",
+  "@ajouterTradeStrategieSetupModelsWithTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "ajouterTradeStrategiePickStrategyHint": "Escolha uma estratégia da lista acima para mostrar os detalhes de configuração (entrada, parada, destino, gerenciamento de negociação, etc.).",
+  "ajouterTradeStrategieRowPattern": "Padrão",
+  "ajouterTradeStrategieRowSignal": "Sinal",
+  "ajouterTradeStrategieClosedLabel100": "Ótimo, estratégia seguida",
+  "ajouterTradeStrategieClosedLabel95": "Quase totalmente seguido",
+  "ajouterTradeStrategieClosedLabelLow": "Pontos a serem revisados",
+  "ajouterTradePlanPickReportAbove": "Escolha um relatório no campo acima.",
+  "ajouterTradePlanFeedbackAlmost100": "Você está perto de 100%: continue aplicando todos os pontos do seu plano de análise.",
+  "ajouterTradePlanFeedbackBravo": "Muito bem! Você seguiu seu plano de análise completamente.",
+  "ajouterTradePlanFeedbackWhichMissed": "Quais partes do seu plano de análise você não seguiu?",
+  "ajouterTradePlanClosedLabel100": "Ótimo, plano seguido",
+  "ajouterTradePlanClosedLabelLow": "Comentários e sugestões",
+  "ajouterTradeChecklistFeedbackAlmost100": "Você está perto de 100%: continue aplicando todos os pontos da sua lista de verificação.",
+  "ajouterTradeChecklistFeedbackBravo": "Muito bem! Você seguiu sua lista de verificação completamente.",
+  "ajouterTradeChecklistFeedbackWhichMissed": "Quais partes da sua lista de verificação você não seguiu?",
+  "ajouterTradeChecklistClosedLabel100": "Ótimo, checklist seguido",
+  "ajouterTradeChecklistClosedLabelLow": "Checklist",
+  "ajouterTradeEtatFeelingPrompt": "Que sentimentos surgiram?",
+  "ajouterTradeEtatFeedbackAlmost100": "Você está perto de 100%: continue aplicando todos os pontos.",
+  "ajouterTradeEtatClosedLabel100": "Sim, é difícil. Muito bem!",
+  "ajouterTradeEtatClosedLabelLow": "Estado do momento",
+  "ajouterTradeEtatHeaderMoment": "Seu Estado",
+  "ajouterTradeEtatHeaderEmotions": "EMOÇÕES",
+  "ajouterTradeScreenshotLoadError": "Não foi possível mostrar a imagem selecionada",
+  "ajouterTradeScreenshotChangeImage": "Trocar Imagem",
+  "ajouterTradeScreenshotTapToAdd": "Toque para adicionar uma imagem",
+  "ajouterTradeScreenshotRemove": "Remover",
+  "ajouterTradePlanRowBias": "Viés",
+  "ajouterTradePlanRowTimeframeHtf": "Prazo HTF",
+  "ajouterTradePlanRowPhase": "Fase",
+  "ajouterTradePlanRowNotes": "Notas",
+  "ajouterTradePlanRowLastPoint": "ponto de swing",
+  "ajouterTradePlanRowExtraSupport": "Apoios extras",
+  "@ajouterTradePlanRowExtraSupport": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradePlanRowExtraResistance": "Resistência extra {n}",
+  "@ajouterTradePlanRowExtraResistance": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradePlanRowOutils": "Ferramentas",
+  "ajouterTradePlanRowLiquidity": "Liquidez",
+  "ajouterTradePlanRowFibPrice": "Preço Fib",
+  "ajouterTradePlanSectionVolume": "VOLUME",
+  "analyseAddField": "+ Adicionar campo",
+  "analyseAddPhaseTitle": "Adicionar fase",
+  "analyseAddResist": "+ Adicionar resistência",
+  "analyseAddShort": "+ Adicionar",
+  "analyseAddSupport": "Apoiar",
+  "analyseAddTimeframeTitle": "Adicionar prazo",
+  "analyseAddTrendTitle": "Adicionar tendência",
+  "analyseReportScreenshotSectionTitle": "SCREENSHOT",
+  "analyseReportScreenshotAddCapture": "Adicionar Captura de tela/ Screenshot",
+  "analyseReportScreenshotChooseImage": "Escolha uma imagem",
+  "analyseReportScreenshotSubtitleWeb": "Arquivo de Imagem",
+  "analyseReportScreenshotSubtitleFilePicker": "Galeria ou explorador de arquivos",
+  "analyseReportScreenshotCamera": "Câmera",
+  "analyseReportScreenshotHintWithCamera": "Arquivo, galeria ou câmera",
+  "analyseReportScreenshotHintNoCamera": "Escolha uma imagem neste dispositivo",
+  "analyseReportScreenshotErrorPlugin": "A seleção de imagens não está disponível neste destino. Use \"Escolher uma imagem\" ou reconstrua o aplicativo (flutter clean / run).",
+  "analyseReportScreenshotErrorGeneric": "Não foi possível adicionar a captura de tela.",
+  "analyseCardIndicators": "Indicadores",
+  "analyseCardSmcLiquidity": "SMC & Liquidez",
+  "analyseCardVolumeProfile": "Perfil de Volume",
+  "analysePageHeroTitle": "Minha análise",
+  "analysePageHeroSubtitle": "Gira as suas análises e estratégias em tempo real.",
+  "analyseSidebarConfidenceSummary": "RESUMO",
+  "analyseSidebarConfidenceLabel": "confiança global",
+  "analyseSidebarReportHint": "O relatório será guardado no histórico com o ativo associado.",
+  "analyseSidebarPreviewStyle": "PRÉ-VISUALIZAÇÃO DO ESTILO",
+  "analyseConfidenceHigh": "Alta",
+  "analyseConfidenceLevelTitle": "Nível de confiança",
+  "analyseConfidenceLow": "Normal",
+  "analyseCopyLabel": "Copiar",
+  "analyseCopyNumber": "Copiar",
+  "analyseCurrentMarketPhase": "FASE ATUAL DO MERCADO",
+  "analyseCurrentTrend": "TENDÊNCIA ATUAL",
+  "analyseDeleteTemplateTitle": "Excluir Tema",
+  "analyseDirectionLabel": "DIREÇÃO",
+  "analyseDraftLabelHint": "Etiqueta",
+  "analyseExtraBroken": "Quebrado",
+  "analyseExtraHeld": "Realizado",
+  "analyseExtraPriceHint": "Preço",
+  "analyseFeuillePlanTitle": "FICHA DE PLANO DE NEGOCIAÇÃO",
+  "analyseFibLevel": "EMA, Nível de Fibonacci,",
+  "analyseFibShort": "Fibonacci",
+  "analyseFreeFields": "CAMPOS LIVRES",
+  "analyseFvg": "DIFERENÇA DE VALOR JUSTO (FVG)",
+  "analyseHintActifExamples": "por exemplo, NASDAQ, EUR/USD...",
+  "analyseHintDetailsDots": "Detalhes…",
+  "analyseHintHtfChipExample": "Ex: Semanal",
+  "analyseHintImbalance": "Desequilíbrio,",
+  "analyseHintNotesDots": "Explicativas",
+  "analyseHintPriceDots": "Preço",
+  "analyseHintStops": "Onde estão as paradas? (por exemplo, Buy Side)",
+  "analyseHintTextDots": "Text…",
+  "analyseHintTfExamples": "por exemplo, MN, 3D...",
+  "analyseHintZoneHtf": "Zona HTF…",
+  "analyseHtfTimeframe": "PRAZO DE ANÁLISE (HTF)",
+  "analyseImpactFeuille": "Impacto da folha",
+  "analyseImpactIndicators": "Impacto dos indicadores",
+  "analyseImpactLine": "Impacto",
+  "analyseImpactModalBlurb": "Os quatro impactos compartilham 100% no total. Mover este controle deslizante ajusta os outros proporcionalmente.",
+  "analyseImpactModalTitle": "Ajustar impacto",
+  "analyseImpactShort": "Impacto",
+  "analyseImpactSmc": "Impacto SMC",
+  "analyseLastPointHint": "Último Ponto",
+  "analyseLiquidityPools": "Pools de liquidez",
+  "analyseMovementDetailsHint": "Detalhes do movimento",
+  "analyseNameFieldHint": "Nome da análise...",
+  "analyseNameFieldLabel": "Nome da análise",
+  "analyseNoTemplatesSaved": "Nenhum modelo salvo",
+  "analyseNote": "NOTA",
+  "analyseNotesIndicators": "NOTAS (INDICADORES)",
+  "analyseNotesSmcExample": "por exemplo, Liquidity grab before FVG...",
+  "analyseNotesSmcLiq": "NOTAS (SMC E LIQUIDEZ)",
+  "analyseNotesVolumeProfile": "NOTAS (PERFIL DE VOLUME)",
+  "analyseOrderBlock": "BLOCO DE PEDIDO (OB)",
+  "analysePhase": "FASE",
+  "analyseReportCellFvg": "FVG",
+  "analyseReportCellLiqPools": "PISCINAS LIQ.",
+  "analyseReportCellOrderBlock": "Seu bloco de pedido",
+  "analyseResistLower": "Resistência",
+  "analyseResistShort": "RESIST",
+  "analyseSetup": "CONFIGURAÇÃO",
+  "analyseSideBuy": "Comprar",
+  "analyseSideSell": "Venda",
+  "analyseSideWatch": "Acompanhar",
+  "analyseSmcAdds": "SMC ADICIONA",
+  "analyseStructTagResist": "R",
+  "analyseStructTagSupport": "S",
+  "analyseStructure": "ESTRUTURAR",
+  "analyseStructureSectionTitle": "Estrutura",
+  "analyseSupport": "SUPORTE",
+  "analyseSupportLower": "Suporte",
+  "analyseTemplateApplied": "Modelo “{name}” aplicado",
+  "analyseTemplateNameHint": "Novo Nome",
+  "analyseTemplateRenameDialogTitle": "Modelo de renomear",
+  "analyseTemplateSaveDialogTitle": "Nome do modelo",
+  "analyseTemplateStyleHint": "por exemplo, swing, scalping...",
+  "analyseTestedTwice": "Testado x 2",
+  "analyseTimeframeLabelShort": "PERIODICIDADE",
+  "analyseTooltipPickTemplate": "Escolha um modelo salvo",
+  "analyseTooltipSaveTemplatePills": "Poupe comprimidos com um nome (o seu hábito)",
+  "analyseTrend": "TENDÊNCIA",
+  "analyseTrendLabel": "Tendência",
+  "analyseVolumePoc": "POC",
+  "analyseVolumeProfile": "Perfil de Volume",
+  "analyseVolumeProfileDefaultLabel": "Perfil de Volume",
+  "analyseVolumeVah": "VAH",
+  "analyseVolumeVal": "VAL",
+  "appBrandName": "PAYCHEK",
+  "buttonCalculate": "Calcular",
+  "calAmountLabel": "Valor",
+  "calMonthlyObjectiveTitle": "Objetivo mensal",
+  "calPageTitle": "Calendário",
+  "calObjectiveLabel": "Objetivo",
+  "calCumulativePerformanceTitle": "Desempenho cumulativo",
+  "calBestDay": "Melhor dia",
+  "calTradingDays": "Dias de negociação",
+  "calAverageShort": "Média",
+  "calPnlShort": "P&L",
+  "calCapitalChangePct": "% do capital social",
+  "calAveragePerDay": "Média/Dia",
+  "calObjectiveShort": "Objetivo",
+  "calChartError": "Erro $<x id=\"0\"/>:",
+  "@calChartError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "calDayTradesCount": "{count, plural, =0{Nenhuma operação} =1{1 operação} other{{count} operações}}",
+  "@calDayTradesCount": {
+    "description": "Number of trades on a calendar day (tooltip or cell).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthJanuary": "Janeiro",
+  "monthFebruary": "Fevereiro",
+  "monthMarch": "Março",
+  "monthApril": "Abril",
+  "monthMay": "Maio",
+  "monthJune": "Junho",
+  "monthJuly": "Julho",
+  "monthAugust": "Agosto",
+  "monthSeptember": "Setembro",
+  "monthOctober": "Outubro",
+  "monthNovember": "Novembro",
+  "monthDecember": "Dezembro",
+  "monthAbbrJanuary": "Jan",
+  "monthAbbrFebruary": "Fev",
+  "monthAbbrMarch": "Mar",
+  "monthAbbrApril": "Abr",
+  "monthAbbrMay": "Maio",
+  "monthAbbrJune": "Jun",
+  "monthAbbrJuly": "Jul",
+  "monthAbbrAugust": "Ago",
+  "monthAbbrSeptember": "Set",
+  "monthAbbrOctober": "Out",
+  "monthAbbrNovember": "Nov",
+  "monthAbbrDecember": "Dez",
+  "calcBestBalance": "Melhor saldo",
+  "calcEndBalance": "Saldos finais",
+  "calcEquityCurveTitle": "Gráfico da curva de retorno da negociação",
+  "calcLabelEntry": "Preço de entrada",
+  "calcLabelRiskShort": "Risco",
+  "calcLabelSl": "Limite de perdas (stop loss)",
+  "calcLabelStartBalance": "Saldo inicial",
+  "calcLabelTp": "Take profit",
+  "calcLabelTradesShort": "Operações",
+  "calcLabelWinRateShort": "Acerto",
+  "calcLoss": "Derrota",
+  "calcMaxDrawdown": "Drawdown Máximo",
+  "calcProfitFactor": "Fator de lucro",
+  "calcRatioSectionTitle": "Proporção",
+  "calcResult": "Resultado",
+  "calcResultOfCalculation": "Resultado da apuração",
+  "calcRowGain": "Ganho: ",
+  "calcRowSl": "Assunto:",
+  "calcRowVsCapital": "Vs capital",
+  "calcSettingsTitle": "Configurações",
+  "calcTotalGainLabel": "Ganho total",
+  "calcTradeReturnTableTitle": "Resultados retorno DA negociação",
+  "calcWin": "Vitória",
+  "calcWinsLosses": "Ganhos / Perdas",
+  "calcWorstBalance": "Pior saldo",
+  "calculateRatio": "Calcular razão",
+  "cancel": "Cancelar",
+  "capitalAmountLabel": "Montante de capital",
+  "capitalCurrencyTitle": "Moeda",
+  "capitalEllipsis": "…",
+  "capitalHintAmount": "por exemplo, 10 450",
+  "capitalInitialTitle": "Capital inicial",
+  "capitalLabel": "Capital",
+  "capitalOther": "outros",
+  "capitalTooltip": "Capital e moeda (conta principal)",
+  "checklistAddSection": "Adicionar uma secção",
+  "checklistDefaultNewSection": "NOVA SEÇÃO",
+  "checklistDeleteSectionBody": "Esta ação é permanente para esta seção.",
+  "checklistDeleteSectionTitle": "Remove seção",
+  "checklistEditSectionHint": "Título",
+  "checklistIntroBody": "Antes de assumir uma posição, certifique-se de validar todos os critérios do seu plano de negociação.",
+  "checklistItemAnalyse1": "A tendência de fundo (HTF) se alinha à minha ideia.",
+  "checklistItemAnalyse2": "O preço está em uma zona-chave (Suporte/Resistência, Bloco de Pedidos).",
+  "checklistItemAnalyse3": "Tenho uma confirmação de entrada clara (Padrão, Divergência).",
+  "checklistItemHint": "Inserir critério",
+  "checklistItemPsy1": "Eu negocio com uma mentalidade neutra (sem negociação de vingança).",
+  "checklistItemPsy2": "Aceito a perda potencial antes de entrar.",
+  "checklistItemPsy3": "Eu mantenho meu plano mesmo depois de uma série de perdas.",
+  "checklistItemRisque1": "Meu stop loss é definido tecnicamente (não aleatoriamente).",
+  "checklistItemRisque2": "O risco não excede 1% do meu capital.",
+  "checklistItemRisque3": "A relação risco/recompensa é de pelo menos 1:2.",
+  "checklistMenuEdit": "Editar",
+  "checklistPageTitle": "Checklist",
+  "checklistProgressCl": "CL",
+  "checklistSectionAnalyse": "ANÁLISE TÉCNICA",
+  "checklistSectionPsy": "PSICOLOGIA",
+  "checklistSectionRisque": "GESTÃO DE RISCOS",
+  "clearAll": "Limpar Tudo",
+  "confirm": "Confirmar",
+  "currencyNameHint": "por exemplo, CHF, XOF",
+  "currencyNameLabel": "Nome da Moeda",
+  "customCurrencyTitle": "Outra moeda",
+  "dashboardAiAnalyze": "Analise",
+  "dashboardAiCoachBody": "Toque em « Analisar » para que a IA reveja as suas estatísticas semanais (Taxa de vitórias, Horas, Fatores) e gere aconselhamento psicológico personalizado.",
+  "dashboardAiCoachTitle": "PAYCHEK AI COACH",
+  "dashboardAnalyseShortcutTitle": "Minha análise",
+  "dashboardBestTradeLabel": "Melhor negociação",
+  "dashboardCapitalBalanceHeader": "Saldo de Capital",
+  "dashboardCapitalEvolutionTitle": "EVOLUÇÃO DO CAPITAL",
+  "dashboardChecklistHeading": "LISTA DE VERIFICAÇÕES",
+  "dashboardChecklistSeeRest": "Mais >",
+  "dashboardChecklistAllDoneBravo": "Bom trade.",
+  "dashboardMyStateSection": "Meu estado",
+  "dashboardOpenStrategyTooltip": "Abrir Minha Estratégia",
+  "dashboardPerfHourWinRate": "WR",
+  "dashboardPerfHoursRow1": "09:00 - 11:30 (Início)",
+  "dashboardPerfHoursRow2": "14:30 - 16:30 (US Open)",
+  "dashboardPerfHoursRow3": "19:00+ (Noite)",
+  "dashboardPerfHoursTitle": "HORAS DE DESEMPENHO",
+  "dashboardRingState": "UF",
+  "dashboardRingWin": "GANHAR",
+  "dashboardSuccessFactorSample": "Esporte antes da sessão",
+  "dashboardSuccessFactorsSubtitle": "Acompanhe como seus hábitos afetam sua taxa de vitórias.",
+  "dashboardSuccessFactorsTitle": "Fatores de sucesso ",
+  "dashboardTfAll": "TODOS",
+  "dashboardTfDay": "Leitor de código de barras com fio 1D",
+  "dashboardTfMonth": "1M",
+  "dashboardTfWeek": "1W",
+  "dashboardTradeCount": "{count} negociações",
+  "dashboardTradeOne": "1 negociação",
+  "dashboardEvolutionTradesThisPeriod": "{count, plural, =0{0 negociações neste período} =1{1 negociação neste período} other{{count} negociações neste período}}",
+  "dashboardEvolutionSparklineHoverOrigin": "Abertura do acumulado",
+  "dashboardEvolutionSparklineHoverNoTrade": "Sem negociações neste patamar",
+  "dashboardEvolutionSparklineHoverMore": "+{count} outras",
+  "@dashboardEvolutionSparklineHoverMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardEvolutionSparklineTapHint": "Toque para abrir",
+  "dashboardWeekResultPrefix": "Resultado:",
+  "dashboardWeekThisWeek": "DA SEMANA",
+  "dashboardWeekdayShortFri": "SEX",
+  "dashboardWeekdayShortMon": "SEG",
+  "dashboardWeekdayShortSat": "SAT",
+  "dashboardWeekdayShortSun": "DOM",
+  "dashboardWeekdayShortThu": "QUI",
+  "dashboardWeekdayShortTue": "TER",
+  "dashboardWeekdayShortWed": "QUA",
+  "dashboardWorstLossLabel": "Pior perda",
+  "delete": "Excluir",
+  "deletePortfolioTitle": "Eliminar \"{name}\"?",
+  "deleteTooltip": "Excluir",
+  "editPortfolioTooltip": "Editar nome, capital, moeda",
+  "errorAmount": "Você deve inserir um valor válido",
+  "errorInvalidAmount": "Valor ou moeda inválidos.",
+  "errorNameOrSymbol": "Insira pelo menos um nome ou um símbolo.",
+  "exportPdfFailed": "Não foi possível exportar o PDF.",
+  "exportPdfFailedWithError": "Não foi possível exportar PDF: {error}",
+  "exportPdfUnavailable": "Exportação de PDF cancelada ou indisponível.",
+  "homePerformance": "Aproveitamento",
+  "webHomeHeroSubtitle": "Bem-vindo — aqui está o seu desempenho semanal",
+  "webHomeHeroWelcome": "Bem-vindo, {fullName}",
+  "@webHomeHeroWelcome": {
+    "placeholders": {
+      "fullName": {}
+    }
+  },
+  "webHomeLiveTerminal": "Terminal ao vivo",
+  "webHomeWelcomeBack": "Bem-vindo de volta,",
+  "webHomeUpgradeUnlockSubtitle": "Desbloqueie dados institucionais em tempo real",
+  "webRailMenuHeading": "Menu",
+  "labelActif": "Ativo",
+  "labelGain": "P&L",
+  "labelLot": "LOT",
+  "labelMarket": "MERCADO",
+  "labelPrice": "PREÇO",
+  "labelRiskPct": "RISCO",
+  "labelSuggestedSize": "Tamanho sugerido",
+  "langChineseTraditional": "中文 （繁體",
+  "langEnglish": "Inglês",
+  "langFrench": "Francês",
+  "langGerman": "Alemão",
+  "langItalian": "Italiano ",
+  "langKorean": "한국어",
+  "langPortuguese": "Português",
+  "langSpanish": "Español",
+  "languageDialogSubtitle": "Idioma da interface.",
+  "languageDialogTitle": "Escolher idioma",
+  "languageSection": "Idioma",
+  "onboardingLanguageContinue": "Continuar",
+  "mentalBad": "Mal",
+  "mentalConfidence": "Confiança",
+  "mentalEmotionFieldLabel": "Nome da emoção (por exemplo, Calmo, Medroso)",
+  "mentalEmotional": "Emocional",
+  "mentalEnergy": "Energia",
+  "mentalExcited": "Empolgada(o) ",
+  "mentalFocus": "Foco",
+  "mentalFrustrated": "Decepcionado",
+  "mentalHappy": "Feliz",
+  "mentalHintEmotion": "por exemplo, calmo, medroso",
+  "mentalHintMetric": "por exemplo, Paciência, Estresse",
+  "mentalHintRoutine": "por exemplo, esporte, leitura",
+  "mentalMarketStudy": "MARKET STUDY ",
+  "mentalMeditation": "Meditação (10 min)",
+  "mentalMetricFieldLabel": "Nome da métrica (por exemplo, Paciência, Estresse)",
+  "mentalNegative": "Negative (-)",
+  "mentalNeutral": "Não concordo nem discordo",
+  "mentalNewEmotion": "Nova emoção",
+  "mentalNewMetric": "Nova Métrica:",
+  "mentalNewRoutine": "Nova rotina?",
+  "mentalPeakForm": "Forma de pico",
+  "mentalPositive": "Positive (+)",
+  "mentalRestTitle": "REST",
+  "mentalRiskAppetite": "Medo",
+  "mentalRoutineFieldLabel": "Nome da rotina (por exemplo, esporte, leitura)",
+  "mentalGlobalScoreCalendarTitle": "PONTUAÇÃO GLOBAL POR DIA",
+  "mentalSleepEnough": "Dormiu o suficiente",
+  "mentalSleepImpact": "Impacto",
+  "mentalSport": "Esporte / corrida",
+  "mentalTired": "Cansado",
+  "mentalWeightGlobalImpact": "Impacto Global",
+  "mentalWeightModalBlurb": "Ajuste a importância desse critério. Use o multiplicador ou defina a porcentagem desejada diretamente.",
+  "mentalWeightModalTitle": "Ajustar impacto",
+  "mentalWeightNatureLabel": "Natureza do impacto ",
+  "mentalWeightPolarityHelpNegative": "Um valor alto para este critério DIMINUIRÁ sua pontuação global.",
+  "mentalWeightPolarityHelpPositive": "Um valor alto para este critério AUMENTARÁ sua pontuação global.",
+  "mentalPageTitle": "Estado mental",
+  "mentalPageIntro": "Avalie seu estado mental. Personalize o impacto (peso) de cada critério para corresponder ao seu perfil.",
+  "mentalGaugeStateLabel": "UF",
+  "mentalGaugeBasedOnIndicators": "Com base em {count} indicadores",
+  "@mentalGaugeBasedOnIndicators": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mentalGaugeStatusStable": "Equilíbrio sólido",
+  "mentalGaugeStatusFragile": "Precisa de atenção",
+  "mentalSectionRoutinesHeading": "MINHAS ROTINAS",
+  "mentalSectionMomentHeading": "ESTADO DO MOMENTO",
+  "mentalSectionEmotionHeading": "EMOÇÕES",
+  "modelSavedSnackbar": "Modelo \"{name}\" guardado",
+  "navAdd": "Adicionar",
+  "navCalendar": "Calendário",
+  "navDashboard": "Painel",
+  "navMore": "Maior",
+  "navTrade": "Comércio",
+  "ok": "OK",
+  "perf0Sub": "Impacto do estresse e da fadiga na taxa de vitórias",
+  "perf0Title": "Psicologia: Emoções e sono",
+  "perf1Sub": "Análise de rentabilidade (Seg-Dom)",
+  "perf1Title": "Dias da semana",
+  "perf2Sub": "Encontre as suas horas mais rentáveis",
+  "perf2Title": "Horas da sessão",
+  "perf3Sub": "Taxa de sucesso deste padrão de gráfico",
+  "perf3Title": "Padrão: Duplo superior / inferior",
+  "perf4Sub": "Análise de reversão principal",
+  "perf4Title": "Padrão: Cabeça e ombros",
+  "perf5Sub": "Validação do sinal de sobrecompra/sobrevenda",
+  "perf5Title": "Indicador: Divergência do RSI",
+  "perf6Sub": "Eficácia do cruzamento da média móvel",
+  "perf6Title": "Indicador: cruzamento MACD",
+  "perf7Sub": "Salta nos níveis 0,618 e 0,5",
+  "perf7Title": "Indicador: Retração de Fibonacci",
+  "perf8Sub": "Blocos de ordens e análise de liquidez",
+  "perf8Title": "Estratégia: Conceito de Dinheiro Inteligente (SMC)",
+  "perf9Sub": "Impacto do risco financeiro na taxa de ganhos",
+  "perf9Title": "Volume e tamanho do lote",
+  "perfAddWidgetButton": "Adicionar widget",
+  "perfChartBar": "Gráfico de barras",
+  "perfChartHBar": "Barras horizontais",
+  "perfChartHintBar": "Ideal para comparação (por exemplo, dias úteis)",
+  "perfChartHintHBar": "Formato de lista, simples e limpo",
+  "perfChartHintLine": "Para ver uma tendência ao longo do tempo",
+  "perfChartHintPie": "Para uma porcentagem geral",
+  "perfChartLine": "Gráfico de linhas",
+  "perfChartPie": "Círculo / medidor",
+  "perfCustomizeIntro": "Personalize sua página de Desempenho.",
+  "perfDataFootnoteDuration": "Dados: discriminação por duração da posição (CSV).",
+  "perfDataFootnoteVolume": "Proxy de volume: buckets por |lucro| (CSV).",
+  "perfEmptyChart": "Importe ou carregue negociações (CSV) para exibir o gráfico.",
+  "perfLineChartCaption": "Linha: lucro acumulado (ordem cronológica, CSV).",
+  "perfNewWidgetTitle": "Novo widget",
+  "perfNoResults": "Nenhuma opção encontrada.",
+  "perfPieChartCaption": "Fatias = volume de negociação por categoria; % em disco = participação do total.",
+  "perfRemoveWidgetTooltip": "Remover Widget",
+  "perfSearchHint": "Pesquisa (por exemplo, padrão, psicologia...)",
+  "perfStep1Title": "1. O que você deseja analisar?",
+  "perfStep2Title": "2. Tipo de gráfico",
+  "plusAdd": "Adicionar",
+  "plusCalculator": "Calculadora",
+  "plusCalendar": "Calendário",
+  "plusChecklist": "Checklist",
+  "plusDashboard": "Painel",
+  "plusMentalState": "Estado mental",
+  "plusMyAnalysis": "Minha análise",
+  "plusMyStrategy": "Minha estratégia",
+  "plusPerformance": "Aproveitamento",
+  "plusSettings": "Configurações",
+  "plusTrade": "Comércio",
+  "paychekAccessDeniedTitle": "Access restricted",
+  "paychekAccessDeniedWeb": "Web access for this account has been disabled. Contact support if needed.",
+  "paychekAccessDeniedMobile": "Mobile app access for this account has been disabled. Contact support if needed.",
+  "portfolioNameMissing": "Insira um nome de portfólio (por exemplo, corretor).",
+  "portfoliosLabel": "Portfólios",
+  "q1Slogan": "Escolha a sua abordagem",
+  "q1Title": "Que tipo de trader você é?",
+  "q1o1s": "Posições de segundos a alguns minutos",
+  "q1o1t": "Scalping",
+  "q1o2s": "Todas as posições são fechadas antes do término da sessão",
+  "q1o2t": "Day trading",
+  "q1o3s": "Posições mantidas entre 1 e 3 dias",
+  "q1o3t": "Intradiário",
+  "q1o4s": "Posições mantidas ao longo de vários dias ou semanas",
+  "q1o4t": "Swing",
+  "q2Slogan": "Onde você está em sua jornada?",
+  "q2Title": "Perfil de experiência",
+  "q2o1s": "Você não está sozinho",
+  "q2o1s2": "Para traders que estão começando e ainda procurando seu método",
+  "q2o1t": "Eu não tenho uma estratégia",
+  "q2o2s": "Luz ao fim do túnel",
+  "q2o2s2": "Para aqueles com o básico que querem consistência",
+  "q2o2t": "Eu tenho minha estratégia",
+  "q2o3s": "A parte mais difícil ficou para trás",
+  "q2o3s2": "Para traders experientes que dominam suas estatísticas",
+  "q2o3t": "Alto desempenho",
+  "q3Slogan": "Escolha a sua prioridade máxima",
+  "q3Title": "O que você mais deseja melhorar?",
+  "q3o1s": "Pare de ganhar um dia para perder tudo no dia seguinte.",
+  "q3o1s2": "Para estabilizar sua curva de equidade e evitar o elevador emocional.",
+  "q3o1t": "SAIR DA MONTANHA-RUSSA",
+  "q3o2s": "Melhore a taxa de acertos e a precisão das entradas.",
+  "q3o2s2": "Para quem quer ganhar mais vezes escolhendo melhor cada operação.",
+  "q3o2t": "TORNE-SE UM SNIPER",
+  "q3o3s": "Domine a disciplina e pare decisões emocionais.",
+  "q3o3s2": "Para eliminar o trading impulsivo e seguir seu plano 100%.",
+  "q3o3t": "MANTENHA A FRIEZA",
+  "q3o4s": "Entenda quais padrões gráficos funcionam de verdade para você.",
+  "q3o4s2": "Para identificar seus próprios padrões vencedores e virar especialista.",
+  "q3o4t": "ENCONTRE A SUA ASSINATURA",
+  "q4Slogan": "Identifique o que mais bloqueia você",
+  "q4Title": "Qual é o seu maior desafio?",
+  "q4o1s": "Medo de ficar de fora.",
+  "q4o1s2": "Rápido, vou perder a chance de lucrar!",
+  "q4o1t": "FOMO",
+  "q4o2s": "Seu coração substituiu seu cérebro.",
+  "q4o2s2": "De jeito nenhum — eu DEVO recuperar meu dinheiro!",
+  "q4o2t": "TILT",
+  "q4o3s": "Nenhuma estratégia ou plano claro.",
+  "q4o3s2": "Eu não sei bem, mas sinto que vai dar certo — vamos tentar.",
+  "q4o3t": "OPERAR À CEGAS",
+  "q4o4s": "Agitação constante.",
+  "q4o4s2": "Se eu não clicar, sinto que não estou trabalhando.",
+  "q4o4t": "OVERTRADING",
+  "q4o5s": "Achar que é invencível.",
+  "q4o5s2": "Eu sou demais — dinheiro fácil! Vou dobrar a aposta.",
+  "q4o5t": "EXCESSO DE CONFIANÇA",
+  "q4o6s": "Medo de tudo.",
+  "q4o6s2": "Não tenho certeza, tenho medo de perder de novo.",
+  "q4o6t": "PARALISIA",
+  "q4o7s": "Brincar com roleta russa.",
+  "q4o7s2": "Estou colocando tudo nesta operação — tudo ou nada.",
+  "q4o7t": "SEM GESTÃO DE CAPITAL",
+  "reglagePortfolioSheetSubtitle": "Capital e moeda da conta",
+  "reglagePortfolioSheetTitle": "Capital e portfólios",
+  "resultDontWorry": "Não se preocupe",
+  "resultHeaderSub": "Este não é o seu perfil - é apenas um cálculo; nada é real ainda. Tudo começa agora.",
+  "resultLabelGlobal": "Global",
+  "resultLabelProfil": "Perfil",
+  "resultLabelPsychology": "Psicologia",
+  "resultLabelStrategy": "Estratégia",
+  "resultStatBullet1": "{percent}% dos traders nesse nível ficam estagnados ou perdem devido à falta de rigor matemático.",
+  "resultStatBullet2": "{percent}% dos traders estão na mesma situação.",
+  "resultStatBullet3": "Um trader com psicologia forte negocia melhor do que aquele que conhece 100 estratégias.",
+  "save": "Salvar",
+  "screenshot": "SCREENSHOT",
+  "accountPageTitle": "Conta",
+  "mobileReconnectAfterLogoutTitle": "Sessão terminada",
+  "mobileReconnectAfterLogoutBody": "Inicia sessão novamente para recuperar o teu perfil na cloud e a tua subscrição. Também podes continuar a usar a app neste dispositivo sem conta.",
+  "mobileReconnectContinueWithoutAccount": "Continuar sem iniciar sessão",
+  "profileViewDetailsSection": "Dados do perfil",
+  "profileAccountStatusTitle": "Estado da conta",
+  "profileAccountStatusPro": "Pro",
+  "profileAccountStatusLite": "Lite",
+  "profileTrialBadge": "TESTE",
+  "profileTrialDaysLeft": "{count, plural, one{Falta 1 dia de teste} other{Faltam {count} dias de teste}}",
+  "@profileTrialDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileTrialEndsOn": "O teste termina em {date}",
+  "@profileTrialEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileTrialEndedOn": "O teste terminou em {date}",
+  "@profileTrialEndedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileProPeriodEndsOn": "Renovação em {date}",
+  "@profileProPeriodEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileSubscribeButton": "Passar ao Pro (49,90 $ / ano — assinatura)",
+  "profileManageSubscriptionButton": "Gerir subscrição",
+  "profileUpgradeLabel": "Upgrade",
+  "profileEditSavedSnack": "Perfil atualizado",
+  "profileEditIncompleteFieldsSnack": "Preencha nome, sobrenome e e-mail",
+  "profileEditInvalidEmailSnack": "Introduza um e-mail válido",
+  "accountAuthSectionTitle": "Entrar",
+  "accountContinueWith": "Continuar com:",
+  "accountTabLogin": "Entrar",
+  "accountTabSignup": "Cadastro",
+  "accountFieldEmail": "E-mail",
+  "accountFieldPassword": "Senha",
+  "accountFieldConfirmPassword": "Confirmar senha",
+  "accountFieldBirthDate": "Data de nascimento",
+  "accountFieldFirstName": "Nome",
+  "accountFieldLastName": "Sobrenome",
+  "accountLoginButton": "Entrar",
+  "accountSignupButton": "Criar conta",
+  "authTerminalTagline": "Domine a mente, domine o trade",
+  "authTerminalCtaLogin": "Abrir terminal",
+  "authTerminalCtaSignup": "Criar identidade",
+  "authTerminalEncryptedPrefix": "Nó encriptado:",
+  "authTerminalEncryptedStatus": "Ativo",
+  "authTerminalHintEmail": "nome@terminal.com",
+  "authTerminalHintPassword": "••••••••",
+  "accountLoginSnackEmailMissing": "Entrar: informe o e-mail",
+  "accountLoginSnackEmailReady": "Entrar: e-mail informado",
+  "accountSignupSnackEmailMissing": "Cadastro: informe o e-mail",
+  "accountSignupSnackFirstNameMissing": "Cadastro: informe o nome",
+  "accountSignupSnackLastNameMissing": "Cadastro: informe o sobrenome",
+  "accountSignupSnackBirthDateMissing": "Cadastro: selecione a data de nascimento",
+  "accountSignupSnackReady": "Cadastro: formulário pronto",
+  "accountSignupSnackPasswordMissing": "Cadastro: informe a senha",
+  "accountSignupSnackPasswordMismatch": "Cadastro: as senhas não coincidem",
+  "accountSignupSnackPasswordTooShort": "A senha deve ter pelo menos 6 caracteres",
+  "accountLoginSnackPasswordMissing": "Entrar: informe a senha",
+  "accountForgotPasswordLink": "Esqueceu a senha?",
+  "accountForgotPasswordSnackEmailMissing": "Informe seu e-mail acima para receber o link.",
+  "accountForgotPasswordSnackSent": "Se existir uma conta com este e-mail, você receberá um link para definir uma nova senha.",
+  "accountForgotPasswordSnackTooManyRequests": "Muitas tentativas. Tente novamente em alguns minutos.",
+  "accountPasswordResetDialogTitle": "Redefinir senha",
+  "accountPasswordResetDialogSubtitle": "Informe o e-mail da sua conta Paychek. Enviaremos um link para definir uma nova senha.",
+  "accountPasswordResetCta": "ENVIAR LINK",
+  "accountPasswordResetBackToLogin": "VOLTAR AO LOGIN",
+  "accountPasswordResetSnackEmailMissing": "Informe seu e-mail.",
+  "accountPasswordResetSentDialogTitle": "Verifique seu e-mail",
+  "accountPasswordResetSentDialogMessage": "Se existir uma conta com este endereço, você receberá um e-mail com um link para definir uma nova senha. Verifique também a pasta de spam.",
+  "accountPasswordResetSentDialogCta": "ENTENDI",
+  "accountAuthSignupSuccess": "Conta criada",
+  "accountAuthLoginSuccess": "Login realizado",
+  "accountAuthErrorWeakPassword": "Senha muito fraca",
+  "accountAuthErrorEmailInUse": "Este e-mail já está em uso",
+  "accountAuthErrorInvalidEmail": "E-mail inválido",
+  "accountAuthErrorWrongCredentials": "E-mail ou senha incorretos",
+  "accountAuthErrorNetwork": "Erro de rede. Tente de novo.",
+  "accountAuthErrorGeneric": "Algo deu errado",
+  "accountAuthErrorRestartOrReload": "Conexão com a autenticação perdida. Encerre o app por completo e execute de novo (na Web, evite hot reload).",
+  "accountAuthErrorDifferentSignInMethod": "Este e-mail já está em uso com outro método de login.",
+  "accountAuthErrorWithFirebaseCode": "Algo deu errado ({code}).",
+  "@accountAuthErrorWithFirebaseCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "accountAuthErrorUnknownFirebaseAuth": "Não foi possível entrar (desconhecido). Verifique a conexão, tente de novo ou abra o Paychek no Chrome. No Firebase Console → Authentication, ative E-mail/senha e os provedores que você usa.",
+  "accountAuthErrorSignInServerMessage": "{message}",
+  "@accountAuthErrorSignInServerMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accountAuthWindowsSignInNotice": "No app de desktop Windows, o login com Firebase costuma ser instável (limitação conhecida do Flutter / Firebase). Use o app móvel Paychek ou entre pelo navegador.",
+  "accountAuthWindowsOpenWebsite": "Abrir paychek.pro no navegador",
+  "accountSocialAppleAndroidUseGoogle": "Entrar com a Apple não está configurado no Android nesta versão. Use Google ou e-mail, ou entre pela web.",
+  "accountSocialAppleUnavailableDesktop": "Entrar com a Apple não está disponível no app de desktop Windows/Linux. Use a web (Chrome), iPhone, iPad ou Mac.",
+  "accountSocialGoogleUnavailableDesktop": "Login com Google indisponível no Windows/Linux. Use Chrome, Android ou iOS.",
+  "accountSocialFacebookUnavailableDesktop": "Login com Facebook não está disponível no app desktop Windows/Linux. Use a versão web (Chrome), Android, iOS ou macOS.",
+  "accountSocialGoogleWebClientMissing": "Para Google em celular ou tablet: defina o ID do cliente OAuth Web em lib/reglage/social_auth_config.dart. No Android, adicione a impressão digital SHA-1 do app no Firebase (Configurações do projeto → app Android).",
+  "paywallTitle": "Seu período de teste acabou",
+  "paywallHeadlineBefore": "Seu teste gratuito ",
+  "paywallHeadlineAccent": "acabou",
+  "paywallUpgradeSubtitle": "Faça upgrade para o Pro para desbloquear todo o seu potencial de trading e manter sua vantagem.",
+  "paywallEndedOn": "Teste encerrado em {date}.",
+  "@paywallEndedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallCompareCurrentPlan": "PLANO ATUAL",
+  "paywallCompareRecommended": "RECOMENDADO",
+  "paywallPlanLiteName": "Lite",
+  "paywallPlanProName": "Pro",
+  "paywallLiteFeature1": "30 trades / mês",
+  "paywallLiteFeature2": "Somente entrada manual",
+  "paywallLiteFeature3": "Calendário padrão",
+  "paywallProFeature1": "Ilimitado",
+  "paywallProFeature2": "Importação CSV e entrada manual",
+  "paywallProFeature3": "Calendário Pro",
+  "paywallProFeature4": "Checklist",
+  "paywallProFeature5": "Gerador de análise",
+  "paywallProFeature6": "Página Estratégia",
+  "paywallProFeature7": "Estatísticas de performance",
+  "paywallProFeature8": "Estado mental",
+  "paywallProFeature9": "Exportação PDF",
+  "paywallPriceAnnualHighlight": "US$ 49,90 / ano",
+  "paywallPriceApproxPerMonth": "Cerca de US$ 4,15 / mês",
+  "paywallTrialEndedBody": "Seus 7 dias grátis (novo cadastro) terminaram em {date}. Sem Pro, você fica no plano Lite.",
+  "@paywallTrialEndedBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paywallLiteLimitedHint": "No Lite, só adicionar trade e o calendário ficam abertos. O restante exige Pro.",
+  "paywallProPriceAnnual": "Pro: US$ 49,90 / ano",
+  "paywallContinueFreemium": "Continuar no Lite (acesso limitado)",
+  "paywallSubscribeButton": "Assinar agora",
+  "paywallRestoreButton": "Já sou assinante",
+  "paywallStoreNotConfigured": "Link Stripe em falta. Admin → Config → URL de pagamento (https://…), ativa a faturação e tenta de novo (sessão iniciada).",
+  "paywallRestoreNothingFound": "Ainda bloqueado: assinatura ativa não encontrada.",
+  "paywallLegalFooter": "Pagamento seguro via Stripe • Cancele quando quiser • Termos de serviço",
+  "paywallGoldPremiumPill": "Acesso premium",
+  "paywallGoldMarketingHeadline": "Upgrade para PRO",
+  "paywallGoldTagline": "A ferramenta dos traders lucrativos.",
+  "paywallGoldYourPlanLabel": "Atual",
+  "paywallGoldLiteColumnCaption": "Standard",
+  "paywallGoldProColumnCaption": "Ilimitado",
+  "settingsTitle": "Configurações",
+  "settingsLogoutButton": "Terminar sessão",
+  "settingsLogoutSnack": "Sessão terminada.",
+  "settingsLogoutSnackPartial": "Perfil apagado neste dispositivo. Se a conta ainda aparecer, verifica a rede ou reinicia a app.",
+  "splashTagline": "Domine a mente, domine o trade",
+  "statsAvgGain": "Ganho-média",
+  "statsPsychSub": "Plano seguido",
+  "statsPsychology": "Psicologia",
+  "statsRR": "Relação R/R",
+  "statsSectionTitle": "ESTATISTICAS",
+  "statsStrategy": "Estratégia",
+  "statsStrategySub": "Critérios validados",
+  "strategieAlertSignal": "SINAL DE ALERTA",
+  "strategieDescription": "DESCRIÇÃO",
+  "strategieDescriptionHint": "por exemplo, baixa volatilidade",
+  "strategieEditSessionTitle": "Editar Sessão",
+  "strategieHintEntry": "Onde clicar em COMPRAR/VENDER?",
+  "strategieHintIndicatorTag": "por exemplo, RSI",
+  "strategieHintInvalidation": "Onde está o cenário errado?",
+  "strategieHintManagement": "Como garantir a posição?",
+  "strategieHintPattern": "por exemplo, Fundo Duplo",
+  "strategieHintSignal": "Gatilho",
+  "strategieHintTarget": "Meta final ou zonas de liquidez",
+  "strategieHintTimeframeTag": "por exemplo, M15",
+  "strategieIndicators": "INDICADORES",
+  "strategieModelName": "Nome do Modelo",
+  "strategieNewSessionTitle": "Nova sessão",
+  "strategiePatternFigure": "PADRÃO / FIGURA",
+  "strategieRuleEntryPrecise": "ENTRADA PRECISA",
+  "strategieRuleInvalidation": "INVALIDAÇÃO (STOP LOSS)",
+  "strategieRuleManagement": "GESTÃO (PONTO DE EQUILÍBRIO / PARCIAIS)",
+  "strategieRuleTarget": "META (OBTER LUCRO)",
+  "strategieSessionName": "Nome da sessão",
+  "strategieSetupColor": "COR",
+  "strategieSetupEditTitle": "Editar configuração",
+  "strategieSetupNewTitle": "Nova configuração",
+  "strategieTimeEndOptionalLabel": "Data de Término (Opcional)",
+  "strategieTimeStartLabel": "START",
+  "strategieTimeframes": "Prazos",
+  "strategieZoneNoTrade": "Sem negociação",
+  "strategieZoneTrade": "Comércio",
+  "strategieZoneType": "Tipo de área",
+  "strategiePagePlaybookIntro": "O teu plano de trading (Playbook). Revisa estas regras antes de cada sessão para manter disciplina e foco.",
+  "analyseReportTitle": "Relatório",
+  "strategieGestionCaptionMaximum": "Máximo",
+  "strategieGestionCaptionMinimum": "Mínimo",
+  "strategieSectionSetupsAndModels": "SETUPS E MODELOS",
+  "strategieSectionTradeCalendar": "CALENDÁRIO DE TRADES",
+  "strategieCalendarNeedSetupForUsage": "Adicione um setup acima para registar os dias de utilização.",
+  "strategieCalendarUsageForSetup": "Utilização — {name}",
+  "@strategieCalendarUsageForSetup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "strategieCalendarUsageTooltip": "Marcar ou remover este dia para este setup (mesmo nome que em Adicionar trade).",
+  "strategieCalendarDotsExplain": "Um ponto por estratégia usada nesse dia, a partir dos seus trades (Adicionar trade, data de entrada).",
+  "strategieSetupNavPrevious": "ANTERIOR",
+  "strategieSetupNavNext": "PRÓXIMO SETUP >",
+  "strategieSheetSetupsTitle": "Setups e modelos",
+  "strategieMenuDisableFactors": "Desativado",
+  "strategieManageTemplates": "Gerir modelos",
+  "strategieDuplicateSetup": "Duplicar um setup",
+  "strategieMesReglesDraftHint": "Nova regra...",
+  "strategieSetupRemoveFromDashboard": "Remover do painel",
+  "strategieSetupShowOnDashboard": "Mostrar no painel",
+  "strategiePdfPlaybookBlurbShort": "O teu plano de trading (Playbook). Revisa estas regras antes de cada sessão.",
+  "strategiePdfFooterNote": "Regras de ouro: textos de referência (não guardados). Risco, horários e setups: dados guardados.",
+  "strategiePdfTableSession": "Sessão",
+  "strategiePdfTableDescription": "Descrição",
+  "strategiePdfTableSchedule": "Horários",
+  "strategiePdfTechnicalContext": "Contexto técnico",
+  "strategiePdfAlertSignal": "Sinal de alerta",
+  "strategiePdfFileNamePrefix": "minha_estrategia",
+  "strategiePdfExportError": "Não foi possível criar o PDF: {error}",
+  "@strategiePdfExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "symbolHint": "por exemplo, Fr, ₣",
+  "symbolLabel": "Símbolo",
+  "tradeColEndingBalance": "Saldos finais",
+  "tradeColPnl": "P/L",
+  "tradeColResult": "Resultado",
+  "tradeColStartingBalance": "Balance de inicio",
+  "tradeColTotalGain": "Ganho total",
+  "tradeColTotalGainPct": "Ganho total",
+  "tradeColTrade": "Negocie",
+  "tradeDeleteConfirmBody": "Esta ação é permanente.",
+  "tradeDeleteConfirmTitle": "Excluir esta negociação?",
+  "tradeReturn": "Retorno da negociação",
+  "tradeActionsTooltip": "Ações",
+  "tradeAverageShort": "MEDIA",
+  "tradeDayTradeNumber": "Negocie #{n} hoje",
+  "tradeDurationHoursMinutes": "{hours}h {minutes}",
+  "tradeDurationMinutes": "Min.",
+  "tradeEditMenu": "Editar",
+  "tradeExportPdfTooltip": "Exportar PDF",
+  "tradeFilterAll": "Todos",
+  "tradeFilterBreakeven": "Breakeven",
+  "tradeFilterLoser": "Perdedores",
+  "tradeFilterOpenPosition": "Vagas abertas",
+  "tradeFilterWinner": "Vencedores",
+  "tradeSummaryBreakdownShort": "W:{w}  L:{l}  B:{b}",
+  "tradeSummaryBreakdownWithOpen": "W:{w}  L:{l}  B:{b}  O:{o}",
+  "tradeGainShort": "NET",
+  "tradeLabelChecklist": "Checklist",
+  "tradeLabelDuration": "Duração",
+  "tradeLabelEntry": "Entrada",
+  "tradeLabelEtat": "UF",
+  "tradeLabelExit": "Sair",
+  "tradeLabelHours": "Horas",
+  "tradeLabelPlan": "Plano",
+  "tradeLabelSession": "Sessão",
+  "tradeLabelStrategie": "Estratégia",
+  "tradeLabelNews": "Notícias",
+  "tradeMindsetFeeling": "Feeling",
+  "tradeMindsetPrinciple": "Princípio",
+  "tradeMonthTitle": "Mês",
+  "tradeMostTradedHeading": "Ativos mais negociados",
+  "tradeNotRespected": "• Não são seguidos",
+  "tradeOpenPositionLine": "Posição aberta • Entrada {when}",
+  "tradePdfAnalysePostTrade": "Avaliação pós-negociação",
+  "tradePdfBarresSemaine": "Barras da semana",
+  "tradePdfCloture": "Fechado",
+  "tradePdfPositionOpen": "Posição Aberta",
+  "tradePdfDatePrefix": "0 Data:",
+  "tradePdfDetailsTitle": "Detalhes da transação",
+  "tradePdfEtatPsychologique": "Estado psicológico",
+  "tradePdfTags": "Tags",
+  "tradeTagsSection": "TAG",
+  "tradePdfExportDayTitle": "Negociações (dia)",
+  "tradePdfExportMonthTitle": "Negociações (mês)",
+  "tradePdfExportWeekTitle": "Negociações (semana)",
+  "tradePdfGainNet": "P&L líquido",
+  "tradePdfImpactCapital": "Impacto de capital",
+  "tradePdfMoyenne": "Média",
+  "tradePdfNonRespecte": "• Não são seguidos",
+  "tradePdfPeriode": "Período",
+  "tradePdfQualiteMoyennes": "Qualidade (médias)",
+  "tradePdfScreenshotTitle": "Screenshot",
+  "tradePdfSessions": "Sessões",
+  "tradePdfSparklineMois": "Sparkline do mês",
+  "tradePdfTrades": "Operações",
+  "tradePdfWinRate": "Acerto",
+  "tradePctOfCapital": "{percent}% do capital",
+  "tradeScreenshotLoadError": "Não foi possível carregar a imagem",
+  "tradeScreenshotUnavailableWeb": "Captura de tela indisponível (web)",
+  "tradeSectionChecklist": "Checklist",
+  "tradeSectionEtat": "UF",
+  "tradeSectionPlan": "Plano",
+  "tradeSectionStrategie": "Estratégia",
+  "tradeStrategieNonRespectUnmapped": "Detalhe da estratégia",
+  "tradeSessionAsia": "Ásia",
+  "tradeSessionEurope": "Europa",
+  "tradeSessionLate": "horas extras ",
+  "tradeSessionUs": "EUA",
+  "tradeSideBreakevenShort": "Breakeven",
+  "tradeSideBuyLong": "Comprar",
+  "tradeSideBuyShort": "COMPRAR",
+  "tradeSideSellLong": "Venda",
+  "tradeSideSellShort": "VENDER",
+  "tradeSummaryProfitNet": "P&L LÍQUIDO",
+  "tradeSummaryTrades": "NEGOCIAÇÕES",
+  "tradeSummaryWinRate": "Taxa de ganho",
+  "tradeTotalUpper": "TOTAL",
+  "tradeTradesListHeading": "Operações",
+  "tradeTradesMonthHeading": "Negociações (mês)",
+  "tradeTradesWeekHeading": "Negociações (semana)",
+  "tradeWeekTitle": "Semana",
+  "tradeWinDayRingSubtitle": "VITÓRIA (dia)",
+  "tradeWinrateLabel": "Acerto",
+  "settingsTradingWeek5": "5 dias (seg–sex)",
+  "settingsTradingWeek7": "7 dias (seg–dom)",
+  "settingsTradingWeekSubtitle": "5 dias para mercados tradicionais (seg–sex), 7 dias para a semana completa (ex.: cripto).",
+  "settingsTradingWeekTitle": "Semana exibida",
+  "settingsDashboardCardSubtitle": "Personalizar início: seções e ordem",
+  "settingsDashLayoutTitle": "Seções do início",
+  "settingsDashLayoutReorderHint": "Arraste as alças para reordenar. Desative uma seção para ocultá-la no início.",
+  "settingsDashOpenHomeButton": "Ver início",
+  "settingsDashSectionCapital": "Capital e win rate",
+  "settingsDashSectionChecklist": "Checklist",
+  "settingsDashSectionAnalyse": "Análise",
+  "settingsDashSectionEtat": "Estado mental",
+  "settingsDashSectionStrategie": "Estratégia",
+  "settingsDashSectionWeekly": "Desempenho semanal",
+  "settingsDashSectionEvolution": "Evolução do capital",
+  "tradingSection": "Negociação",
+  "settingsCgvSection": "Termos legais",
+  "settingsCgvPageTitle": "Condições gerais de venda",
+  "settingsCgvRowTitle": "Condições gerais de venda",
+  "settingsCgvRowSubtitle": "Ler o texto completo na aplicação",
+  "settingsCgvDocHeading": "CONDIÇÕES GERAIS DE VENDA (CGV) - PAYCHEK",
+  "settingsCgv1Title": "1. Objeto",
+  "settingsCgv1Body": "As presentes CGV regem a subscrição de acesso «Premium» à aplicação Paychek, uma ferramenta de diário de trading e gestão de risco. O acesso é fornecido por subscrição anual, renovada automaticamente todos os anos até cancelamento.",
+  "settingsCgv2Title": "2. Serviços prestados",
+  "settingsCgv2Body": "O acesso Premium desbloqueia todas as funcionalidades da aplicação (estatísticas avançadas, cálculo automático de risco, exportação de dados). O acesso está associado à conta de utilizador criada no registo.",
+  "settingsCgv3Title": "3. Preços e pagamento",
+  "settingsCgv3Body": "Subscrição direta: o preço é de 49,90 $ USD por ano (renovação automática até cancelamento).\n\nOferta de parceiro: O acesso pode ser oferecido gratuitamente se o utilizador cumprir as condições de referência junto de um dos nossos parceiros (Prop Firm ou broker).\n\nA Paychek reserva-se o direito de alterar os preços a qualquer momento para novos clientes.",
+  "settingsCgv4Title": "4. Direito de livre resolução e reembolso",
+  "settingsCgv4Body": "Em conformidade com a legislação sobre produtos digitais:\n\nDevido à natureza digital do serviço e ao acesso imediato ao conteúdo após o pagamento, o utilizador aceita que o serviço comece de imediato e renuncia expressamente ao direito de livre resolução de 14 dias.\n\nNão será efetuado reembolso após a ativação do acesso Premium, exceto em caso de falha técnica grave que torne a aplicação inutilizável.",
+  "settingsCgv5Title": "5. Cláusula específica \"Oferta de parceiro\"",
+  "settingsCgv5Body": "O acesso concedido através de um parceiro depende da validação da afiliação por esse parceiro.\n\nSe o parceiro recusar a afiliação (por incumprimento das regras de depósito ou de trading), a Paychek reserva-se o direito de revogar o acesso Premium ou exigir o pagamento do preço normal.",
+  "settingsCgv6Title": "6. Aviso de riscos (Trading)",
+  "settingsCgv6Body": "A Paychek não é um consultor financeiro. A aplicação é uma ferramenta técnica de gestão e análise.\n\nO trading envolve um elevado risco de perda de capital. O utilizador é o único responsável pelas suas decisões de trading.\n\nA Paychek não poderá ser responsabilizada por perdas financeiras do utilizador nos mercados.",
+  "settingsCgv7Title": "7. Disponibilidade do serviço",
+  "settingsCgv7Body": "A Paychek esforça-se por manter o acesso 24/7. Contudo, não somos responsáveis por interrupções devidas a manutenção ou falhas de servidores de terceiros (Firebase, Google Cloud).",
+  "settingsCgv8Title": "8. Proteção de dados",
+  "settingsCgv8Body": "Os dados de trading dos utilizadores são estritamente confidenciais e nunca são revendidos. São armazenados de forma segura através dos nossos fornecedores técnicos.",
+  "settingsPrivacyRowTitle": "Política de privacidade",
+  "settingsPrivacyRowSubtitle": "Dados pessoais, cookies e os seus direitos",
+  "settingsPrivacyPageTitle": "Política de privacidade",
+  "settingsPrivacyDocHeading": "POLÍTICA DE PRIVACIDADE — PAYCHEK",
+  "settingsDataResetSection": "Dados",
+  "settingsDataResetTitle": "Apagar todos os dados locais",
+  "settingsDataResetDescription": "Se usaste o Paychek durante algum tempo e queres recomeçar do zero (como após reinstalar a aplicação), podes apagar tudo neste dispositivo: trades, análises, diário, layout do painel, perfil local, âncora de trial, etc.\n\nMantêm-se o idioma e a opção «semana mostrada».\n\nFecha completamente a aplicação e volta a abri-la para limpar memória temporária (ex.: checklist).",
+  "settingsDataResetButton": "Apagar tudo neste dispositivo",
+  "settingsDataResetDialogTitle": "Apagar todos os dados locais?",
+  "settingsDataResetDialogBody": "Ação irreversível. Os dados Paychek guardados localmente serão eliminados. A sessão Firebase pode manter-se iniciada; apenas cópias locais são removidas.\n\nReinicia a app depois se algo parecer em cache.",
+  "settingsDataResetDialogCancel": "Cancelar",
+  "settingsDataResetDialogConfirm": "Apagar tudo",
+  "settingsDataResetSuccess": "Dados locais apagados. Reinicia a app se necessário.",
+  "validate": "Confirmar",
+  "winrate": "Acerto",
+  "@deletePortfolioTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@resultStatBullet1": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@resultStatBullet2": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@modelSavedSnackbar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseCopyLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseTemplateApplied": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@mentalSleepImpact": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@analyseImpactLine": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@exportPdfFailedWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@analyseCopyNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardTradeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardEvolutionTradesThisPeriod": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashboardPerfHourWinRate": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeDayTradeNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@tradeOpenPositionLine": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePctOfCapital": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfDatePrefix": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfDetailsTitle": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      }
+    }
+  },
+  "@tradePdfScreenshotTitle": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSupportSection": "Suporte",
+  "settingsSupportCardTitle": "Suporte e feedback",
+  "settingsSupportCardSubtitle": "Envia-nos uma mensagem e consulta os guias na app.",
+  "supportFeedbackTitleLead": "Suporte e ",
+  "supportFeedbackTitleAccent": "Feedback",
+  "supportFeedbackSubtitle": "Dúvida ou ideia? Estamos a ouvir-te.",
+  "supportFeedbackBack": "Voltar",
+  "supportActionEmailLabel": "E-mail",
+  "supportActionEmailHint": "Resposta até 24 h",
+  "supportActionDocsLabel": "Docs",
+  "supportActionDocsHint": "Guias de utilização",
+  "supportActionTwitterLabel": "X",
+  "supportActionTwitterHint": "Comunidade",
+  "supportFormNewMessage": "Nova mensagem",
+  "supportFormKindLabel": "Tipo de pedido",
+  "supportFormKindAccount": "Conta",
+  "supportFormKindBilling": "Faturação",
+  "supportFormKindFeature": "Funcionalidade",
+  "supportFormKindOther": "Outro",
+  "supportFormEmailLabel": "Seu e-mail",
+  "supportFormEmailHint": "nome@exemplo.com",
+  "supportFormDescriptionLabel": "Descrição",
+  "supportFormDescriptionHint": "Detalhes da mensagem…",
+  "supportFormSubmit": "Enviar agora",
+  "supportFormSubmitSuccess": "Obrigado — a tua mensagem foi enviada com sucesso.",
+  "supportFormSubmitSuccessPartial": "Obrigado — a tua mensagem foi enviada (anexo não carregado).",
+  "supportFormSubmitDone": "Se o teu cliente de e-mail não abriu, tenta de novo ou escreve-nos diretamente.",
+  "supportFormErrorEmail": "Indica um endereço de e-mail.",
+  "supportFormErrorDescription": "Adiciona uma descrição.",
+  "supportFormMailSubjectPrefix": "Paychek suporte",
+  "supportFormMailBodyIntro": "Mensagem enviada pela app Paychek:",
+  "supportFormAttachmentLabel": "Anexo (opcional)",
+  "supportFormAttachmentPick": "Foto ou PDF",
+  "supportFormAttachmentHint": "PDF ou imagem, máx. 10 MB",
+  "supportFormAttachmentRemove": "Remover ficheiro",
+  "supportFormAttachmentSignInHint": "Inicia sessão para anexar — ou usa o e-mail sem anexo.",
+  "supportFormAttachmentTooLarge": "Ficheiro acima de 10 MB.",
+  "supportFormAttachmentInvalidExtension": "Apenas PDF, JPG, PNG ou WebP.",
+  "supportFormAttachmentReadFailed": "Não foi possível ler o ficheiro.",
+  "supportFormSubmitFirestoreDone": "Obrigado — mensagem guardada. A equipa vê na consola admin.",
+  "supportFormSubmitSending": "A enviar…",
+  "supportFormSubmitError": "Envio falhou. Verifica a ligação.",
+  "supportFormSubmitSavedPartialAttachment": "Mensagem guardada sem anexo (rede, tempo ou Storage). Verifica o Firebase.",
+  "supportQuickHelpTitle": "Ajuda rápida",
+  "supportFaqWhereDataQ": "Onde estão os meus dados?",
+  "supportFaqWhereDataA": "Os dados ficam neste dispositivo (preferências, diário, carteiras). Sair ou apagar dados locais remove-os — exporta PDFs se precisares de arquivo.",
+  "supportFaqFeatureQ": "Precisas de uma nova funcionalidade?",
+  "supportFaqFeatureA": "Usa o formulário com «Sugerir uma ideia». Lemos todas as mensagens.",
+  "supportStatusLabel": "Estado técnico",
+  "supportStatusOperational": "Serviços operacionais",
+  "helpCenterArticleAddTradeBody": "Vá ao separador Adicionar, preencha os campos (ativo, entrada, stop, alvo…) e guarde. Pode anexar uma captura de ecrã se precisar.",
+  "helpCenterArticleAddTradeTitle": "Adicionar um trade",
+  "helpCenterArticleCalendarBody": "📅 Guide: Calendar & performance analysis\n\nThe Paychek Calendar is your main steering tool. It turns raw data into a visual map of your success and discipline.\n\n[img:assets/help_center/calendar_overview.png]\n\n1. Month overview\nColor coding: Green cells show net profit, red cells a loss, and gray cells days with no activity.\n\nQuick summary: Above the calendar, see your win rate, trade count, and total monthly P&L at a glance.\n\nMonthly objective: Watch the progress bar to see how far you are from your financial goal. Tap the settings icon to change your target.\n\n[img:assets/help_center/calendar_monthly_objective.png]\n\n2. Expandable menu (deep analysis)\nTap any month header to open detailed analysis.\n\n[img:assets/help_center/calendar_deep_analysis.png]\n\nDiscipline rings: View your average discipline scores for the month (plan followed, checklist completed, mental state).\n\nSession breakdown: See performance by timezone — Asia, Europe, and US. Great for spotting which part of the day pays best for you.\n\nInteractive sparkline (performance curve):\n- Hover the line to pinpoint a trade (on mobile, drag along the curve with your finger).\n- Tap a point on the curve to open that trade’s full record instantly.\n\n3. Session statistics (sidebar)\nTo the right of your calendar, your consistency stats:\n\nCumulative performance: How your capital evolves day by day.\n\nBest day: Your largest daily gain of the month.\n\nAverage day: What you gain or lose on average per day.\n\n[img:assets/help_center/calendar_trades_month_report.png]\n\n4. PDF export 📄\nAt the top right of the Calendar page, the PDF icon generates a professional report in one tap.\n\nWhat’s inside: The report includes the visual calendar, the performance curve, and a recap of your discipline averages.",
+  "helpCenterArticleCalendarTitle": "Calendário",
+  "helpCenterArticleChecklistBody": "📋 Checklist\n\n[img:assets/help_center/checklist_routine_discipline.png]\n\n1. Understanding the progress ring\nThe colored circle at the top of your screen is your readiness indicator.\n\n- Real-time progress: each ticked box moves the percentage forward.\n- Your checklist ring is not only on Routine — it stays in sync on your main Dashboard.\n- The gold standard: we recommend never opening a position unless your ring is at 100%. A trade taken with an incomplete checklist is often an emotional trade.\n\n2. Customize your routine\nEvery trader is unique. Paychek lets you build your own verification system.\n\n- Add a section: tap “+ Add a section” at the bottom to create a category (e.g. morning routine, economic news, post-session).\n- Manage items (⋯ menu):\n  - Add a task: open the three-dot menu next to a section title to insert a new checkpoint.\n  - Delete / edit: if a rule no longer fits your strategy, remove it to keep the UI clean.\n\n3. Default sections\nTo help you get started, we include three pillars:\n\n- Technical Analysis: validate your confluences (trend, S/R, indicators).\n- Risk Management: confirm your stop-loss is set and your risk per trade is respected.\n- Psychology: a quick check that you are not in revenge mode or euphoria.",
+  "helpCenterArticleChecklistTitle": "Checklist",
+  "helpCenterArticleEditTradeBody": "Guide : Maîtriser votre Journal de Trading (Page Trade)\nLa page Trade est le centre d'archivage intelligent de Paychek. Elle ne se contente pas de lister vos opérations ; elle les organise pour vous offrir une vision claire de votre progression, du trade individuel à la performance mensuelle.\n\n[img:assets/help_center/trade_page_header_filters.png]\n\n1. Tableau de Bord de Période (Header)\nEn haut de votre journal, vous disposez d'un résumé instantané de la période sélectionnée :\n\nProfit Net : Votre résultat financier net en dollars et son impact en pourcentage sur votre capital (ex: +1070,00$ / +53,50%).\n\nLe Win Rate Ring : L'anneau central affiche votre pourcentage de réussite global. C'est l'indicateur visuel immédiat de la santé de votre trading.\n\nCompteur de Trades : Le détail précis du nombre de positions Gagnantes (G), Perdantes (P) et à l'équilibre (Br).\n\n2. Navigation et Filtres Temporels\nPersonnalisez votre vue selon votre besoin d'analyse grâce aux sélecteurs rapides :\n\nSélecteur 1D / 1S / 1M / ALL : Basculez instantanément entre une vue journalière, hebdomadaire, mensuelle ou l'historique complet.\n\nFiltres de statut : Isolez vos trades Gagnants, Perdants ou Breakeven d'un seul clic pour étudier des comportements spécifiques.\n\nActifs les plus tradés : Visualisez rapidement vos statistiques sur vos instruments préférés (ex: XAUUSD, EURUSD).\n\n[img:assets/help_center/trade_page_period_pdf_report.png]\n\n3. Structure en Accordéons et Rapports PDF\nL'interface utilise un système de \"replier/déplier\" pour une lecture fluide et des options d'exportation à tous les niveaux :\n\nRapports de Période (Jour/Semaine/Mois) : Chaque bloc de date (ex: \"14 Mars\") affiche un résumé de la performance du jour.\n\nEn cliquant sur l'icône PDF à côté de la date, vous téléchargez un rapport complet de cette période spécifique. Idéal pour vos bilans de fin de semaine ou de mois.\n\nRapports de Trade Individuel : Cliquez sur un trade pour le déplier et voir ses détails (Heures, Session, Entry/Exit).\n\nChaque trade possède son propre bouton PDF. Ce document génère une fiche technique pro avec votre graphique et vos scores de discipline.\n\n[img:assets/help_center/trade_page_rings_week_view.png]\n\n4. Analyse visuelle par Ring\nChaque ligne (journée ou trade) est accompagnée d'un Ring (anneau) :\n\nPour une journée, le ring représente le Win Rate global du jour.\n\nCela vous permet d'identifier en une seconde vos journées \"rouges\" ou \"vertes\" sans avoir à lire chaque ligne de trade.\n\n[img:assets/help_center/trade_page_options_menu.png]\n\n5. Options de Gestion et Correction (Les 3 points)\nParce qu'une erreur de saisie peut arriver, Paychek vous donne un contrôle total sur vos archives. À côté de l'icône PDF de chaque fiche trade, vous trouverez un menu \"Options\" (représenté par 3 points verticaux) :\n\nModifier le Trade : Vous permet de réouvrir le formulaire de saisie pour corriger un prix, changer l'heure, ajouter un screenshot oublié ou ajuster vos scores de discipline.\n\nSupprimer le Trade : Efface définitivement l'enregistrement de votre journal.\n\nAttention : La suppression d'un trade mettra à jour instantanément vos statistiques globales, votre Win Rate et votre capital dans les pages Trade et Performance.",
+  "helpCenterArticleEditTradeTitle": "Diário — página do trade",
+  "helpCenterArticleExportPdfBody": "Em Trade ou Desempenho, use Exportar PDF. Se falhar, verifique as permissões e tente novamente.",
+  "helpCenterArticleExportPdfTitle": "Exportar PDF",
+  "helpCenterArticleMentalStateBody": "Guide: Mental state — tailor your psychology\n\nRoughly 80% of trading success is psychology. The Mental state page lets you measure how you feel and see how emotions affect your results.\n\n[img:assets/help_center/mental_state_dashboard.png]\n\n1. Global score (The Ring)\nThe central ring shows your “Solid Balance”. It updates from all your indicators (emotions, rest, routines). The higher the score, the more you are in a mindset suited to trading.\n\n2. Personalized impact (gear ⚙️)\nEvery trader is different. Paychek lets you define your own rules:\n\n[img:assets/help_center/mental_state_adjust_impact.png]\n\n- Impact nature: open a criterion’s gear to set Positive (+) or Negative (−). Example: if excitement is dangerous for you, set it to Negative.\n\n- Global impact (%): the slider sets how much that criterion weighs on your global score. Crank it up for what matters most; lower it for secondary criteria.\n\n3. Sections & emotions\n\n[img:assets/help_center/mental_state_section_controls.png]\n\n- Edit / delete: pencil to rename an emotion or indicator; trash to remove it.\n\n- Section toggle (ON / OFF 100%): turn off an entire section (e.g. My Routines). When off, it no longer counts toward your daily global score.\n\n- Add (+): create your own indicators to match your routine.\n\n4. Score calendar & time window\nThe mini-calendar shows your mental score for past days.\n\n- Session settings (⚙️): set a start time and an end time.\n\n- Day mode: track from morning to evening (full-day style window).\n\n- Session mode: focus on trading hours only (e.g. 3:30 PM – 10:00 PM).",
+  "helpCenterArticleMentalStateTitle": "Estado mental",
+  "helpCenterArticleMyAnalysisBody": "🔬 My Analysis: Build Your Trading Plans\n\nThe My Analysis page lets you build a full roadmap before you enter the market. By quantifying each technical element, Paychek calculates a global confidence score to validate your setup.\n\n[img:assets/help_center/analyse_trend_sheet.png]\n\n1. Trend card (context)\nDefine the frame for your opportunity:\n\nAsset & name: Use (+) to name your analysis and the instrument (e.g. EUR/USD — Weekly Swing Plan).\n\nDirection & phase: Choose your bias (Buy, Sell, or Watch) and the current market phase (Accumulation, Impulse, Distribution).\n\nConfidence slider: Set how certain you feel for this section. Open the gear (⚙️) to adjust this card’s impact (weight %) on the final report confidence.\n\n[img:assets/help_center/analyse_card_controls.png]\n\nCustomization: Use the pencil to edit available timeframes or phases, and Duplicate to compare several analyses on different timeframes in the same section.\n\n2. Technical sections (Structure, SMC, Indicators, Volume)\nEveryone trades differently. Turn cards on or off with the ON/OFF switch:\n\n[img:assets/help_center/analyse_technical_cards.png]\n\nStructure: Log support and resistance. Tick if a level was tested more than twice to strengthen relevance.\n\nSMC & Liquidity: Record Order Blocks, Fair Value Gaps (FVG), and Fibonacci levels.\n\nIndicators & Volume profile: Detail RSI/MACD signals or Point of Control (POC) zones.\n\nScreenshot: Attach a chart capture to illustrate your plan visually.\n\n3. Generating the report\nWhen your analysis is ready, tap Report.\n\n[img:assets/help_center/analyse_summary_report.png]\n\nGlobal confidence ring: The final ring is computed from your sliders and their impact weights.\n\nDynamic color coding: The validated report at the bottom uses a color that matches your direction: green (Buy), red (Sell), or yellow (Watch).\n\n[img:assets/help_center/analyse_report_embedded.png]\n\n4. Managing reports\nHistory: Reports are saved and tied to your instruments.\n\nActions: You can edit (pencil), delete (trash), or export a professional PDF of your analysis to archive or share.\n\n[img:assets/help_center/analyse_report_pdf.png]",
+  "helpCenterArticleMyAnalysisTitle": "Minha análise — planos de trade",
+  "helpCenterArticleMyStrategyTitle": "Minha estratégia — Playbook",
+  "helpCenterArticlePerformanceTitle": "Desempenho — scanner de trades",
+  "helpCenterArticleResetDataBody": "Em Definições > Dados pode apagar os dados guardados neste dispositivo. É irreversível; recomendamos reiniciar a app depois.",
+  "helpCenterArticleResetDataTitle": "Apagar dados locais",
+  "helpCenterEmptyResults": "Sem resultados.",
+  "helpCenterSearchHint": "Pesquisar…",
+  "helpCenterSubtitle": "Respostas rápidas e explicações sobre o uso do app.",
+  "helpCenterTitle": "Central de ajuda",
+  "helpCenterVersionMobile": "Versão móvel",
+  "helpCenterVersionWeb": "Versão Web"
+}

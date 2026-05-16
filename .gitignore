@@ -1,0 +1,66 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Cloud Functions (Firebase)
+functions/node_modules/
+functions/.env
+whsec.txt
+sk.txt
+# Paramètres par projet (évite « Attempted to write param-defined key … already defined »
+# si le fichier coexiste avec les invites interactives du CLI). Ne pas versionner.
+functions/.env.*
+!functions/.env.example
+
+# Clés compte de service Firebase (grant admin claim — ne jamais commit)
+**/firebase-adminsdk-*.json
+**/service-account*.json
+
+# Mot de passe SMTP pour `firebase functions:secrets:set --data-file` (local)
+gmail_app_pw.txt
+smtp_pw.txt
+
+# Local copy for pdfrx + flutter test PDF debugging (never commit)
+/pdfium.dll
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release

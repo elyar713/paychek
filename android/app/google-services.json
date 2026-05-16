@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "738203717325",
+    "project_id": "paychek-trading",
+    "storage_bucket": "paychek-trading.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738203717325:android:da54e7c83f0bdc5336e384",
+        "android_client_info": {
+          "package_name": "pro.paychek.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738203717325-gke6ohrsg6192u3cnq8po9tbo2uc2jjn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsNtrvdvIYEub-XTMNWD0YFU0VqLzRxuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738203717325-gke6ohrsg6192u3cnq8po9tbo2uc2jjn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "738203717325-jkfnm4lgvb3o9s5o4e2to2hl3f0ieqhn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "pro.paychek.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,14 @@
+{
+  // Désactive complètement cSpell dans ce workspace.
+  // (Utile si une extension de spellcheck souligne encore les strings en Dart.)
+  "cSpell.enabled": false,
+  "cSpell.language": "en,fr",
+  // Désactive le spellcheck sur le code Dart (évite les soulignements jaunes sur les textes UI).
+  "cSpell.enabledLanguageIds": ["markdown", "plaintext", "text"],
+
+  // Désactive d'autres extensions de correction orthographique (workspace).
+  "spellright.enabled": false,
+  "ltex.enabled": false,
+  "typos.enable": false
+}
+
