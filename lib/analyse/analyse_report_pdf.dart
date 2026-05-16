@@ -781,7 +781,11 @@ Future<void> exportAnalyseReportPdf(
     );
     final name = _safePdfFileName(snapshot);
 
-    final ok = await pdf_platform.trySaveReportPdfOnPlatform(bytes, name);
+    final ok = await pdf_platform.trySaveReportPdfOnPlatform(
+      bytes,
+      name,
+      shareContext: context,
+    );
     if (!ok) {
       return;
     }

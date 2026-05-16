@@ -467,7 +467,11 @@ Future<void> exportStrategiePdf(BuildContext context) async {
     final bytes = await buildStrategiePdf(locale);
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = '${l.strategiePdfFileNamePrefix}_$stamp.pdf';
-    final ok = await pdf_platform.trySaveReportPdfOnPlatform(bytes, name);
+    final ok = await pdf_platform.trySaveReportPdfOnPlatform(
+      bytes,
+      name,
+      shareContext: context,
+    );
     if (!ok && kDebugMode) {
       debugPrint('exportStrategiePdf: save canceled');
     }

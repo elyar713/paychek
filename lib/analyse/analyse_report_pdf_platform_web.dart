@@ -4,7 +4,11 @@ import 'dart:typed_data';
 import 'package:web/web.dart';
 
 /// Web : téléchargement du fichier via blob (sans plugin natif).
-Future<bool> trySaveReportPdfOnPlatform(List<int> bytes, String filename) async {
+Future<bool> trySaveReportPdfOnPlatform(
+  List<int> bytes,
+  String filename, {
+  Object? shareContext,
+}) async {
   final u8 = Uint8List.fromList(bytes);
   final blob = Blob([u8.toJS].toJS);
   final url = URL.createObjectURL(blob);

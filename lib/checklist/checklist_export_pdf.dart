@@ -128,7 +128,11 @@ Future<void> exportChecklistPdf(
     final bytes = await buildChecklistPdf(locale, l, controller);
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = 'checklist_$stamp.pdf';
-    final ok = await pdf_platform.trySaveReportPdfOnPlatform(bytes, name);
+    final ok = await pdf_platform.trySaveReportPdfOnPlatform(
+      bytes,
+      name,
+      shareContext: context,
+    );
     if (!ok && kDebugMode) {
       debugPrint('exportChecklistPdf: save canceled');
     }

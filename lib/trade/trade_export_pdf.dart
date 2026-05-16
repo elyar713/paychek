@@ -910,7 +910,11 @@ Future<void> exportTradeTimeframePdf(
   required String filename,
 }) async {
   try {
-    final ok = await pdf_platform.trySaveReportPdfOnPlatform(bytes, filename);
+    final ok = await pdf_platform.trySaveReportPdfOnPlatform(
+      bytes,
+      filename,
+      shareContext: context,
+    );
     if (!ok && context.mounted) {
       final l = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(
@@ -946,6 +950,7 @@ Future<void> exportTradePdf(
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(
       bytes,
       _safePdfFileName(t),
+      shareContext: context,
     );
     if (!ok && context.mounted) {
       final l = AppLocalizations.of(context)!;
