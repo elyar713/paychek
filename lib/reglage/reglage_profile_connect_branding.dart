@@ -6,28 +6,61 @@ import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import 'reglage_profile_connect_tokens.dart';
 
-/// Logo Paychek (SVG) — connexion / inscription mobile et réglages.
+/// Logo Paychek (3 cercles) — évite [SvgPicture] sur le Web (shaders Skia / GL).
 class PaychekBrandLogoMark extends StatelessWidget {
   const PaychekBrandLogoMark({
     super.key,
     this.height = 48,
+    this.color = brandEmerald,
   });
 
   static const String assetPath = 'assets/branding/app_icon.svg';
+  static const Color brandEmerald = Color(0xFF1EB48A);
 
   final double height;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: SvgPicture.asset(
-        assetPath,
-        fit: BoxFit.contain,
-        semanticsLabel: 'Paychek',
+    return Semantics(
+      label: 'Paychek',
+      child: SizedBox(
+        width: height,
+        height: height,
+        child: CustomPaint(
+          painter: _PaychekLogoMarkPainter(color: color),
+        ),
       ),
     );
   }
+}
+
+/// Reproduit `assets/branding/app_icon.svg` (viewBox 0 0 100 100).
+class _PaychekLogoMarkPainter extends CustomPainter {
+  const _PaychekLogoMarkPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scale = size.width / 100;
+    final center = Offset(size.width / 2, size.height / 2);
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 9 * scale;
+    final fill = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, 34 * scale, stroke);
+    canvas.drawCircle(center, 18 * scale, stroke);
+    canvas.drawCircle(center, 6 * scale, fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PaychekLogoMarkPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class ReglageProfileAuthTabButton extends StatelessWidget {

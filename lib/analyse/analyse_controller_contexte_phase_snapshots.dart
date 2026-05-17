@@ -153,24 +153,36 @@ mixin AnalyseControllerContextePhaseSnapshots on AnalyseControllerContexteFields
     _mutateContexteSnapshot(index, (s) {
       var vis = Set<AnalyseTimeframe>.from(s.htfVisibleEnums);
       var pick = s.htfPick;
-      if (vis.contains(t) && vis.length <= 1) return s;
+      final total = vis.length + s.htfCustomLabels.length;
+      if (vis.contains(t) && total <= 1) return s;
       if (vis.contains(t)) {
         vis.remove(t);
         if (pick.enumVal == t) {
-          pick = ContextePick.enumOf(
-            AnalyseTimeframe.values.where((e) => vis.contains(e)).first,
-          );
+          pick = _snapshotFirstAvailableHtfPick(vis, s.htfCustomLabels);
         }
       } else {
         vis.add(t);
       }
       if (pick.isEnum && !vis.contains(pick.enumVal!)) {
-        pick = ContextePick.enumOf(
-          AnalyseTimeframe.values.where((e) => vis.contains(e)).first,
-        );
+        pick = _snapshotFirstAvailableHtfPick(vis, s.htfCustomLabels);
       }
       return s.copyWith(htfVisibleEnums: vis, htfPick: pick);
     });
+  }
+
+  ContextePick<AnalyseTimeframe> _snapshotFirstAvailableHtfPick(
+    Set<AnalyseTimeframe> vis,
+    List<String> customs,
+  ) {
+    final ordered =
+        AnalyseTimeframe.values.where((e) => vis.contains(e)).toList();
+    if (ordered.isNotEmpty) {
+      return ContextePick.enumOf(ordered.first);
+    }
+    if (customs.isNotEmpty) {
+      return ContextePick.customLabel(customs.first);
+    }
+    return const ContextePick.enumOf(AnalyseTimeframe.daily);
   }
 
   void addContexteSnapshotHtfCustomLabel(int index, String raw) {
@@ -189,15 +201,14 @@ mixin AnalyseControllerContextePhaseSnapshots on AnalyseControllerContexteFields
 
   void removeContexteSnapshotHtfCustomLabel(int index, String label) {
     _mutateContexteSnapshot(index, (s) {
+      if (s.htfVisibleEnums.length + s.htfCustomLabels.length <= 1) {
+        return s;
+      }
       final list = List<String>.from(s.htfCustomLabels);
       if (!list.remove(label)) return s;
       var pick = s.htfPick;
       if (pick.custom == label) {
-        pick = ContextePick.enumOf(
-          AnalyseTimeframe.values
-              .where((e) => s.htfVisibleEnums.contains(e))
-              .first,
-        );
+        pick = _snapshotFirstAvailableHtfPick(s.htfVisibleEnums, list);
       }
       return s.copyWith(htfCustomLabels: list, htfPick: pick);
     });

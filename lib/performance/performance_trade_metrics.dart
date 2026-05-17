@@ -2,6 +2,7 @@ import 'dart:ui' show Locale;
 
 import 'package:intl/intl.dart' as intl;
 
+import '../ajouter_trade/ajouter_trade_asset_class.dart';
 import 'performance_locale_copy.dart';
 import 'performance_trade_model.dart';
 
@@ -82,9 +83,14 @@ class AssetTradeBarStat {
 }
 
 /// Top actifs par nombre de trades sur la période (barres proportionnelles au volume).
-List<AssetTradeBarStat> computeTopAssetBarStats(List<Trade> trades, {int maxBars = 8}) {
+List<AssetTradeBarStat> computeTopAssetBarStats(
+  List<Trade> trades, {
+  int maxBars = 8,
+  AjouterTradeAssetClass? marche,
+}) {
   final map = <String, List<Trade>>{};
   for (final t in trades) {
+    if (marche != null && t.assetClass != marche) continue;
     final p = t.pair?.trim();
     if (p == null || p.isEmpty) continue;
     map.putIfAbsent(p, () => []).add(t);

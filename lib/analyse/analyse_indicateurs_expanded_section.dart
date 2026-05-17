@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import 'analyse_controller.dart';
@@ -197,22 +197,6 @@ class AnalyseIndicateursExpandedSection extends StatelessWidget {
                     onTap: c.addIndicatorExtraField,
                   ),
                 ],
-                if (c.indicatorsSnapshots.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  for (var i = 0; i < c.indicatorsSnapshots.length; i++) ...[
-                    if (i > 0) const SizedBox(height: 12),
-                    AnalyseIndicatorsDuplicateBlock(
-                      key: ValueKey<String>('ind_dup_$i'),
-                      controller: c,
-                      snapshotIndex: i,
-                      indexLabel: i + 1,
-                      editMode: indicatorsEditMode,
-                      onRemove: indicatorsEditMode
-                          ? () => c.removeIndicatorsSnapshot(i)
-                          : null,
-                    ),
-                  ],
-                ],
               ],
             );
           },
@@ -226,6 +210,33 @@ class AnalyseIndicateursExpandedSection extends StatelessWidget {
           minLines: 3,
           maxLines: 4,
           onChanged: (v) => c.notesIndicators = v,
+        ),
+        ListenableBuilder(
+          listenable: c,
+          builder: (context, _) {
+            if (c.indicatorsSnapshots.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 14),
+                for (var i = 0; i < c.indicatorsSnapshots.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 12),
+                  AnalyseIndicatorsDuplicateBlock(
+                    key: ValueKey<String>('ind_dup_$i'),
+                    controller: c,
+                    snapshotIndex: i,
+                    indexLabel: i + 1,
+                    editMode: indicatorsEditMode,
+                    onRemove: indicatorsEditMode
+                        ? () => c.removeIndicatorsSnapshot(i)
+                        : null,
+                  ),
+                ],
+              ],
+            );
+          },
         ),
         const SizedBox(height: 14),
         AnalyseConfidenceSlider(

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import '../reglage/reglage_profile_connect_branding.dart';
 import 'paychek_web_tokens.dart';
 import 'plus_menu_actions.dart';
 
@@ -206,19 +207,10 @@ class _PaychekRailLogo extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
+        const SizedBox(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: PaychekWebTokens.accentEmerald,
-          ),
-          alignment: Alignment.center,
-          child: const Icon(
-            Icons.trending_up_rounded,
-            size: 20,
-            color: Colors.black87,
-          ),
+          child: PaychekBrandLogoMark(height: 36),
         ),
         const SizedBox(width: 10),
         Expanded(

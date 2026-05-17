@@ -189,7 +189,10 @@ void applyAnalyseDefaultEuroUsdWeeklySwingDemo(
   c.smcFibPrice = '1.08550';
   c.confidenceSmc = 65;
 
-  c.volumeProfileModeLabel = 'Fixed Range';
+  c.volumeProfileTf = AnalyseStructureChartTf.h4.label;
+  c.volumeProfileZoneActive = true;
+  c.volumeProfileZoneFrom = '1.08150';
+  c.volumeProfileZoneTo = '1.08700';
   c.volumeProfilePoc = '1.08350';
   c.volumeProfileVah = '1.08700';
   c.volumeProfileVal = '1.08150';

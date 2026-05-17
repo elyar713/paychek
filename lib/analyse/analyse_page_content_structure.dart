@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import 'analyse_controller.dart';
@@ -230,6 +230,21 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
               );
             },
           ),
+          const SizedBox(height: 14),
+          Text(l.analyseNote, style: AnalyseTokens.labelStyle),
+          const SizedBox(height: 8),
+          ListenableBuilder(
+            listenable: c,
+            builder: (context, _) {
+              return AnalyseTextField(
+                hintText: l.analyseHintNotesDots,
+                value: c.notesStructure,
+                minLines: 3,
+                maxLines: 4,
+                onChanged: (v) => c.notesStructure = v,
+              );
+            },
+          ),
           ListenableBuilder(
             listenable: c,
             builder: (context, _) {
@@ -253,21 +268,6 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
                     ),
                   ],
                 ],
-              );
-            },
-          ),
-          const SizedBox(height: 14),
-          Text(l.analyseNote, style: AnalyseTokens.labelStyle),
-          const SizedBox(height: 8),
-          ListenableBuilder(
-            listenable: c,
-            builder: (context, _) {
-              return AnalyseTextField(
-                hintText: l.analyseHintNotesDots,
-                value: c.notesStructure,
-                minLines: 3,
-                maxLines: 4,
-                onChanged: (v) => c.notesStructure = v,
               );
             },
           ),

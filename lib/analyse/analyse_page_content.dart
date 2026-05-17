@@ -178,10 +178,7 @@ class _AnalysePageScrollContentState extends State<AnalysePageScrollContent> {
         const SizedBox(height: 14),
         AnalyseSmcCard(controller: c),
         const SizedBox(height: 14),
-        ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 340),
-          child: AnalyseVolumeProfilCard(controller: c),
-        ),
+        AnalyseVolumeProfilCard(controller: c),
         const SizedBox(height: 14),
         _analysisDraftScreenshotSection(),
       ],

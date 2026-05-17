@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_tokens.dart';
+import '../analyse/report_widgets/analyse_report_structure_ui.dart'
+    show dashboardStructureLevelColumn;
 import '../analyse/report_widgets/analyse_report_ui_primitives.dart'
     show analyseReportBiasPill;
 import '../dashboard/widgets/donut_ring.dart';
@@ -300,34 +302,111 @@ class WebDashboardAnalysePreview extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: _WebKvColumn(
-                              label: l.analyseSupport,
-                              value: _dash(s.support),
+                            child: dashboardStructureLevelColumn(
+                              context: context,
+                              mainLabel: l.analyseSupport,
+                              mainValue: _dash(s.support),
+                              headerStyle: _labelUpperGrey(context),
                               valueStyle: GoogleFonts.plusJakartaSans(
                                 color: AnalyseTokens.accentGreen,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 height: 1.2,
                               ),
-                              labelStyle: _labelUpperGrey(context),
+                              extras: s.structureExtraSupports ??
+                                  const <AnalyseReportStructureExtraLine>[],
+                              extraPrefix: 'S',
+                              extraValueColor: AnalyseTokens.accentGreen,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: _WebKvColumn(
-                              label: l.analyseResistShort,
-                              value: _dash(s.resistance),
+                            child: dashboardStructureLevelColumn(
+                              context: context,
+                              mainLabel: l.analyseResistShort,
+                              mainValue: _dash(s.resistance),
+                              headerStyle: _labelUpperGrey(context),
                               valueStyle: GoogleFonts.plusJakartaSans(
                                 color: AnalyseTokens.accentRed,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 height: 1.2,
                               ),
-                              labelStyle: _labelUpperGrey(context),
+                              extras: s.structureExtraResistances ??
+                                  const <AnalyseReportStructureExtraLine>[],
+                              extraPrefix: 'R',
+                              extraValueColor: AnalyseTokens.accentRed,
                             ),
                           ),
                         ],
                       ),
+                      for (final copy
+                          in s.structureCopies ?? const <AnalyseReportStructureCopy>[]) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: PaychekWebTokens.borderGray800
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _WebKvColumn(
+                                label: l.analyseStructure,
+                                value:
+                                    '${_dash(copy.structureTf)} - ${_dash(copy.chartisme)}',
+                                valueStyle: GoogleFonts.plusJakartaSans(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.25,
+                                ),
+                                labelStyle: _labelUpperGrey(context),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: dashboardStructureLevelColumn(
+                                context: context,
+                                mainLabel: l.analyseSupport,
+                                mainValue: _dash(copy.support),
+                                headerStyle: _labelUpperGrey(context),
+                                valueStyle: GoogleFonts.plusJakartaSans(
+                                  color: AnalyseTokens.accentGreen,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.2,
+                                ),
+                                extras: copy.structureExtraSupports,
+                                extraPrefix: 'S',
+                                extraValueColor: AnalyseTokens.accentGreen,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: dashboardStructureLevelColumn(
+                                context: context,
+                                mainLabel: l.analyseResistShort,
+                                mainValue: _dash(copy.resistance),
+                                headerStyle: _labelUpperGrey(context),
+                                valueStyle: GoogleFonts.plusJakartaSans(
+                                  color: AnalyseTokens.accentRed,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.2,
+                                ),
+                                extras: copy.structureExtraResistances,
+                                extraPrefix: 'R',
+                                extraValueColor: AnalyseTokens.accentRed,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       if (s.noteStructure.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         _WebAnalyseQuoteBand(text: s.noteStructure),

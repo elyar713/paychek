@@ -439,6 +439,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyseAddTimeframeTitle => 'Add timeframe';
 
   @override
+  String get analyseAddTimeframeCustomEntry => 'Other (custom label)';
+
+  @override
+  String get analyseAddTimeframeSectionRestore => 'Restore';
+
+  @override
+  String get analyseAddTimeframeSectionIntraday => 'Intraday';
+
+  @override
+  String get analyseAddTimeframeSectionSwing => 'Swing & position';
+
+  @override
   String get analyseAddTrendTitle => 'Add trend';
 
   @override
@@ -756,6 +768,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyseVolumeVal => 'VAL';
+
+  @override
+  String get analyseVolumeZoneFrom => 'From';
+
+  @override
+  String get analyseVolumeZoneLabel => 'Zone';
+
+  @override
+  String get analyseVolumeZoneTo => 'To';
 
   @override
   String get appBrandName => 'PAYCHEK';

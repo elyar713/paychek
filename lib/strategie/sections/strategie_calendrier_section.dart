@@ -43,6 +43,15 @@ class _StrategieCalendrierSectionState extends State<StrategieCalendrierSection>
   late DateTime _focusedMonth;
   DateTime? _selected;
 
+  void _publishSelectedDay(DateTime? day) {
+    final notifier = widget.selectedDayNotifier;
+    if (notifier == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      notifier.value = day;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +59,7 @@ class _StrategieCalendrierSectionState extends State<StrategieCalendrierSection>
     final n = DateTime.now();
     _focusedMonth = DateTime(n.year, n.month);
     _selected = DateTime(n.year, n.month, n.day);
-    widget.selectedDayNotifier?.value = _selected;
+    _publishSelectedDay(_selected);
   }
 
   void _prevMonth() {
@@ -199,10 +208,10 @@ class _StrategieCalendrierSectionState extends State<StrategieCalendrierSection>
                     daysInMonth: daysInMonth,
                     languageCode: Localizations.localeOf(context).languageCode,
                     firstDayOfWeekIndex: loc.firstDayOfWeekIndex,
-                    onDaySelected: (date) => setState(() {
-                      _selected = date;
-                      widget.selectedDayNotifier?.value = date;
-                    }),
+                    onDaySelected: (date) {
+                      setState(() => _selected = date);
+                      _publishSelectedDay(date);
+                    },
                     onToggleSelectedUsage: (day) {
                       StrategieSetupUsageStore.toggleDay(
                         setup.title,

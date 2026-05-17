@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// Non-zero [Rect] for [Share.shareXFiles] on iOS/iPadOS (share sheet popover).
 Rect resolveSharePositionOrigin({BuildContext? context, Rect? explicit}) {

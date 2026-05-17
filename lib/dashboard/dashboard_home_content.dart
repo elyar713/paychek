@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../analyse/analyse_report_snapshot.dart';
@@ -19,7 +20,7 @@ import 'pages/capital/widgets/capital_balance_card.dart';
 import 'widgets/capital_evolution_card.dart';
 import 'widgets/dashboard_calendrier_card.dart';
 import 'widgets/dashboard_home_hero.dart';
-import 'widgets/weekly_this_week_section.dart';
+import 'widgets/dashboard_paychek_lens_section.dart';
 import 'widgets/web_this_week_calendar_pair.dart';
 
 /// Contenu scrollable de l’onglet Accueil (sans Scaffold).
@@ -69,10 +70,12 @@ class DashboardHomeContent extends StatefulWidget {
 class _DashboardHomeContentState extends State<DashboardHomeContent> {
   void _onLiteTap() => widget.onLiteFreemiumRestrictedTap?.call();
 
-  /// Carte Capital : sur web, alignée avec l’évolution (pilules masquées sur la carte Capital).
-  int _capitalTimeframe = WebDashboardConfig.useLeftRail ? 3 : 0;
+  /// Carte Capital : web rail → « Tous » ; web étroit → jour ; mobile → « Tous » (courbe fusionnée).
+  int _capitalTimeframe = WebDashboardConfig.useLeftRail
+      ? 3
+      : (kIsWeb ? 0 : 3);
 
-  /// Évolution du capital : « Tous » par défaut pour afficher toute la courbe sur l’historique.
+  /// Évolution du capital (web) : « Tous » par défaut.
   int _evolutionTimeframe = 3;
 
   Widget _sectionForId(String id, {bool webPairStretch = false}) {
@@ -84,14 +87,13 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               ? (_) => _onLiteTap()
               : (i) => setState(() {
                   _capitalTimeframe = i;
-                  if (WebDashboardConfig.useLeftRail) {
-                    _evolutionTimeframe = i;
-                  }
+                  _evolutionTimeframe = i;
                 }),
           checklistController: widget.checklistController,
           onOpenChecklist: widget.onOpenChecklist,
           onOpenEtatMental: widget.onOpenEtatMental,
           onOpenTrade: widget.onOpenTrade,
+          onOpenTradeById: kIsWeb ? null : widget.onOpenTradeById,
           hideTimeframePills: WebDashboardConfig.useLeftRail,
           cardDecoration: WebDashboardConfig.useLeftRail
               ? PaychekWebTokens.shellCardDecoration()
@@ -140,6 +142,15 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               ? Colors.transparent
               : null,
         );
+      case DashboardHomeLayoutKeys.paychekLens:
+        return DashboardPaychekLensSection(
+          contentPadding: WebDashboardConfig.useLeftRail
+              ? const EdgeInsets.symmetric(horizontal: 28, vertical: 24)
+              : null,
+          cardBackgroundColor: WebDashboardConfig.useLeftRail
+              ? Colors.transparent
+              : null,
+        );
       case DashboardHomeLayoutKeys.capitalEvolution:
         return CapitalEvolutionCard(
           timeframeIndex: _evolutionTimeframe,
@@ -152,7 +163,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                   }
                 }),
           onOpenTradeById: widget.onOpenTradeById,
-          hideTimeframePills: WebDashboardConfig.useLeftRail,
+          hideTimeframePills: WebDashboardConfig.useLeftRail || !kIsWeb,
           cardDecoration: WebDashboardConfig.useLeftRail
               ? PaychekWebTokens.shellCardDecoration()
               : null,
@@ -163,6 +174,13 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     }
   }
 
+  /// Mobile : évolution fusionnée dans [CapitalBalanceCard] — pas de carte séparée.
+  List<String> _mobileHomeSectionOrder(List<String> ids) {
+    return ids
+        .where((id) => id != DashboardHomeLayoutKeys.capitalEvolution)
+        .toList();
+  }
+
   /// Web : capital + évolution ; checklist + analyse ; état + stratégie + this week + calendrier ; puis le reste.
   Widget _buildWebHomeSections(List<String> orderedVisibleIds) {
     const capId = DashboardHomeLayoutKeys.capitalBalance;
@@ -171,6 +189,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     const analyseId = DashboardHomeLayoutKeys.analyse;
     const etatId = DashboardHomeLayoutKeys.etatMental;
     const stratId = DashboardHomeLayoutKeys.strategie;
+    const paychekLensId = DashboardHomeLayoutKeys.paychekLens;
 
     final hasCap = orderedVisibleIds.contains(capId);
     final hasEvo = orderedVisibleIds.contains(evoId);
@@ -178,6 +197,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     final hasAnalyse = orderedVisibleIds.contains(analyseId);
     final hasEtat = orderedVisibleIds.contains(etatId);
     final hasStrat = orderedVisibleIds.contains(stratId);
+    final hasPaychekLens = orderedVisibleIds.contains(paychekLensId);
 
     final rest = orderedVisibleIds
         .where(
@@ -187,7 +207,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               id != checkId &&
               id != analyseId &&
               id != etatId &&
-              id != stratId,
+              id != stratId &&
+              id != paychekLensId,
         )
         .toList();
 
@@ -197,10 +218,12 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
 
     final gapAfterCapital =
         showCapitalRow &&
-        (showCheckAnalyseRow || showEtatStratRow || rest.isNotEmpty);
+        (showCheckAnalyseRow || showEtatStratRow || hasPaychekLens || rest.isNotEmpty);
     final gapAfterCheckAnalyse =
-        showCheckAnalyseRow && (showEtatStratRow || rest.isNotEmpty);
-    final gapAfterEtatStrat = showEtatStratRow && rest.isNotEmpty;
+        showCheckAnalyseRow && (showEtatStratRow || hasPaychekLens || rest.isNotEmpty);
+    final gapAfterPaychekLens = hasPaychekLens && rest.isNotEmpty;
+    final gapBeforePaychekLens = hasPaychekLens &&
+        (showCapitalRow || showCheckAnalyseRow || showEtatStratRow || WebDashboardConfig.useLeftRail);
 
     /// Ligne capital + évolution : capital ~27 %, évolution ~73 %.
     const webCapitalRowFlex = 10;
@@ -227,28 +250,23 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                       );
                     }
 
-                    final inner =
-                        (constraints.maxWidth - webCapitalPairGap).clamp(0.0, double.infinity);
+                    final inner = (constraints.maxWidth - webCapitalPairGap)
+                        .clamp(0.0, double.infinity);
                     final sumFlex = webCapitalRowFlex + webEvolutionRowFlex;
                     final capW = inner * webCapitalRowFlex / sumFlex;
                     final evoW = inner - capW;
-                    // IntrinsicHeight + LayoutBuilder déclenche une assertion sur Web:
-                    // "LayoutBuilder does not support returning intrinsic dimensions".
-                    // On laisse les cartes à leur hauteur naturelle; `webPairStretch`
-                    // gère déjà l’alignement interne si besoin.
+
                     return Row(
-                      // Dans un scroll vertical, la hauteur peut être non bornée (Infinity).
-                      // `stretch` transmettrait une contrainte de hauteur infinie aux enfants.
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
                           width: capW,
-                          child: _sectionForId(capId, webPairStretch: true),
+                          child: _sectionForId(capId),
                         ),
                         SizedBox(width: webCapitalPairGap),
                         SizedBox(
                           width: evoW,
-                          child: _sectionForId(evoId, webPairStretch: true),
+                          child: _sectionForId(evoId),
                         ),
                       ],
                     );
@@ -312,13 +330,6 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                               child: _sectionForId(stratId),
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          WebDashboardPairedCard(
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: WeeklyThisWeekSection(),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -378,10 +389,6 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                     WebDashboardPairedCard(child: _sectionForId(stratId)),
                     const SizedBox(height: 24),
                     WebDashboardPairedCard(
-                      child: WeeklyThisWeekSection(),
-                    ),
-                    const SizedBox(height: 24),
-                    WebDashboardPairedCard(
                       child: DashboardCalendrierCard(
                         onOpenTradeById: widget.liteFreemiumRestricted
                             ? null
@@ -430,7 +437,9 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               );
             },
           ),
-        if (gapAfterEtatStrat) const SizedBox(height: 20),
+        if (gapBeforePaychekLens) const SizedBox(height: 20),
+        if (hasPaychekLens) _sectionForId(paychekLensId),
+        if (gapAfterPaychekLens) const SizedBox(height: 20),
         for (var i = 0; i < rest.length; i++) ...[
           if (i > 0) const SizedBox(height: 20),
           _sectionForId(rest[i]),
@@ -494,12 +503,13 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                     if (WebDashboardConfig.useLeftRail) {
                       return _buildWebHomeSections(ids);
                     }
+                    final mobileIds = _mobileHomeSectionOrder(ids);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (var i = 0; i < ids.length; i++) ...[
+                        for (var i = 0; i < mobileIds.length; i++) ...[
                           if (i > 0) const SizedBox(height: 20),
-                          _sectionForId(ids[i]),
+                          _sectionForId(mobileIds[i]),
                         ],
                       ],
                     );

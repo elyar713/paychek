@@ -25,6 +25,8 @@ class ReglageDashboardLayoutPage extends StatelessWidget {
         return l.settingsDashSectionEtat;
       case DashboardHomeLayoutKeys.strategie:
         return l.settingsDashSectionStrategie;
+      case DashboardHomeLayoutKeys.paychekLens:
+        return 'Paychek Lens';
       case DashboardHomeLayoutKeys.capitalEvolution:
         return l.settingsDashSectionEvolution;
       default:

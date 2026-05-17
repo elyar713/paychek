@@ -1,6 +1,7 @@
 library;
 
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
+import '../analyse/analyse_report_snapshot.dart';
 
 /// Modèle [Trade] et parsing CSV / helpers de dates (journal ou import historique).
 
@@ -24,6 +25,11 @@ class Trade {
     this.strategieTitle,
     /// Points stratégie cochés « non respectés » (journal).
     this.strategieNonRespectIds,
+    this.planNonRespectIds,
+    this.checklistNonRespectIds,
+    this.etatNonRespectIds,
+    this.planReport,
+    this.psychTags = const [],
     this.assetClass,
     this.pair,
     this.avantNews = false,
@@ -50,6 +56,11 @@ class Trade {
   final String? strategieTitle;
 
   final Set<String>? strategieNonRespectIds;
+  final Set<String>? planNonRespectIds;
+  final Set<String>? checklistNonRespectIds;
+  final Set<String>? etatNonRespectIds;
+  final AnalyseReportSnapshot? planReport;
+  final List<String> psychTags;
 
   final AjouterTradeAssetClass? assetClass;
 
@@ -274,6 +285,11 @@ List<Trade> parsePerformanceCsv(String raw) {
       lotSize: null,
       strategieTitle: null,
       strategieNonRespectIds: null,
+      planNonRespectIds: null,
+      checklistNonRespectIds: null,
+      etatNonRespectIds: null,
+      planReport: null,
+      psychTags: const [],
       assetClass: null,
       pair: null,
       avantNews: false,

@@ -21,7 +21,8 @@ class AnalyseIndicatorDraftPillRow extends StatelessWidget {
   static const double _radius = 12;
   static const double _hPad = 10;
   static const double _vPad = 7;
-  static const double _fieldWidth = 50;
+  static const double _fieldWidth = 88;
+  static const int _maxNameLength = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,7 @@ class AnalyseIndicatorDraftPillRow extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 focusNode: focusNode,
-                maxLength: 5,
+                maxLength: _maxNameLength,
                 maxLines: 1,
                 style: const TextStyle(
                   color: Color(0xFFDFDFDF),

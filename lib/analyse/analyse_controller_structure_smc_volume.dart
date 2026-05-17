@@ -234,7 +234,7 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
     notifyListeners();
   }
 
-  /// Libellé du type de profil (ex. « Fixed Range »), affiché sur la puce sous le titre.
+  /// Libellé du type de profil (legacy / démo) — l’UI utilise [volumeProfileTf] + zone.
   String _volumeProfileModeLabel = 'Volume profile';
   String get volumeProfileModeLabel => _volumeProfileModeLabel;
   set volumeProfileModeLabel(String v) {
@@ -242,6 +242,52 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
     final nv = t.isEmpty ? 'Volume profile' : t;
     if (nv == _volumeProfileModeLabel) return;
     _volumeProfileModeLabel = nv;
+    notifyListeners();
+  }
+
+  String _volumeProfileTf = AnalyseStructureChartTf.daily.label;
+  final List<String> _volumeProfileTfCustom = <String>[];
+
+  String get volumeProfileTf => _volumeProfileTf;
+  set volumeProfileTf(String v) {
+    final nv = v.trim();
+    if (nv.isEmpty || nv == _volumeProfileTf) return;
+    _volumeProfileTf = nv;
+    notifyListeners();
+  }
+
+  List<String> get volumeProfileTfCustom => List.unmodifiable(_volumeProfileTfCustom);
+
+  void addVolumeProfileTfCustom(String raw) {
+    final v = raw.trim();
+    if (v.isEmpty) return;
+    if (_volumeProfileTfCustom.contains(v)) return;
+    _volumeProfileTfCustom.add(v);
+    _volumeProfileTf = v;
+    notifyListeners();
+  }
+
+  bool _volumeProfileZoneActive = false;
+  bool get volumeProfileZoneActive => _volumeProfileZoneActive;
+  set volumeProfileZoneActive(bool v) {
+    if (v == _volumeProfileZoneActive) return;
+    _volumeProfileZoneActive = v;
+    notifyListeners();
+  }
+
+  String _volumeProfileZoneFrom = '';
+  String get volumeProfileZoneFrom => _volumeProfileZoneFrom;
+  set volumeProfileZoneFrom(String v) {
+    if (v == _volumeProfileZoneFrom) return;
+    _volumeProfileZoneFrom = v;
+    notifyListeners();
+  }
+
+  String _volumeProfileZoneTo = '';
+  String get volumeProfileZoneTo => _volumeProfileZoneTo;
+  set volumeProfileZoneTo(String v) {
+    if (v == _volumeProfileZoneTo) return;
+    _volumeProfileZoneTo = v;
     notifyListeners();
   }
 
@@ -304,6 +350,10 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
     _volumeProfileVal = '';
     _notesVolumeProfile = '';
     _volumeProfileModeLabel = 'Volume profile';
+    _volumeProfileTf = AnalyseStructureChartTf.daily.label;
+    _volumeProfileZoneActive = false;
+    _volumeProfileZoneFrom = '';
+    _volumeProfileZoneTo = '';
     notifyListeners();
   }
 

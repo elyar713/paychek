@@ -177,16 +177,16 @@ class _StrategieGestionRisqueSectionState
       _editSnapshot = null;
       _syncControllersFromState();
     });
-    StrategieGestionRisqueStorage.save(
-      StrategieGestionRisqueParams(
-        riskPct: _riskPct,
-        lossPct: _lossPct,
-        tradesPerDay: _tradesPerDay,
-        rrRatio: _rrRatio,
-      ),
+    final params = StrategieGestionRisqueParams(
+      riskPct: _riskPct,
+      lossPct: _lossPct,
+      tradesPerDay: _tradesPerDay,
+      rrRatio: _rrRatio,
     );
-    // Fire-and-forget : sync cloud.
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    unawaited(() async {
+      await StrategieGestionRisqueStorage.save(params);
+      await StrategieFirestoreSync.pushIfSignedIn(riskOverride: params);
+    }());
   }
 
   void _cancelEdit() {

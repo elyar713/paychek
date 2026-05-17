@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'analyse_controller.dart';
 import 'analyse_models.dart';
-import 'analyse_page_content_contexte_options.dart';
 import 'analyse_phase_locale.dart';
 import 'analyse_tokens.dart';
 import 'widgets/analyse_gauge.dart';
@@ -55,6 +54,10 @@ class AnalyseReportSnapshot {
     required this.vah,
     required this.val,
     required this.noteVolume,
+    this.volumeProfileTf,
+    this.volumeProfileZoneActive,
+    this.volumeProfileZoneFrom,
+    this.volumeProfileZoneTo,
     required this.gaugeFeuille,
     required this.gaugeStructure,
     required this.gaugeIndicators,
@@ -133,6 +136,11 @@ class AnalyseReportSnapshot {
   final String poc;
   final String vah;
   final String val;
+
+  final String? volumeProfileTf;
+  final bool? volumeProfileZoneActive;
+  final String? volumeProfileZoneFrom;
+  final String? volumeProfileZoneTo;
 
   final int gaugeFeuille;
   final int gaugeStructure;
@@ -274,6 +282,10 @@ class AnalyseReportSnapshot {
       vah: _orDash(c.volumeProfileVah),
       val: _orDash(c.volumeProfileVal),
       noteVolume: c.notesVolumeProfile.trim(),
+      volumeProfileTf: _orDash(c.volumeProfileTf),
+      volumeProfileZoneActive: c.volumeProfileZoneActive,
+      volumeProfileZoneFrom: c.volumeProfileZoneFrom.trim(),
+      volumeProfileZoneTo: c.volumeProfileZoneTo.trim(),
       gaugeFeuille: c.confidenceFeuille,
       gaugeStructure: c.confidenceStructure,
       gaugeIndicators: c.confidenceIndicators,

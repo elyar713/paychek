@@ -862,6 +862,30 @@ abstract class AppLocalizations {
   /// **'Ajouter un timeframe'**
   String get analyseAddTimeframeTitle;
 
+  /// No description provided for @analyseAddTimeframeCustomEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre (saisie libre)'**
+  String get analyseAddTimeframeCustomEntry;
+
+  /// No description provided for @analyseAddTimeframeSectionRestore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réactiver'**
+  String get analyseAddTimeframeSectionRestore;
+
+  /// No description provided for @analyseAddTimeframeSectionIntraday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intraday'**
+  String get analyseAddTimeframeSectionIntraday;
+
+  /// No description provided for @analyseAddTimeframeSectionSwing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Swing & position'**
+  String get analyseAddTimeframeSectionSwing;
+
   /// No description provided for @analyseAddTrendTitle.
   ///
   /// In fr, this message translates to:
@@ -1467,6 +1491,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'VAL'**
   String get analyseVolumeVal;
+
+  /// No description provided for @analyseVolumeZoneFrom.
+  ///
+  /// In fr, this message translates to:
+  /// **'De'**
+  String get analyseVolumeZoneFrom;
+
+  /// No description provided for @analyseVolumeZoneLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zone'**
+  String get analyseVolumeZoneLabel;
+
+  /// No description provided for @analyseVolumeZoneTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'À'**
+  String get analyseVolumeZoneTo;
 
   /// No description provided for @appBrandName.
   ///

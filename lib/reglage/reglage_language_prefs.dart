@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,20 +35,63 @@ abstract final class ReglageLanguagePrefs {
     }
   }
 
+  static String _guestScopedKey(String baseKey) => '${baseKey}__guest';
+
+  static String? _readCodeIfValid(String? raw) {
+    if (raw != null && availableCodes.contains(raw)) return raw;
+    return null;
+  }
+
+  /// Après connexion : reprend le choix fait sur la landing (`__guest`) si le compte n’a pas encore de langue.
+  static Future<void> promoteGuestLanguageToCurrentAccountIfNeeded() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final p = await SharedPreferences.getInstance();
+    await _migrateLegacyGlobalIfNeeded(p);
+    final scopedCodeKey = paychekScopedPrefsKey(_kLanguageCodeBase);
+    if (_readCodeIfValid(p.getString(scopedCodeKey)) != null) return;
+
+    final guestCode = _readCodeIfValid(
+      p.getString(_guestScopedKey(_kLanguageCodeBase)),
+    );
+    if (guestCode == null) return;
+
+    final guestAtKey = _guestScopedKey(_kUpdatedAtMsBase);
+    final ms =
+        p.getInt(guestAtKey) ?? DateTime.now().millisecondsSinceEpoch;
+    await save(guestCode, updatedAtMillis: ms);
+  }
+
   static Future<String> loadCode() async {
     final p = await SharedPreferences.getInstance();
     await _migrateLegacyGlobalIfNeeded(p);
-    final key = paychekScopedPrefsKey(_kLanguageCodeBase);
-    final raw = p.getString(key) ?? defaultCode;
-    return availableCodes.contains(raw) ? raw : defaultCode;
+    final scopedKey = paychekScopedPrefsKey(_kLanguageCodeBase);
+    final scoped = _readCodeIfValid(p.getString(scopedKey));
+    if (scoped != null) return scoped;
+
+    final guest = _readCodeIfValid(
+      p.getString(_guestScopedKey(_kLanguageCodeBase)),
+    );
+    if (guest != null) return guest;
+
+    final legacy = _readCodeIfValid(p.getString(_kLanguageCodeBase));
+    if (legacy != null) return legacy;
+
+    return defaultCode;
   }
 
   /// Horodatage local du dernier choix explicite (compare à [appLanguageUpdatedAt] Firestore).
   static Future<int> loadUpdatedAtMillis() async {
     final p = await SharedPreferences.getInstance();
     await _migrateLegacyGlobalIfNeeded(p);
-    final key = paychekScopedPrefsKey(_kUpdatedAtMsBase);
-    return p.getInt(key) ?? 0;
+    final scopedKey = paychekScopedPrefsKey(_kUpdatedAtMsBase);
+    final scopedMs = p.getInt(scopedKey);
+    if (scopedMs != null) return scopedMs;
+
+    final guestMs = p.getInt(_guestScopedKey(_kUpdatedAtMsBase));
+    if (guestMs != null) return guestMs;
+
+    return p.getInt(_kUpdatedAtMsBase) ?? 0;
   }
 
   static Future<void> save(String code, {int? updatedAtMillis}) async {

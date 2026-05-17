@@ -70,6 +70,16 @@ class _WebDashboardChecklistAnalysePairState
   /// Hauteur **intérieure** (hors padding de [WebDashboardPairedCard]) de la colonne checklist + lien « Plus ».
   /// `null` : pas encore mesuré (première frame ou analyse pas encore layout).
   double? _checklistTargetInnerHeight;
+  bool _measurePostFrameQueued = false;
+
+  void _scheduleMeasureAnalyseHeight() {
+    if (_measurePostFrameQueued) return;
+    _measurePostFrameQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measurePostFrameQueued = false;
+      _measureAnalyseCardOuterHeight();
+    });
+  }
 
   void _measureAnalyseCardOuterHeight() {
     if (!mounted) return;
@@ -119,8 +129,7 @@ class _WebDashboardChecklistAnalysePairState
           );
         }
 
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _measureAnalyseCardOuterHeight());
+        _scheduleMeasureAnalyseHeight();
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,

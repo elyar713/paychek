@@ -1,15 +1,16 @@
-﻿import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_tokens.dart';
 import '../l10n/app_localizations.dart';
+import '../analyse/report_widgets/analyse_report_structure_ui.dart'
+    show dashboardStructureSupportResistanceRow;
 import '../analyse/report_widgets/analyse_report_ui_primitives.dart'
     show
         AnalyseReportNoteBand,
         analyseReportBiasPill,
-        analyseReportContexteTfTrendPhaseRow,
-        analyseReportKv;
+        analyseReportContexteTfTrendPhaseRow;
 import '../analyse/widgets/analyse_gauge.dart';
 import '../checklist/checklist_tokens.dart';
 import '../web/web_dashboard_analyse_preview.dart';
@@ -270,28 +271,73 @@ class DashboardAnalyseShortcut extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: analyseReportKv(
-                              l.analyseSupport,
-                              _dash(s.support),
-                              valueColor: AnalyseTokens.accentGreen,
-                              valueBold: true,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: analyseReportKv(
-                              l.analyseResistShort,
-                              _dash(s.resistance),
-                              valueColor: AnalyseTokens.accentRed,
-                              valueBold: true,
-                            ),
-                          ),
-                        ],
+                      dashboardStructureSupportResistanceRow(
+                        context: context,
+                        supportLabel: l.analyseSupport,
+                        supportValue: _dash(s.support),
+                        resistLabel: l.analyseResistShort,
+                        resistValue: _dash(s.resistance),
+                        headerStyle: AnalyseTokens.labelStyle,
+                        supportValueStyle: const TextStyle(
+                          color: AnalyseTokens.accentGreen,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          height: 1.2,
+                        ),
+                        resistValueStyle: const TextStyle(
+                          color: AnalyseTokens.accentRed,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                          height: 1.2,
+                        ),
+                        structureExtraSupports: s.structureExtraSupports,
+                        structureExtraResistances: s.structureExtraResistances,
+                        uppercaseHeaders: false,
                       ),
+                      for (final copy in s.structureCopies ?? const []) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: AnalyseTokens.cardBorder,
+                          ),
+                        ),
+                        Text(
+                          '${_dash(copy.structureTf)} - ${_dash(copy.chartisme)}',
+                          style: const TextStyle(
+                            color: AnalyseTokens.matteText,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        dashboardStructureSupportResistanceRow(
+                          context: context,
+                          supportLabel: l.analyseSupport,
+                          supportValue: _dash(copy.support),
+                          resistLabel: l.analyseResistShort,
+                          resistValue: _dash(copy.resistance),
+                          headerStyle: AnalyseTokens.labelStyle,
+                          supportValueStyle: const TextStyle(
+                            color: AnalyseTokens.accentGreen,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            height: 1.2,
+                          ),
+                          resistValueStyle: const TextStyle(
+                            color: AnalyseTokens.accentRed,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                            height: 1.2,
+                          ),
+                          structureExtraSupports: copy.structureExtraSupports,
+                          structureExtraResistances:
+                              copy.structureExtraResistances,
+                          uppercaseHeaders: false,
+                        ),
+                      ],
                       if (s.noteStructure.isNotEmpty) ...[
                         const SizedBox(height: 14),
                         AnalyseReportNoteBand(text: s.noteStructure),

@@ -598,6 +598,12 @@ pw.Widget _volumeCard(AnalyseReportSnapshot s) {
         ),
       ),
       pw.SizedBox(height: 8),
+      if ((s.volumeProfileTf ?? '').trim().isNotEmpty)
+        _kvPdf('TF', _dashOr(s.volumeProfileTf)),
+      if (s.volumeProfileZoneActive == true) ...[
+        _kvPdf('Zone (de)', _dashOr(s.volumeProfileZoneFrom)),
+        _kvPdf('Zone (a)', _dashOr(s.volumeProfileZoneTo)),
+      ],
       _kvPdf('POC', _dashOr(s.poc)),
       _kvPdf('VAH', _dashOr(s.vah)),
       _kvPdf('VAL', _dashOr(s.val)),
@@ -779,6 +785,7 @@ Future<void> exportAnalyseReportPdf(
       snapshot,
       imageBytes: imageBytes,
     );
+    if (!context.mounted) return;
     final name = _safePdfFileName(snapshot);
 
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(

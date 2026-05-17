@@ -132,13 +132,29 @@ extension _PerformancePageUiBottom on _PerformancePageState {
     );
   }
 
-  Widget _volumeMarcheChip(AjouterTradeAssetClass m) {
+  Widget _volumeMarcheChip(AjouterTradeAssetClass m) => _assetMarcheChip(
+        m: m,
+        selected: _volumeSectionMarche,
+        onSelected: () => _setVolumeSectionMarche(m),
+      );
+
+  Widget _mostTradedMarcheChip(AjouterTradeAssetClass m) => _assetMarcheChip(
+        m: m,
+        selected: _mostTradedSectionMarche,
+        onSelected: () => _setMostTradedSectionMarche(m),
+      );
+
+  Widget _assetMarcheChip({
+    required AjouterTradeAssetClass m,
+    required AjouterTradeAssetClass selected,
+    required VoidCallback onSelected,
+  }) {
     final l = AppLocalizations.of(context)!;
-    final sel = _volumeSectionMarche == m;
+    final sel = selected == m;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _setVolumeSectionMarche(m),
+        onTap: onSelected,
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
@@ -465,7 +481,15 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             LucideIcons.trendingUp,
             t('Actif le plus tradé', 'Most traded asset', 'Activo más tradeado', 'Meist gehandeltes Instrument', 'Ativo mais negociado', '가장 많이 거래한 종목'),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final m in AjouterTradeAssetClass.values) _mostTradedMarcheChip(m),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
             t(
               'Nombre de trades par symbole (période filtrée). Barres = volume relatif, pourcentage = winrate.',
@@ -485,12 +509,12 @@ extension _PerformancePageUiBottom on _PerformancePageState {
           if (stats.isEmpty)
             Text(
               t(
-                'Ajoutez des trades avec un actif renseigné pour afficher le diagramme.',
-                'Add trades with an asset symbol to display the chart.',
-                'Agrega trades con símbolo de activo para mostrar el gráfico.',
-                'Fügen Sie Trades mit angegebenem Symbol hinzu, um das Diagramm anzuzeigen.',
-                'Adicione trades com ativo informado para exibir o gráfico.',
-                '종목이 입력된 트레이드를 추가하면 차트가 표시됩니다.',
+                'Aucun trade pour ce marché sur la période (symbole renseigné).',
+                'No trades for this market in the period (symbol required).',
+                'Sin trades para este mercado en el período (símbolo requerido).',
+                'Keine Trades für diesen Markt im Zeitraum (Symbol erforderlich).',
+                'Nenhum trade para este mercado no período (símbolo obrigatório).',
+                '이 기간·시장에 해당하는 트레이드가 없습니다(종목 필요).',
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
@@ -580,7 +604,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
     );
   }
 
-  Widget _cardTitle(IconData icon, String title) {
+  Widget _cardTitle(IconData icon, String title, {Color titleColor = const Color(0xFF9A9A9A)}) {
     return Row(
       children: [
         Icon(icon, size: 16, color: _kGreen.withValues(alpha: 0.9)),
@@ -591,7 +615,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF9A9A9A),
+              color: titleColor,
               letterSpacing: 1.35,
             ),
           ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,9 +12,9 @@ import '../../calendrier/calendrier_utils.dart';
 import '../../web/paychek_web_tokens.dart';
 import '../capital_evolution_computed.dart';
 import '../dashboard_tokens.dart';
-import 'dashboard_cumulative_sparkline.dart';
-import 'dashboard_trade_extremes_row.dart';
+import 'capital_evolution_chart_section.dart';
 import 'timeframe_pills.dart';
+import 'weekly_this_week_section.dart';
 
 class CapitalEvolutionCard extends StatelessWidget {
   const CapitalEvolutionCard({
@@ -61,64 +61,30 @@ class CapitalEvolutionCard extends StatelessWidget {
             );
             final sym = pf.effectiveCurrencySymbol(capStore);
 
-            final tradesLine = kIsWeb
-                ? Text(
-                    l
-                        .dashboardEvolutionTradesThisPeriod(data.tradeCount)
-                        .toUpperCase(),
-                    maxLines: 2,
-                    style: GoogleFonts.plusJakartaSans(
-                      color: PaychekWebTokens.textGray500,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.95,
-                      height: 1.25,
-                    ),
-                  )
-                : Text(
-                    data.tradeCount == 1
-                        ? l.dashboardTradeOne
-                        : l.dashboardTradeCount(data.tradeCount),
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontSize: 11,
-                          color: DashboardTokens.labelGrey,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ) ??
-                        const TextStyle(
-                          fontSize: 11,
-                          color: DashboardTokens.labelGrey,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
-                  );
+            final tradesLine = Text(
+              l
+                  .dashboardEvolutionTradesThisPeriod(data.tradeCount)
+                  .toUpperCase(),
+              maxLines: 2,
+              style: GoogleFonts.plusJakartaSans(
+                color: PaychekWebTokens.textGray500,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.95,
+                height: 1.25,
+              ),
+            );
 
             Widget amountHeading() {
-              if (kIsWeb) {
-                return Text(
-                  formatMoneyWithCurrencySymbol(data.periodNet, sym),
-                  style: GoogleFonts.plusJakartaSans(
-                    color: data.periodNet < 0
-                        ? DashboardTokens.negative
-                        : PaychekWebTokens.accentMint,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 30,
-                    height: 1.04,
-                  ),
-                );
-              }
-              final color = data.periodNet < 0
-                  ? DashboardTokens.negative
-                  : (data.periodNet == 0
-                      ? DashboardTokens.onMatteEmphasis
-                      : DashboardTokens.accent);
               return Text(
                 formatMoneyWithCurrencySymbol(data.periodNet, sym),
-                style: TextStyle(
-                  color: color,
+                style: GoogleFonts.plusJakartaSans(
+                  color: data.periodNet < 0
+                      ? DashboardTokens.negative
+                      : PaychekWebTokens.accentMint,
                   fontWeight: FontWeight.w900,
-                  fontSize: 22,
-                  height: 1.05,
+                  fontSize: 30,
+                  height: 1.04,
                 ),
               );
             }
@@ -130,76 +96,73 @@ class CapitalEvolutionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  if (kIsWeb) ...[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l.dashboardCapitalEvolutionTitle.toUpperCase(),
+                            style: GoogleFonts.plusJakartaSans(
+                              color: PaychekWebTokens.textGray500,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                        if (!hideTimeframePills)
+                          TimeframePills(
+                            labels: tfLabels,
+                            selectedIndex: timeframeIndex,
+                            onChanged: onTimeframeChanged,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 11),
+                  ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: Text(
-                          kIsWeb
-                              ? l.dashboardCapitalEvolutionTitle.toUpperCase()
-                              : l.dashboardCapitalEvolutionTitle,
-                          style: kIsWeb
-                              ? GoogleFonts.plusJakartaSans(
-                                  color: PaychekWebTokens.textGray500,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.2,
-                                )
-                              : const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.8,
-                                ),
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              amountHeading(),
+                              const SizedBox(height: 6),
+                              tradesLine,
+                            ],
+                          ),
+                          Expanded(
+                            child: Align(
+                              alignment: const Alignment(-0.22, 1),
+                              child: WeeklyThisWeekSection(
+                                compactOnly: true,
+                                compactPart:
+                                    WeeklyThisWeekCompactPart.barsOnly,
+                              ),
+                            ),
+                          ),
+                          WeeklyThisWeekSection(
+                            compactOnly: true,
+                            compactPart:
+                                WeeklyThisWeekCompactPart.extremesOnly,
+                            includeTradeExtremes: true,
+                            onOpenTradeById: onOpenTradeById,
+                          ),
+                        ],
                       ),
-                      if (!hideTimeframePills)
-                        TimeframePills(
-                          labels: tfLabels,
-                          selectedIndex: timeframeIndex,
-                          onChanged: onTimeframeChanged,
-                        ),
+                      const SizedBox(height: 10),
                     ],
                   ),
-                  SizedBox(height: kIsWeb ? 11 : 14),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 54,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            amountHeading(),
-                            SizedBox(height: kIsWeb ? 6 : 5),
-                            tradesLine,
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: kIsWeb ? 8 : 6),
-                      Expanded(
-                        flex: 46,
-                        child: DashboardTradeExtremesRow(
-                          compact: true,
-                          spacing: kIsWeb ? 6 : 8,
-                          onOpenTradeById: onOpenTradeById,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: kIsWeb ? 10 : 11),
-                  // Pas de [Expanded] ici quand parent = [IntrinsicHeight] (rangée Capital+Évolution web) :
-                  // les flex sont exclus du calcul intrinsèque → hauteur 0 pour la courbe.
-                  DashboardCumulativeSparkline(
-                    spots: data.spots,
-                    spotContexts: data.spotContexts,
-                    minY: data.minY,
-                    maxY: data.maxY,
-                    height: kIsWeb ? 122 : 130,
-                    currencySymbol: sym,
+                  CapitalEvolutionChartSection(
+                    timeframeIndex: timeframeIndex,
                     onOpenTradeById: onOpenTradeById,
+                    sparklineHeight: 122,
+                    showTradeExtremes: false,
                   ),
-                  if (!kIsWeb) const SizedBox(height: 4),
                 ],
               ),
             );

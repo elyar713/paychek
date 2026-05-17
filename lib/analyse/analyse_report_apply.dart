@@ -337,6 +337,13 @@ void applyAnalyseReportToController(
   c.volumeProfileVah = _stripReportDash(s.vah);
   c.volumeProfileVal = _stripReportDash(s.val);
   c.notesVolumeProfile = s.noteVolume;
+  final volTf = s.volumeProfileTf?.trim();
+  if (volTf != null && volTf.isNotEmpty && volTf != '—' && volTf != '-') {
+    c.volumeProfileTf = volTf;
+  }
+  c.volumeProfileZoneActive = s.volumeProfileZoneActive ?? false;
+  c.volumeProfileZoneFrom = _stripReportDash(s.volumeProfileZoneFrom ?? '');
+  c.volumeProfileZoneTo = _stripReportDash(s.volumeProfileZoneTo ?? '');
 
   c.restoreImpactsSnapshot(
     s.gaugeImpactFeuille,

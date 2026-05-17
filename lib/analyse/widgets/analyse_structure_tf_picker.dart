@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -11,6 +11,7 @@ import '../analyse_tokens.dart';
 /// - Structure : [structureSnapshotIndex] non nul â†’ copie dupliquÃ©e ; sinon TF principal.
 /// - Indicateurs : [forIndicatorsSection] ; [indicatorsSnapshotIndex] non nul â†’ copie.
 /// - SMC : [forSmcSection] ; [smcSnapshotIndex] non nul â†’ copie.
+/// - Profil de volume : [forVolumeProfileSection].
 Future<void> showAnalyseStructureTfPicker(
   BuildContext context,
   AnalyseController controller, {
@@ -19,15 +20,19 @@ Future<void> showAnalyseStructureTfPicker(
   int? indicatorsSnapshotIndex,
   bool forSmcSection = false,
   int? smcSnapshotIndex,
+  bool forVolumeProfileSection = false,
 }) async {
   final c = controller;
   final rootContext = context;
 
-  final multiSection =
-      (forIndicatorsSection ? 1 : 0) + (forSmcSection ? 1 : 0);
+  final multiSection = (forIndicatorsSection ? 1 : 0) +
+      (forSmcSection ? 1 : 0) +
+      (forVolumeProfileSection ? 1 : 0);
   if (multiSection > 1) return;
 
-  if (forSmcSection) {
+  if (forVolumeProfileSection) {
+    // Rien d’autre à valider.
+  } else if (forSmcSection) {
     if (smcSnapshotIndex != null) {
       if (smcSnapshotIndex < 0 || smcSnapshotIndex >= c.smcSnapshots.length) {
         return;
@@ -55,6 +60,9 @@ Future<void> showAnalyseStructureTfPicker(
   final smcSnap = forSmcSection ? smcSnapshotIndex : null;
 
   String currentTf() {
+    if (forVolumeProfileSection) {
+      return c.volumeProfileTf;
+    }
     if (forSmcSection) {
       return smcSnap != null ? c.smcSnapshots[smcSnap].smcTf : c.smcTf;
     }
@@ -69,6 +77,10 @@ Future<void> showAnalyseStructureTfPicker(
   }
 
   void applyTf(String label) {
+    if (forVolumeProfileSection) {
+      c.volumeProfileTf = label;
+      return;
+    }
     if (forSmcSection) {
       if (smcSnap != null) {
         c.setSmcSnapshotTf(smcSnap, label);
@@ -119,7 +131,9 @@ Future<void> showAnalyseStructureTfPicker(
 
     void apply() {
       if (!rootContext.mounted) return;
-      if (forSmcSection) {
+      if (forVolumeProfileSection) {
+        c.addVolumeProfileTfCustom(v);
+      } else if (forSmcSection) {
         if (smcSnap != null) {
           c.addSmcSnapshotTfCustom(smcSnap, v);
         } else {
@@ -159,11 +173,13 @@ Future<void> showAnalyseStructureTfPicker(
   }
 
   final presetLabels = AnalyseStructureChartTf.values.map((e) => e.label).toList();
-  final List<String> customSource = forSmcSection
-      ? c.smcTfCustom
-      : forIndicatorsSection
-          ? c.indicatorsTfCustom
-          : c.structureTfCustom;
+  final List<String> customSource = forVolumeProfileSection
+      ? c.volumeProfileTfCustom
+      : forSmcSection
+          ? c.smcTfCustom
+          : forIndicatorsSection
+              ? c.indicatorsTfCustom
+              : c.structureTfCustom;
   final custom = customSource.where((s) => !presetLabels.contains(s)).toList();
 
   final mq = MediaQuery.sizeOf(context);

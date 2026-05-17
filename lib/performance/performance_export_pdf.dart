@@ -1,5 +1,3 @@
-import 'dart:ui' show Locale;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
@@ -58,6 +56,7 @@ Future<void> exportPerformancePdf(
       l: l,
       uiLocale: uiLocale,
     );
+    if (!context.mounted) return;
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = 'performance_journal_$stamp.pdf';
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(

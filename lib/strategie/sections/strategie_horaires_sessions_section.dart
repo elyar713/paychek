@@ -249,8 +249,10 @@ class _StrategieHorairesSessionsSectionState
 
   void _persistSessions() {
     final list = _sessions.map(_sessionToPersisted).toList();
-    StrategieHorairesSessionsStorage.save(list);
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    unawaited(() async {
+      await StrategieHorairesSessionsStorage.save(list);
+      await StrategieFirestoreSync.pushIfSignedIn(sessionsOverride: list);
+    }());
   }
 
   void _syncSessionKeysLength() {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -54,12 +56,22 @@ String _paychekTrimField(Object? v) => v?.toString().trim() ?? '';
 /// (ou si aucun horodatage — anciennes docs — et les codes diffèrent).
 ///
 /// À appeler **avant** de lire la langue pour [syncPaychekUserDocument] ou [AppLocaleController.load].
+/// Délai max pour lire la langue cloud (web lent / hors ligne) — ne pas bloquer l’UI.
+const Duration _kAppLanguageFirestoreReadTimeout = Duration(seconds: 4);
+
 Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
   try {
-    final snap = await FirebaseFirestore.instance
-        .collection(kPaychekUsersCollection)
-        .doc(user.uid)
-        .get();
+    await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
+    final DocumentSnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await FirebaseFirestore.instance
+          .collection(kPaychekUsersCollection)
+          .doc(user.uid)
+          .get()
+          .timeout(_kAppLanguageFirestoreReadTimeout);
+    } on TimeoutException {
+      return;
+    }
     if (!snap.exists) return;
     final data = snap.data();
     if (data == null) return;

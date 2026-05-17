@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../calendrier/calendrier_constants.dart';
@@ -82,27 +83,8 @@ class DashboardCumulativeSparkline extends StatefulWidget {
 class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkline> {
   int? _hoverIndex;
 
-  /// Mesure sans [LayoutBuilder] (nécessaire pour un ascendant [IntrinsicHeight]).
-  final GlobalKey _paintStackKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() {});
-    });
-  }
-
   double _chartHeightPx() =>
       widget.height ?? DashboardCumulativeSparkline._defaultHeight;
-
-  Size _chartSizePx() {
-    final hPx = _chartHeightPx();
-    final rb =
-        _paintStackKey.currentContext?.findRenderObject() as RenderBox?;
-    final w = (rb != null && rb.hasSize) ? rb.size.width : 0.0;
-    return Size(w, hPx);
-  }
 
   void _setHoverFromLocal(Offset local, double width, double height) {
     if (widget.spots.isEmpty) return;
@@ -112,11 +94,9 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     setState(() => _hoverIndex = idx);
   }
 
-  void _hoverAtLocalPosition(Offset local) {
-    final sz = _chartSizePx();
-    final w = sz.width;
-    if (w <= 0) return;
-    _setHoverFromLocal(local, w, sz.height);
+  void _hoverAtLocalPosition(Offset local, Size chartSize) {
+    if (chartSize.width <= 0) return;
+    _setHoverFromLocal(local, chartSize.width, chartSize.height);
   }
 
   void _clearHover() {
@@ -133,6 +113,7 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     final trades = widget.spotContexts[idx].tradesOnSlice;
     if (trades.isEmpty) return;
     widget.onOpenTradeById!(trades.first.id);
+    _clearHover();
   }
 
   @override
@@ -141,7 +122,6 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     assert(widget.spots.length == widget.spotContexts.length);
 
     final hPx = _chartHeightPx();
-    final chartSize = _chartSizePx();
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -149,64 +129,84 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
         color: DashboardTokens.cardBoxBg,
         child: SizedBox(
           height: hPx,
-          child: Stack(
-            key: _paintStackKey,
-            clipBehavior: Clip.hardEdge,
-            fit: StackFit.expand,
-            children: [
-              CustomPaint(
-                painter: _DashboardSparklinePainter(
-                  spots: widget.spots,
-                  minY: widget.minY,
-                  maxY: widget.maxY,
-                ),
-              ),
-              if (_hoverIndex != null &&
-                  _hoverIndex! < widget.spots.length &&
-                  chartSize.width > 0)
-                CustomPaint(
-                  painter: _SparkHoverMarkerPainter(
-                    center: sparkPointScreen(
-                      widget.spots[_hoverIndex!],
-                      chartSize,
-                      widget.minY,
-                      widget.maxY,
-                      widget.spots.length,
-                    ),
-                    cumulativeY: widget.spots[_hoverIndex!].y,
-                  ),
-                ),
-              Positioned.fill(
-                child: MouseRegion(
-                  onExit: (_) => _clearHover(),
-                  onHover: (e) => _hoverAtLocalPosition(e.localPosition),
-                  child: Listener(
-                    behavior: HitTestBehavior.translucent,
-                    onPointerMove: (e) =>
-                        _hoverAtLocalPosition(e.localPosition),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTapDown: (d) => _hoverAtLocalPosition(d.localPosition),
-                      onTapCancel: () => _clearHover(),
-                      onTap: () => _maybeOpenTrade(_hoverIndex),
-                      child: const SizedBox.expand(),
+          width: double.infinity,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final chartSize = Size(constraints.maxWidth, hPx);
+
+              return Stack(
+                clipBehavior: Clip.hardEdge,
+                fit: StackFit.expand,
+                children: [
+                  CustomPaint(
+                    painter: _DashboardSparklinePainter(
+                      spots: widget.spots,
+                      minY: widget.minY,
+                      maxY: widget.maxY,
                     ),
                   ),
-                ),
-              ),
-              if (_hoverIndex != null &&
-                  _hoverIndex! < widget.spots.length &&
-                  chartSize.width > 0)
-                _HoverReadout(
-                  spots: widget.spots,
-                  index: _hoverIndex!,
-                  spotContexts: widget.spotContexts,
-                  currencySymbol: widget.currencySymbol,
-                  showOpenHint: widget.onOpenTradeById != null,
-                  l: l,
-                  chartSize: chartSize,
-                ),
-            ],
+                  if (_hoverIndex != null &&
+                      _hoverIndex! < widget.spots.length &&
+                      chartSize.width > 0)
+                    CustomPaint(
+                      painter: _SparkHoverMarkerPainter(
+                        center: sparkPointScreen(
+                          widget.spots[_hoverIndex!],
+                          chartSize,
+                          widget.minY,
+                          widget.maxY,
+                          widget.spots.length,
+                        ),
+                        cumulativeY: widget.spots[_hoverIndex!].y,
+                      ),
+                    ),
+                  Positioned.fill(
+                    child: MouseRegion(
+                      onExit: (_) => _clearHover(),
+                      onHover: (e) =>
+                          _hoverAtLocalPosition(e.localPosition, chartSize),
+                      child: Listener(
+                        behavior: HitTestBehavior.translucent,
+                        onPointerDown: (e) =>
+                            _hoverAtLocalPosition(e.localPosition, chartSize),
+                        onPointerMove: (e) =>
+                            _hoverAtLocalPosition(e.localPosition, chartSize),
+                        onPointerUp: (e) {
+                          if (e.kind == PointerDeviceKind.touch ||
+                              e.kind == PointerDeviceKind.stylus) {
+                            // Après [onTap] éventuel (même frame).
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) _clearHover();
+                            });
+                          }
+                        },
+                        onPointerCancel: (_) => _clearHover(),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTapCancel: () => _clearHover(),
+                          onTap: () => _maybeOpenTrade(_hoverIndex),
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_hoverIndex != null &&
+                      _hoverIndex! < widget.spots.length &&
+                      chartSize.width > 0)
+                    _HoverReadout(
+                      spots: widget.spots,
+                      index: _hoverIndex!,
+                      spotContexts: widget.spotContexts,
+                      currencySymbol: widget.currencySymbol,
+                      minY: widget.minY,
+                      maxY: widget.maxY,
+                      showOpenHint: widget.onOpenTradeById != null,
+                      l: l,
+                      chartSize: chartSize,
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -260,6 +260,8 @@ class _HoverReadout extends StatelessWidget {
     required this.index,
     required this.spotContexts,
     required this.currencySymbol,
+    required this.minY,
+    required this.maxY,
     required this.showOpenHint,
     required this.l,
     required this.chartSize,
@@ -269,6 +271,8 @@ class _HoverReadout extends StatelessWidget {
   final int index;
   final List<EvolutionSpotContext> spotContexts;
   final String currencySymbol;
+  final double minY;
+  final double maxY;
   final bool showOpenHint;
   final AppLocalizations l;
   final Size chartSize;
@@ -296,17 +300,24 @@ class _HoverReadout extends StatelessWidget {
 
     const maxW = 220.0;
     const pad = 8.0;
+    const estH = 80.0;
     final n = spots.length;
-    final anchorX =
-        _sparkScreenXFromSpotValue(spots[index].x, n, chartSize.width);
-    final topPad = chartSize.height * 0.08;
+    final anchor = sparkPointScreen(
+      spots[index],
+      chartSize,
+      minY,
+      maxY,
+      n,
+    );
 
     final left =
-        (anchorX - maxW * 0.45).clamp(pad, chartSize.width - maxW - pad);
+        (anchor.dx - maxW * 0.5).clamp(pad, chartSize.width - maxW - pad);
+    final top =
+        (anchor.dy - estH - 8).clamp(4.0, chartSize.height - estH - 4);
 
     return Positioned(
       left: left,
-      top: topPad,
+      top: top,
       width: maxW,
       child: IgnorePointer(
         child: Material(

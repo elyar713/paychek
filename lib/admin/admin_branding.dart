@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
+import '../reglage/reglage_profile_connect_branding.dart';
 import 'admin_theme.dart';
 
 /// Identité alignée sur l’app web Paychek (nom + visuel proche du rail).
@@ -28,19 +28,7 @@ class PaychekAdminLogoRow extends StatelessWidget {
     final logoSize = compact ? 36.0 : 44.0;
     return Row(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            width: logoSize,
-            height: logoSize,
-            child: SvgPicture.asset(
-              AdminBranding.logoAssetSvg,
-              fit: BoxFit.contain,
-              placeholderBuilder: (context) =>
-                  _FallbackMark(size: logoSize),
-            ),
-          ),
-        ),
+        PaychekBrandLogoMark(height: logoSize),
         SizedBox(width: compact ? 10 : 12),
         Expanded(
           child: Column(
@@ -68,26 +56,6 @@ class PaychekAdminLogoRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _FallbackMark extends StatelessWidget {
-  const _FallbackMark({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AdminTheme.accent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(Icons.trending_up_rounded, size: size * 0.45, color: Colors.black87),
     );
   }
 }

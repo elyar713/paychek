@@ -104,24 +104,38 @@ abstract final class StrategieFirestoreSync {
     }
   }
 
-  static Future<void> pushIfSignedIn() async {
+  /// [riskOverride] / [sessionsOverride] : valeurs fraîches en mémoire (évite une course
+  /// avec SharedPreferences si le push part juste après un `save` local).
+  static Future<void> pushIfSignedIn({
+    StrategieGestionRisqueParams? riskOverride,
+    List<StrategieSessionPersisted>? sessionsOverride,
+  }) async {
     if (_suppressPush > 0 || PaychekFirestorePushGuard.isSuppressed) return;
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
     try {
-      await _pushFull(u);
+      await _pushFull(
+        u,
+        riskOverride: riskOverride,
+        sessionsOverride: sessionsOverride,
+      );
     } catch (e, st) {
       debugPrint('[Paychek] StrategieFirestoreSync.push: $e\n$st');
     }
   }
 
-  static Future<void> _pushFull(User u) async {
+  static Future<void> _pushFull(
+    User u, {
+    StrategieGestionRisqueParams? riskOverride,
+    List<StrategieSessionPersisted>? sessionsOverride,
+  }) async {
     await StrategieSetupsStore.ensureLoaded();
     await StrategieSetupUsageStore.ensureLoaded();
     final setups = StrategieSetupsStore.notifier.value;
     final usage = StrategieSetupUsageStore.notifier.value;
-    final sessions = await StrategieHorairesSessionsStorage.load();
-    final risk = await StrategieGestionRisqueStorage.load();
+    final sessions =
+        sessionsOverride ?? await StrategieHorairesSessionsStorage.load();
+    final risk = riskOverride ?? await StrategieGestionRisqueStorage.load();
     final starred = await StrategieStarredSetupStorage.load();
 
     final localRev = await _readLocalRev();

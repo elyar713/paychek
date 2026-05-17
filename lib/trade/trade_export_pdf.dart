@@ -947,6 +947,7 @@ Future<void> exportTradePdf(
       l: l,
       checklistController: checklistController,
     );
+    if (!context.mounted) return;
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(
       bytes,
       _safePdfFileName(t),

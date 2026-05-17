@@ -49,6 +49,8 @@ class DashboardHomeHero extends StatelessWidget {
         ? welcomeUserName!
         : subtitle;
 
+    final isMobileHome = !_showTimeframeStrip;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final narrow = constraints.maxWidth < 520;
@@ -61,14 +63,20 @@ class DashboardHomeHero extends StatelessWidget {
               )
             : null;
 
+        final planBadge = DashboardHomePlanLogic.shouldShowPlanBadge(accountPlanIsPro)
+            ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!)
+            : null;
+
+        final hasHeaderExtras = planBadge != null || upgrade != null;
+        final nameFontSize = isMobileHome && hasHeaderExtras ? 16.0 : 20.0;
+
         // Étroit (< 420) : Upgrade sur la ligne du nom (pas en dessous à droite).
         final welcomeBlock = _MinimalWelcomeBlock(
           welcomePrefix: l.webHomeWelcomeBack,
           displayName: displayName,
           nameColor: scheme.onSurface,
-          planBadge: DashboardHomePlanLogic.shouldShowPlanBadge(accountPlanIsPro)
-              ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!)
-              : null,
+          nameFontSize: nameFontSize,
+          planBadge: planBadge,
           nameRowTrailing: stackUpgrade ? upgrade : null,
         );
 
@@ -130,6 +138,7 @@ class _MinimalWelcomeBlock extends StatelessWidget {
     required this.welcomePrefix,
     required this.displayName,
     required this.nameColor,
+    required this.nameFontSize,
     this.planBadge,
     this.nameRowTrailing,
   });
@@ -137,6 +146,7 @@ class _MinimalWelcomeBlock extends StatelessWidget {
   final String welcomePrefix;
   final String displayName;
   final Color nameColor;
+  final double nameFontSize;
   final Widget? planBadge;
   /// Sur écran étroit : CTA Upgrade aligné sur la ligne du nom.
   final Widget? nameRowTrailing;
@@ -166,7 +176,7 @@ class _MinimalWelcomeBlock extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
-                  fontSize: 20,
+                  fontSize: nameFontSize,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
                   color: nameColor,

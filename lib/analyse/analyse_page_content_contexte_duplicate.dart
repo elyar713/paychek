@@ -50,27 +50,35 @@ class _AnalyseContexteDuplicateBlockState
     }
   }
 
-  void _openHtfAdd() {
+  Future<void> _openHtfAdd() async {
     if (_i >= _c.contexteSnapshots.length) return;
     final s = _c.contexteSnapshots[_i];
     final hidden = AnalyseTimeframe.values
         .where((e) => !s.htfVisibleEnums.contains(e))
         .toList();
-    if (hidden.isEmpty) {
+    final visible = htfVisibleLabelSet(
+      visibleEnums: AnalyseTimeframe.values
+          .where((e) => s.htfVisibleEnums.contains(e)),
+      customLabels: s.htfCustomLabels,
+    );
+    if (hidden.isEmpty && htfExtraPresetsNotVisible(visible).isEmpty) {
       setState(() => _htfDraftOpen = true);
       return;
     }
-    if (hidden.length == 1) {
-      _c.toggleContexteSnapshotHtfPill(_i, hidden.single);
-      return;
+    final choice = await showAnalyseContexteAddHtfSheet(
+      context,
+      hiddenEnums: hidden,
+      visibleLabels: visible,
+    );
+    if (!mounted || choice == null) return;
+    switch (choice) {
+      case AnalyseHtfAddChoiceEnum(:final timeframe):
+        _c.toggleContexteSnapshotHtfPill(_i, timeframe);
+      case AnalyseHtfAddChoiceLabel(:final label):
+        _c.addContexteSnapshotHtfCustomLabel(_i, label);
+      case AnalyseHtfAddChoiceDraft():
+        setState(() => _htfDraftOpen = true);
     }
-    _sheetPickHiddenHtf(hidden);
-  }
-
-  Future<void> _sheetPickHiddenHtf(List<AnalyseTimeframe> hidden) async {
-    final t = await showAnalyseContexteHiddenHtfSheet(context, hidden);
-    if (!mounted || t == null) return;
-    _c.toggleContexteSnapshotHtfPill(_i, t);
   }
 
   void _openTrendAdd() {

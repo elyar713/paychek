@@ -7,6 +7,7 @@ abstract final class DashboardHomeLayoutKeys {
   static const String analyse = 'analyse';
   static const String etatMental = 'etat_mental';
   static const String strategie = 'strategie';
+  static const String paychekLens = 'paychek_lens';
   static const String capitalEvolution = 'capital_evolution';
 
   static const List<String> defaultOrder = [
@@ -15,6 +16,7 @@ abstract final class DashboardHomeLayoutKeys {
     analyse,
     etatMental,
     strategie,
+    paychekLens,
     capitalEvolution,
   ];
 }

@@ -6,6 +6,59 @@ enum AnalyseDirectionBias { achat, vente, surveiller }
 
 enum AnalyseTimeframe { daily, h4, h1 }
 
+String ctxLabelHtf(AnalyseTimeframe t) => switch (t) {
+      AnalyseTimeframe.daily => 'Daily',
+      AnalyseTimeframe.h4 => 'H4',
+      AnalyseTimeframe.h1 => 'H1',
+    };
+
+/// Timeframes supplémentaires proposés dans « My Analyse » (contexte HTF), en plus de Daily / H4 / H1.
+const List<String> kAnalyseHtfExtraPresetLabels = <String>[
+  'M1',
+  'M5',
+  'M15',
+  'M30',
+  '2H',
+  'Weekly',
+  'Monthly',
+];
+
+Set<String> htfVisibleLabelSet({
+  required Iterable<AnalyseTimeframe> visibleEnums,
+  required Iterable<String> customLabels,
+}) {
+  return {
+    for (final tf in visibleEnums) ctxLabelHtf(tf),
+    ...customLabels,
+  };
+}
+
+List<String> htfExtraPresetsNotVisible(Set<String> visibleLabels) {
+  final lower = visibleLabels.map((e) => e.toLowerCase()).toSet();
+  return kAnalyseHtfExtraPresetLabels
+      .where((l) => !lower.contains(l.toLowerCase()))
+      .toList();
+}
+
+/// Résultat du menu « + » timeframe (contexte My Analyse).
+sealed class AnalyseHtfAddChoice {
+  const AnalyseHtfAddChoice();
+}
+
+final class AnalyseHtfAddChoiceEnum extends AnalyseHtfAddChoice {
+  const AnalyseHtfAddChoiceEnum(this.timeframe);
+  final AnalyseTimeframe timeframe;
+}
+
+final class AnalyseHtfAddChoiceLabel extends AnalyseHtfAddChoice {
+  const AnalyseHtfAddChoiceLabel(this.label);
+  final String label;
+}
+
+final class AnalyseHtfAddChoiceDraft extends AnalyseHtfAddChoice {
+  const AnalyseHtfAddChoiceDraft();
+}
+
 enum AnalyseLocalTrend { haussiere, baissiere, range }
 
 enum AnalyseStructureTenue { tenu, casse }

@@ -126,6 +126,7 @@ Future<void> exportChecklistPdf(
     final l = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
     final bytes = await buildChecklistPdf(locale, l, controller);
+    if (!context.mounted) return;
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = 'checklist_$stamp.pdf';
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../dashboard_page.dart';
 import '../onboarding_language_page.dart';
 import '../reglage/paychek_user_firestore.dart';
+import '../reglage/reglage_profile_prefs.dart';
 import '../reglage/user_profile_scope.dart';
 import '../questionnaire/questionnaire_flow.dart';
 import '../splash_screen.dart';
@@ -45,7 +46,19 @@ class _PostAuthGateState extends State<PostAuthGate> {
     _syncStarted = true;
     // Fire-and-forget: ne pas bloquer l'UI.
     unawaited(() async {
-      await syncPaychekUserDocumentAndMergeProfile(widget.user);
+      final prefs = await ReglageProfilePrefs.load();
+      final prenom = prefs.prenom.trim();
+      final nom = prefs.nom.trim();
+      if (prenom.isNotEmpty || nom.isNotEmpty) {
+        await syncPaychekUserDocument(
+          widget.user,
+          firstName: prenom.isNotEmpty ? prenom : null,
+          lastName: nom.isNotEmpty ? nom : null,
+        );
+        await paychekMergeProfileFromFirestore(widget.user);
+      } else {
+        await syncPaychekUserDocumentAndMergeProfile(widget.user);
+      }
       if (!mounted) return;
       try {
         await UserProfileScope.of(context).load();

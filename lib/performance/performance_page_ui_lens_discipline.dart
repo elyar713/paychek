@@ -1,10 +1,112 @@
 part of 'performance_page.dart';
 
 extension _PerformancePageUiLensDiscipline on _PerformancePageState {
-  Widget _cardEye(PaychekLensSnapshot lens, List<String> strategieWarnings) {
+  Widget _strategieWarningBullet(String w) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(LucideIcons.alertTriangle, size: 15, color: _kRed.withValues(alpha: 0.95)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              w,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.4,
+                color: const Color(0xFFCCCCCC),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _strategieWarningsListColumn(List<String> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [for (final w in items) _strategieWarningBullet(w)],
+    );
+  }
+
+  static const Color _kWarningsSplitLine = Color(0xFF333333);
+
+  Widget _cardStrategieWarnings(List<String> strategieWarnings) {
+    if (strategieWarnings.isEmpty) return const SizedBox.shrink();
     final code = Localizations.localeOf(context).languageCode;
     String txt(String fr, String en, String es, String de, String pt, String ko) =>
         perf6(code, fr, en, es, de, pt, ko);
+    final splitAt = (strategieWarnings.length / 2).ceil();
+    final left = strategieWarnings.sublist(0, splitAt);
+    final right = strategieWarnings.sublist(splitAt);
+
+    Widget splitBody({required bool sideBySide}) {
+      if (strategieWarnings.length <= 1) {
+        return _strategieWarningsListColumn(strategieWarnings);
+      }
+      if (sideBySide) {
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: _strategieWarningsListColumn(left)),
+              const SizedBox(width: 16),
+              Container(width: 1, color: _kWarningsSplitLine),
+              const SizedBox(width: 16),
+              Expanded(child: _strategieWarningsListColumn(right)),
+            ],
+          ),
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _strategieWarningsListColumn(left),
+          Container(height: 1, color: _kWarningsSplitLine),
+          const SizedBox(height: 12),
+          _strategieWarningsListColumn(right),
+        ],
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _performanceSectionDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            txt(
+              'AVERTISSEMENTS - SEUILS STRATÉGIE',
+              'WARNINGS - STRATEGY THRESHOLDS',
+              'ADVERTENCIAS - UMBRALES DE ESTRATEGIA',
+              'HINWEISE - STRATEGIE-SCHWELLEN',
+              'AVISOS - LIMITES DA ESTRATÉGIA',
+              '경고 - 전략 임계값',
+            ),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF666666),
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final sideBySide = constraints.maxWidth >= 520;
+              return splitBody(sideBySide: sideBySide);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cardEye(PaychekLensSnapshot lens) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: _performanceSectionDecoration(),
@@ -61,50 +163,6 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   ),
               ],
             ),
-          ],
-          if (strategieWarnings.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(height: 1, color: const Color(0xFF333333)),
-            const SizedBox(height: 12),
-            Text(
-              txt(
-                'AVERTISSEMENTS - SEUILS STRATÉGIE',
-                'WARNINGS - STRATEGY THRESHOLDS',
-                'ADVERTENCIAS - UMBRALES DE ESTRATEGIA',
-                'HINWEISE - STRATEGIE-SCHWELLEN',
-                'AVISOS - LIMITES DA ESTRATÉGIA',
-                '경고 - 전략 임계값',
-              ),
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF666666),
-                letterSpacing: 0.8,
-              ),
-            ),
-            const SizedBox(height: 10),
-            for (final w in strategieWarnings)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(LucideIcons.alertTriangle, size: 15, color: _kRed.withValues(alpha: 0.95)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        w,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          height: 1.4,
-                          color: const Color(0xFFCCCCCC),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ],
       ),
@@ -237,37 +295,16 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
       final barColor = fillColor == Colors.white ? const Color(0xFFE8E8E8) : fillColor;
       final emptyNoFill = hideFillIfEmpty && n == 0;
       final fill = n > 0 ? wr.clamp(0.0, 1.0) : 0.0;
+      const minFill = 0.08;
       final double barH;
       if (emptyNoFill) {
         barH = 0;
       } else if (n > 0) {
-        barH = (trackH * fill).clamp(trackH * 0.08, trackH);
+        // 0 % WR avec trades : petit segment en bas (dans la piste, via ClipRRect).
+        final h = fill <= 0 ? trackH * minFill : trackH * fill;
+        barH = h.clamp(trackH * minFill, trackH);
       } else {
-        barH = trackH * 0.08;
-      }
-
-      List<BoxShadow>? barGlow() {
-        if (fillColor == _kGreen) {
-          return [
-            BoxShadow(
-              color: _kGreen.withValues(alpha: 0.28),
-              blurRadius: 18,
-              spreadRadius: -4,
-              offset: const Offset(0, 6),
-            ),
-          ];
-        }
-        if (fillColor == _kRed) {
-          return [
-            BoxShadow(
-              color: _kRed.withValues(alpha: 0.26),
-              blurRadius: 16,
-              spreadRadius: -4,
-              offset: const Offset(0, 5),
-            ),
-          ];
-        }
-        return null;
+        barH = trackH * minFill;
       }
 
       return Column(
@@ -289,37 +326,44 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             child: LayoutBuilder(
               builder: (context, c) {
                 final w = math.min(104.0, c.maxWidth * 0.88);
+                final radius = 18.0;
                 return Align(
                   alignment: Alignment.bottomCenter,
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: w,
-                        height: trackH,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0D0D0D),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFF2A2A2A)),
+                  child: SizedBox(
+                    width: w,
+                    height: trackH,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0D0D0D),
+                        borderRadius: BorderRadius.circular(radius),
+                        border: Border.all(color: const Color(0xFF2A2A2A)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(radius - 1),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            if (barH > 0)
+                              Positioned(
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                height: barH,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: barColor,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(
+                                        math.min(radius, math.min(barH, w) / 2),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                      if (barH > 0)
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: w,
-                            height: barH,
-                            decoration: BoxDecoration(
-                              color: barColor,
-                              borderRadius: BorderRadius.circular(
-                                math.min(18.0, math.min(barH, w) / 2),
-                              ),
-                              boxShadow: barGlow(),
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 );
               },

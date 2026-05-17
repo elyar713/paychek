@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import 'analyse_controller.dart';
@@ -6,10 +6,12 @@ import 'analyse_page_widgets.dart';
 import 'analyse_tokens.dart';
 import 'widgets/analyse_card.dart';
 import 'widgets/analyse_collapsible_section_body.dart';
+import 'widgets/analyse_inline_pill_and_add_row.dart';
 import 'widgets/analyse_section_title_row.dart';
+import 'widgets/analyse_structure_tf_picker.dart';
 import 'widgets/analyse_text_field.dart';
 
-/// Carte Â« Profil de Volume Â».
+/// Carte « Profil de Volume ».
 class AnalyseVolumeProfilCard extends StatelessWidget {
   const AnalyseVolumeProfilCard({
     super.key,
@@ -22,11 +24,6 @@ class AnalyseVolumeProfilCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final c = controller;
-    final volumeModeLabel =
-        (c.volumeProfileModeLabel == 'Profil volume' ||
-                c.volumeProfileModeLabel == 'Volume profile')
-            ? l.analyseVolumeProfileDefaultLabel
-            : c.volumeProfileModeLabel;
     return AnalyseCard(
       editorSection: AnalyseEditorSection.profilVolume,
       child: ListenableBuilder(
@@ -49,17 +46,82 @@ class AnalyseVolumeProfilCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        AnalyseSoftChip(
-                          compact: true,
-                          label: volumeModeLabel,
-                          onTap: () {},
-                        ),
-                      ],
+                    SizedBox(
+                      height: AnalyseTextField.compactRowHeight,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            width: 88,
+                            height: AnalyseTextField.compactRowHeight,
+                            child: AnalyseInlinePill(
+                              label: c.volumeProfileTf,
+                              icon: Icons.keyboard_arrow_down,
+                              compact: true,
+                              height: AnalyseTextField.compactRowHeight,
+                              onPressed: (ctx) => showAnalyseStructureTfPicker(
+                                ctx,
+                                c,
+                                forVolumeProfileSection: true,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          AnalyseSoftChip(
+                            compact: true,
+                            label: l.analyseVolumeZoneLabel,
+                            selected: c.volumeProfileZoneActive,
+                            onTap: () => c.volumeProfileZoneActive =
+                                !c.volumeProfileZoneActive,
+                          ),
+                        ],
+                      ),
                     ),
+                    if (c.volumeProfileZoneActive) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  l.analyseVolumeZoneFrom,
+                                  style: AnalyseTokens.volumeProfileLabelStyle,
+                                ),
+                                const SizedBox(height: 8),
+                                AnalyseTextField(
+                                  hintText: l.analyseHintPriceDots,
+                                  value: c.volumeProfileZoneFrom,
+                                  onChanged: (v) => c.volumeProfileZoneFrom = v,
+                                  compact: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  l.analyseVolumeZoneTo,
+                                  style: AnalyseTokens.volumeProfileLabelStyle,
+                                ),
+                                const SizedBox(height: 8),
+                                AnalyseTextField(
+                                  hintText: l.analyseHintPriceDots,
+                                  value: c.volumeProfileZoneTo,
+                                  onChanged: (v) => c.volumeProfileZoneTo = v,
+                                  compact: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +204,3 @@ class AnalyseVolumeProfilCard extends StatelessWidget {
     );
   }
 }
-
-
-

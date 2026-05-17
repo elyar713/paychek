@@ -25,6 +25,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   /// Marché sélectionné pour les libellés de la section Volume (micro/mini vs fourchettes contrats).
   AjouterTradeAssetClass _volumeSectionMarche = AjouterTradeAssetClass.forex;
+  AjouterTradeAssetClass _mostTradedSectionMarche = AjouterTradeAssetClass.forex;
 
   late final AnimationController _pulseCtrl;
 
@@ -321,8 +322,10 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
       disc,
       locale: locale,
     );
-    final assetBarStats = computeTopAssetBarStats(_visibleTrades);
-    final dayIntensityHistogram = computeDayIntensityHistogramBuckets(_visibleTrades);
+    final assetBarStats = computeTopAssetBarStats(
+      _visibleTrades,
+      marche: _mostTradedSectionMarche,
+    );
 
     final winPct = (agg.winrate * 100).round();
     final lite = widget.liteFreemiumRestricted;
@@ -386,15 +389,24 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: _cardGlobal(winPct, agg)),
-                      SizedBox(width: gap),
                       Expanded(
-                        child: _cardEye(lens, lensStrategieWarnings),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _cardGlobal(winPct, agg),
+                            SizedBox(height: gap),
+                            _buildPeriodFilterBar(),
+                          ],
+                        ),
                       ),
+                      SizedBox(width: gap),
+                      Expanded(child: _cardEye(lens)),
                     ],
                   ),
-                  SizedBox(height: gap),
-                  _buildPeriodFilterBar(),
+                  if (lensStrategieWarnings.isNotEmpty) ...[
+                    SizedBox(height: gap),
+                    _cardStrategieWarnings(lensStrategieWarnings),
+                  ],
                   SizedBox(height: gap),
                   _cardDailyJournalVolume(dailyJournalBuckets),
                   SizedBox(height: gap),
@@ -424,13 +436,17 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
                     ],
                   ),
                   SizedBox(height: gap),
-                  _cardDayIntensityHistogram(dayIntensityHistogram),
+                  const PaychekLensSection(),
                 ] else ...[
                   _cardGlobal(winPct, agg),
                   const SizedBox(height: 12),
                   _buildPeriodFilterBar(),
+                  if (lensStrategieWarnings.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _cardStrategieWarnings(lensStrategieWarnings),
+                  ],
                   const SizedBox(height: 16),
-                  _cardEye(lens, lensStrategieWarnings),
+                  _cardEye(lens),
                   const SizedBox(height: 16),
                   _cardDailyJournalVolume(dailyJournalBuckets),
                   const SizedBox(height: 16),
@@ -446,7 +462,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
                   const SizedBox(height: 16),
                   _cardMostTradedAssetBars(assetBarStats),
                   const SizedBox(height: 16),
-                  _cardDayIntensityHistogram(dayIntensityHistogram),
+                  const PaychekLensSection(),
                 ],
                 if (savedInsight != null) ...[
                   SizedBox(height: gap),
@@ -475,6 +491,10 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   void _setVolumeSectionMarche(AjouterTradeAssetClass m) {
     setState(() => _volumeSectionMarche = m);
+  }
+
+  void _setMostTradedSectionMarche(AjouterTradeAssetClass m) {
+    setState(() => _mostTradedSectionMarche = m);
   }
 
   Future<void> _exportPerformancePdf() async {

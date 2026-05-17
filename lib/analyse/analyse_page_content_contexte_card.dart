@@ -180,24 +180,31 @@ class _AnalyseFeuilleContexteCardState extends State<AnalyseFeuilleContexteCard>
     );
   }
 
-  void _openHtfAdd() {
+  Future<void> _openHtfAdd() async {
     final hidden =
         AnalyseTimeframe.values.where((e) => !_c.isHtfPillVisible(e)).toList();
-    if (hidden.isEmpty) {
+    final visible = htfVisibleLabelSet(
+      visibleEnums: _c.htfPillsVisibleOrdered,
+      customLabels: _c.htfCustomLabels,
+    );
+    if (hidden.isEmpty && htfExtraPresetsNotVisible(visible).isEmpty) {
       setState(() => _htfDraftOpen = true);
       return;
     }
-    if (hidden.length == 1) {
-      _c.toggleHtfPill(hidden.single);
-      return;
+    final choice = await showAnalyseContexteAddHtfSheet(
+      context,
+      hiddenEnums: hidden,
+      visibleLabels: visible,
+    );
+    if (!mounted || choice == null) return;
+    switch (choice) {
+      case AnalyseHtfAddChoiceEnum(:final timeframe):
+        _c.toggleHtfPill(timeframe);
+      case AnalyseHtfAddChoiceLabel(:final label):
+        _c.addHtfCustomLabel(label);
+      case AnalyseHtfAddChoiceDraft():
+        setState(() => _htfDraftOpen = true);
     }
-    _sheetPickHiddenHtf(hidden);
-  }
-
-  Future<void> _sheetPickHiddenHtf(List<AnalyseTimeframe> hidden) async {
-    final t = await showAnalyseContexteHiddenHtfSheet(context, hidden);
-    if (!mounted || t == null) return;
-    _c.toggleHtfPill(t);
   }
 
   void _openTrendAdd() {

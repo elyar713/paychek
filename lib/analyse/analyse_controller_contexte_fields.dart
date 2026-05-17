@@ -60,20 +60,32 @@ mixin AnalyseControllerContexteFields on ChangeNotifier {
       .where((AnalyseTimeframe e) => _htfPillsVisible.contains(e))
       .toList();
 
+  int get htfTotalPillCount => _htfPillsVisible.length + _htfCustomLabels.length;
+
   bool isHtfPillVisible(AnalyseTimeframe t) => _htfPillsVisible.contains(t);
 
+  ContextePick<AnalyseTimeframe> _firstAvailableHtfPick() {
+    if (htfPillsVisibleOrdered.isNotEmpty) {
+      return ContextePick.enumOf(htfPillsVisibleOrdered.first);
+    }
+    if (_htfCustomLabels.isNotEmpty) {
+      return ContextePick.customLabel(_htfCustomLabels.first);
+    }
+    return const ContextePick.enumOf(AnalyseTimeframe.daily);
+  }
+
   void toggleHtfPill(AnalyseTimeframe t) {
-    if (_htfPillsVisible.contains(t) && _htfPillsVisible.length <= 1) return;
+    if (_htfPillsVisible.contains(t) && htfTotalPillCount <= 1) return;
     if (_htfPillsVisible.contains(t)) {
       _htfPillsVisible.remove(t);
       if (_htfPick.enumVal == t) {
-        _htfPick = ContextePick.enumOf(htfPillsVisibleOrdered.first);
+        _htfPick = _firstAvailableHtfPick();
       }
     } else {
       _htfPillsVisible.add(t);
     }
     if (_htfPick.isEnum && !_htfPillsVisible.contains(_htfPick.enumVal!)) {
-      _htfPick = ContextePick.enumOf(htfPillsVisibleOrdered.first);
+      _htfPick = _firstAvailableHtfPick();
     }
     notifyListeners();
   }
@@ -88,9 +100,10 @@ mixin AnalyseControllerContexteFields on ChangeNotifier {
   }
 
   void removeHtfCustomLabel(String s) {
+    if (htfTotalPillCount <= 1) return;
     if (!_htfCustomLabels.remove(s)) return;
     if (_htfPick.custom == s) {
-      _htfPick = ContextePick.enumOf(htfPillsVisibleOrdered.first);
+      _htfPick = _firstAvailableHtfPick();
     }
     notifyListeners();
   }

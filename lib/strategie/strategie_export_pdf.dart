@@ -465,6 +465,7 @@ Future<void> exportStrategiePdf(BuildContext context) async {
     final locale = Localizations.localeOf(context);
     final l = lookupAppLocalizations(locale);
     final bytes = await buildStrategiePdf(locale);
+    if (!context.mounted) return;
     final stamp = DateTime.now().toIso8601String().split('T').first;
     final name = '${l.strategiePdfFileNamePrefix}_$stamp.pdf';
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(

@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 import '../../questionnaire/user_capital_scope.dart';
 import '../../reglage/paychek_prefs_scope.dart';
 import '../../reglage/user_portfolio_scope.dart';
+import '../../trade/trade_journal_helper.dart';
 import '../../trade/trade_journal_scope.dart';
 import '../capital_evolution_computed.dart';
 import 'dashboard_cumulative_sparkline.dart';
@@ -139,7 +140,7 @@ class _DashboardCalendrierCardState extends State<DashboardCalendrierCard> {
     return ListenableBuilder(
       listenable: Listenable.merge([store, pf]),
       builder: (context, _) {
-        final trades = store.itemsForPortfolio(pf.activePortfolioId);
+        final trades = activeJournalTradesOrDemo(context);
         final loc = MaterialLocalizations.of(context);
         final daysInMonth =
             DateUtils.getDaysInMonth(_focusedMonth.year, _focusedMonth.month);

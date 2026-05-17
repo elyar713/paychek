@@ -212,8 +212,12 @@ class _StrategieSetupModelesSectionState
       _syncCardKeysLength();
     });
     widget.visibleSetupIndex.value = _cards.length - 1;
-    StrategieSetupsStore.setAll(_cards);
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    unawaited(_persistSetupsAndPush());
+  }
+
+  Future<void> _persistSetupsAndPush() async {
+    await StrategieSetupsStore.setAll(_cards);
+    await StrategieFirestoreSync.pushIfSignedIn();
   }
 
   void _removeCardAt(int index) {
@@ -234,9 +238,11 @@ class _StrategieSetupModelesSectionState
     } else if (index < v) {
       widget.visibleSetupIndex.value = v - 1;
     }
-    if (starred) StrategieStarredSetupStorage.clear();
-    StrategieSetupsStore.setAll(_cards);
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    unawaited(() async {
+      if (starred) await StrategieStarredSetupStorage.clear();
+      await StrategieSetupsStore.setAll(_cards);
+      await StrategieFirestoreSync.pushIfSignedIn();
+    }());
   }
 
   bool _isStarredAt(int i) {
@@ -257,7 +263,7 @@ class _StrategieSetupModelesSectionState
       if (!mounted) return;
       setState(() => _starredSetupSnapshot = d);
     }
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    await StrategieFirestoreSync.pushIfSignedIn();
   }
 
   Future<void> _openSetupEditor(int index) async {
@@ -277,7 +283,7 @@ class _StrategieSetupModelesSectionState
       if (!mounted) return;
       setState(() => _starredSetupSnapshot = _cards[index]);
     }
-    unawaited(StrategieFirestoreSync.pushIfSignedIn());
+    await StrategieFirestoreSync.pushIfSignedIn();
   }
 
   void _syncSetupsNotifier() {

@@ -17,30 +17,9 @@ const _kPaychekAuthMessageType = 'paychek-auth';
 const _kPaychekLocaleMessageType = 'paychek-locale';
 const _kPaychekReadyMessageType = 'paychek-ready';
 const _kPaychekLocaleSyncType = 'paychek-locale-sync';
-const _kIframeViewType = 'paychek-landing-html-iframe';
+const _kIframeViewTypePrefix = 'paychek-landing-html-iframe';
 
-bool _iframeViewFactoryRegistered = false;
-
-/// Référence DOM de l’iframe (pour `pointer-events` pendant les modales Flutter).
-html.IFrameElement? _landingIframeElement;
-
-void _ensureIframeRegistered() {
-  if (_iframeViewFactoryRegistered) return;
-  _iframeViewFactoryRegistered = true;
-  ui_web.platformViewRegistry.registerViewFactory(_kIframeViewType, (int _) {
-    final iframe = html.IFrameElement()
-      ..src = 'landing.html'
-      ..style.border = 'none'
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..style.display = 'block'
-      // Calque GPU dédié : réduit les artefacts de texte (background-clip) à la frontière Flutter / iframe.
-      ..style.transform = 'translateZ(0)'
-      ..setAttribute('title', 'PAYCHEK — landing');
-    _landingIframeElement = iframe;
-    return iframe;
-  });
-}
+int _nextLandingViewTypeId = 0;
 
 /// Landing marketing HTML (`web/landing.html`) dans une iframe.
 class WebLandingUnauthenticatedWeb extends StatefulWidget {
@@ -59,19 +38,70 @@ class WebLandingUnauthenticatedWeb extends StatefulWidget {
 class _WebLandingUnauthenticatedWebState
     extends State<WebLandingUnauthenticatedWeb> {
   StreamSubscription<html.MessageEvent>? _sub;
+  bool _tearDown = false;
+  bool _acceptMessages = false;
+  final List<({Map<String, dynamic> map, String? origin})> _pendingMessages =
+      [];
+
+  late final String _viewType;
+  html.IFrameElement? _iframe;
+  bool _iframeVisible = false;
+
+  static void _purgeStaleLandingIframes() {
+    for (final el in html.document.querySelectorAll(
+      'iframe[title="PAYCHEK — landing"]',
+    )) {
+      el.remove();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _purgeStaleLandingIframes();
+    _viewType = '$_kIframeViewTypePrefix-${_nextLandingViewTypeId++}';
+    _registerIframeViewFactory();
     WebLandingIframeSuppress.attachIframeDomHooks(
       blockPointerOnIframe: () {
-        _landingIframeElement?.style.pointerEvents = 'none';
+        _iframe?.style.pointerEvents = 'none';
       },
       unblockPointerOnIframe: () {
-        _landingIframeElement?.style.pointerEvents = 'auto';
+        _iframe?.style.pointerEvents = 'auto';
       },
     );
     _sub = html.window.onMessage.listen(_onWindowMessage);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _tearDown) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _tearDown) return;
+        setState(() => _iframeVisible = true);
+        _acceptMessages = true;
+        final pending =
+            List<({Map<String, dynamic> map, String? origin})>.from(
+          _pendingMessages,
+        );
+        _pendingMessages.clear();
+        for (final item in pending) {
+          _handleMessageMap(item.map, eventOrigin: item.origin);
+        }
+      });
+    });
+  }
+
+  void _registerIframeViewFactory() {
+    final viewType = _viewType;
+    ui_web.platformViewRegistry.registerViewFactory(viewType, (int _) {
+      final iframe = html.IFrameElement()
+        ..src = 'landing.html'
+        ..style.border = 'none'
+        ..style.width = '100%'
+        ..style.height = '100%'
+        ..style.display = 'block'
+        ..style.transform = 'translateZ(0)'
+        ..setAttribute('title', 'PAYCHEK — landing');
+      _iframe = iframe;
+      return iframe;
+    });
   }
 
   Map<String, dynamic>? _decodeMessageData(Object? raw) {
@@ -88,42 +118,69 @@ class _WebLandingUnauthenticatedWebState
     return null;
   }
 
-  /// N’utilise pas [html.MessageEvent.source] : le getter Dart peut lever
-  /// `_DOMWindowCrossFrame` → `Window?` (DDC). On cible [IFrameElement.contentWindow].
-  static void _replyLocaleToLandingIframe(String payload) {
+  void _replyLocaleToLandingIframe(String payload) {
     try {
-      final cw = _landingIframeElement?.contentWindow;
+      final cw = _iframe?.contentWindow;
       if (cw == null) return;
       // ignore: avoid_dynamic_calls
       (cw as dynamic).postMessage(payload, '*');
     } catch (_) {}
   }
 
+  /// Clics dans l’iframe HTML ne planifient pas de frame Flutter : sans
+  /// [scheduleFrame], les modales auth ne s’ouvrent jamais.
+  void _runLandingUiAction(void Function() action) {
+    if (!mounted || _tearDown) return;
+    scheduleMicrotask(() {
+      if (!mounted || _tearDown) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _tearDown) return;
+        action();
+      });
+      final binding = WidgetsBinding.instance;
+      if (!binding.hasScheduledFrame) {
+        try {
+          binding.scheduleFrame();
+        } catch (_) {
+          try {
+            binding.ensureVisualUpdate();
+          } catch (_) {}
+        }
+      }
+    });
+  }
+
   void _onWindowMessage(html.MessageEvent event) {
-    if (!mounted) return;
+    if (!mounted || _tearDown) return;
     final map = _decodeMessageData(event.data);
     if (map == null) return;
 
+    if (!_acceptMessages) {
+      _pendingMessages.add((map: map, origin: event.origin));
+      return;
+    }
+    _handleMessageMap(map, eventOrigin: event.origin);
+  }
+
+  void _handleMessageMap(
+    Map<String, dynamic> map, {
+    String? eventOrigin,
+  }) {
+    if (!mounted || _tearDown) return;
+
     final type = map['type']?.toString();
     if (type == _kPaychekReadyMessageType) {
-      if (event.origin != html.window.location.origin) return;
-      final code = ReglageLanguagePrefs.codeFromLocale(
-        AppLocaleScope.of(context).locale,
-      );
-      final payload = jsonEncode(<String, String>{
-        'type': _kPaychekLocaleSyncType,
-        'code': code,
-      });
-      _replyLocaleToLandingIframe(payload);
+      if (eventOrigin != null && eventOrigin != html.window.location.origin) {
+        return;
+      }
+      final codeFromLanding = map['code']?.toString().toLowerCase();
+      unawaited(_syncLocaleWithLanding(codeFromLanding));
       return;
     }
 
     if (type == _kPaychekAuthMessageType) {
       final mode = map['mode']?.toString().toLowerCase();
-      // Hors dispatch navigateur pur : [context] du [State] reste valide. [addPostFrameCallback]
-      // peut ne pas tourner après certaines erreurs moteur / hot reload — [scheduleMicrotask] suffit.
-      scheduleMicrotask(() {
-        if (!mounted) return;
+      _runLandingUiAction(() {
         if (mode == 'login' || mode == 'signin' || mode == 'connexion') {
           unawaited(showWebLandingLoginDialog(context));
         } else if (mode == 'signup' ||
@@ -140,26 +197,57 @@ class _WebLandingUnauthenticatedWebState
       if (code == null || !ReglageLanguagePrefs.availableCodes.contains(code)) {
         return;
       }
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        await widget.onLocaleSelected(code);
+      _runLandingUiAction(() {
+        unawaited(widget.onLocaleSelected(code));
       });
     }
   }
 
+  Future<void> _syncLocaleWithLanding(String? codeFromLanding) async {
+    if (!mounted || _tearDown) return;
+    if (codeFromLanding != null &&
+        ReglageLanguagePrefs.availableCodes.contains(codeFromLanding)) {
+      await widget.onLocaleSelected(codeFromLanding);
+    }
+    if (!mounted || _tearDown) return;
+    final code = ReglageLanguagePrefs.codeFromLocale(
+      AppLocaleScope.of(context).locale,
+    );
+    _replyLocaleToLandingIframe(
+      jsonEncode(<String, String>{
+        'type': _kPaychekLocaleSyncType,
+        'code': code,
+      }),
+    );
+  }
+
   @override
   void dispose() {
+    _tearDown = true;
+    _acceptMessages = false;
+    _iframeVisible = false;
+    _pendingMessages.clear();
     _sub?.cancel();
+    WebLandingIframeSuppress.attachIframeDomHooks(
+      blockPointerOnIframe: () {},
+      unblockPointerOnIframe: () {},
+    );
+    try {
+      _iframe?.remove();
+    } catch (_) {}
+    _iframe = null;
+    _purgeStaleLandingIframes();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     assert(kIsWeb);
-    _ensureIframeRegistered();
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.black,
-      body: HtmlElementView(viewType: _kIframeViewType),
+      body: _iframeVisible
+          ? HtmlElementView(viewType: _viewType)
+          : const ColoredBox(color: Colors.black),
     );
   }
 }

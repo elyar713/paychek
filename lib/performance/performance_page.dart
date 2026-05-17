@@ -14,6 +14,7 @@ import '../reglage/user_portfolio_store.dart';
 import '../reglage/user_portfolio_models.dart';
 import '../strategie/strategie_gestion_risque_storage.dart';
 import '../strategie/strategie_horaires_sessions_storage.dart';
+import '../checklist/checklist_models.dart';
 import '../strategie/strategie_setups_store.dart';
 import '../trade/trade_journal_helper.dart';
 import '../trade/trade_journal_scope.dart';
@@ -30,6 +31,9 @@ import 'performance_widget_model.dart';
 import 'performance_widget_series.dart';
 import 'performance_strategie_warnings.dart';
 import 'performance_widget_storage.dart';
+import 'performance_custom_lens_card.dart';
+import 'performance_custom_lens_model.dart';
+import 'performance_paychek_lens_section.dart';
 
 part 'performance_page_state.dart';
 part 'performance_page_ui_header_global.dart';
@@ -39,6 +43,7 @@ part 'performance_page_ui_duration.dart';
 part 'performance_page_ui_horaires.dart';
 part 'performance_page_ui_news.dart';
 part 'performance_page_ui_bottom.dart';
+part 'performance_page_ui_custom_lens.dart';
 
 /// Cartes / sections — même famille que le dashboard sombre, avec léger relief.
 BoxDecoration _performanceSectionDecoration() {

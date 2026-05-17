@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,6 +14,7 @@ import '../../../../trade/trade_journal_scope.dart';
 import '../../../../trade/trade_stats.dart';
 import '../../../../web/paychek_web_tokens.dart';
 import '../../../dashboard_tokens.dart';
+import '../../../widgets/capital_evolution_chart_section.dart';
 import '../../../widgets/donut_ring.dart';
 import '../../../widgets/timeframe_pills.dart';
 
@@ -27,6 +28,7 @@ class CapitalBalanceCard extends StatelessWidget {
     required this.onOpenChecklist,
     required this.onOpenEtatMental,
     required this.onOpenTrade,
+    this.onOpenTradeById,
     this.hideTimeframePills = false,
     this.cardDecoration,
     this.webPairStretch = false,
@@ -38,6 +40,7 @@ class CapitalBalanceCard extends StatelessWidget {
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenEtatMental;
   final VoidCallback onOpenTrade;
+  final ValueChanged<String>? onOpenTradeById;
   final bool hideTimeframePills;
   final BoxDecoration? cardDecoration;
 
@@ -118,27 +121,14 @@ class CapitalBalanceCard extends StatelessWidget {
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                l.dashboardCapitalBalanceHeader.toUpperCase(),
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 2,
-                                  color: PaychekWebTokens.textGray500,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              size: 16,
-                              color: PaychekWebTokens.textGray500.withValues(
-                                alpha: 0.65,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          l.dashboardCapitalBalanceHeader.toUpperCase(),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2,
+                            color: PaychekWebTokens.textGray500,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         // Sur web, cette carte peut être rendue dans une largeur très étroite (split/rail).
@@ -201,9 +191,6 @@ class CapitalBalanceCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // En scroll web, la hauteur est souvent non bornée : `Spacer` (flex)
-                        // déclenche "incoming height constraints are unbounded".
-                        // On garde simplement un espacement fixe.
                         const SizedBox(height: 24),
                         Container(
                           padding: const EdgeInsets.only(top: 24),
@@ -444,6 +431,13 @@ class CapitalBalanceCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (!kIsWeb && onOpenTradeById != null) ...[
+                    const CapitalEvolutionMergedDivider(),
+                    CapitalEvolutionChartSection(
+                      timeframeIndex: timeframeIndex,
+                      onOpenTradeById: onOpenTradeById!,
+                    ),
+                  ],
                 ],
               ),
             );

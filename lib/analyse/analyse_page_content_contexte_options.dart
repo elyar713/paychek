@@ -6,6 +6,7 @@ import 'analyse_models.dart';
 import 'analyse_phase_locale.dart';
 import 'analyse_tokens.dart';
 import 'widgets/analyse_equal_chips_row.dart';
+import 'widgets/analyse_htf_add_sheet.dart';
 
 List<AnalyseEqualChipOption<ContextePick<AnalyseTimeframe>>> buildHtfChipOptions(
   AnalyseController c,
@@ -136,12 +137,6 @@ List<AnalyseEqualChipOption<ContextePick<AnalysePhase>>> snapshotPhaseChipOption
   ];
 }
 
-String ctxLabelHtf(AnalyseTimeframe t) => switch (t) {
-      AnalyseTimeframe.daily => 'Daily',
-      AnalyseTimeframe.h4 => 'H4',
-      AnalyseTimeframe.h1 => 'H1',
-    };
-
 String ctxLabelTrend(AnalyseLocalTrend t) => switch (t) {
       AnalyseLocalTrend.haussiere => 'Haussi\u00e8re',
       AnalyseLocalTrend.baissiere => 'Baissi\u00e8re',
@@ -179,47 +174,15 @@ String ctxLabelTrendLocalized(AnalyseLocalTrend t, AppLocalizations l) =>
 String ctxLabelPhase(AnalysePhase p, Locale locale) =>
     analysePhaseLabelForLocale(p, locale);
 
-Future<AnalyseTimeframe?> showAnalyseContexteHiddenHtfSheet(
-  BuildContext context,
-  List<AnalyseTimeframe> hidden,
-) {
-  return showModalBottomSheet<AnalyseTimeframe>(
-    context: context,
-    backgroundColor: const Color(0xFF141414),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-    ),
-    builder: (sheetCtx) {
-      final l = AppLocalizations.of(sheetCtx)!;
-      return SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(
-                l.analyseAddTimeframeTitle,
-                style: AnalyseTokens.labelStyle.copyWith(fontSize: 13),
-              ),
-            ),
-            for (final x in hidden)
-              ListTile(
-                title: Text(
-                  ctxLabelHtf(x),
-                  style: const TextStyle(
-                    color: Color(0xFFDFDFDF),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                onTap: () => Navigator.pop(sheetCtx, x),
-              ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      );
-    },
+Future<AnalyseHtfAddChoice?> showAnalyseContexteAddHtfSheet(
+  BuildContext context, {
+  required List<AnalyseTimeframe> hiddenEnums,
+  required Set<String> visibleLabels,
+}) {
+  return showAnalyseHtfAddSheet(
+    context,
+    hiddenEnums: hiddenEnums,
+    visibleLabels: visibleLabels,
   );
 }
 

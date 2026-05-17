@@ -564,6 +564,7 @@ class _DashboardPageState extends State<DashboardPage>
               _showLitePaywallSheet();
               return;
             }
+            _openTradeIdNotifier.value = trade.id;
             _applyTabIndex(1);
           },
           onAddTrade: () => _applyTabIndex(2),

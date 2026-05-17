@@ -423,6 +423,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get analyseAddTimeframeTitle => '시간봉 추가';
 
   @override
+  String get analyseAddTimeframeCustomEntry => '기타 (직접 입력)';
+
+  @override
+  String get analyseAddTimeframeSectionRestore => '다시 표시';
+
+  @override
+  String get analyseAddTimeframeSectionIntraday => '인트라데이';
+
+  @override
+  String get analyseAddTimeframeSectionSwing => '스윙·포지션';
+
+  @override
   String get analyseAddTrendTitle => '추세 추가';
 
   @override
@@ -734,6 +746,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get analyseVolumeVal => 'VAL';
+
+  @override
+  String get analyseVolumeZoneFrom => '부터';
+
+  @override
+  String get analyseVolumeZoneLabel => '구간';
+
+  @override
+  String get analyseVolumeZoneTo => '까지';
 
   @override
   String get appBrandName => 'PAYCHEK';

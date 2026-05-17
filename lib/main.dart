@@ -1,4 +1,4 @@
-﻿import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -257,16 +257,18 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final sess = FirebaseAuth.instance.currentUser;
       if (sess != null) {
-        try {
-          await paychekMergeAppLanguageFromFirestore(sess).timeout(
-            const Duration(seconds: 6),
-          );
-          if (mounted) await _locale.load();
-        } catch (e, st) {
-          debugPrint(
-            '[Paychek] paychekMergeAppLanguageFromFirestore (post-frame): $e\n$st',
-          );
-        }
+        // Best-effort : prefs locales / guest d’abord ; merge cloud sans bloquer l’hydratation.
+        unawaited(() async {
+          try {
+            await paychekMergeAppLanguageFromFirestore(sess);
+          } catch (e, st) {
+            debugPrint(
+              '[Paychek] paychekMergeAppLanguageFromFirestore (post-frame): $e\n$st',
+            );
+          } finally {
+            if (mounted) await _locale.load();
+          }
+        }());
       }
       // Hydrater le journal **avant** d’attacher les listeners : sinon le premier snapshot
       // `!exists` + store vide pouvait enchaîner set/snapshot et saturer le heap (GC bloquant).
