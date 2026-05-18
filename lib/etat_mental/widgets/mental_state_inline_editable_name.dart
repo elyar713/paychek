@@ -53,7 +53,8 @@ class MentalStateInlineEditableNameState extends State<MentalStateInlineEditable
     if (!_editing && widget.text != oldWidget.text) {
       _controller.text = widget.text;
     }
-    if (!widget.showEditIcon && _editing) {
+    // Ne committer que si le mode édition parent est désactivé (pas à chaque rebuild).
+    if (oldWidget.showEditIcon && !widget.showEditIcon && _editing) {
       _commit();
     }
   }

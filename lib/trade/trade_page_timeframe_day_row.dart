@@ -86,6 +86,16 @@ extension _TradePageTimeframeDayRow on _TradePageState {
         final sessionCounts = counts;
         if (!context.mounted) return;
         final lPdf = AppLocalizations.of(context)!;
+        final checklist = await checklistControllerReadyForPdfExport(
+          widget.checklistController,
+        );
+        final storedReports = await loadAnalyseReportsForPdfExport();
+        final disciplineAvgs = averageDisciplineDisplayForTrades(
+          dayTrades,
+          checklist,
+          storedReports,
+        );
+        if (!context.mounted) return;
         final bytes = await buildTradeTimeframePdf(
           l: lPdf,
           title: lPdf.tradePdfExportDayTitle,
@@ -95,10 +105,10 @@ extension _TradePageTimeframeDayRow on _TradePageState {
           avg: avg,
           pct: pct,
           winRatePct: winDay,
-          avgChecklist: avgChecklist,
-          avgPlan: avgPlan,
-          avgStrategie: avgStrategie,
-          avgEtat: avgEtat,
+          avgChecklist: disciplineAvgs.checklist,
+          avgPlan: disciplineAvgs.plan,
+          avgStrategie: disciplineAvgs.strategie,
+          avgEtat: disciplineAvgs.etat,
           principeCount: principeCount,
           feelingCount: feelingCount,
           sessionCounts: sessionCounts,

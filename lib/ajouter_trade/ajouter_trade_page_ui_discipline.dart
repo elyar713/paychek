@@ -234,6 +234,19 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                             ),
                           ],
                         ),
+                        ListenableBuilder(
+                          listenable: Listenable.merge([
+                            widget.checklistController,
+                            MentalStateController.instance,
+                          ]),
+                          builder: (context, _) {
+                            return AjouterTradeDisciplineMindsetSummary(
+                              checklistPercent: _checklistRingPercent,
+                              mentalScore: _mentalRingScore,
+                              sectionHeaderColor: sectionHeaderColor,
+                            );
+                          },
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: ajouterTradeDisciplineSectionsWithSeparators([
@@ -246,13 +259,9 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                   children: [
                                     AjouterTradeStrategieSection(
                                       labelStyle: labelStyle,
-                                      slider: AjouterTradePercentSliderCell(
-                                        label: '',
-                                        value: _strategieRespectPct,
-                                        onChanged: (v) => setState(
-                                          () => _strategieRespectPct = v,
-                                        ),
-                                      ),
+                                      strategieRespectPct: _strategieRespectPct,
+                                      onStrategieRespectPctChanged: (v) =>
+                                          setState(() => _strategieRespectPct = v),
                                       strategiePicker: Builder(
                                         builder: (ctx) {
                                           final setups = StrategieSetupsStore
@@ -406,12 +415,6 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                   children: [
                                     AjouterTradePlanAnalyseSection(
                                       labelStyle: labelStyle,
-                                      slider: AjouterTradePercentSliderCell(
-                                        label: '',
-                                        value: _planRespectPct,
-                                        onChanged: (v) =>
-                                            setState(() => _planRespectPct = v),
-                                      ),
                                       planPickerTop:
                                           AjouterTradePlanAnalyseMenu(
                                             showDemoReports: true,
@@ -423,13 +426,15 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                                 _planAnalyseNonRespectIds = {};
                                               });
                                             },
+                                            onReportsLoaded:
+                                                _onPlanAnalyseReportsLoaded,
                                           ),
                                       planPickerBottom:
                                           AjouterTradePlanAnalyseFeedbackMenu(
                                             key: ValueKey<int>(
                                               _feedbackUiEpoch,
                                             ),
-                                            planRespectPercent: _planRespectPct,
+                                            planRespectPercent: _planPctForFeedback,
                                             selectedReport:
                                                 _planAnalyseSelectedReport,
                                             onNonRespectSelectionChanged:
@@ -461,27 +466,6 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                         return id;
                                       },
                                     ),
-                                    AjouterTradeDisciplineRespectLine(
-                                      respectPercent: _planRespectPct,
-                                      nonRespectIds: _planAnalyseNonRespectIds,
-                                      labelForId: (id) {
-                                        final s = _planAnalyseSelectedReport;
-                                        if (s == null) return id;
-                                        final entries =
-                                            planAnalyseFeedbackEntriesFor(s, l);
-                                        for (final e in entries) {
-                                          if (e is PlanAnalyseFeedbackRow &&
-                                              e.id == id) {
-                                            final v = (e.hint ?? '').trim();
-                                            return v.isEmpty
-                                                ? e.label
-                                                : '${e.label} : $v';
-                                          }
-                                        }
-                                        return id;
-                                      },
-                                      mutedStyle: mutedStyle,
-                                    ),
                                   ],
                                 ),
                               ),
@@ -510,18 +494,10 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                               ),
                                     ),
                                     const SizedBox(height: 6),
-                                    AjouterTradePercentSliderCell(
-                                      label: '',
-                                      value: _checklistRespectPct,
-                                      onChanged: (v) => setState(
-                                        () => _checklistRespectPct = v,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
                                     AjouterTradeChecklistFeedbackMenu(
                                       key: ValueKey<int>(_feedbackUiEpoch),
                                       checklistRespectPercent:
-                                          _checklistRespectPct,
+                                          _checklistPctForFeedback,
                                       controller: widget.checklistController,
                                       onNonRespectSelectionChanged: (ids) {
                                         setState(() {
@@ -552,33 +528,6 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                         return id;
                                       },
                                     ),
-                                    AjouterTradeDisciplineRespectLine(
-                                      respectPercent: _checklistRespectPct,
-                                      nonRespectIds: _checklistNonRespectIds,
-                                      labelForId: (id) {
-                                        final parts = id.split(':');
-                                        if (parts.length != 2) {
-                                          return id;
-                                        }
-                                        final sectionId = parts[0];
-                                        final itemId = parts[1];
-                                        for (final s
-                                            in widget
-                                                .checklistController
-                                                .sections) {
-                                          if (s.id != sectionId) {
-                                            continue;
-                                          }
-                                          for (final it in s.items) {
-                                            if (it.id == itemId) {
-                                              return it.label;
-                                            }
-                                          }
-                                        }
-                                        return id;
-                                      },
-                                      mutedStyle: mutedStyle,
-                                    ),
                                   ],
                                 ),
                               ),
@@ -607,16 +556,9 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                               ),
                                     ),
                                     const SizedBox(height: 6),
-                                    AjouterTradePercentSliderCell(
-                                      label: '',
-                                      value: _etatMomentPct,
-                                      onChanged: (v) =>
-                                          setState(() => _etatMomentPct = v),
-                                    ),
-                                    const SizedBox(height: 6),
                                     AjouterTradeEtatMomentFeedbackMenu(
                                       key: ValueKey<int>(_feedbackUiEpoch),
-                                      etatMomentPercent: _etatMomentPct,
+                                      etatMomentPercent: _etatPctForFeedback,
                                       controller:
                                           MentalStateController.instance,
                                       onNonRespectSelectionChanged: (ids) {

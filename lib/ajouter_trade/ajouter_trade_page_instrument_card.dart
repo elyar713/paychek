@@ -138,10 +138,15 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                   ],
-                  fieldHeight: 40,
                   fieldTrailing: IconButton(
                     onPressed: onOpenAddCustomActif,
                     tooltip: '${l.actionAdd} ${l.ajouterTradeFieldActif}',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 28,
+                      height: 28,
+                    ),
+                    visualDensity: VisualDensity.compact,
                     icon: const Icon(
                       Icons.settings_outlined,
                       size: 16,
@@ -277,7 +282,6 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                           },
                           checkboxLabel: l.ajouterTradeCheckboxPositionOpen,
                           checkboxLabelStyle: checkboxLabelStyle,
-                          alignStart: true,
                         ),
                         const SizedBox(height: 4),
                         _MiniCheckboxRow(
@@ -285,7 +289,6 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                           onChanged: onApresNewsChanged,
                           label: l.ajouterTradeCheckboxApresNews,
                           labelStyle: checkboxLabelStyle,
-                          alignStart: true,
                         ),
                       ],
                     ),
@@ -329,14 +332,12 @@ class _MiniCheckboxRow extends StatelessWidget {
     required this.onChanged,
     required this.label,
     required this.labelStyle,
-    this.alignStart = false,
   });
 
   final bool value;
   final ValueChanged<bool> onChanged;
   final String label;
   final TextStyle? labelStyle;
-  final bool alignStart;
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +391,7 @@ class _MiniCheckboxRow extends StatelessWidget {
     );
 
     return Align(
-      alignment: alignStart ? Alignment.centerLeft : Alignment.center,
+      alignment: Alignment.center,
       child: ConstrainedBox(
         constraints: const BoxConstraints.tightFor(width: 188),
         child: row,

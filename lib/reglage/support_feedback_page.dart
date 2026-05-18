@@ -12,6 +12,7 @@ import '../dashboard/dashboard_tokens.dart';
 import '../help_center/help_center_page.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
+import '../widgets/paychek_page_header.dart';
 import 'paychek_support_ticket_submit.dart';
 import 'support_feedback_config.dart';
 
@@ -97,18 +98,16 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
     try {
       final ok = await launchUrl(uri, mode: mode);
       if (!ok && mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Impossible d’ouvrir l’app e-mail. Vérifie qu’une messagerie est installée.',
-            ),
-          ),
+          SnackBar(content: Text(l10n.supportErrorEmailAppUnavailable)),
         );
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-          SnackBar(content: Text('Ouverture e-mail impossible : $e')),
+          SnackBar(content: Text(l10n.supportErrorEmailOpenFailed('$e'))),
         );
       }
     }
@@ -122,18 +121,16 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
     try {
       final ok = await launchUrl(uri, mode: mode);
       if (!ok && mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Impossible d’ouvrir l’app e-mail. Vérifie qu’une messagerie est installée.',
-            ),
-          ),
+          SnackBar(content: Text(l10n.supportErrorEmailAppUnavailable)),
         );
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-          SnackBar(content: Text('Ouverture e-mail impossible : $e')),
+          SnackBar(content: Text(l10n.supportErrorEmailOpenFailed('$e'))),
         );
       }
     }
@@ -336,9 +333,6 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
   }
 
   static const Color _accentBlue = Color(0xFF3B82F6);
-  static const Gradient _feedbackGradient = LinearGradient(
-    colors: [Color(0xFF818CF8), Color(0xFF38BDF8)],
-  );
 
   /// Largeur max du bloc formulaire sur grand écran.
   static const double _formMaxWidth = 560;
@@ -352,94 +346,40 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
     final border = web ? PaychekWebTokens.borderGray800 : const Color(0xFF232326);
     final maxContentW = web ? 960.0 : double.infinity;
 
+    final supportTitle =
+        '${l10n.supportFeedbackTitleLead}${l10n.supportFeedbackTitleAccent}';
+
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxContentW),
-            child: ListView(
-              padding: EdgeInsets.fromLTRB(web ? 24 : 16, web ? 16 : 8, web ? 24 : 16, 24),
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () {
-                      if (widget.onCloseInShell != null) {
-                        widget.onCloseInShell!();
-                      } else {
-                        Navigator.of(context).maybePop();
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.chevron_left_rounded,
-                            color: Colors.white,
-                            size: web ? 26 : 22,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            l10n.supportFeedbackBack,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: web ? 16 : 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PaychekPageHeader(
+              onBack: PaychekPageHeader.resolveBack(
+                context,
+                onCloseInShell: widget.onCloseInShell,
+              ),
+              title: supportTitle,
+              subtitle: l10n.supportFeedbackSubtitle,
+              maxContentWidth: maxContentW,
+            ),
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxContentW),
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      PaychekPageHeader.horizontalPad(
+                        MediaQuery.sizeOf(context).width,
                       ),
+                      0,
+                      PaychekPageHeader.horizontalPad(
+                        MediaQuery.sizeOf(context).width,
+                      ),
+                      24,
                     ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text.rich(
-                  TextSpan(
                     children: [
-                      TextSpan(
-                        text: l10n.supportFeedbackTitleLead,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: web ? 28 : 24,
-                          fontWeight: FontWeight.w800,
-                          color: DashboardTokens.onMatteEmphasis,
-                          height: 1.15,
-                        ),
-                      ),
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.baseline,
-                        baseline: TextBaseline.alphabetic,
-                        child: ShaderMask(
-                          shaderCallback: (bounds) =>
-                              _feedbackGradient.createShader(bounds),
-                          child: Text(
-                            l10n.supportFeedbackTitleAccent,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: web ? 28 : 24,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              height: 1.15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.supportFeedbackSubtitle,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: web ? 15 : 14,
-                    fontWeight: FontWeight.w400,
-                    color: web ? PaychekWebTokens.textGray500 : DashboardTokens.labelGrey,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.center,
                   child: ConstrainedBox(
@@ -468,9 +408,12 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
                     ),
                   ),
                 ),
-              ],
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

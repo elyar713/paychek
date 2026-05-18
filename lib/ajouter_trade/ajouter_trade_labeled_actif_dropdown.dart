@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../dashboard/dashboard_tokens.dart';
 import 'ajouter_trade_actif_dropdown_overlay.dart';
 import 'ajouter_trade_shell_scope.dart';
+import 'ajouter_trade_widgets_fields.dart';
 
 /// Libellé + pilule ; menu sous la pilule (même largeur), **étoile** favori par ligne.
 class AjouterTradeLabeledActifDropdown extends StatefulWidget {
@@ -73,7 +74,7 @@ class _AjouterTradeLabeledActifDropdownState
     }
   }
 
-  static const double _fieldH = 36;
+  static const double _fieldH = kAjouterTradeInstrumentFieldHeight;
   static const double _radius = 10;
 
   void _toggleFavorite(String symbol) {

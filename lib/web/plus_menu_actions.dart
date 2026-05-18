@@ -65,6 +65,11 @@ class PlusMenuActions {
         label: l10n.plusMentalState,
         onTap: onOpenMental,
       ),
+      (
+        icon: Icons.fact_check_outlined,
+        label: l10n.plusChecklist,
+        onTap: onOpenChecklist,
+      ),
       // track_changes Material : glyphe vide possible en web release → Lucide (cf. teaser stratégie).
       (
         icon: LucideIcons.target,
@@ -80,11 +85,6 @@ class PlusMenuActions {
         icon: Icons.query_stats_outlined,
         label: l10n.plusPerformance,
         onTap: onOpenPerformance,
-      ),
-      (
-        icon: Icons.fact_check_outlined,
-        label: l10n.plusChecklist,
-        onTap: onOpenChecklist,
       ),
       (
         icon: Icons.calculate_outlined,

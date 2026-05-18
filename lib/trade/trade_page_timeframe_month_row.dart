@@ -215,6 +215,7 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
           monthTrades: monthTrades,
           initialCapital: cap,
           filenamePrefix: 'trades_month',
+          checklistController: widget.checklistController,
         );
       },
     );

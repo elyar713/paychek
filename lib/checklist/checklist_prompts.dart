@@ -48,15 +48,22 @@ class ChecklistPrompts {
   static const itemLineHint = 'Saisir le critère';
 
   // --- Sections par dÃ©faut (ids) ---
+  static const sectionIdNews = 'news';
   static const sectionIdAnalyse = 'analyse';
   static const sectionIdRisque = 'risque';
   static const sectionIdPsy = 'psy';
 
+  static const sectionTitleNews = 'NEWS · CALENDRIER ÉCONOMIQUE';
   static const sectionTitleAnalyse = 'ANALYSE TECHNIQUE';
   static const sectionTitleRisque = 'GESTION DU RISQUE';
   static const sectionTitlePsy = 'PSYCHOLOGIE';
 
   // --- Items : ids ---
+  static const itemIdNews1 = 'n1';
+  static const itemIdNews2 = 'n2';
+  static const itemIdNews3 = 'n3';
+  static const itemIdNews4 = 'n4';
+
   static const itemIdAnalyse1 = 'a1';
   static const itemIdAnalyse2 = 'a2';
   static const itemIdAnalyse3 = 'a3';
@@ -68,6 +75,15 @@ class ChecklistPrompts {
   static const itemIdPsy3 = 'p3';
 
   // --- Items : libellÃ©s (critÃ¨res) â€” alignÃ©s sur app_en.arb ; affichage via l10n ---
+  static const itemLabelNews1 =
+      'Calendrier économique consulté (FED, CPI, NFP, PIB…).';
+  static const itemLabelNews2 =
+      'FOMC / FED : pas de trade pendant l’annonce.';
+  static const itemLabelNews3 =
+      'CPI (inflation) : horaire et impact anticipés.';
+  static const itemLabelNews4 =
+      'NFP (emplois US) : fenêtre à risque identifiée.';
+
   static const itemLabelAnalyse1 =
       'La tendance de fond (HTF) est alignée avec mon idée.';
   static const itemLabelAnalyse2 =

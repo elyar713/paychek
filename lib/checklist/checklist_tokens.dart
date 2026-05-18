@@ -77,6 +77,14 @@ class ChecklistTokens {
   /// Icône ⋯ : blanc cassé mat.
   static const sectionMenuIconColor = Color(0xFFB8B8B8);
 
+  /// Résumé rappel personnalisé (hebdo / date précise) au-dessus d’une ligne.
+  static const scheduleCustomSummary = Color(0xFF56B4FF);
+
+  /// Espace vertical du résumé date (éloigné du séparateur, proche du libellé).
+  static const scheduleSummaryPaddingTop = 8.0;
+  static const scheduleSummaryPaddingBottom = 0.0;
+  static const scheduleSummaryFontSize = 9.0;
+
   /// Menu ⋯ : coins arrondis, fond **légèrement** transparent (même base que [cardBg]).
   static const sectionPopupMenuRadius = 12.0;
   /// Alpha ~94 % (moins transparent qu’avant, ~0xE6).

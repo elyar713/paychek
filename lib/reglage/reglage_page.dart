@@ -235,7 +235,6 @@ class _ReglagePageState extends State<ReglagePage> {
     final tradingWeek = TradingWeekScope.of(context);
 
     final isWebUi = kIsWeb;
-    final t = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor:
           isWebUi ? PaychekWebTokens.scaffoldBg : Colors.black,
@@ -356,48 +355,13 @@ class _ReglagePageState extends State<ReglagePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (isWebUi)
-                    PaychekPageHeader(
-                      title: l10n.settingsTitle,
-                      subtitle: '',
-                      onBack: widget.onClose,
-                      maxContentWidth: _kWebReglageMaxWidth,
-                    )
-                  else
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: InkWell(
-                        onTap: widget.onClose,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 4),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.chevron_left_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                l10n.settingsTitle,
-                                style: t.labelMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ) ??
-                                    const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: isWebUi ? 12 : 6),
+                  PaychekPageHeader(
+                    title: l10n.settingsTitle,
+                    subtitle: l10n.settingsSupportCardSubtitle,
+                    onBack: widget.onClose,
+                    maxContentWidth: _kWebReglageMaxWidth,
+                  ),
+                  SizedBox(height: isWebUi ? 4 : 0),
                   Expanded(
                     child: isWebUi
                         ? Align(

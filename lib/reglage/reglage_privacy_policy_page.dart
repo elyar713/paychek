@@ -3,10 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/paychek_page_header.dart';
 
 /// Politique de confidentialité (texte type standard ; FR / EN selon la langue de l’app).
 class ReglagePrivacyPolicyPage extends StatelessWidget {
-  const ReglagePrivacyPolicyPage({super.key});
+  const ReglagePrivacyPolicyPage({super.key, this.onCloseInShell});
+
+  /// Dashboard overlay : fermeture sans [Navigator.pop].
+  final VoidCallback? onCloseInShell;
 
   static bool _useFrench(BuildContext context) {
     return Localizations.localeOf(context).languageCode == 'fr';
@@ -16,47 +20,55 @@ class ReglagePrivacyPolicyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final fr = _useFrench(context);
+    final back = PaychekPageHeader.resolveBack(
+      context,
+      onCloseInShell: onCloseInShell,
+    );
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          l10n.settingsPrivacyPageTitle,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-      ),
       body: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.settingsPrivacyDocHeading,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: DashboardTokens.onMatteEmphasis,
-                  height: 1.35,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PaychekPageHeader(
+              onBack: back,
+              title: l10n.settingsPrivacyPageTitle,
+              subtitle: l10n.settingsPrivacyRowSubtitle,
+              maxContentWidth: 720,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  PaychekPageHeader.horizontalPad(
+                    MediaQuery.sizeOf(context).width,
+                  ),
+                  0,
+                  PaychekPageHeader.horizontalPad(
+                    MediaQuery.sizeOf(context).width,
+                  ),
+                  40,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.settingsPrivacyDocHeading,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: DashboardTokens.onMatteEmphasis,
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ..._blocks(fr).map(
+                      (b) => _block(b.$1, b.$2),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              ..._blocks(fr).map(
-                (b) => _block(b.$1, b.$2),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

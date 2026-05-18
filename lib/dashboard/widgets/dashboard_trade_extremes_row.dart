@@ -37,8 +37,7 @@ class DashboardTradeExtremesRow extends StatelessWidget {
   final double spacing;
 
   static String _fmt(double? v, String sym) {
-    if (v == null) return '\u2014';
-    return formatMoneyWithCurrencySymbol(v, sym);
+    return formatMoneyWithCurrencySymbol(v ?? 0, sym);
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,37 @@ const _kAuthDialogRadius = 40.0;
 
 enum _WebLandingAuthMode { login, signup }
 
+bool _hasMaterialLocalizations(BuildContext context) {
+  return Localizations.of<MaterialLocalizations>(
+        context,
+        MaterialLocalizations,
+      ) !=
+      null;
+}
+
+/// Contexte valide pour [showDialog] (évite l’assert MaterialLocalizations sur Web).
+BuildContext? _resolveAuthDialogHost(BuildContext context) {
+  if (!context.mounted) return null;
+  if (_hasMaterialLocalizations(context)) return context;
+
+  final overlay = Overlay.maybeOf(context, rootOverlay: true);
+  final overlayCtx = overlay?.context;
+  if (overlayCtx != null &&
+      overlayCtx.mounted &&
+      _hasMaterialLocalizations(overlayCtx)) {
+    return overlayCtx;
+  }
+
+  final nav = Navigator.maybeOf(context, rootNavigator: true);
+  if (nav != null &&
+      nav.context.mounted &&
+      _hasMaterialLocalizations(nav.context)) {
+    return nav.context;
+  }
+
+  return null;
+}
+
 void _popDialog(BuildContext dialogCtx) {
   if (!dialogCtx.mounted) return;
   Navigator.of(dialogCtx, rootNavigator: true).pop();
@@ -24,12 +56,14 @@ Widget _webLandingAuthDialogBody({
   required _WebLandingAuthMode mode,
   required BuildContext callerContext,
 }) {
-  final l10n = AppLocalizations.of(dialogCtx)!;
+  final l10n =
+      AppLocalizations.of(dialogCtx) ?? AppLocalizations.of(callerContext);
+  if (l10n == null) return const SizedBox.shrink();
   final isLogin = mode == _WebLandingAuthMode.login;
   final title = isLogin ? l10n.accountTabLogin : l10n.accountTabSignup;
   final subtitle = isLogin
-      ? 'Bon retour sur Paychek.'
-      : 'Rejoignez l\'élite des traders.';
+      ? l10n.webLandingLoginSubtitle
+      : l10n.webLandingSignupSubtitle;
 
   final mq = MediaQuery.of(dialogCtx);
   final maxCardW = math.min(440.0, mq.size.width - mq.padding.horizontal - 32);
@@ -100,8 +134,8 @@ Widget _webLandingAuthDialogBody({
                 showAuthEyebrow: false,
                 dense: true,
                 landingPillStyle: true,
-                landingLoginCtaLabel: 'SE CONNECTER',
-                landingSignupCtaLabel: 'ESSAYER GRATUITEMENT',
+                landingLoginCtaLabel: l10n.webLandingLoginCta,
+                landingSignupCtaLabel: l10n.webLandingSignupCta,
                 onAuthSuccess: () => _popDialog(dialogCtx),
               ),
               const SizedBox(height: 12),
@@ -112,7 +146,7 @@ Widget _webLandingAuthDialogBody({
                     spacing: 4,
                     children: [
                       Text(
-                        'PAS DE COMPTE ?',
+                        l10n.webLandingNoAccountLabel,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -123,14 +157,14 @@ Widget _webLandingAuthDialogBody({
                       TextButton(
                         onPressed: () {
                           _popDialog(dialogCtx);
+                          final host = callerContext;
                           WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (callerContext.mounted) {
-                              showWebLandingSignupDialog(callerContext);
-                            }
+                            if (!host.mounted) return;
+                            unawaited(showWebLandingSignupDialog(host));
                           });
                         },
                         child: Text(
-                          'S\'INSCRIRE',
+                          l10n.webLandingRegisterLink,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -149,7 +183,7 @@ Widget _webLandingAuthDialogBody({
                     spacing: 4,
                     children: [
                       Text(
-                        'DÉJÀ MEMBRE ?',
+                        l10n.webLandingAlreadyMemberLabel,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -160,14 +194,14 @@ Widget _webLandingAuthDialogBody({
                       TextButton(
                         onPressed: () {
                           _popDialog(dialogCtx);
+                          final host = callerContext;
                           WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (callerContext.mounted) {
-                              showWebLandingLoginDialog(callerContext);
-                            }
+                            if (!host.mounted) return;
+                            unawaited(showWebLandingLoginDialog(host));
                           });
                         },
                         child: Text(
-                          'CONNEXION',
+                          l10n.webLandingLoginLink,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -192,24 +226,30 @@ Future<void> _showWebLandingAuthDialog(
   BuildContext context, {
   required _WebLandingAuthMode mode,
 }) async {
-  if (!context.mounted) return;
+  final host = _resolveAuthDialogHost(context);
+  if (host == null) return;
   WebLandingIframeSuppress.prepareForAuthOverlay();
-  if (!context.mounted) {
+  if (!host.mounted) {
     WebLandingIframeSuppress.release();
     return;
   }
   try {
     await showDialog<void>(
-      context: context,
+      context: host,
       useRootNavigator: true,
       barrierDismissible: true,
       barrierColor: Colors.black.withValues(alpha: 0.88),
       builder: (dialogCtx) => _webLandingAuthDialogBody(
         dialogCtx: dialogCtx,
         mode: mode,
-        callerContext: context,
+        callerContext: host,
       ),
     );
+  } catch (e, st) {
+    assert(() {
+      debugPrint('showWebLandingAuthDialog: $e\n$st');
+      return true;
+    }());
   } finally {
     WebLandingIframeSuppress.release();
   }

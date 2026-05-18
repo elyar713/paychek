@@ -1,0 +1,308 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "Mit institutioneller Disziplin handeln nicht mit emotionalen Ausschlägen.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Kapital und Bilanz:",
+        "body": "Liquiditätslage sofort transparent."
+      },
+      {
+        "icon": "fa-sticky-note",
+        "label": "Ihre Spielnotiz:",
+        "body": "Kein Suchen mehr im Chaos die Bias-Prüfung sitzt dort wo Risiko entschieden wird."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Checkliste:",
+        "body": "Mit einem Tap bestätigen Sie jede Spielbuch-Regel direkt vom Kommandoland aus."
+      },
+      {
+        "icon": "fa-gauge",
+        "label": "Mindset-Anzeige:",
+        "body": "Zeiger zeigt ob Sie handeln dürfen oder die Session pausieren sollten."
+      },
+      {
+        "icon": "fa-calendar-alt",
+        "label": "Kalender:",
+        "body": "Equity-Verlauf monatweise festgehalten."
+      },
+      {
+        "icon": "fa-chess-knight",
+        "label": "Ihre Strategie:",
+        "body": "Der Plan bleibt jederzeit sichtbar."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK Dashboard Vorschau",
+      "PAYCHEK Dashboard Mindset Strategie Kalender"
+    ]
+  },
+  "checklist": {
+    "title": "Checklist",
+    "lead": "Ihr strukturelles Ampelsystem vor jeder Risikoannahme.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "360-Grad-Validierung:",
+        "body": "Technik Risiko Kopf drei Achsen vor der Order."
+      },
+      {
+        "icon": "fa-circle-notch",
+        "label": "Visuelle Vollständigkeit:",
+        "body": "Der Ring füllt sich wenn alle Gates geschlossen sind nur dann ausführen."
+      },
+      {
+        "icon": "fa-link",
+        "label": "Keine Aussetzer:",
+        "body": "Money-Management in der Routine verankert."
+      },
+      {
+        "icon": "fa-file-pdf",
+        "label": "PDF-Belege:",
+        "body": "Nachweisbare Disziplin für Coach oder Investor exportieren."
+      }
+    ],
+    "imgAlt": "PAYCHEK Checkliste Screenshot"
+  },
+  "mental": {
+    "title": "Mindset",
+    "lead": "Der Markt straft Burnout PAYCHEK liefert die psychologische Freigabe mit stahlhart codierter Routine.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Performance Kompass:",
+        "body": "Readiness Score aus Schlaf Bewegung Fokusroutinen wenn Sie wirklich scharf sind."
+      },
+      {
+        "icon": "fa-sliders",
+        "label": "Moment Snapshot:",
+        "body": "Swipe für Fokus Energie Stress rote Warnung bevor Behavior bricht."
+      },
+      {
+        "icon": "fa-face-smile",
+        "label": "Emotions Telemetrie:",
+        "body": "Euphorie Frust Neutralität labeln Revenge Tilts austrocknen."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Warmup Ritual:",
+        "body": "Professionelle Routinen vor Session werden bei fester Disziplin zu messbarer Routine."
+      }
+    ],
+    "imgAlt": "PAYCHEK Mindset Modul"
+  },
+  "analyse": {
+    "title": "Analysebereich",
+    "lead": "Live-Dossiers mit Tradeplan Detailblöcken und Executive Wrap.",
+    "descPoints": [
+      {
+        "icon": "fa-file-lines",
+        "label": "Plan Arbeitsblatt:",
+        "body": "Richtung Timeframes Trend Regime Vertrauen auf einem Panel."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Deep Dives:",
+        "body": "Struktur Indikatoren Smart Money Liquidität Volumprofile Screenshots."
+      },
+      {
+        "icon": "fa-file-export",
+        "label": "Executive Wrap:",
+        "body": "Schließen Sie mit Konfidenzwert gekoppelt an Instrument Historie."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK Wochenszenario Karte",
+      "PAYCHEK Struktur Indikator SMC Blätter",
+      "PAYCHEK Plan Arbeitsblatt Trading",
+      "PAYCHEK Rollup Confidence Export Stack"
+    ]
+  },
+  "strategie": {
+    "title": "Strategy",
+    "lead": "Viele verlieren den Plan unter Feuer PAYCHEK pinned ihn sichtbar damit Drift verliert.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Eigene Säulen:",
+        "body": "Rahmen exakt nach Ihrer Methodik keine Social Copypaste Playbooks."
+      },
+      {
+        "icon": "fa-pen-to-square",
+        "label": "Konviktionsbuch:",
+        "body": "Jede Idee bekommt Textthese im Journal."
+      },
+      {
+        "icon": "fa-bullseye",
+        "label": "Sofortige Ausrichtung:",
+        "body": "Dashboard blendet kontinuierlich Regeln keine Tab Navigation Panik."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Setup Bewertung:",
+        "body": "Ideenscore vor Ausführung filtert mittelmäßige Setups upstream."
+      }
+    ],
+    "imgAlt": "PAYCHEK Strategie Playbook Risiko Sessions"
+  },
+  "performance": {
+    "title": "Performance",
+    "lead": "Hören Sie auf zu raten wo Blut floss quantifizieren Sie jede Reibungsstelle.",
+    "descPoints": [
+      {
+        "icon": "fa-brain",
+        "label": "Mind Analytik:",
+        "body": "Prinzip Trades gegen Bauch Trades emotionaler Drag auf Expectancy zeigen."
+      },
+      {
+        "icon": "fa-clock",
+        "label": "Golden Hour Radar:",
+        "body": "Stunden höchsten Ertragszug Fokus kondensieren."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Session Telemetrie:",
+        "body": "Trefferquote Payoff Ratio Volum wie ein VolDesk Modelle tweakt."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Handelsintensität Guardrail:",
+        "body": "Trades pro Tag Cap gegen Overtrade schützt Kapitalfluss."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK Performance Volum Lots Symbole",
+      "PAYCHEK Performance Zeitraster Payoff Zeitspanne",
+      "PAYCHEK Performance Mind Strategie interplay"
+    ]
+  },
+  "calendrier": {
+    "title": "Kalender",
+    "lead": "Chromatische Historie Stärken sichtbar Fehler chirurgisch kürzen.",
+    "desc": "Monatsüberblick PnL Gewinnserie erkennen rote Sessions entmystifizieren ohne Mythos.",
+    "imgAlt": "PAYCHEK Kalender Monthly Net Metriken"
+  },
+  "trade": {
+    "title": "Trade Buch",
+    "lead": "Mehr als Klicks dokumentieren Institutional Grade Stories archivieren.",
+    "descPoints": [
+      {
+        "icon": "fa-book",
+        "label": "Chronologie:",
+        "body": "Jede Position automatisch Net Profit Erwartung gerechnet."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Technisches Dossier:",
+        "body": "Charts Thesis parallel damit später kein Context Rebuild."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Disziplin Forensik:",
+        "body": "Sofort sehen welche Regeln live welche Impulse Übernahme."
+      },
+      {
+        "icon": "fa-pen",
+        "label": "Reflection Journal:",
+        "body": "Emotion Intuition Capture damit hindsight Playbook Evolution treibt."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Mikrometeriken:",
+        "body": "True RR Exposure Zeit Gebührendrain ohne Ausreden KPI."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK Trades Liste Filter PnL",
+      "PAYCHEK Trade Detail Drill",
+      "PAYCHEK Wochensession Recap"
+    ]
+  },
+  "pdf": {
+    "title": "PDF Export",
+    "lead": "Audit Pakete fuer Investoren oder Ihr späteres Ich mit Prozessbeweisen.",
+    "descPoints": [
+      {
+        "icon": "fa-chess-knight",
+        "label": "Strategie Portfolio:",
+        "body": "Regeln Tech Säulen als signiertes Artefakt."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Instrument Reviews:",
+        "body": "Szenarios Snapshots Sessions gebündelt archivieren."
+      },
+      {
+        "icon": "fa-file-lines",
+        "label": "Trade Folioblätter:",
+        "body": "Jede Füllung mit Journal Tags Behavior Score Export."
+      },
+      {
+        "icon": "fa-calendar-week",
+        "label": "Rhythmus Audits:",
+        "body": "Woche PDF powering strukturierten Posttrade."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Performance Dossiers:",
+        "body": "Daily Weekly Monthly Compounds Briefing-ready."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK PDF Journal Synopsis",
+      "PAYCHEK PDF analytic brief",
+      "PAYCHEK PDF playbook Risiko Sessions",
+      "PAYCHEK PDF week rollup",
+      "PAYCHEK PDF ticket dossier"
+    ]
+  },
+  "csv": {
+    "title": "CSV import",
+    "lead": "Neun Venues Drop Export PAYCHEK matcht Schema selbstständig.",
+    "descPoints": [
+      {
+        "icon": "fa-file-csv",
+        "label": "Interop Abdeckung:",
+        "body": "MT4 MT5 TradingView Tradovate cTrader NinjaTrader Quantower ATAS Rithmic."
+      },
+      {
+        "icon": "fa-wand-magic-sparkles",
+        "label": "Guided ingest:",
+        "body": "Vendor Flows ohne manuelle Remap Theater."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Unified Blotter:",
+        "body": "Imports erben analytic PDF pipeline automatisch."
+      }
+    ],
+    "imgAlt": "PAYCHEK CSV Wizard Venue Grid"
+  },
+  "ajouter": {
+    "title": "Trade hinzufügen",
+    "lead": "Erfassen mit Algorithmus-Präzision und diskretionärer Klarheit kombiniert.",
+    "descPoints": [
+      {
+        "icon": "fa-bolt",
+        "label": "Schnell Blotter:",
+        "body": "Ultra low friction UI journaling habit bleibt."
+      },
+      {
+        "icon": "fa-calculator",
+        "label": "Smart Netting:",
+        "body": "Entry Exit Fees automatisch Expectancy keine Spreadsheet Panik."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Behavior Gate:",
+        "body": "Sofort markieren Regel adherence vs Impuls Slide."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK Add Trade ticker sizing",
+      "PAYCHEK Add Trade playbook checklist"
+    ]
+  }
+}

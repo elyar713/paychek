@@ -1,10 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../ajouter_trade/ajouter_trade_page_non_respect_labels.dart';
+import '../checklist/checklist_models.dart';
 import '../l10n/app_localizations.dart';
+import 'performance_custom_lens_labels.dart';
+import 'performance_custom_lens_logic.dart';
+import 'performance_custom_lens_model.dart';
+import 'performance_custom_lens_plan.dart';
 import '../analyse/analyse_report_pdf_platform.dart' as pdf_platform;
 import '../strategie/strategie_gestion_risque_storage.dart';
 import '../strategie/strategie_horaires_sessions_storage.dart';
@@ -20,6 +27,8 @@ part 'performance_export_pdf_text.dart';
 part 'performance_export_pdf_widgets_core.dart';
 part 'performance_export_pdf_widgets_rows.dart';
 part 'performance_export_pdf_document.dart';
+part 'performance_export_pdf_custom_lens.dart';
+part 'performance_export_pdf_capital_chart.dart';
 
 /// Libellés PDF Performance (FR / EN / ES / DE / PT / KO), alignés sur [performancePickLocale].
 String _p(Locale locale, String fr, String en, String es, String de, String pt, String ko) =>
@@ -39,6 +48,8 @@ Future<void> exportPerformancePdf(
   required StrategieGestionRisqueParams gestionParams,
   double? capitalAmount,
   required int journalItemCount,
+  required List<PerformanceCustomLensSavedCard> customLensSavedCards,
+  required List<ChecklistSectionData> checklistSections,
   required AppLocalizations l,
   required Locale uiLocale,
 }) async {
@@ -53,6 +64,8 @@ Future<void> exportPerformancePdf(
       gestionParams: gestionParams,
       capitalAmount: capitalAmount,
       journalItemCount: journalItemCount,
+      customLensSavedCards: customLensSavedCards,
+      checklistSections: checklistSections,
       l: l,
       uiLocale: uiLocale,
     );

@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../mental_state_controller.dart';
+import '../mental_state_date_utils.dart';
 import 'mental_state_sleep_mini_calendar.dart';
 
 ThemeData _mentalTimePickerTheme(BuildContext context) {
@@ -63,10 +64,14 @@ class MentalStateGlobalScoreCalendarSection extends StatelessWidget {
     super.key,
     required this.controller,
     required this.titleStyle,
+    this.selectedDay,
+    this.onDaySelected,
   });
 
   final MentalStateController controller;
   final TextStyle titleStyle;
+  final DateTime? selectedDay;
+  final ValueChanged<DateTime>? onDaySelected;
 
   String _fmtHm(TimeOfDay t) {
     String p2(int v) => v.toString().padLeft(2, '0');
@@ -288,98 +293,20 @@ class MentalStateGlobalScoreCalendarSection extends StatelessWidget {
         const SizedBox(height: 12),
         MentalStateSleepMiniCalendar(
           controller: controller,
+          selectedDay: selectedDay,
           onDayTap: (date) async {
-            final l = AppLocalizations.of(context)!;
-            final snap = controller.snapshotForCalendarDay(date);
-            final pct = controller.overallScoreForCalendarDay(date);
-            if (snap == null && pct == null) return;
-
-            String p2(int v) => v.toString().padLeft(2, '0');
-            final d = date;
-            final title = '${p2(d.day)}/${p2(d.month)}/${d.year}';
-
-            final sleep = (snap?['sleepValue'] as num?)?.toDouble();
-            final selected = snap?['selectedEmotionIds'];
-            final selectedIds = selected is List
-                ? selected.map((e) => e.toString()).where((s) => s.trim().isNotEmpty).toList()
-                : <String>[];
-
-            await showModalBottomSheet<void>(
-              context: context,
-              backgroundColor: const Color(0xFF141416),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              builder: (ctx) {
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '${l.mentalGlobalScoreCalendarTitle}: ${(pct ?? 0).round()}%',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFFE5E5E5),
-                        ),
-                      ),
-                      if (sleep != null) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          '${l.mentalSleepEnough}: ${sleep.round()}%',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFE5E5E5),
-                          ),
-                        ),
-                      ],
-                      if (selectedIds.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          '${l.mentalSectionEmotionHeading}: ${selectedIds.join(', ')}',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF9CA3AF),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 14),
-                      FilledButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          l.ok,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            final d = MentalStateDateUtils.dateOnly(date);
+            final anchor = MentalStateDateUtils.liveScoreAnchorCalendarDate(
+              DateTime.now(),
+              controller.mentalDayStart,
+              controller.mentalDayEnd,
             );
+            final today = MentalStateDateUtils.dateOnly(anchor);
+            if (d.isAfter(today)) return;
+
+            if (onDaySelected != null) {
+              onDaySelected!(date);
+            }
           },
         ),
       ],

@@ -7,13 +7,11 @@ class AjouterTradePlanAnalyseSection extends StatelessWidget {
   const AjouterTradePlanAnalyseSection({
     super.key,
     required this.labelStyle,
-    required this.slider,
     required this.planPickerTop,
     required this.planPickerBottom,
   });
 
   final TextStyle? labelStyle;
-  final Widget slider;
   final Widget planPickerTop;
   final Widget planPickerBottom;
 
@@ -38,8 +36,6 @@ class AjouterTradePlanAnalyseSection extends StatelessWidget {
             letterSpacing: 0.35,
           ),
         ),
-        const SizedBox(height: 4),
-        slider,
         const SizedBox(height: 4),
         planPickerTop,
         const SizedBox(height: 6),

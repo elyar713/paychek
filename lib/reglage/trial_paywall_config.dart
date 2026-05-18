@@ -1,15 +1,28 @@
-// Paywall web : URL Stripe via --dart-define ou Firestore `paychek_app_config/billing`
-// (éditable console admin). Voir aussi subscriber_entitlements + webhook Functions.
+// Paywall : URL Stripe via --dart-define ou Firestore `paychek_app_config/billing`
 
+import 'paychek_billing_plan.dart';
 import 'paychek_billing_remote.dart';
 
-/// Build / CI : prioritaire sur la valeur Firestore (back-office).
 const String kPaywallSubscribeLaunchUrl = String.fromEnvironment(
   'PAYCHEK_STRIPE_CHECKOUT_URL',
   defaultValue: '',
 );
 
-/// Stripe Payment Link : alphanum, tirets, underscores, max 200 car.
+const String kPaywallSubscribeLaunchUrlMonthly = String.fromEnvironment(
+  'PAYCHEK_STRIPE_CHECKOUT_URL_MONTHLY',
+  defaultValue: '',
+);
+
+const String kPaywallSubscribeLaunchUrlQuarterly = String.fromEnvironment(
+  'PAYCHEK_STRIPE_CHECKOUT_URL_QUARTERLY',
+  defaultValue: '',
+);
+
+const String kPaywallSubscribeLaunchUrlAnnual = String.fromEnvironment(
+  'PAYCHEK_STRIPE_CHECKOUT_URL_ANNUAL',
+  defaultValue: '',
+);
+
 String? paychekSanitizeStripeClientReferenceId(String? raw) {
   final t = raw?.trim() ?? '';
   if (t.isEmpty) return null;
@@ -42,26 +55,39 @@ Uri? _buildPaywallSubscribeUriFromBase(
   return base.replace(queryParameters: q);
 }
 
-/// Version synchrone : **dart-define uniquement** (tests / hot reload sans Firestore).
 Uri? buildPaywallSubscribeUri({
+  PaychekBillingCycle cycle = PaychekBillingCycle.annual,
   String? firebaseEmail,
   String? firebaseUid,
 }) {
+  final urls = PaychekBillingRemote.mergeCompileAndRemote(
+    compileMonthly: kPaywallSubscribeLaunchUrlMonthly,
+    compileQuarterly: kPaywallSubscribeLaunchUrlQuarterly,
+    compileAnnual: kPaywallSubscribeLaunchUrlAnnual,
+    compileLegacyAnnual: kPaywallSubscribeLaunchUrl,
+    remote: const {},
+  );
+  final base = urls.forCycle(cycle);
+  if (base == null || base.isEmpty) return null;
   return _buildPaywallSubscribeUriFromBase(
-    kPaywallSubscribeLaunchUrl,
+    base,
     firebaseEmail: firebaseEmail,
     firebaseUid: firebaseUid,
   );
 }
 
-/// Résout l’URL (dart-define puis Firestore admin), puis construit l’URI finale.
 Future<Uri?> buildPaywallSubscribeUriAsync({
+  PaychekBillingCycle cycle = PaychekBillingCycle.annual,
   String? firebaseEmail,
   String? firebaseUid,
 }) async {
-  final base = await PaychekBillingRemote.resolveStripeCheckoutBaseUrl(
-    kPaywallSubscribeLaunchUrl,
+  final urls = await PaychekBillingRemote.resolveStripeCheckoutUrls(
+    compileMonthly: kPaywallSubscribeLaunchUrlMonthly,
+    compileQuarterly: kPaywallSubscribeLaunchUrlQuarterly,
+    compileAnnual: kPaywallSubscribeLaunchUrlAnnual,
+    compileLegacyAnnual: kPaywallSubscribeLaunchUrl,
   );
+  final base = urls?.forCycle(cycle);
   if (base == null || base.trim().isEmpty) return null;
   return _buildPaywallSubscribeUriFromBase(
     base,

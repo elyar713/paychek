@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import 'ajouter_trade_page_percent_slider.dart';
 
-/// Libellé **STRATÉGIE**, ligne de sélection (slot) + menu rétroaction en dessous.
+/// Libellé **STRATÉGIE**, curseur « respectée », sélection + rétroaction.
 class AjouterTradeStrategieSection extends StatelessWidget {
   const AjouterTradeStrategieSection({
     super.key,
     required this.labelStyle,
-    required this.slider,
+    required this.strategieRespectPct,
+    required this.onStrategieRespectPctChanged,
     required this.strategiePicker,
     required this.feedbackMenu,
   });
 
   final TextStyle? labelStyle;
-  final Widget slider;
+  final double strategieRespectPct;
+  final ValueChanged<double> onStrategieRespectPctChanged;
   final Widget strategiePicker;
   final Widget feedbackMenu;
 
@@ -41,7 +44,11 @@ class AjouterTradeStrategieSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        slider,
+        AjouterTradePercentSliderCell(
+          label: l.ajouterTradeDisciplineSliderStrategieRespected,
+          value: strategieRespectPct,
+          onChanged: onStrategieRespectPctChanged,
+        ),
         const SizedBox(height: 6),
         strategiePicker,
         const SizedBox(height: 10),

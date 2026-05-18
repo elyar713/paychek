@@ -4,10 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import '../l10n/checklist_localizations.dart';
+import '../checklist/checklist_item_schedule.dart';
+import '../checklist/checklist_item_schedule_sort.dart';
+import '../checklist/checklist_item_schedule_summary.dart';
 import '../checklist/checklist_page_controller.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_tokens.dart';
 import '../checklist/widgets/checklist_item_row.dart';
+import '../checklist/widgets/checklist_schedule_calendar_button.dart';
 import '../web/paychek_web_tokens.dart';
 import 'dashboard_tokens.dart';
 
@@ -51,43 +55,52 @@ class DashboardChecklistPreview extends StatelessWidget {
   /// Fond derrière le contenu (ex. transparent si la carte est dans un cadre web).
   final Color? cardBackgroundColor;
 
-  /// Toutes les lignes non cochées, dans l’ordre des sections puis des items (liste globale).
-  static List<_DashboardChecklistPreviewEntry> _orderedUncheckedEntries(
+  /// Lignes non cochées **du jour** (rappel = aujourd’hui), ordre sections / items.
+  static List<_DashboardChecklistPreviewEntry> _orderedUncheckedEntriesToday(
     List<ChecklistSectionData> sections,
   ) {
     final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
       for (final item in section.items) {
-        if (!item.checked) {
+        if (!item.checked && item.isDueOnDay()) {
           out.add((sectionId: section.id, item: item));
         }
       }
     }
+    sortChecklistPreviewEntriesBySchedule(out);
     return out;
   }
 
-  /// Web : toutes les lignes (technique, analyse, psy, risque, etc.) — d’abord les non cochées
-  /// (même ordre sections/items), puis les cochées, pour remplir l’aperçu au maximum.
-  static List<_DashboardChecklistPreviewEntry> _webEntriesUncheckedThenChecked(
+  static List<_DashboardChecklistPreviewEntry> _orderedCheckedEntriesToday(
     List<ChecklistSectionData> sections,
   ) {
-    final unchecked = _orderedUncheckedEntries(sections);
-    final checked = <_DashboardChecklistPreviewEntry>[];
+    final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
       for (final item in section.items) {
-        if (item.checked) {
-          checked.add((sectionId: section.id, item: item));
+        if (item.checked && item.isDueOnDay()) {
+          out.add((sectionId: section.id, item: item));
         }
       }
     }
-    return [...unchecked, ...checked];
+    sortChecklistPreviewEntriesBySchedule(out);
+    return out;
+  }
+
+  /// Web : critères du jour — non cochés puis cochés, tri date+heure la plus proche.
+  static List<_DashboardChecklistPreviewEntry> _webEntriesTodayUncheckedThenChecked(
+    List<ChecklistSectionData> sections,
+  ) {
+    return [
+      ..._orderedUncheckedEntriesToday(sections),
+      ..._orderedCheckedEntriesToday(sections),
+    ];
   }
 
   static List<_DashboardChecklistPreviewEntry> _previewEntriesSlice(
     List<ChecklistSectionData> sections, {
     required bool limitPreviewRows,
   }) {
-    final all = _orderedUncheckedEntries(sections);
+    final all = _orderedUncheckedEntriesToday(sections);
     if (!limitPreviewRows) return all;
     if (all.length <= _kDashboardChecklistPreviewMaxUncheckedRowsMobile) return all;
     return all.sublist(0, _kDashboardChecklistPreviewMaxUncheckedRowsMobile);
@@ -119,6 +132,15 @@ class DashboardChecklistPreview extends StatelessWidget {
                       entries[j].item.id,
                       v,
                     ),
+            schedule: entries[j].item.schedule ??
+                const ChecklistItemSchedule(),
+            onScheduleChanged: liteInteractionLocked
+                ? null
+                : (sched) => controller.updateItemSchedule(
+                      entries[j].sectionId,
+                      entries[j].item.id,
+                      sched,
+                    ),
             showDividerBelow: j < entries.length - 1,
           ),
       ],
@@ -132,7 +154,7 @@ class DashboardChecklistPreview extends StatelessWidget {
     required bool liteInteractionLocked,
     required VoidCallback? onLiteInteractionLockedTap,
   }) {
-    final entries = _webEntriesUncheckedThenChecked(sections);
+    final entries = _webEntriesTodayUncheckedThenChecked(sections);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -144,6 +166,14 @@ class DashboardChecklistPreview extends StatelessWidget {
               entries[j].item.label,
             ),
             checked: entries[j].item.checked,
+            schedule: entries[j].item.schedule ?? const ChecklistItemSchedule(),
+            onScheduleChanged: liteInteractionLocked
+                ? null
+                : (sched) => controller.updateItemSchedule(
+                      entries[j].sectionId,
+                      entries[j].item.id,
+                      sched,
+                    ),
             onToggle: liteInteractionLocked
                 ? () => onLiteInteractionLockedTap?.call()
                 : () => controller.toggleItem(
@@ -254,8 +284,9 @@ class DashboardChecklistPreview extends StatelessWidget {
           );
         }
 
-        final checklistAllDone = controller.totalItems > 0 &&
-            controller.checkedItems == controller.totalItems;
+        final totalToday = controller.totalItemsDueToday;
+        final checklistAllDone = totalToday > 0 &&
+            controller.checkedItemsDueToday == totalToday;
 
         if (checklistAllDone) {
           if (kIsWeb) {
@@ -501,49 +532,98 @@ class _WebChecklistCircleRow extends StatelessWidget {
   const _WebChecklistCircleRow({
     required this.label,
     required this.checked,
+    required this.schedule,
     required this.onToggle,
+    this.onScheduleChanged,
   });
 
   final String label;
   final bool checked;
+  final ChecklistItemSchedule schedule;
   final VoidCallback onToggle;
+  final ValueChanged<ChecklistItemSchedule>? onScheduleChanged;
+
+  static const double _markSize = 16;
+  static const double _markGap = 10;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onToggle,
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: _WebCircleMark(checked: checked),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      height: 1.35,
-                      color: checked
-                          ? PaychekWebTokens.accentMint
-                          : PaychekWebTokens.textGray400,
-                    ),
-                  ),
-                ),
-              ],
+    final summary = onScheduleChanged != null
+        ? checklistItemScheduleSummaryLine(context, schedule)
+        : null;
+    final summaryColor = schedule.isNonDailyDisplay
+        ? ChecklistTokens.scheduleCustomSummary
+        : DashboardTokens.accent.withValues(alpha: 0.92);
+
+    Widget rowContent = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: _WebCircleMark(checked: checked),
+        ),
+        const SizedBox(width: _markGap),
+        Expanded(
+          child: Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
+              color: checked
+                  ? PaychekWebTokens.accentMint
+                  : PaychekWebTokens.textGray400,
             ),
           ),
         ),
+        if (onScheduleChanged != null)
+          ChecklistScheduleCalendarButton(
+            schedule: schedule,
+            onScheduleChanged: onScheduleChanged!,
+          ),
+      ],
+    );
+
+    rowContent = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onToggle,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: rowContent,
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (summary != null)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: _markSize + _markGap,
+                right: 4,
+                top: ChecklistTokens.scheduleSummaryPaddingTop,
+                bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
+              ),
+              child: Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: ChecklistTokens.scheduleSummaryFontSize,
+                  height: 1.15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.15,
+                  color: summaryColor,
+                ),
+              ),
+            ),
+          rowContent,
+        ],
       ),
     );
   }

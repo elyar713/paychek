@@ -1,3 +1,4 @@
+import 'checklist_item_schedule.dart';
 import 'checklist_prompts.dart';
 
 /// Données d’une ligne de checklist (sans logique UI).
@@ -6,19 +7,34 @@ class ChecklistItemData {
     required this.id,
     required this.label,
     this.checked = false,
+    this.schedule,
   });
 
   final String id;
   final String label;
   final bool checked;
+  final ChecklistItemSchedule? schedule;
 
-  ChecklistItemData copyWith({String? label, bool? checked}) {
+  ChecklistItemData copyWith({
+    String? label,
+    bool? checked,
+    ChecklistItemSchedule? schedule,
+    bool clearSchedule = false,
+  }) {
     return ChecklistItemData(
       id: id,
       label: label ?? this.label,
       checked: checked ?? this.checked,
+      schedule: clearSchedule ? null : (schedule ?? this.schedule),
     );
   }
+
+  /// Rappel actif pour [day] (défaut : aujourd’hui).
+  bool isDueOnDay([DateTime? day]) =>
+      ChecklistItemSchedule.isDueOnDay(
+        ChecklistItemSchedule.effectiveSchedule(schedule),
+        day,
+      );
 }
 
 /// Groupe de lignes avec titre de section.
@@ -45,9 +61,31 @@ class ChecklistSectionData {
   }
 }
 
-/// 3 sections : Analyse technique, Gestion du risque, Psychologie.
+/// Sections par défaut (nouveaux utilisateurs) : news, analyse, risque, psy.
 List<ChecklistSectionData> defaultNouveauTradeSections() {
   return [
+    const ChecklistSectionData(
+      id: ChecklistPrompts.sectionIdNews,
+      title: ChecklistPrompts.sectionTitleNews,
+      items: [
+        ChecklistItemData(
+          id: ChecklistPrompts.itemIdNews1,
+          label: ChecklistPrompts.itemLabelNews1,
+        ),
+        ChecklistItemData(
+          id: ChecklistPrompts.itemIdNews2,
+          label: ChecklistPrompts.itemLabelNews2,
+        ),
+        ChecklistItemData(
+          id: ChecklistPrompts.itemIdNews3,
+          label: ChecklistPrompts.itemLabelNews3,
+        ),
+        ChecklistItemData(
+          id: ChecklistPrompts.itemIdNews4,
+          label: ChecklistPrompts.itemLabelNews4,
+        ),
+      ],
+    ),
     const ChecklistSectionData(
       id: ChecklistPrompts.sectionIdAnalyse,
       title: ChecklistPrompts.sectionTitleAnalyse,

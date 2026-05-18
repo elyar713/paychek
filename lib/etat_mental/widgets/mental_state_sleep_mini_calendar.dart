@@ -12,10 +12,12 @@ class MentalStateSleepMiniCalendar extends StatefulWidget {
   const MentalStateSleepMiniCalendar({
     super.key,
     required this.controller,
+    this.selectedDay,
     this.onDayTap,
   });
 
   final MentalStateController controller;
+  final DateTime? selectedDay;
   final void Function(DateTime date)? onDayTap;
 
   @override
@@ -79,13 +81,21 @@ class _MentalStateSleepMiniCalendarState
         for (var i = 0; i < leading; i++) {
           cells.add(const SizedBox(height: 44));
         }
+        final selected = widget.selectedDay == null
+            ? null
+            : MentalStateDateUtils.dateOnly(widget.selectedDay!);
         for (var day = 1; day <= daysInMonth; day++) {
           final date = DateTime(y, m, day);
+          final d = MentalStateDateUtils.dateOnly(date);
           cells.add(_DayCell(
             date: date,
             today: today,
+            isSelected: selected != null &&
+                MentalStateDateUtils.isSameDate(d, selected),
             pct: c.overallScoreForCalendarDay(date),
-            onTap: widget.onDayTap == null ? null : () => widget.onDayTap!(date),
+            onTap: widget.onDayTap == null
+                ? null
+                : () => widget.onDayTap!(date),
           ));
         }
         while (cells.length % 7 != 0) {
@@ -177,12 +187,14 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.date,
     required this.today,
+    required this.isSelected,
     required this.pct,
     this.onTap,
   });
 
   final DateTime date;
   final DateTime today;
+  final bool isSelected;
   final double? pct;
   final VoidCallback? onTap;
 
@@ -194,15 +206,18 @@ class _DayCell extends StatelessWidget {
 
     Color? pctColor;
     if (pct != null && !isFuture) {
-      final s = pct!;
-      if (s >= 70) {
-        pctColor = MentalStateTokens.matteGreen;
-      } else if (s >= 45) {
-        pctColor = const Color(0xFFE5E5E5);
-      } else {
-        pctColor = MentalStateTokens.matteRed;
-      }
+      pctColor = MentalStateTokens.ringStrokeForScore(pct!);
     }
+
+    final borderColor = isSelected
+        ? (pctColor ??
+            (isToday
+                ? MentalStateTokens.matteGreen.withValues(alpha: 0.85)
+                : const Color(0xFF6E6E6E).withValues(alpha: 0.65)))
+        : (isToday
+            ? MentalStateTokens.matteGreen.withValues(alpha: 0.7)
+            : null);
+    final borderWidth = isSelected ? 1.25 : (isToday ? 1.1 : 0.0);
 
     return SizedBox(
       height: 44,
@@ -214,10 +229,8 @@ class _DayCell extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              border: isToday
-                  ? Border.all(
-                      color: MentalStateTokens.matteGreen.withValues(alpha: 0.7),
-                    )
+              border: borderColor != null
+                  ? Border.all(color: borderColor, width: borderWidth)
                   : null,
             ),
             child: Column(

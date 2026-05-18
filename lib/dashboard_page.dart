@@ -241,6 +241,7 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   void _onChecklistCloudTick() {
+    if (_checklistController.isEditingChecklist) return;
     unawaited(_checklistController.reloadFromStorage());
   }
 
@@ -873,7 +874,12 @@ class _DashboardPageState extends State<DashboardPage>
                               setState(() => _overlayPage = _overlayNone),
                         ),
                       ),
-                    _overlayHelpCenter => const HelpCenterPage(),
+                    _overlayHelpCenter => HelpCenterPage(
+                        onCloseInShell: () {
+                          if (!mounted) return;
+                          setState(() => _overlayPage = _overlayNone);
+                        },
+                      ),
                     _overlaySupportFeedback => SupportFeedbackPage(
                         onCloseInShell: () {
                           if (!mounted) return;
@@ -885,9 +891,18 @@ class _DashboardPageState extends State<DashboardPage>
                               _overlayPage = _overlayHelpCenter);
                         },
                       ),
-                    _overlayCgv => const ReglageCgvTermsPage(),
-                    _overlayPrivacyPolicy =>
-                        const ReglagePrivacyPolicyPage(),
+                    _overlayCgv => ReglageCgvTermsPage(
+                        onCloseInShell: () {
+                          if (!mounted) return;
+                          setState(() => _overlayPage = _overlayNone);
+                        },
+                      ),
+                    _overlayPrivacyPolicy => ReglagePrivacyPolicyPage(
+                        onCloseInShell: () {
+                          if (!mounted) return;
+                          setState(() => _overlayPage = _overlayNone);
+                        },
+                      ),
                     _ => const SizedBox.shrink(),
                   },
                 ),

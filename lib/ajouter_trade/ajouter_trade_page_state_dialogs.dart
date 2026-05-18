@@ -233,10 +233,7 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
       _avantNews = false;
       _apresNews = false;
 
-      _checklistRespectPct = 50;
-      _etatMomentPct = 50;
       _strategieRespectPct = 50;
-      _planRespectPct = 50;
 
       _strategieChoisie = strategieSetupDefaultCardDataList().first.title;
       _strategieNonRespectIds = {};
@@ -261,23 +258,7 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
       _clearPerfLitePreserve();
     });
 
-    AnalyseReportsStorage.loadAll().then((stored) {
-      if (!mounted) return;
-      final pick = pickStoredAnalyseReportDefaultPreferGold(stored);
-      if (pick != null) {
-        setState(() => _planAnalyseSelectedReport = pick);
-      } else {
-        final appLoc = Localizations.localeOf(context);
-        final platformLoc = WidgetsBinding.instance.platformDispatcher.locale;
-        if (appLoc.languageCode != platformLoc.languageCode) {
-          setState(() {
-            _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(
-              appLoc,
-            );
-          });
-        }
-      }
-    });
+    _refreshPlanAnalyseFromStorage();
 
     _requestGainRecalc();
   }

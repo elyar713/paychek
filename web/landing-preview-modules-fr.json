@@ -1,0 +1,344 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "Tradez avec la discipline d'un pro, pas avec vos émotions.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Capital & Balance :",
+        "body": "Votre santé financière immédiatement visible."
+      },
+      {
+        "icon": "fa-sticky-note",
+        "label": "Votre analyse :",
+        "body": "Ne cherchez plus vos notes. Votre analyse est affichée clairement pour valider votre biais en une seconde."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Checklist :",
+        "body": "Cliquez et validez vos règles de stratégie directement sur l'écran principal."
+      },
+      {
+        "icon": "fa-gauge",
+        "label": "État Mental :",
+        "body": "Une jauge visuelle pour savoir si vous êtes en état de cliquer ou s'il faut s'arrêter."
+      },
+      {
+        "icon": "fa-calendar-alt",
+        "label": "Calendrier :",
+        "body": "Votre progression gravée dans le temps."
+      },
+      {
+        "icon": "fa-chess-knight",
+        "label": "Votre Stratégie :",
+        "body": "Toujours sous vos yeux."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-dashboard.png",
+      "images/landing-preview-dashboard-2.png"
+    ],
+    "imgAlts": [
+      "Aperçu du terminal PAYCHEK — Dashboard",
+      "Aperçu PAYCHEK — état mental, stratégie et calendrier"
+    ]
+  },
+  "checklist": {
+    "title": "Checklist",
+    "lead": "Votre \"Feu Vert\" avant chaque trade",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Validation 360° :",
+        "body": "Technique, Risque, Psychologie. Vérifiez tous vos paramètres avant de cliquer."
+      },
+      {
+        "icon": "fa-circle-notch",
+        "label": "Progression Visuelle :",
+        "body": "Le cercle se remplit à mesure que vous validez vos étapes. Ne cliquez sur \"Buy\" ou \"Sell\" que lorsque le cercle est complet."
+      },
+      {
+        "icon": "fa-link",
+        "label": "Zéro Oubli :",
+        "body": "Vos règles de gestion sont gravées dans votre routine."
+      },
+      {
+        "icon": "fa-file-pdf",
+        "label": "Export PDF :",
+        "body": "Gardez une preuve de votre discipline pour vos bilans."
+      }
+    ],
+    "img": "images/landing-preview-checklist.png",
+    "imgAlt": "Aperçu du module Checklist PAYCHEK"
+  },
+  "mental": {
+    "title": "Mental State",
+    "lead": "Le marché ne pardonne pas la fatigue. Paychek vous donne le feu vert psychologique pour trader avec une discipline de fer",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Indicateur de Performance :",
+        "body": "Un score global basé sur vos habitudes. Sommeil, sport, méditation : sachez instantanément si vous êtes en \"Peak Form\" pour dominer le marché."
+      },
+      {
+        "icon": "fa-sliders",
+        "label": "Analyse du Moment :",
+        "body": "Évaluez votre Focus, votre Énergie et votre Stress en un glissement de doigt. Si vos jauges sont dans le rouge, le Dashboard vous avertit avant l'erreur."
+      },
+      {
+        "icon": "fa-face-smile",
+        "label": "Gestion des Émotions :",
+        "body": "Excited ? Frustrated ? Neutral ? Identifiez vos biais émotionnels pour éviter le \"Revenge Trading\" ou l'euphorie toxique."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Routine de Pro :",
+        "body": "Validez vos rituels avant-session. Un trader préparé est un trader qui encaisse."
+      }
+    ],
+    "img": "images/landing-preview-mental.png",
+    "imgAlt": "Aperçu du module État mental PAYCHEK"
+  },
+  "analyse": {
+    "title": "Mon analyse",
+    "lead": "Gérez vos analyses et stratégies en temps réel : plan de trade, blocs détaillés et rapport de synthèse.",
+    "descPoints": [
+      {
+        "icon": "fa-file-lines",
+        "label": "Feuille de plan :",
+        "body": "Direction, timeframes, tendance, phase de marché et niveau de confiance sur un seul écran."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Blocs détaillés :",
+        "body": "Structure, indicateurs, SMC & liquidité, volume profile et capture graphique."
+      },
+      {
+        "icon": "fa-file-export",
+        "label": "Rapport :",
+        "body": "Vue synthèse avec confiance globale avant d'enregistrer dans votre historique lié à l'actif."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-analyse-1.png",
+      "images/landing-preview-analyse-2.png",
+      "images/landing-preview-analyse-3.png",
+      "images/landing-preview-analyse-4.png"
+    ],
+    "imgAlts": [
+      "PAYCHEK — rapport d'analyse (Weekly Swing)",
+      "PAYCHEK — fiches Structure, Indicateurs, SMC, Volume",
+      "PAYCHEK — feuille de plan Trading",
+      "PAYCHEK — résumé confiance et rapport"
+    ]
+  },
+  "strategie": {
+    "title": "My Strategy",
+    "lead": "La plupart des traders oublient leur plan dans le feu de l'action. Paychek l'affiche en permanence pour garantir votre discipline",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Configuration personnalisée :",
+        "body": "Définissez vos propres piliers techniques. C'est votre stratégie, pas celle d'un autre."
+      },
+      {
+        "icon": "fa-pen-to-square",
+        "label": "Arguments de conviction :",
+        "body": "Notez vos arguments pour chaque trade."
+      },
+      {
+        "icon": "fa-bullseye",
+        "label": "Focus immédiat :",
+        "body": "Ne perdez plus de temps à chercher votre plan. Il est affiché sur votre Dashboard pour vous garder aligné avec vos règles à chaque session."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Score de confiance :",
+        "body": "Évaluez la qualité de votre setup avant de l'exécuter pour éviter les trades de « basse qualité »."
+      }
+    ],
+    "img": "images/landing-preview-strategie.png",
+    "imgAlt": "Aperçu module Stratégie PAYCHEK — playbook, risque, sessions et setups"
+  },
+  "performance": {
+    "title": "Performance",
+    "lead": "Ne devinez plus vos erreurs, mesurez-les",
+    "descPoints": [
+      {
+        "icon": "fa-brain",
+        "label": "Analyse du Mindset :",
+        "body": "Visualisez l'impact réel de vos émotions sur vos profits en comparant vos trades par « Principe » et au « Feeling »."
+      },
+      {
+        "icon": "fa-clock",
+        "label": "Golden Hours :",
+        "body": "Découvrez vos heures les plus rentables pour concentrer vos efforts sur les moments où vous gagnez vraiment."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Statistiques de Session :",
+        "body": "Maîtrisez vos données de performance (Win Rate, RR, Volume) pour ajuster votre stratégie comme un professionnel."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Intensité de Trading :",
+        "body": "Déterminez votre nombre de trades idéal par jour pour éviter l'overtrading et protéger votre capital."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-performance-2.png",
+      "images/landing-preview-performance-3.png",
+      "images/landing-preview-performance-4.png"
+    ],
+    "imgAlts": [
+      "PAYCHEK — Performance : volume, lots et actifs les plus tradés",
+      "PAYCHEK — Performance : day & volume, performance hours et durée de position",
+      "PAYCHEK — Performance : discipline & impact, mindset et stratégie execution"
+    ]
+  },
+  "calendrier": {
+    "title": "Calendrier",
+    "lead": "Un historique visuel complet pour identifier vos forces et corriger vos erreurs passées.",
+    "desc": "Une vue mensuelle de vos gains et pertes. Visualisez vos séries de victoires et apprenez de vos jours rouges.",
+    "img": "images/landing-preview-calendrier.png",
+    "imgAlt": "PAYCHEK — Calendrier : vue mensuelle, cumul, métriques et récapitulatif"
+  },
+  "trade": {
+    "title": "Trade page",
+    "lead": "Ne vous contentez pas de passer des ordres. Archivez votre succès.",
+    "descPoints": [
+      {
+        "icon": "fa-book",
+        "label": "Le Journal de Bord :",
+        "body": "Retrouvez l'historique complet de vos positions avec un calcul automatique de votre rentabilité nette."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Analyse Technique :",
+        "body": "Documentez vos setups avec vos graphiques et vos arguments techniques pour ne jamais oublier le contexte d'un trade."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Bilan de Discipline :",
+        "body": "Identifiez immédiatement quelles règles de votre stratégie ont été respectées ou ignorées pour chaque position."
+      },
+      {
+        "icon": "fa-pen",
+        "label": "Notes Personnelles :",
+        "body": "Gardez une trace de vos émotions et de vos intuitions pour transformer chaque séance en une leçon de progression."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Statistiques de Trade :",
+        "body": "Maîtrisez vos chiffres clés : Risk/Reward réel, durée d'exposition et impact des commissions sur votre capital."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-trade-1.png",
+      "images/landing-preview-trade-2.png",
+      "images/landing-preview-trade-3.png"
+    ],
+    "imgAlts": [
+      "PAYCHEK — Trade : liste, filtres et P&L",
+      "PAYCHEK — Trade : fiche détaillée d'un trade",
+      "PAYCHEK — Trade : récapitulatif hebdomadaire et sessions"
+    ]
+  },
+  "pdf": {
+    "title": "Export PDF",
+    "lead": "Générez des rapports professionnels pour auditer votre progression et prouver votre régularité.",
+    "descPoints": [
+      {
+        "icon": "fa-chess-knight",
+        "label": "Stratégie Personnalisée :",
+        "body": "Exportez vos règles et vos piliers techniques pour conserver une trace officielle de votre plan de trading."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Analyse d'Actif :",
+        "body": "Archivez vos scénarios et vos captures de graphiques pour chaque actif travaillé durant la session."
+      },
+      {
+        "icon": "fa-file-lines",
+        "label": "Détails du Trade :",
+        "body": "Obtenez une fiche individuelle pour chaque position, incluant vos notes, votre setup et votre score de discipline."
+      },
+      {
+        "icon": "fa-calendar-week",
+        "label": "Revues Périodiques :",
+        "body": "Générez des rapports détaillés de vos trades de la semaine pour une analyse post-session approfondie."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Suivi de Performance :",
+        "body": "Compilez vos résultats journaliers, hebdomadaires et mensuels dans un document clair et structuré."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-pdf-1.png",
+      "images/landing-preview-pdf-2.png",
+      "images/landing-preview-pdf-3.png",
+      "images/landing-preview-pdf-4.png",
+      "images/landing-preview-pdf-5.png"
+    ],
+    "imgAlts": [
+      "PAYCHEK — Export PDF : performance journal (résumé + discipline)",
+      "PAYCHEK — Export PDF : rapport d'analyse (exécutif, structure, indicateurs)",
+      "PAYCHEK — Export PDF : playbook stratégie (règles, risk management, sessions)",
+      "PAYCHEK — Export PDF : trades week (récap et qualité)",
+      "PAYCHEK — Export PDF : détails d'un trade (discipline, stats, review)"
+    ]
+  },
+  "csv": {
+    "title": "Import CSV",
+    "lead": "9 logiciels acceptés : choisissez votre plateforme, importez votre export, Paychek reconnaît le format.",
+    "descPoints": [
+      {
+        "icon": "fa-file-csv",
+        "label": "Formats pris en charge :",
+        "body": "MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, Quantower, ATAS, Rithmic."
+      },
+      {
+        "icon": "fa-wand-magic-sparkles",
+        "label": "Import guidé :",
+        "body": "Sélection du logiciel dans la liste, puis fichier adapté à chaque source (CSV, HTML, etc.)."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Historique dans le journal :",
+        "body": "Vos positions importées rejoignent le journal pour stats, performance et exports PDF."
+      }
+    ],
+    "img": "images/landing-preview-csv.png",
+    "imgAlt": "PAYCHEK — Import CSV : choix du logiciel (MT4, MT5, TradingView, Tradovate, cTrader…)"
+  },
+  "ajouter": {
+    "title": "Page Trade",
+    "lead": "Saisissez vos trades avec la précision d'un algorithme et la clarté d'un professionnel.",
+    "descPoints": [
+      {
+        "icon": "fa-bolt",
+        "label": "Ajouter un Trade :",
+        "body": "Enregistrez vos positions en quelques secondes avec une interface intuitive conçue pour la rapidité d'exécution."
+      },
+      {
+        "icon": "fa-calculator",
+        "label": "Saisie Intelligente :",
+        "body": "Renseignez vos entrées, sorties et frais pour obtenir un calcul automatique et précis de votre profit net."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Validation du Plan :",
+        "body": "Identifiez immédiatement si votre trade respecte vos règles ou s'il s'agit d'une décision impulsive (Feeling)."
+      }
+    ],
+    "imgs": [
+      "images/landing-preview-ajouter-1.png",
+      "images/landing-preview-ajouter-2.png"
+    ],
+    "imgAlts": [
+      "PAYCHEK — Ajouter : saisie du trade (actif, lots, entrée/sortie, date)",
+      "PAYCHEK — Ajouter : principe/feeling, stratégie et checklist"
+    ]
+  }
+}

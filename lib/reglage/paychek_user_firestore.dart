@@ -61,7 +61,13 @@ const Duration _kAppLanguageFirestoreReadTimeout = Duration(seconds: 4);
 
 Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
   try {
-    await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
+    final guestPromoted =
+        await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
+    if (guestPromoted) {
+      final code = await ReglageLanguagePrefs.loadCode();
+      await paychekPushUserAppLanguageToFirestore(code);
+      return;
+    }
     final DocumentSnapshot<Map<String, dynamic>> snap;
     try {
       snap = await FirebaseFirestore.instance

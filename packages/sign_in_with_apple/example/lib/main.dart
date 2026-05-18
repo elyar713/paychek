@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
                     AppleIDAuthorizationScopes.fullName,
                   ],
                   webAuthenticationOptions: WebAuthenticationOptions(
-                    // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
+                    // Example-only: replace with your Services ID and redirect URI from Apple Developer (web/Android).
                     clientId:
                         'de.lunaone.flutter.signinwithappleexample.service',
                     redirectUri:
@@ -61,9 +61,6 @@ class _MyAppState extends State<MyApp> {
                             'https://flutter-sign-in-with-apple-example.glitch.me/callbacks/sign_in_with_apple',
                           ),
                   ),
-                  // TODO: Remove these if you have no need for them
-                  nonce: 'example-nonce',
-                  state: 'example-state',
                 );
 
                 // ignore: avoid_print

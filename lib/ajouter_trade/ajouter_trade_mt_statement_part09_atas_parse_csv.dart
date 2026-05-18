@@ -251,7 +251,15 @@ List<MtStatementTradeRow> parseAtasTradesCsv(String csvContent) {
   return _atasParseFromStringMatrix(matrix);
 }
 
-/// RÃ©sultat import `.xlsx` ATAS : [emptyReason] pour SnackBar si [rows] vide.
+/// Raison d'échec import `.xlsx` ATAS (localiser côté UI).
+enum AtasXlsxEmptyReason {
+  emptyFile,
+  invalidFormat,
+  journalSheetMissing,
+  noTradeRows,
+}
+
+/// Résultat import `.xlsx` ATAS : [emptyReason] pour SnackBar si [rows] vide.
 class AtasXlsxParseOutcome {
   const AtasXlsxParseOutcome({
     required this.rows,
@@ -259,7 +267,7 @@ class AtasXlsxParseOutcome {
   });
 
   final List<MtStatementTradeRow> rows;
-  final String? emptyReason;
+  final AtasXlsxEmptyReason? emptyReason;
 }
 
 /// Statistiques ATAS : **uniquement** la feuille **Journal** (ZIP/XML interne au `.xlsx`).
@@ -267,14 +275,13 @@ AtasXlsxParseOutcome parseAtasTradesXlsxOutcome(Uint8List bytes) {
   if (bytes.isEmpty) {
     return const AtasXlsxParseOutcome(
       rows: [],
-      emptyReason: 'Fichier vide.',
+      emptyReason: AtasXlsxEmptyReason.emptyFile,
     );
   }
   if (bytes.length < 4 || bytes[0] != 0x50 || bytes[1] != 0x4B) {
     return const AtasXlsxParseOutcome(
       rows: [],
-      emptyReason:
-          'Ce fichier nâ€™est pas un .xlsx Excel valide (en-tÃªte manquant). RÃ©exporte depuis ATAS.',
+      emptyReason: AtasXlsxEmptyReason.invalidFormat,
     );
   }
 
@@ -282,8 +289,7 @@ AtasXlsxParseOutcome parseAtasTradesXlsxOutcome(Uint8List bytes) {
   if (zipMatrix.length < 2) {
     return const AtasXlsxParseOutcome(
       rows: [],
-      emptyReason:
-          'Feuille Â« Journal Â» introuvable ou classeur illisible. VÃ©rifie lâ€™export Statistiques .xlsx.',
+      emptyReason: AtasXlsxEmptyReason.journalSheetMissing,
     );
   }
 
@@ -295,8 +301,7 @@ AtasXlsxParseOutcome parseAtasTradesXlsxOutcome(Uint8List bytes) {
   if (rows.isEmpty) {
     return const AtasXlsxParseOutcome(
       rows: [],
-      emptyReason:
-          'Aucune ligne de trade reconnue. Ouvre la feuille Journal : colonnes Instrument, Open time, Open/Close volume.',
+      emptyReason: AtasXlsxEmptyReason.noTradeRows,
     );
   }
   return AtasXlsxParseOutcome(rows: rows, emptyReason: null);

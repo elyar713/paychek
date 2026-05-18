@@ -1,0 +1,308 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "감정보다 검증 가능한 디스플린으로 운용하세요.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "자금과 잔고:",
+        "body": "유동성 건전성을 즉시 시각화합니다."
+      },
+      {
+        "icon": "fa-sticky-note",
+        "label": "분석 노트:",
+        "body": "스티커 헌팅 종료 검증 순간 근처에 노트 노출합니다."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "체크리스트:",
+        "body": "한 번 탭하면 모든 플레이북 룰이 중앙 명령에서 확정됩니다."
+      },
+      {
+        "icon": "fa-gauge",
+        "label": "멘탈 상태:",
+        "body": "지금 체결해도 되는지 혹은 멈추어야 하는지 바로 확인합니다."
+      },
+      {
+        "icon": "fa-calendar-alt",
+        "label": "캘린더:",
+        "body": "월별 에쿼티 흔적을 차곡 차곡 적재합니다."
+      },
+      {
+        "icon": "fa-chess-knight",
+        "label": "전략:",
+        "body": "플랜은 시선에서 놓치지 않습니다."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK 대시보드 미리보기",
+      "대시보드 멘탈 전략 콜라주"
+    ]
+  },
+  "checklist": {
+    "title": "Checklist",
+    "lead": "포지션 사이즈 결정 전 절차적인 출발 신호등.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "360도 검증:",
+        "body": "기술 리스크 심리 각도 주문 전 이중 검증합니다."
+      },
+      {
+        "icon": "fa-circle-notch",
+        "label": "시각적 완충링:",
+        "body": "모든 게이트가 닫힐 때만 헤일로 채워집니다 헤일로 완성 전까지 체결 보류입니다."
+      },
+      {
+        "icon": "fa-link",
+        "label": "망각 방지:",
+        "body": "자금 관리 규칙은 루틴 속에 새겨져 있습니다."
+      },
+      {
+        "icon": "fa-file-pdf",
+        "label": "PDF 감사:",
+        "body": "코치 또는 투자자 보고 순간 디스플린 증거를 내보냅니다."
+      }
+    ],
+    "imgAlt": "PAYCHEK 체크리스트 스크린샷"
+  },
+  "mental": {
+    "title": "마인드셋",
+    "lead": "피로는 시장이 부과 페널티 PAYCHEK는 생체 탑처럼 심리 이륙 승인을 관리합니다.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "퍼포먼스 나침반:",
+        "body": "수면 운동 명상 패턴 준비도 스코어로 피크 체류 여부 즉결합니다."
+      },
+      {
+        "icon": "fa-sliders",
+        "label": "순간 스냅샷:",
+        "body": "집중 에너지 스트레스 스와이프 한 번 레드 게이지면 선제 경보."
+      },
+      {
+        "icon": "fa-face-smile",
+        "label": "감정 텔레메트리:",
+        "body": "흥분 좌절 중립 태깅 리벤지 루프 말립니다."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "프리 세션 루틴:",
+        "body": "준비가 탄탄한 트레이더만 루틴을 수익 루프로 전환합니다."
+      }
+    ],
+    "imgAlt": "PAYCHEK 마인드 모듈"
+  },
+  "analyse": {
+    "title": "분석 스튜디오",
+    "lead": "계획 기술 심층 블록 브리핑 레이어를 한 유리면에 두었습니다.",
+    "descPoints": [
+      {
+        "icon": "fa-file-lines",
+        "label": "플랜 시트:",
+        "body": "방향 타임프레임 추세 레짐 신뢰 맵 한 패널에 모읍니다."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "심층 카드 묶음:",
+        "body": "구조 SMC 유동성 볼륨 프로필 차트 스냅을 묶었습니다."
+      },
+      {
+        "icon": "fa-file-export",
+        "label": "요약 브리핑:",
+        "body": "자산 히스토리와 신뢰 점수로 기록 완충합니다."
+      }
+    ],
+    "imgAlts": [
+      "주간 분석 카드 PAYCHEK",
+      "구조 SMC 카드 더미 PAYCHEK",
+      "트레이딩 플랜 페이지 PAYCHEK",
+      "신뢰 롤업 PAYCHEK"
+    ]
+  },
+  "strategie": {
+    "title": "전략",
+    "lead": "세션 중 플레이북 증발을 막기 위해 PAYCHEK가 상시 피닝 디스플린 승리.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "커스텀 기둥:",
+        "body": "외부 베낀 템플릿 대신 우리 방법론 피드를 만듭니다."
+      },
+      {
+        "icon": "fa-pen-to-square",
+        "label": "컨빅션 로그:",
+        "body": "모든 거래 아이디어 근거를 텍스트로 남겨 증언합니다."
+      },
+      {
+        "icon": "fa-bullseye",
+        "label": "즉석 정렬:",
+        "body": "탭 헌팅 없이 규칙 대시보드에 상주합니다."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "셋업 점수:",
+        "body": "실행 전 품질 필터로 저급 셋업을 업스트림에서 제거."
+      }
+    ],
+    "imgAlt": "전략 모듈 리스크 세션 플레이북 PAYCHEK"
+  },
+  "performance": {
+    "title": "퍼포먼스",
+    "lead": "누수 위치 추측을 멈추고 KPI가 출혈을 지목합니다.",
+    "descPoints": [
+      {
+        "icon": "fa-brain",
+        "label": "마인드맵 분석:",
+        "body": "규칙 대 직관 트레이드 스택 비교 실제 감정 드래그량 가시화."
+      },
+      {
+        "icon": "fa-clock",
+        "label": "골든 아워 레이더:",
+        "body": "기대값 밀도가 높은 창구만 선택적 집중."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "세션 텔레메트리:",
+        "body": "승률 페이오프 트레이딩량으로 데스크 모델 튜닝 복제 가능."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "세션 강도 가드:",
+        "body": "일일 거래 건 한도 과매매로 자본 교란 차단합니다."
+      }
+    ],
+    "imgAlts": [
+      "퍼포먼스 거래량 심볼 히트맵 PAYCHEK",
+      "퍼포먼스 시간대 페이오프 체류 PAYCHEK",
+      "디스플린 실행 상호 PAYCHEK"
+    ]
+  },
+  "calendrier": {
+    "title": "캘린더",
+    "lead": "색 히스토리로 강점 부각 과거 미스 크랙 축소.",
+    "desc": "월별 PnL 연승과 적신호 날 패턴 학습 데이터만 남김 무신 신화 배제.",
+    "imgAlt": "캘린더 누적 메트릭 모자이크 PAYCHEK"
+  },
+  "trade": {
+    "title": "트레이드 북",
+    "lead": "클릭을 넘어 기관형 스토리 아카이빙.",
+    "descPoints": [
+      {
+        "icon": "fa-book",
+        "label": "연대기 원장:",
+        "body": "티켓마다 순익 기대값 자동 연산 패널 포함."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "테크 두시어:",
+        "body": "차트 논증 병렬로 추후 회고 시 컨텍스트 재건 불필요."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "디스플린 포렌식:",
+        "body": "규칙 존중 대 충동 침식 즉시 라벨."
+      },
+      {
+        "icon": "fa-pen",
+        "label": "리플렉션 저널:",
+        "body": "감정 통찰 적재 hindsight가 플레이북 반복 학습 재료입니다."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "마이크로 KPI:",
+        "body": "실제 페이오프 비율 체류시간 커미션 누수 핵심 수치 고정."
+      }
+    ],
+    "imgAlts": [
+      "거래 목록 필터 PAYCHEK",
+      "티켓 드릴 다운 PAYCHEK",
+      "주간 세션 리캡 PAYCHEK"
+    ]
+  },
+  "pdf": {
+    "title": "PDF 내보내기",
+    "lead": "투자 담당 또는 미래의 나에게 반복 프로세스를 증명하는 PDF 패키지.",
+    "descPoints": [
+      {
+        "icon": "fa-chess-knight",
+        "label": "전략 포트폴리오:",
+        "body": "규정 테크 기둥을 서명 수준 패키지로 보관합니다."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "종목 리뷰실:",
+        "body": "시나리오와 캡처 세션 종료 순간별 아카이브."
+      },
+      {
+        "icon": "fa-file-lines",
+        "label": "티켓 시트:",
+        "body": "체결마다 저널 규칙 태깅 디스플린 스코어 기록합니다."
+      },
+      {
+        "icon": "fa-calendar-week",
+        "label": "주기 감사:",
+        "body": "주간 디브리프 자동 패키지로 구조 회고 제공."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "퍼포먼스 두시어:",
+        "body": "일중 주중 월간 결합 레포트 레디 PDF 패키지."
+      }
+    ],
+    "imgAlts": [
+      "PDF 일간 요약 디스플린 PAYCHEK",
+      "PDF 브리핑 패키지 PAYCHEK",
+      "PDF 플레이북 RM 세션 PAYCHEK",
+      "PDF 주간 rollup PAYCHEK",
+      "PDF 티켓 디테일 패킷 PAYCHEK"
+    ]
+  },
+  "csv": {
+    "title": "CSV 가져오기",
+    "lead": "9개 플랫폼 브라우즈 내보내기를 끌어다 놓으면 PAYCHEK가 스키마 인식합니다.",
+    "descPoints": [
+      {
+        "icon": "fa-file-csv",
+        "label": "통합 호환 목록:",
+        "body": "MT4 MT5 TradingView Tradovate cTrader NinjaTrader Quantower ATAS Rithmic."
+      },
+      {
+        "icon": "fa-wand-magic-sparkles",
+        "label": "가이드 수집:",
+        "body": "벤더 별 플로우 CSV HTML 무리한 리맵 필요 없음."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "단일 블로터 라인:",
+        "body": "가져오기 결과는 분석 PDF 파이프라인 그대로 승계."
+      }
+    ],
+    "imgAlt": "CSV 위자드 벤처 그리드 PAYCHEK"
+  },
+  "ajouter": {
+    "title": "트레이드 추가",
+    "lead": "알고리즘 수준 정밀도와 전문 디스크립션 명료함을 동시에.",
+    "descPoints": [
+      {
+        "icon": "fa-bolt",
+        "label": "저지연 블로터:",
+        "body": "마찰 저항 최소 입력 습관을 보호합니다."
+      },
+      {
+        "icon": "fa-calculator",
+        "label": "스마트 넷팅:",
+        "body": "진출 청산 수수료 자연스럽게 순 기대값 연산합니다."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "컨덕트 필터:",
+        "body": "규칙 준수 대 충동 체결을 즉석 마킹합니다."
+      }
+    ],
+    "imgAlts": [
+      "트레이드 추가 사이즈 태깅 PAYCHEK",
+      "체크리스트 포함 트레이드 추가 PAYCHEK"
+    ]
+  }
+}

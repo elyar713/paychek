@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../ajouter_trade/ajouter_trade_actifs.dart';
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
 import '../dashboard/dashboard_tokens.dart';
-import '../performance/performance_locale_copy.dart';
 import '../widgets/paychek_page_header.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
@@ -62,27 +61,12 @@ class _CalculatricePageState extends State<CalculatricePage> {
   bool _settingStartBalanceFromStore = false;
 
   bool get _embeddedInTabShell => widget.onCloseAsTab != null;
-  bool get _isFrench => Localizations.localeOf(context).languageCode == 'fr';
-
   void _handleLeadingBack() {
     if (_embeddedInTabShell) {
       widget.onCloseAsTab!.call();
     } else {
       Navigator.of(context).maybePop();
     }
-  }
-
-  String _calculatriceHeaderSubtitle() {
-    final code = Localizations.localeOf(context).languageCode;
-    return perf6(
-      code,
-      'Simulations rendement et ratio — valeurs indicatives.',
-      'Return and ratio simulations — indicative values only.',
-      'Simulaciones de retorno y ratio — valores orientativos.',
-      'Rendite- und Ratio-Simulationen — unverbindliche Werte.',
-      'Simulações de retorno e ratio — valores indicativos.',
-      '수익·비율 시뮬레이션 — 참고 수치.',
-    );
   }
 
   @override
@@ -154,7 +138,7 @@ class _CalculatricePageState extends State<CalculatricePage> {
       int.tryParse(c.text.trim().replaceAll(',', '.'));
 
   void _calculateTradeReturn() {
-    final isFr = _isFrench;
+    final l = AppLocalizations.of(context)!;
     final start = _parseNum(_startBalance);
     final trades = _parseInt(_trades);
     final winRate = _parseNum(_winRatePct);
@@ -163,25 +147,19 @@ class _CalculatricePageState extends State<CalculatricePage> {
 
     String? err;
     if (start == null || start <= 0) {
-      err = isFr ? 'Solde initial invalide.' : 'Invalid start balance.';
+      err = l.calcErrorInvalidBalance;
     }
     if (err == null && (trades == null || trades <= 0 || trades > 2000)) {
-      err = isFr
-          ? 'Le nombre de trades doit être entre 1 et 2000.'
-          : 'Trades must be between 1 and 2000.';
+      err = l.calcErrorTradesRange;
     }
     if (err == null && (winRate == null || winRate < 0 || winRate > 100)) {
-      err = isFr
-          ? 'Le win rate doit être entre 0 et 100.'
-          : 'Win rate must be between 0 and 100.';
+      err = l.calcErrorWinRateRange;
     }
     if (err == null && (riskPct == null || riskPct <= 0 || riskPct > 100)) {
-      err = isFr
-          ? 'Le risque (%) doit être entre 0 et 100.'
-          : 'Risk % must be between 0 and 100.';
+      err = l.calcErrorRiskRange;
     }
     if (err == null && (rr == null || rr <= 0 || rr > 1000)) {
-      err = isFr ? 'Risk:Reward invalide.' : 'Invalid risk:reward.';
+      err = l.calcErrorInvalidRiskReward;
     }
 
     if (err != null) {
@@ -221,27 +199,25 @@ class _CalculatricePageState extends State<CalculatricePage> {
   }
 
   void _calculateRatio() {
-    final isFr = _isFrench;
+    final l = AppLocalizations.of(context)!;
     final lot = _parseNum(_ratioLot);
     final entry = _parseNum(_ratioEntry);
     final sl = _parseNum(_ratioSl);
     final tp = _parseNum(_ratioTp);
 
     String? err;
-    if (lot == null || lot <= 0) err = isFr ? 'Lot invalide.' : 'Invalid lot size.';
+    if (lot == null || lot <= 0) err = l.calcErrorInvalidLot;
     if (err == null && (entry == null || entry <= 0)) {
-      err = isFr ? 'Prix d’entrée invalide.' : 'Invalid entry price.';
+      err = l.calcErrorInvalidEntry;
     }
     if (err == null && (sl == null || sl <= 0)) {
-      err = isFr ? 'Stop loss invalide.' : 'Invalid stop loss.';
+      err = l.calcErrorInvalidSl;
     }
     if (err == null && (tp == null || tp <= 0)) {
-      err = isFr ? 'Take profit invalide.' : 'Invalid take profit.';
+      err = l.calcErrorInvalidTp;
     }
     if (err == null && entry == sl) {
-      err = isFr
-          ? 'Entrée et SL ne peuvent pas être identiques.'
-          : 'Entry and SL cannot be identical.';
+      err = l.calcErrorEntrySlIdentical;
     }
 
     if (err != null) {
@@ -292,7 +268,7 @@ class _CalculatricePageState extends State<CalculatricePage> {
               PaychekPageHeader(
                 onBack: _handleLeadingBack,
                 title: l.plusCalculator,
-                subtitle: _calculatriceHeaderSubtitle(),
+                subtitle: l.calcHeaderSubtitleEstimates,
                 maxContentWidth: 1180,
               ),
               Expanded(
@@ -360,9 +336,7 @@ class _CalculatricePageState extends State<CalculatricePage> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              _isFrench
-                                  ? "Attention : ces calculs ne sont pas des chiffres contractuels. Ils servent uniquement à donner une idée."
-                                  : "Warning: these calculations are not contractual figures. They are only estimates.",
+                              l.calcDisclaimerEstimates,
                               style: t.bodySmall?.copyWith(
                                 color: DashboardTokens.muted.withValues(alpha: 0.95),
                                 fontWeight: FontWeight.w600,

@@ -215,6 +215,16 @@ extension _TradePageTimeframeWeekRow on _TradePageState {
         final weekDayLabels = weekDays
             .map((d) => DateFormat.E(localeTag).format(d))
             .toList();
+        final checklist = await checklistControllerReadyForPdfExport(
+          widget.checklistController,
+        );
+        final storedReports = await loadAnalyseReportsForPdfExport();
+        final disciplineAvgs = averageDisciplineDisplayForTrades(
+          weekTrades,
+          checklist,
+          storedReports,
+        );
+        if (!context.mounted) return;
         final bytes = await buildTradeTimeframePdf(
           l: lPdf,
           title: lPdf.tradePdfExportWeekTitle,
@@ -224,10 +234,10 @@ extension _TradePageTimeframeWeekRow on _TradePageState {
           avg: avg,
           pct: pct,
           winRatePct: winWeek,
-          avgChecklist: avgChecklist,
-          avgPlan: avgPlan,
-          avgStrategie: avgStrategie,
-          avgEtat: avgEtat,
+          avgChecklist: disciplineAvgs.checklist,
+          avgPlan: disciplineAvgs.plan,
+          avgStrategie: disciplineAvgs.strategie,
+          avgEtat: disciplineAvgs.etat,
           principeCount: principeCount,
           feelingCount: feelingCount,
           sessionCounts: sessionCounts,

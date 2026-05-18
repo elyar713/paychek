@@ -85,6 +85,137 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get tradeImportPickSoftwareFirst =>
+      'Elige una plataforma antes de importar.';
+
+  @override
+  String get tradeImportEmptyFile => 'Archivo vacío o ilegible.';
+
+  @override
+  String get tradeImportMt4HtmlOnly => 'MT4: usa una exportación HTML/HTM.';
+
+  @override
+  String get tradeImportTradingViewCsvOnly =>
+      'TradingView: usa una exportación CSV.';
+
+  @override
+  String get tradeImportCtraderHtmlOnly =>
+      'cTrader: usa un informe HTML/HTM (cuenta).';
+
+  @override
+  String get tradeImportTradovateOrdersCsv =>
+      'Tradovate: exporta Orders.csv (ejecuciones).';
+
+  @override
+  String get tradeImportTradovatePickOrdersCsv =>
+      'Tradovate: elige un archivo Orders.csv.';
+
+  @override
+  String get tradeImportNinjaGridCsv =>
+      'NinjaTrader: exporta una cuadrícula CSV (órdenes o ejecuciones).';
+
+  @override
+  String get tradeImportNinjaPickCsv =>
+      'NinjaTrader: elige un archivo CSV (cuadrícula).';
+
+  @override
+  String get tradeImportRithmicCsv =>
+      'Rithmic: usa una exportación CSV (Recent Orders).';
+
+  @override
+  String get tradeImportRithmicPickCsv => 'Rithmic: elige un archivo CSV.';
+
+  @override
+  String get tradeImportQuantowerCsv =>
+      'Quantower: usa una exportación CSV (Orders history).';
+
+  @override
+  String get tradeImportQuantowerPickCsv =>
+      'Quantower: elige un archivo CSV (Orders history).';
+
+  @override
+  String get tradeImportAtasXlsxReadFailed =>
+      'No se pudo leer el .xlsx (vacío o demasiado grande para el navegador). Inténtalo de nuevo.';
+
+  @override
+  String get tradeImportAtasPickCsvXlsx =>
+      'ATAS: elige un archivo CSV o .xlsx (Estadísticas).';
+
+  @override
+  String get tradeImportAtasXlsxEmptyFile => 'Archivo vacío.';
+
+  @override
+  String get tradeImportAtasXlsxInvalidFormat =>
+      'No es un .xlsx Excel válido (falta la cabecera). Vuelve a exportar desde ATAS.';
+
+  @override
+  String get tradeImportAtasXlsxJournalMissing =>
+      'Hoja Journal no encontrada o libro ilegible. Revisa la exportación Estadísticas .xlsx.';
+
+  @override
+  String get tradeImportAtasXlsxNoRows =>
+      'Ninguna fila de operación reconocida. Abre la hoja Journal: columnas Instrument, Open time, Open/Close volume.';
+
+  @override
+  String tradeImportNotImplemented(String source) {
+    return 'Importación $source aún no disponible.';
+  }
+
+  @override
+  String tradeImportEmptyMt5(String extension) {
+    return 'MT5 $extension: no se detectaron filas Position.';
+  }
+
+  @override
+  String get tradeImportEmptyTradingView =>
+      'TradingView CSV: no se detectaron posiciones cerradas.';
+
+  @override
+  String get tradeImportEmptyCtrader =>
+      'cTrader HTML: no se detectaron filas Historial.';
+
+  @override
+  String get tradeImportEmptyTradovate =>
+      'Tradovate CSV: no se detectó round-trip (entrada/salida).';
+
+  @override
+  String get tradeImportEmptyNinjaTrader =>
+      'NinjaTrader CSV: no se detectó round-trip (entrada/salida).';
+
+  @override
+  String get tradeImportEmptyAtas =>
+      'ATAS: ninguna fila reconocida (solo hoja Journal).';
+
+  @override
+  String get tradeImportEmptyGeneric =>
+      'No se reconoció ninguna posición para esta plataforma/archivo.';
+
+  @override
+  String tradeImportNoneNew(String source, String duplicates) {
+    return 'No se importaron operaciones nuevas desde $source$duplicates.';
+  }
+
+  @override
+  String tradeImportSummary(int count, String source, String duplicates) {
+    return '$count operación(es) importada(s) desde $source$duplicates.';
+  }
+
+  @override
+  String tradeImportDuplicatesSuffix(int count) {
+    return ' · $count duplicado(s) ignorado(s)';
+  }
+
+  @override
+  String tradeImportDuplicatesOnlySuffix(int count) {
+    return ' · $count duplicado(s)';
+  }
+
+  @override
+  String tradeImportFailed(String error) {
+    return 'Importación fallida: $error';
+  }
+
+  @override
   String get ajouterTradeSectionEtatMoment => 'ESTADO ACTUAL';
 
   @override
@@ -222,6 +353,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ajouterTradeDisciplinePlanTitle => 'Plan de análisis';
+
+  @override
+  String get ajouterTradeDisciplineConfidencePlanTitle => 'Plan de confianza';
 
   @override
   String get ajouterTradeDisciplinePlanSubtitle => 'Informe, comentarios';
@@ -990,6 +1124,58 @@ class AppLocalizationsEs extends AppLocalizations {
   String get calcWinsLosses => 'Victorias / Derrotas';
 
   @override
+  String get calcErrorInvalidBalance => 'Saldo inicial no válido.';
+
+  @override
+  String get calcErrorTradesRange =>
+      'El número de operaciones debe estar entre 1 y 2000.';
+
+  @override
+  String get calcErrorWinRateRange => 'El win rate debe estar entre 0 y 100.';
+
+  @override
+  String get calcErrorRiskRange => 'El riesgo (%) debe estar entre 0 y 100.';
+
+  @override
+  String get calcErrorInvalidRiskReward => 'Risk:Reward no válido.';
+
+  @override
+  String get calcErrorInvalidLot => 'Lote no válido.';
+
+  @override
+  String get calcErrorInvalidEntry => 'Precio de entrada no válido.';
+
+  @override
+  String get calcErrorInvalidSl => 'Stop loss no válido.';
+
+  @override
+  String get calcErrorInvalidTp => 'Take profit no válido.';
+
+  @override
+  String get calcErrorEntrySlIdentical =>
+      'Entrada y SL no pueden ser idénticos.';
+
+  @override
+  String get calcDisclaimerEstimates =>
+      'Atención: estos cálculos no son cifras contractuales. Solo sirven como referencia.';
+
+  @override
+  String get calcHeaderSubtitleEstimates =>
+      'Simulaciones de rendimiento y ratio — valores indicativos.';
+
+  @override
+  String get calcMarketIndex => 'Índice';
+
+  @override
+  String get calcMarketFutures => 'Futuros';
+
+  @override
+  String get calcMarketStock => 'Acción';
+
+  @override
+  String get calcMarketCommodities => 'Materias primas';
+
+  @override
   String get calcWorstBalance => 'Peor saldo';
 
   @override
@@ -1043,6 +1229,41 @@ class AppLocalizationsEs extends AppLocalizations {
       'Antes de tomar una posición, asegúrese de validar todos los criterios de su plan comercial.';
 
   @override
+  String get checklistDailyCalendarTitle => 'CHECKLIST POR DÍA';
+
+  @override
+  String get checklistDailyUncheckedTitle => 'NO MARCADOS';
+
+  @override
+  String get checklistDailyUncheckedNoActivity => 'Sin actividad este día.';
+
+  @override
+  String get checklistDailyUncheckedNoDue =>
+      'Ningún criterio previsto este día.';
+
+  @override
+  String get checklistDailyUncheckedAllDone =>
+      'Todos los criterios del día están marcados.';
+
+  @override
+  String get checklistDailyUncheckedNoHistory =>
+      'No hay detalles de checklist guardados para este día. El seguimiento de criterios no marcados está disponible desde hoy.';
+
+  @override
+  String get checklistItemNews1 =>
+      'Calendario económico revisado (FED, CPI, NFP, PIB…).';
+
+  @override
+  String get checklistItemNews2 => 'FOMC / FED: sin operar durante el anuncio.';
+
+  @override
+  String get checklistItemNews3 => 'CPI (inflación): hora e impacto previstos.';
+
+  @override
+  String get checklistItemNews4 =>
+      'NFP (empleo EE. UU.): ventana de riesgo identificada.';
+
+  @override
   String get checklistItemAnalyse1 =>
       'La tendencia de fondo (HTF) se alinea con mi idea.';
 
@@ -1090,6 +1311,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get checklistProgressCl => 'CL';
 
   @override
+  String get checklistSectionNews => 'NEWS · CALENDARIO ECONÓMICO';
+
+  @override
   String get checklistSectionAnalyse => 'ANÁLISIS TÉCNICO';
 
   @override
@@ -1097,6 +1321,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get checklistSectionRisque => 'GESTIÓN DE RIESGOS';
+
+  @override
+  String get checklistScheduleTitle => 'Item reminder';
+
+  @override
+  String get checklistScheduleDefaultHeading => '1 · Default rule';
+
+  @override
+  String get checklistScheduleModeDaily => 'Every day';
+
+  @override
+  String get checklistScheduleModeWeekly => 'Once a week';
+
+  @override
+  String get checklistScheduleModeSpecificDate => 'Specific date';
+
+  @override
+  String get checklistScheduleUserDateHeading => '2 · Chosen date';
+
+  @override
+  String get checklistSchedulePickDate => 'Pick a date';
+
+  @override
+  String get checklistScheduleWeekHeading => '3 · Day of week';
+
+  @override
+  String checklistScheduleNextOccurrence(String date) {
+    return 'Next date: $date';
+  }
+
+  @override
+  String get checklistScheduleWarningHeading => '4 · Alert time';
+
+  @override
+  String get checklistSchedulePickTime => 'Pick time';
+
+  @override
+  String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
 
   @override
   String get clearAll => 'Borrar todo';
@@ -1454,6 +1716,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get mentalRoutineFieldLabel =>
       'Nombre de la rutina (por ejemplo, deporte, lectura)';
+
+  @override
+  String get mentalDayDetailTitle => 'CRITERIOS DEL DÍA';
+
+  @override
+  String get mentalDayDetailNoData =>
+      'Sin datos para este día. Actualiza tu estado mental para guardarlos.';
+
+  @override
+  String get mentalDayDetailGlobalScore => 'PUNTUACIÓN GLOBAL';
 
   @override
   String get mentalGlobalScoreCalendarTitle => 'PUNTUACIÓN GLOBAL POR DÍA';
@@ -2033,8 +2305,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get profileSubscribeButton =>
-      'Pasar a Pro (49,90 \$ / año — suscripción)';
+  String get profileSubscribeButton => 'Pasar a Pro (desde 8,99 \$ / mes)';
 
   @override
   String get profileManageSubscriptionButton => 'Gestionar suscripción';
@@ -2097,6 +2368,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get authTerminalCtaSignup => 'Crear identidad';
+
+  @override
+  String get webLandingLoginSubtitle => 'Bienvenido de nuevo a Paychek.';
+
+  @override
+  String get webLandingSignupSubtitle => 'Únete a la élite de los traders.';
+
+  @override
+  String get webLandingLoginCta => 'INICIAR SESIÓN';
+
+  @override
+  String get webLandingSignupCta => 'PROBAR GRATIS';
+
+  @override
+  String get webLandingNoAccountLabel => '¿NO TIENES CUENTA?';
+
+  @override
+  String get webLandingRegisterLink => 'REGISTRARSE';
+
+  @override
+  String get webLandingAlreadyMemberLabel => '¿YA ERES MIEMBRO?';
+
+  @override
+  String get webLandingLoginLink => 'INICIAR SESIÓN';
 
   @override
   String get authTerminalEncryptedPrefix => 'Nodo cifrado:';
@@ -2334,10 +2629,86 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallProFeature9 => 'Exportación PDF';
 
   @override
-  String get paywallPriceAnnualHighlight => '49,90 \$ US / año';
+  String get paywallMobilePlanAnnualTitle => '1 año (12 meses)';
 
   @override
-  String get paywallPriceApproxPerMonth => 'Unos 4,15 \$ US / mes';
+  String get paywallMobilePlanQuarterlyTitle => '3 meses';
+
+  @override
+  String get paywallMobilePlanMonthlyTitle => '1 mes';
+
+  @override
+  String paywallMobilePlanPerMonthLine(String price) {
+    return 'Unos $price \$ US / mes';
+  }
+
+  @override
+  String get paywallMobilePlanPerMonthPrefix => 'Unos ';
+
+  @override
+  String get paywallMobilePlanPerMonthPriceSuffix => ' \$ US';
+
+  @override
+  String get paywallMobilePlanPerMonthEnd => ' / mes';
+
+  @override
+  String paywallMobilePlanTotalLine(String total) {
+    return '$total \$';
+  }
+
+  @override
+  String get paywallMobilePlanAnnualBilling => 'Facturado al año';
+
+  @override
+  String get paywallMobilePlanQuarterlyBilling => 'Cada 3 meses';
+
+  @override
+  String get paywallMobilePlanMonthlyBilling => 'Facturado al mes';
+
+  @override
+  String get paywallMobilePlanMonthlyCommitment => 'Compromiso mensual';
+
+  @override
+  String get paywallMobilePlanSavings44 => 'Ahorra un 44 %';
+
+  @override
+  String get paywallMobilePlanPopular => 'Popular';
+
+  @override
+  String get paywallMobileCompareFeatureCol => 'Función';
+
+  @override
+  String get paywallMobileRowTrades => 'Trades / mes';
+
+  @override
+  String get paywallMobileRowEntry => 'Entrada de datos';
+
+  @override
+  String get paywallMobileRowCalendar => 'Calendario';
+
+  @override
+  String get paywallMobileRowChecklist => 'Checklist';
+
+  @override
+  String get paywallMobileRowAnalysis => 'Generador de análisis';
+
+  @override
+  String get paywallMobileRowStrategy => 'Página Estrategia';
+
+  @override
+  String get paywallMobileRowStats => 'Estadísticas de rendimiento';
+
+  @override
+  String get paywallMobileRowMental => 'Estado mental';
+
+  @override
+  String get paywallMobileRowExport => 'Exportación PDF';
+
+  @override
+  String get paywallPriceAnnualHighlight => '59,99 \$ US / año';
+
+  @override
+  String get paywallPriceApproxPerMonth => 'Unos 4,99 \$ US / mes';
 
   @override
   String paywallTrialEndedBody(String date) {
@@ -2347,9 +2718,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get paywallLiteLimitedHint =>
       'En Lite solo quedan añadir un trade y el calendario. Lo demás requiere Pro.';
-
-  @override
-  String get paywallProPriceAnnual => 'Pro: 49,90 \$ US / año';
 
   @override
   String get paywallContinueFreemium => 'Seguir en Lite (acceso limitado)';
@@ -2411,9 +2779,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get supportFeedbackSubtitle => '¿Pregunta o idea? Estamos contigo.';
-
-  @override
-  String get supportFeedbackBack => 'Volver';
 
   @override
   String get supportActionEmailLabel => 'Correo';
@@ -2527,6 +2892,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get supportFormSubmitError => 'No se pudo enviar. Revisa la conexión.';
+
+  @override
+  String supportErrorEmailOpenFailed(String error) {
+    return 'No se pudo abrir el correo: $error';
+  }
+
+  @override
+  String get supportErrorEmailAppUnavailable =>
+      'No se pudo abrir la app de correo. Comprueba que tengas un cliente instalado.';
 
   @override
   String get supportFormSubmitSavedPartialAttachment =>
@@ -3207,6 +3581,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDashSectionEvolution => 'Evolución del capital';
 
   @override
+  String get settingsDashSectionLens => 'Paychek Lens';
+
+  @override
   String get tradingSection => 'Comercio';
 
   @override
@@ -3231,7 +3608,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsCgv1Body =>
-      'Las presentes CGV regulan la suscripción al acceso «Premium» a la aplicación Paychek, una herramienta de diario de trading y gestión de riesgos. El acceso se proporciona mediante suscripción anual, renovada automáticamente cada año hasta su cancelación.';
+      'Las presentes CGV regulan la suscripción al acceso «Pro» (Premium) a la aplicación Paychek, una herramienta de diario de trading y gestión de riesgos. El acceso se proporciona mediante suscripción mensual, trimestral o anual, renovada automáticamente en cada periodo hasta su cancelación.';
 
   @override
   String get settingsCgv2Title => '2. Servicios prestados';
@@ -3245,7 +3622,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsCgv3Body =>
-      'Suscripción directa: el precio es de 49,90 \$ USD al año (renovación automática hasta cancelación).\n\nOferta de socio: El acceso puede ofrecerse gratis si el usuario cumple las condiciones de referidos con uno de nuestros socios (Prop Firm o broker).\n\nPaychek se reserva el derecho de modificar los precios en cualquier momento para nuevos clientes.';
+      'Suscripción directa: los planes Pro se facturan en dólares estadounidenses (USD) a través de Stripe, con renovación automática hasta cancelación:\n• 8,99 \$ USD / mes\n• 20,97 \$ USD / 3 meses\n• 59,99 \$ USD / año\n\nOferta de socio: El acceso puede ofrecerse gratis si el usuario cumple las condiciones de referidos con uno de nuestros socios (Prop Firm o broker).\n\nPaychek se reserva el derecho de modificar los precios en cualquier momento para nuevos clientes.';
 
   @override
   String get settingsCgv4Title => '4. Derecho de desistimiento y reembolso';
@@ -3259,7 +3636,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsCgv5Body =>
-      'El acceso ofrecido mediante un socio está supeditado a la validación de la afiliación por dicho socio.\n\nSi el socio rechaza la afiliación (por incumplimiento de las normas de depósito o de trading), Paychek se reserva el derecho de revocar el acceso Premium o exigir el pago del precio estándar.';
+      'El acceso ofrecido mediante un socio está supeditado a la validación de la afiliación por dicho socio.\n\nSi el socio rechaza la afiliación (por incumplimiento de las normas de depósito o de trading), Paychek se reserva el derecho de revocar el acceso Premium o exigir el pago de las tarifas Pro vigentes.';
 
   @override
   String get settingsCgv6Title => '6. Advertencia de riesgos (Trading)';

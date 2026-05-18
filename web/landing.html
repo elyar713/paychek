@@ -5,6 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAYCHEK | Transformez vos données en profits</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            950: '#451a03',
+                        },
+                        dark: {
+                            950: '#000000',
+                            900: '#050505',
+                            800: '#0c0c0e',
+                            700: '#141416',
+                            600: '#1e1e21',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
@@ -206,16 +236,12 @@
             background: linear-gradient(to top, var(--pure-black), transparent);
         }
 
-        /* Pricing Styles */
-        .pricing-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
+        /* Pricing compare table (or compact) */
+        .pricing-compare-glow {
+            box-shadow: 0 0 20px -5px rgba(217, 119, 6, 0.15);
         }
-
-        .pricing-card.featured {
-            border-color: rgba(59, 130, 246, 0.5);
-            background: rgba(59, 130, 246, 0.02);
+        .pricing-pro-highlight-border {
+            border-left: 1px solid rgba(217, 119, 6, 0.25);
         }
 
         /* FAQ Styles */
@@ -396,17 +422,15 @@
     <nav class="glass-nav sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
             <div class="flex items-center gap-3 group cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.35)]" aria-hidden="true">
-                    <i class="fas fa-arrow-trend-up text-sm opacity-90"></i>
-                </div>
+                <img src="images/paychek-logo.svg" alt="" class="w-10 h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
                 <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
             </div>
             
             <div class="hidden lg:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
-                <a href="#preview-section" class="hover:text-white transition">Aperçu</a>
-                <a href="#processus" class="hover:text-white transition">Processus</a>
-                <a href="#pricing" class="hover:text-white transition">Tarifs</a>
-                <a href="#faq" class="hover:text-white transition">FAQ</a>
+                <a href="#preview-section" class="hover:text-white transition" data-i18n="nav.preview">Aperçu</a>
+                <a href="#processus" class="hover:text-white transition" data-i18n="nav.process">Processus</a>
+                <a href="#pricing" class="hover:text-white transition" data-i18n="nav.pricing">Tarifs</a>
+                <a href="#faq" class="hover:text-white transition" data-i18n="nav.faq">FAQ</a>
             </div>
 
             <div class="flex items-center gap-4 sm:gap-5 shrink-0">
@@ -440,8 +464,8 @@
                         </div>
                     </div>
                     <span class="hidden sm:inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
-                    <button type="button" onclick="paychekNotifyParentAuth('login')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition whitespace-nowrap">Connexion</button>
-                    <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                    <button type="button" data-paychek-auth="login" onclick="paychekNotifyParentAuth('login')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition whitespace-nowrap" data-i18n="nav.login">Connexion</button>
+                    <button type="button" data-paychek-auth="signup" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap" data-i18n="nav.signup">
                         S'inscrire
                     </button>
                 </div>
@@ -451,25 +475,25 @@
 
     <!-- Hero Section -->
     <header class="max-w-7xl mx-auto px-6 pt-32 text-center relative">
-        <div class="flex flex-wrap items-center justify-center gap-5 sm:gap-7 mb-8 md:mb-10" role="navigation" aria-label="Télécharger l'application">
-            <a href="https://play.google.com/store/apps/details?id=pro.paychek.app" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-google inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:brightness-110 hover:scale-[1.02]" aria-label="Télécharger sur Google Play">
+        <div class="flex flex-wrap items-center justify-center gap-5 sm:gap-7 mb-8 md:mb-10" role="navigation" data-paychek-store-nav data-i18n-aria="hero.storeNavAria" aria-label="Télécharger l'application">
+            <a href="https://play.google.com/store/apps/details?id=pro.paychek.app" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-google inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:brightness-110 hover:scale-[1.02]" data-i18n-aria="hero.googlePlayAria" aria-label="Télécharger sur Google Play">
                 <img src="images/badge-google-play-hero.png" alt="" decoding="async">
             </a>
-            <a href="https://apps.apple.com/app/paychek/id0000000000" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-appstore inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:scale-[1.02]" aria-label="Télécharger sur l'App Store">
+            <a href="https://apps.apple.com/app/paychek/id0000000000" target="_blank" rel="noopener noreferrer" class="paychek-store-badge-slot paychek-store-badge-appstore inline-flex shrink-0 items-stretch justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition hover:scale-[1.02]" data-i18n-aria="hero.appStoreAria" aria-label="Télécharger sur l'App Store">
                 <img src="images/badge-app-store-hero.png" alt="" decoding="async">
             </a>
         </div>
-        <h1 class="text-6xl md:text-8xl font-bold mb-6 md:mb-7 tracking-tighter leading-[0.9] paychek-hero-title">
+        <h1 class="text-6xl md:text-8xl font-bold mb-6 md:mb-7 tracking-tighter leading-[0.9] paychek-hero-title" data-i18n-html="hero.titleHtml">
             TRANSFORMEZ VOS <br> <span class="gradient-text">DONNÉES</span> EN PROFITS.
         </h1>
-        <p class="paychek-hero-tagline max-w-[36rem] mx-auto mb-10 md:mb-12 px-4 text-base sm:text-lg md:text-xl font-medium leading-snug md:leading-relaxed text-gray-400/95 tracking-tight">
+        <p class="paychek-hero-tagline max-w-[36rem] mx-auto mb-10 md:mb-12 px-4 text-base sm:text-lg md:text-xl font-medium leading-snug md:leading-relaxed text-gray-400/95 tracking-tight" data-i18n-html="hero.taglineHtml">
             Le journal de trading conçu pour transformer votre <span class="text-white font-semibold">discipline</span> en <span class="font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent">avantage statistique</span>
         </p>
         <div class="flex flex-col sm:flex-row gap-5 justify-center mb-32">
-            <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest">
+            <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest" data-i18n="hero.ctaStart">
                 Démarrer mon journal
             </button>
-            <button onclick="document.getElementById('preview-section').scrollIntoView({behavior: 'smooth'})" class="btn-secondary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest hover:text-white">
+            <button onclick="document.getElementById('preview-section').scrollIntoView({behavior: 'smooth'})" class="btn-secondary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest hover:text-white" data-i18n="hero.ctaExplore">
                 Explorer l'interface
             </button>
         </div>
@@ -521,7 +545,7 @@
             <!-- SECTION : PROCESSUS AVEC PHOTOS -->
             <div id="processus" class="max-w-6xl mx-auto border-t border-white/5 pt-20 mb-32 scroll-mt-32">
                 <div class="text-center mb-16">
-                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em]">Votre Parcours Vers le Sommet</h3>
+                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em]" data-i18n="process.title">Votre Parcours Vers le Sommet</h3>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -533,8 +557,8 @@
                         </div>
                         <div class="p-8 pt-0 text-center flex-grow">
                             <div class="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">1</div>
-                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Ajoutez votre trade</h5>
-                            <p class="text-gray-500 text-xs leading-relaxed">Saisissez vos positions en quelques secondes. Une interface pensée pour la rapidité.</p>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest" data-process-step-title>Ajoutez votre trade</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed" data-process-desc>Saisissez vos positions en quelques secondes. Une interface pensée pour la rapidité.</p>
                         </div>
                     </div>
 
@@ -546,8 +570,8 @@
                         </div>
                         <div class="p-8 pt-0 text-center flex-grow">
                             <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">2</div>
-                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Faites les points</h5>
-                            <p class="text-gray-500 text-xs leading-relaxed">Analysez chaque setup. Identifiez vos points forts et corrigez vos erreurs récurrentes.</p>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest" data-process-step-title>Faites les points</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed" data-process-desc>Analysez chaque setup. Identifiez vos points forts et corrigez vos erreurs récurrentes.</p>
                         </div>
                     </div>
 
@@ -559,125 +583,175 @@
                         </div>
                         <div class="p-8 pt-0 text-center flex-grow">
                             <div class="w-10 h-10 border-2 border-white/20 text-white rounded-full flex items-center justify-center font-bold text-sm mx-auto mb-6 -mt-5 relative z-20">3</div>
-                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest">Obtenez la performance</h5>
-                            <p class="text-gray-500 text-xs leading-relaxed">Visualisez votre progression. Prenez des décisions basées sur des données réelles.</p>
+                            <h5 class="text-lg font-bold mb-3 uppercase tracking-widest" data-process-step-title>Obtenez la performance</h5>
+                            <p class="text-gray-500 text-xs leading-relaxed" data-process-desc>Visualisez votre progression. Prenez des décisions basées sur des données réelles.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION : TARIFS -->
-            <section id="pricing" class="max-w-4xl mx-auto pt-20 scroll-mt-32">
-                <div class="text-center mb-16">
-                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em] mb-4">Prêt à passer au niveau supérieur ?</h3>
-                    <p class="text-gray-500 text-sm">Choisissez le plan qui correspond à votre ambition.</p>
+            <!-- SECTION : TARIFS (tableau comparatif Lite / Pro — or compact) -->
+            <section id="pricing" class="max-w-2xl mx-auto pt-16 scroll-mt-32">
+                <div class="text-center mb-4" data-pricing-head>
+                    <h3 class="text-xl md:text-2xl font-extrabold tracking-tight text-white mb-1" data-pricing-title>Choisissez votre formule <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">Pro</span></h3>
+                    <p class="text-gray-400 text-[11px] md:text-xs max-w-xs mx-auto" data-pricing-subtitle>Comparez nos fonctionnalités et débloquez la puissance maximale de vos analyses.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Lite Plan -->
-                    <div class="pricing-card p-10 rounded-[3rem] flex flex-col">
-                        <div class="mb-8">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-gray-500"></span>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Lite</span>
+                <div class="w-full max-w-xs mx-auto bg-dark-900 p-1 rounded-xl border border-dark-800 flex mb-5 relative" id="pricing-period-selector">
+                    <button type="button" onclick="paychekSelectPricingPeriod('1m')" id="btn-pricing-1m" class="relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 text-gray-400" data-pricing-period-btn="1m"><span data-pricing-period-label>1 Mois</span></button>
+                    <button type="button" onclick="paychekSelectPricingPeriod('3m')" id="btn-pricing-3m" class="relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 text-gray-400" data-pricing-period-btn="3m">
+                        <span data-pricing-period-label>3 Mois</span>
+                        <span class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-amber-500/10 text-gold-400 border border-gold-500/20 text-[7px] px-1 py-0.5 rounded-full font-bold" data-pricing-badge-22>-22%</span>
+                    </button>
+                    <button type="button" onclick="paychekSelectPricingPeriod('1y')" id="btn-pricing-1y" class="relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 text-black font-bold" data-pricing-period-btn="1y">
+                        <span data-pricing-period-label>1 An</span>
+                        <span class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-gold-500 text-black text-[7px] px-1 py-0.5 rounded-full font-bold shadow-lg shadow-gold-500/20" data-pricing-badge-44>ÉCO. 44%</span>
+                    </button>
+                    <div id="pricing-pill-indicator" class="absolute top-1 bottom-1 left-[calc(66.666%+4px)] right-1 bg-gradient-to-r from-gold-600 to-gold-500 rounded-lg transition-all duration-300 ease-out z-0 shadow-lg shadow-gold-600/10"></div>
+                </div>
+
+                <div id="pricing-compare" class="w-full bg-dark-900 rounded-2xl border border-dark-800 overflow-hidden pricing-compare-glow relative">
+                    <div class="grid grid-cols-2 border-b border-dark-800">
+                        <div class="p-4 md:p-5 flex flex-col justify-between bg-dark-950/40">
+                            <div>
+                                <span class="text-[8px] font-bold tracking-widest text-gray-500 uppercase" data-pricing-lite-standard>STANDARD</span>
+                                <h2 class="text-base md:text-lg font-bold text-white" data-pricing-lite-label>Lite</h2>
                             </div>
-                            <div class="flex items-baseline gap-1 mt-2">
-                                <span class="text-5xl font-bold">0$</span>
-                                <span class="text-gray-600 text-xs uppercase font-bold tracking-widest">/ à vie</span>
+                            <div class="mt-2">
+                                <span class="text-xl md:text-2xl font-black text-white" data-pricing-lite-free>Gratuit</span>
                             </div>
                         </div>
-                        <ul class="space-y-4 mb-10 flex-grow">
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> 30 trades / mois maximum
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> Saisie manuelle uniquement
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> Calendrier standard
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Checklist
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Générateur d'analyse
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Page Stratégie
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Statistiques performance
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> État mental
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Export PDF
-                            </li>
-                        </ul>
-                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-secondary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest">Commencer gratuitement</button>
-                    </div>
-
-                    <!-- Pro Plan -->
-                    <div class="pricing-card featured p-10 rounded-[3rem] flex flex-col relative overflow-hidden">
-                        <div class="absolute top-6 right-8 bg-blue-600 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Populaire</div>
-                        <div class="mb-8">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Pro</span>
+                        <div class="p-4 md:p-5 flex flex-col justify-between bg-gradient-to-b from-gold-950/10 to-transparent pricing-pro-highlight-border relative">
+                            <div class="absolute top-2 right-2">
+                                <span class="bg-gold-500 text-black text-[8px] font-extrabold px-1.5 py-0.5 rounded tracking-wider shadow-md" data-pricing-pro-badge>PRO</span>
                             </div>
-                            <div class="flex flex-col gap-1 mt-2">
+                            <div>
+                                <span class="text-[8px] font-bold tracking-widest text-gold-400 uppercase" data-pricing-pro-unlimited>ILLIMITÉ</span>
+                                <h2 class="text-base md:text-lg font-bold text-white" data-pricing-pro-label>Pro</h2>
+                            </div>
+                            <div class="mt-2">
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-5xl font-bold">49.90$</span>
-                                    <span class="text-gray-600 text-xs uppercase font-bold tracking-widest">/ an</span>
+                                    <span id="display-price" class="text-xl md:text-2xl font-black text-white transition-opacity duration-200">59,99 $</span>
+                                    <span id="display-period-label" class="text-gray-400 text-[10px] transition-opacity duration-200">/ an</span>
                                 </div>
-                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500/80 ml-1 mt-1">Sans engagement</span>
+                                <p id="display-saving" class="text-gold-300 text-[9px] font-semibold mt-0.5 transition-opacity duration-200">Soit environ 4,99 $ / mois</p>
                             </div>
                         </div>
-                        <ul class="space-y-4 mb-10 flex-grow">
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Trades illimités
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Import CSV + saisie manuelle
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Calendrier Pro
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Checklist
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Générateur d'analyse
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Page Stratégie
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Statistiques performance
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> État mental
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Export PDF
-                            </li>
-                        </ul>
-                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-white/10">Devenir Pro</button>
+                    </div>
+
+                    <div class="divide-y divide-dark-800/40">
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="trades">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-300">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Trades / mois</span>
+                                <span class="font-medium" data-pricing-lite-value>30 Trades / mois</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-gold-300 font-bold bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Trades / mois</span>
+                                <span data-pricing-pro-value>Illimité</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="entry">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-300">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Saisie</span>
+                                <span class="font-medium text-gray-400" data-pricing-lite-value>Saisie manuelle uniquement</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Saisie</span>
+                                <span data-pricing-pro-value>Import CSV + saisie manuelle</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="calendar">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-400">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Calendrier</span>
+                                <span data-pricing-lite-value>Calendrier standard</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-semibold bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Calendrier</span>
+                                <span data-pricing-pro-value>Calendrier Pro</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="checklist">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Checklist</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Checklist</span>
+                                <span data-pricing-pro-value>Checklist</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="analysis">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Analyse</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Analyse</span>
+                                <span data-pricing-pro-value>Générateur d'analyse</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="strategy">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Stratégie</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Stratégie</span>
+                                <span data-pricing-pro-value>Page Stratégie</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="performance">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Performances</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Performances</span>
+                                <span data-pricing-pro-value>Statistiques performance</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="psychology">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Psychologie</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Psychologie</span>
+                                <span data-pricing-pro-value>État mental</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 text-center text-[11px] md:text-xs" data-pricing-row="reports">
+                            <div class="p-2.5 bg-dark-950/10 flex flex-col justify-center items-center text-gray-600">
+                                <span class="text-gray-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-lite-label-row>Rapports</span>
+                                <span class="text-sm" data-pricing-lite-value>×</span>
+                            </div>
+                            <div class="p-2.5 pricing-pro-highlight-border flex flex-col justify-center items-center text-white font-medium bg-gold-950/5">
+                                <span class="text-gold-500 text-[9px] uppercase font-semibold tracking-wider mb-0.5" data-pricing-pro-label-row>Rapports</span>
+                                <span data-pricing-pro-value>Export PDF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 border-t border-dark-800 bg-dark-950/50 p-3 md:p-4 gap-3">
+                        <div class="flex items-center justify-center">
+                            <button type="button" disabled class="w-full max-w-[200px] py-2.5 px-3 rounded-lg border border-dark-800 bg-dark-950 text-gray-500 font-bold text-[10px] md:text-xs cursor-not-allowed uppercase tracking-wider" data-pricing-cta-current>ACTUEL</button>
+                        </div>
+                        <div class="flex items-center justify-center pricing-pro-highlight-border">
+                            <button type="button" id="cta-button" onclick="paychekNotifyParentAuth('signup')" class="w-full max-w-[200px] py-2.5 px-3 rounded-lg bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 hover:from-gold-500 hover:to-gold-300 text-black font-extrabold text-[10px] md:text-xs tracking-wide transition-all duration-300 transform active:scale-[0.98] shadow-lg shadow-gold-500/15">S'ABONNER MAINTENANT</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Bouton d'essai gratuit -->
-                <div class="mt-12 flex flex-col items-center">
+                <div class="mt-10 flex flex-col items-center">
                     <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-trial px-8 py-4 rounded-full flex items-center gap-4 group">
-                        <span class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center">
                             <i class="fas fa-play text-white text-[10px] ml-0.5"></i>
                         </span>
                         <div class="text-left">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-white leading-none mb-1">Démarrer mon essai gratuit</p>
-                            <p class="text-[9px] font-bold uppercase tracking-widest text-blue-400/80 leading-none">Accès complet pendant 7 jours</p>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-white leading-none mb-1" data-pricing-trial-main>Démarrer mon essai gratuit</p>
+                            <p class="text-[9px] font-bold uppercase tracking-widest text-gold-400/80 leading-none" data-pricing-trial-sub>Accès complet pendant 7 jours</p>
                         </div>
-                        <i class="fas fa-arrow-right text-blue-400 text-xs ml-4 transition-transform group-hover:translate-x-1"></i>
+                        <i class="fas fa-arrow-right text-gold-400 text-xs ml-4 transition-transform group-hover:translate-x-1"></i>
                     </button>
                 </div>
             </section>
@@ -685,8 +759,8 @@
             <!-- SECTION : FAQ -->
             <section id="faq" class="max-w-3xl mx-auto pt-32 pb-20 scroll-mt-32">
                 <div class="text-center mb-16">
-                    <h3 class="text-xl font-bold uppercase tracking-[0.3em] mb-4">Questions Fréquentes</h3>
-                    <p class="text-gray-500 text-xs uppercase tracking-widest">Tout ce que vous devez savoir sur PAYCHEK</p>
+                    <h3 class="text-xl font-bold uppercase tracking-[0.3em] mb-4" data-i18n="faq.title">Questions Fréquentes</h3>
+                    <p class="text-gray-500 text-xs uppercase tracking-widest" data-i18n="faq.subtitle">Tout ce que vous devez savoir sur PAYCHEK</p>
                 </div>
 
                 <div class="space-y-4">
@@ -772,12 +846,10 @@
                 <!-- Gauche : Logo & Slogan -->
                 <div class="flex flex-col gap-6">
                     <div class="flex items-center gap-3 group cursor-pointer">
-                        <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-transform group-hover:scale-110" aria-hidden="true">
-                            <i class="fas fa-arrow-trend-up text-sm opacity-90"></i>
-                        </div>
+                        <img src="images/paychek-logo.svg" alt="" class="w-10 h-10 shrink-0 transition-transform group-hover:scale-110" width="40" height="40" decoding="async" aria-hidden="true">
                         <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
                     </div>
-                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] leading-loose max-w-sm">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] leading-loose max-w-sm" data-i18n="footer.slogan">
                         Le terminal ultime pour les traders sérieux qui souhaitent transformer leurs données en stratégie rentable.
                     </p>
                     <div class="flex gap-4 mt-4">
@@ -881,6 +953,7 @@
         </div>
     </div>
 
+    <script src="landing-i18n.js"></script>
     <script>
         const previewData = {
             'dashboard': {
@@ -1125,6 +1198,60 @@
             }
         }
 
+        window.paychekPricingPeriod = '1y';
+
+        window.paychekSelectPricingPeriod = function paychekSelectPricingPeriod(period) {
+            window.paychekPricingPeriod = period;
+            var pricing = window.PAYCHEK_LANDING_PRICING_PERIODS || {};
+            var data = pricing[period];
+            if (!data) return;
+
+            var btn1m = document.getElementById('btn-pricing-1m');
+            var btn3m = document.getElementById('btn-pricing-3m');
+            var btn1y = document.getElementById('btn-pricing-1y');
+            var activeClass = 'relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 text-black font-bold';
+            var idleClass = 'relative z-10 flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-300 text-gray-400 hover:text-white';
+            if (btn1m) btn1m.className = period === '1m' ? activeClass : idleClass;
+            if (btn3m) btn3m.className = period === '3m' ? activeClass : idleClass;
+            if (btn1y) btn1y.className = period === '1y' ? activeClass : idleClass;
+
+            var pill = document.getElementById('pricing-pill-indicator');
+            if (pill) {
+                if (period === '1m') {
+                    pill.style.left = '4px';
+                    pill.style.right = 'calc(66.666% + 4px)';
+                } else if (period === '3m') {
+                    pill.style.left = 'calc(33.333% + 4px)';
+                    pill.style.right = 'calc(33.333% + 4px)';
+                } else if (period === '1y') {
+                    pill.style.left = 'calc(66.666% + 4px)';
+                    pill.style.right = '4px';
+                }
+            }
+
+            var priceEl = document.getElementById('display-price');
+            var periodEl = document.getElementById('display-period-label');
+            var savingEl = document.getElementById('display-saving');
+            var ctaEl = document.getElementById('cta-button');
+            if (!priceEl || !periodEl || !savingEl || !ctaEl) return;
+
+            priceEl.style.opacity = '0';
+            periodEl.style.opacity = '0';
+            savingEl.style.opacity = '0';
+            ctaEl.style.opacity = '0.8';
+
+            setTimeout(function () {
+                priceEl.textContent = data.price || '';
+                periodEl.textContent = data.label || '';
+                savingEl.textContent = data.saving || '';
+                ctaEl.textContent = data.cta || ctaEl.textContent;
+                priceEl.style.opacity = '1';
+                periodEl.style.opacity = '1';
+                savingEl.style.opacity = '1';
+                ctaEl.style.opacity = '1';
+            }, 150);
+        };
+
         function paychekNotifyParentAuth(mode) {
             paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
         }
@@ -1140,8 +1267,11 @@
         };
 
         function applyLandingLocaleUI(code) {
-            var meta = LANDING_LANG_META[code];
-            if (!meta) return;
+            var normalized = typeof landingNormalizeLocale === 'function'
+                ? landingNormalizeLocale(code)
+                : code;
+            var meta = LANDING_LANG_META[normalized];
+            if (!meta) return normalized;
             var img = document.getElementById('lang-trigger-flag');
             var span = document.getElementById('lang-trigger-code');
             if (img) {
@@ -1151,7 +1281,7 @@
             if (span) span.textContent = meta.trigger;
             document.querySelectorAll('[data-landing-lang]').forEach(function (el) {
                 var c = el.getAttribute('data-landing-lang');
-                if (c === code) {
+                if (c === normalized) {
                     el.classList.remove('text-gray-400');
                     el.classList.add('text-white');
                 } else {
@@ -1159,6 +1289,7 @@
                     el.classList.remove('text-white');
                 }
             });
+            return normalized;
         }
 
         function paychekNotifyParentLocale(code) {
@@ -1170,8 +1301,14 @@
                 ev.preventDefault();
                 ev.stopPropagation();
             }
-            applyLandingLocaleUI(code);
-            paychekNotifyParentLocale(code);
+            var normalized = typeof landingSaveLocale === 'function'
+                ? landingSaveLocale(code)
+                : applyLandingLocaleUI(code);
+            applyLandingLocaleUI(normalized);
+            if (typeof applyLandingTranslations === 'function') {
+                applyLandingTranslations(normalized);
+            }
+            paychekNotifyParentLocale(normalized);
         }
 
         window.addEventListener('message', function (event) {
@@ -1179,7 +1316,13 @@
                 if (typeof event.data !== 'string') return;
                 var data = JSON.parse(event.data);
                 if (!data || data.type !== 'paychek-locale-sync' || !data.code) return;
-                applyLandingLocaleUI(data.code);
+                var normalized = typeof landingSaveLocale === 'function'
+                    ? landingSaveLocale(data.code)
+                    : applyLandingLocaleUI(data.code);
+                applyLandingLocaleUI(normalized);
+                if (typeof applyLandingTranslations === 'function') {
+                    applyLandingTranslations(normalized);
+                }
             } catch (e) {}
         });
 
@@ -1235,7 +1378,18 @@
                     document.body.classList.add('paychek-in-app-shell');
                 }
             } catch (e) {}
-            paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-ready' }));
+            var initialLocale = typeof landingDetectInitialLocale === 'function'
+                ? landingDetectInitialLocale()
+                : 'fr';
+            if (typeof landingSaveLocale === 'function') {
+                landingSaveLocale(initialLocale);
+            }
+            applyLandingLocaleUI(initialLocale);
+            if (typeof applyLandingTranslations === 'function') {
+                applyLandingTranslations(initialLocale);
+            }
+            paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-ready', code: initialLocale }));
+            paychekNotifyParentLocale(initialLocale);
             previewCarouselIndex = 0;
             var dashTab = document.getElementById('tab-dashboard');
             if (dashTab && dashTab.classList.contains('active')) {

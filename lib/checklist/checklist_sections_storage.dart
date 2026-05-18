@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import 'checklist_item_schedule.dart';
 import 'checklist_models.dart';
 
 /// Persistance JSON de la checklist « Nouveau Trade » (sections + lignes).
@@ -13,6 +14,16 @@ abstract final class ChecklistSectionsStorage {
 
   static String get _key => paychekScopedPrefsKey(_kBase);
 
+  /// JSON d’une ligne (prefs + Firestore).
+  static Map<String, dynamic> encodeItem(ChecklistItemData item) {
+    return {
+      'id': item.id,
+      'label': item.label,
+      'checked': item.checked,
+      if (item.schedule != null) 'schedule': item.schedule!.toJson(),
+    };
+  }
+
   static Future<void> save(List<ChecklistSectionData> sections) async {
     final p = await SharedPreferences.getInstance();
     final raw = jsonEncode(
@@ -21,15 +32,7 @@ abstract final class ChecklistSectionsStorage {
             (s) => {
               'id': s.id,
               'title': s.title,
-              'items': s.items
-                  .map(
-                    (i) => {
-                      'id': i.id,
-                      'label': i.label,
-                      'checked': i.checked,
-                    },
-                  )
-                  .toList(),
+              'items': s.items.map(encodeItem).toList(),
             },
           )
           .toList(),
@@ -66,11 +69,13 @@ abstract final class ChecklistSectionsStorage {
           final iid = it['id'];
           final lab = it['label'];
           if (iid is! String || lab is! String) continue;
+          final sched = ChecklistItemSchedule.fromJson(it['schedule']);
           items.add(
             ChecklistItemData(
               id: iid,
               label: lab,
               checked: it['checked'] == true,
+              schedule: sched,
             ),
           );
         }

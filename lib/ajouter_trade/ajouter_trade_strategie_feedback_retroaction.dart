@@ -74,8 +74,6 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
     }
 
     final regles = StrategieFeedbackReference.mesReglesDor(locale);
-    final gestion = StrategieFeedbackReference.gestionRisque(locale);
-    final horaires = StrategieFeedbackReference.horairesSessions(locale);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,30 +108,6 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
             labelStyle: labelStyle,
             bodyStyle: bodyStyle,
             estNonRespecte: nonRespectSelection.contains('mes_regles_$i'),
-            onToggle: onToggleNonRespect,
-          ),
-        StrategieFeedbackSectionHeader(l.ajouterTradeStrategieRiskManagement, labelStyle),
-        for (var i = 0; i < gestion.length; i++)
-          StrategieFeedbackCheckRow(
-            l: l,
-            id: 'gestion_risque_$i',
-            titre: gestion[i].label,
-            corps: gestion[i].valeur,
-            labelStyle: labelStyle,
-            bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('gestion_risque_$i'),
-            onToggle: onToggleNonRespect,
-          ),
-        StrategieFeedbackSectionHeader(l.ajouterTradeStrategieHoursSessions, labelStyle),
-        for (var i = 0; i < horaires.length; i++)
-          StrategieFeedbackCheckRow(
-            l: l,
-            id: 'horaire_$i',
-            titre: horaires[i].titre,
-            corps: '${horaires[i].sousTitre}\n${horaires[i].creneau}',
-            labelStyle: labelStyle,
-            bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('horaire_$i'),
             onToggle: onToggleNonRespect,
           ),
         if (data != null) ...[

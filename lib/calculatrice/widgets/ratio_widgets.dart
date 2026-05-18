@@ -170,20 +170,20 @@ class _MarketPillDropdown extends StatelessWidget {
     BuildContext context,
     AjouterTradeAssetClass market,
   ) {
-    final isFr = Localizations.localeOf(context).languageCode == 'fr';
+    final l = AppLocalizations.of(context)!;
     switch (market) {
       case AjouterTradeAssetClass.forex:
         return 'Forex';
       case AjouterTradeAssetClass.indice:
-        return isFr ? 'Indice' : 'Index';
+        return l.calcMarketIndex;
       case AjouterTradeAssetClass.future:
-        return isFr ? 'Future' : 'Futures';
+        return l.calcMarketFutures;
       case AjouterTradeAssetClass.crypto:
         return 'Crypto';
       case AjouterTradeAssetClass.stock:
-        return isFr ? 'Action' : 'Stock';
+        return l.calcMarketStock;
       case AjouterTradeAssetClass.matieresPremieres:
-        return isFr ? 'Matières premières' : 'Commodities';
+        return l.calcMarketCommodities;
     }
   }
 

@@ -1,0 +1,308 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "Opere com a disciplina de um escritório profissional, não com ruído emocional.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Capital e saldo:",
+        "body": "Saúde de liquidez sempre visível."
+      },
+      {
+        "icon": "fa-sticky-note",
+        "label": "Nota estratégica:",
+        "body": "Acaba caça aos post-its bias fica onde o risco é aprovado."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Checklist:",
+        "body": "Um toque certifica todas as regras no painel comando."
+      },
+      {
+        "icon": "fa-gauge",
+        "label": "Estado mental:",
+        "body": "Ponteiros diz operar pausado ou encerre sessão."
+      },
+      {
+        "icon": "fa-calendar-alt",
+        "label": "Calendário:",
+        "body": "Curva mensal registra progresso."
+      },
+      {
+        "icon": "fa-chess-knight",
+        "label": "Sua estratégia:",
+        "body": "O plano não some do radar."
+      }
+    ],
+    "imgAlts": [
+      "preview dashboard PAYCHEK",
+      "dashboard PAYCHEK mental estrategia calendário"
+    ]
+  },
+  "checklist": {
+    "title": "Checklist",
+    "lead": "Sinal procedural verde antes dimensionar risco.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Validação 360:",
+        "body": "Técnico risco psique triplo cheque antes clicar."
+      },
+      {
+        "icon": "fa-circle-notch",
+        "label": "Arco visual:",
+        "body": "Anel fecha quando portões cerram só halo completo executa."
+      },
+      {
+        "icon": "fa-link",
+        "label": "Zero esquecimentos:",
+        "body": "Gestão scripted na rotina corporativa."
+      },
+      {
+        "icon": "fa-file-pdf",
+        "label": "PDF de auditoria:",
+        "body": "Selos tempo disciplina export coach investidor rápido."
+      }
+    ],
+    "imgAlt": "módulo checklist PAYCHEK screenshot"
+  },
+  "mental": {
+    "title": "Mental",
+    "lead": "Mercado penaliza burnout PAYCHEK é radar biométrico concede autorização só com solo firme.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Bússola performance:",
+        "body": "Score hábitos sono treino mindfulness pico real."
+      },
+      {
+        "icon": "fa-sliders",
+        "label": "Snapshot momento:",
+        "body": "Swipe foco energia stress gauges vermelhos alerta antes explode."
+      },
+      {
+        "icon": "fa-face-smile",
+        "label": "Telemetria emocional:",
+        "body": "Marcar euforia frustra neutro revenge loop não sobrevive."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Ritual warmup:",
+        "body": "Traders preparados monetizam preparação repetível."
+      }
+    ],
+    "imgAlt": "módulo mental PAYCHEK"
+  },
+  "analyse": {
+    "title": "Espaço análise",
+    "lead": "Dossiê vivo com plano técnico mais wrap executivo no mesmo vidro.",
+    "descPoints": [
+      {
+        "icon": "fa-file-lines",
+        "label": "Folha plano:",
+        "body": "Direção timeframes regime convicção num painel único."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Imersões profundas:",
+        "body": "Estrutura indicadores smart money liquidity volume snaps."
+      },
+      {
+        "icon": "fa-file-export",
+        "label": "Executive wrap:",
+        "body": "Fecha com índice confiança ligado histórico do símbolo."
+      }
+    ],
+    "imgAlts": [
+      "card analise PAYCHEK semanal",
+      "fichas estrutura indicadores SMC",
+      "plan sheet PAYCHEK",
+      "rollup confiança PAYCHEK"
+    ]
+  },
+  "strategie": {
+    "title": "Strategy",
+    "lead": "Em guerra playbook some PAYCHEK mantém visible disciplina ganha corrida.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Pilares custom:",
+        "body": "Framework espelho playbook nada viral terceiros."
+      },
+      {
+        "icon": "fa-pen-to-square",
+        "label": "Registro convicção:",
+        "body": "Tese texto cada ideia acionável."
+      },
+      {
+        "icon": "fa-bullseye",
+        "label": "Alinhamento imediato:",
+        "body": "Dashboard segura regras sem tab frenzy."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Score setup:",
+        "body": "Nota antes executar scalp ruim barrado upstream."
+      }
+    ],
+    "imgAlt": "estrategia PAYCHEK playbook risco sessões"
+  },
+  "performance": {
+    "title": "Performance",
+    "lead": "Pare fugas intuitivas medição objetiva onde capital sangra.",
+    "descPoints": [
+      {
+        "icon": "fa-brain",
+        "label": "Mapa mental:",
+        "body": "Trades princípio contra feeling revelam arrasto emocional."
+      },
+      {
+        "icon": "fa-clock",
+        "label": "Radar horários ouro:",
+        "body": "Só quando payoff mais denso você foca energia lá."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Telemetria sessão:",
+        "body": "Winrate payoff volume tweaking vibe mesa proprietária."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Guard intensidade:",
+        "body": "Teto trades dia evitar overtrade defesa capital."
+      }
+    ],
+    "imgAlts": [
+      "performance volume símbolo PAYCHEK",
+      "performance tempo payoff PAYCHEK",
+      "impacto disciplina mindset PAYCHEK"
+    ]
+  },
+  "calendrier": {
+    "title": "Calendário",
+    "lead": "Histórico cromático força aparecer erros cortados com precisão.",
+    "desc": "PnL mensal rachas vermelhas estudadas factual sem folclore.",
+    "imgAlt": "calendário PAYCHEK métricas recap"
+  },
+  "trade": {
+    "title": "Livro trades",
+    "lead": "Além do click arquiva história nível sala institucional.",
+    "descPoints": [
+      {
+        "icon": "fa-book",
+        "label": "Cronologia:",
+        "body": "Cada bilhete net expectancy autopilot."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Folder técnico:",
+        "body": "Gráficos tese lado a lado revisitas sem reaprender contexto."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Forense disciplina:",
+        "body": "Instantâneo regra obedecida vs impulso destaque vivo."
+      },
+      {
+        "icon": "fa-pen",
+        "label": "Journal reflexivo:",
+        "body": "Captura emoção intuição hindsight evolui playbook."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Micrometrics:",
+        "body": "RR real tempo exposicao bleed taxas KPI duro."
+      }
+    ],
+    "imgAlts": [
+      "trades filtros PAYCHEK",
+      "trade detalhe PAYCHEK",
+      "recap semanal sessões PAYCHEK"
+    ]
+  },
+  "pdf": {
+    "title": "Exportar PDF",
+    "lead": "Pacotes auditoria investidor futuro você com provas repetível processo.",
+    "descPoints": [
+      {
+        "icon": "fa-chess-knight",
+        "label": "Portfólio estratégia:",
+        "body": "Regras pilares arquivo assinado."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Reviews instrumentos:",
+        "body": "Cenarios prints sprint arquivo."
+      },
+      {
+        "icon": "fa-file-lines",
+        "label": "Fichas ticket:",
+        "body": "Notas playbook comportamento cada fill."
+      },
+      {
+        "icon": "fa-calendar-week",
+        "label": "Auditorias ritmo:",
+        "body": "Semana relatórios pós-trade estruturado."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Dossiers perf:",
+        "body": "Daily weekly mensal PDF briefing-ready."
+      }
+    ],
+    "imgAlts": [
+      "PDF resumo PAYCHEK",
+      "PDF briefing analítico PAYCHEK",
+      "PDF playbook PAYCHEK",
+      "PDF semanal trades PAYCHEK",
+      "PDF dossier ticket PAYCHEK"
+    ]
+  },
+  "csv": {
+    "title": "Importar CSV",
+    "lead": "Nove venues largar exports schema PAYCHEK autodetecta.",
+    "descPoints": [
+      {
+        "icon": "fa-file-csv",
+        "label": "Cobertura interop:",
+        "body": "MT4 MT5 TradingView Tradovate cTrader NinjaTrader Quantower ATAS Rithmic."
+      },
+      {
+        "icon": "fa-wand-magic-sparkles",
+        "label": "Assistent ingest:",
+        "body": "Flows vendor CSV HTML sem remap manual."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Blotter unificado:",
+        "body": "Import herda analytics PDF automatismo."
+      }
+    ],
+    "imgAlt": "wizard CSV PAYCHEK grade venues"
+  },
+  "ajouter": {
+    "title": "Adicionar trade",
+    "lead": "Precisão algoritmo mais clara discrição profissional.",
+    "descPoints": [
+      {
+        "icon": "fa-bolt",
+        "label": "Blotter veloz:",
+        "body": "Baixa frição journaling consistente."
+      },
+      {
+        "icon": "fa-calculator",
+        "label": "Net inteligente:",
+        "body": "Entradas saídas taxas netting automático expectancy."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Filtro comportamento:",
+        "body": "Flag instantâneo regra obedece contra impulsão."
+      }
+    ],
+    "imgAlts": [
+      "add trade PAYCHEK tamanhos",
+      "playbook checklist add trade PAYCHEK"
+    ]
+  }
+}

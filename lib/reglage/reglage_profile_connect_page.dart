@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../widgets/paychek_page_header.dart';
 export 'reglage_profile_connect_constants.dart';
 import 'reglage_profile_auth_panel.dart';
 import 'reglage_profile_connect_constants.dart';
@@ -23,7 +24,6 @@ class ReglageProfileConnectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final t = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: kReglageProfileMonoBg,
@@ -38,37 +38,11 @@ class ReglageProfileConnectPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (showBackButton)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                      child: Row(
-                        children: [
-                          InkWell(
-                            onTap: () => Navigator.of(context).pop(),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.chevron_left,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    l10n.accountPageTitle,
-                                    style: t.labelMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    PaychekPageHeader(
+                      onBack: () => Navigator.of(context).pop(),
+                      title: l10n.accountPageTitle,
+                      subtitle: l10n.profileViewDetailsSection,
+                      maxContentWidth: 520,
                     ),
                   Expanded(
                     child: SingleChildScrollView(

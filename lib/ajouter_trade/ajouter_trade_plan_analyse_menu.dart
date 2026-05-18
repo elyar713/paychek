@@ -4,6 +4,7 @@ import '../analyse/analyse_controller.dart';
 import '../analyse/analyse_default_demo_seed.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_reports_storage.dart';
+import '../analyse/analyse_tokens.dart';
 import '../dashboard/dashboard_tokens.dart';
 import 'ajouter_trade_shell_scope.dart';
 
@@ -31,11 +32,18 @@ class AjouterTradePlanAnalyseMenu extends StatefulWidget {
     this.showDemoReports = false,
     this.selectedSnapshot,
     this.onSelectedSnapshotChanged,
+    this.onReportsLoaded,
   });
 
   final bool showDemoReports;
   final AnalyseReportSnapshot? selectedSnapshot;
   final ValueChanged<AnalyseReportSnapshot?>? onSelectedSnapshotChanged;
+
+  /// Liste disque + rapport courant (confiance à jour pour le parent).
+  final void Function(
+    List<AnalyseReportSnapshot> reports,
+    AnalyseReportSnapshot? current,
+  )? onReportsLoaded;
 
   @override
   State<AjouterTradePlanAnalyseMenu> createState() =>
@@ -105,14 +113,23 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
       _reports = next;
       _selectedIdx = _selectedIdx.clamp(0, (_reports.length - 1).clamp(0, 999));
     });
+    _notifyReportsLoaded();
+  }
+
+  void _notifyReportsLoaded() {
+    widget.onReportsLoaded?.call(_reports, _currentSnapshot);
+  }
+
+  AnalyseReportSnapshot? get _currentSnapshot {
+    final sel = widget.selectedSnapshot;
+    if (sel != null) return sel;
+    if (!widget.showDemoReports || _reports.isEmpty) return null;
+    return _reports[_selectedIdx.clamp(0, _reports.length - 1)];
   }
 
   String get _fieldLabel {
     if (!widget.showDemoReports) return '—';
-    if (_reports.isEmpty) return '—';
-    final sel = widget.selectedSnapshot;
-    if (sel != null) return sel.actif;
-    return _reports[_selectedIdx.clamp(0, _reports.length - 1)].actif;
+    return _currentSnapshot?.actif ?? '—';
   }
 
   void _closeOverlay() {
@@ -215,32 +232,57 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
                                         horizontal: 8,
                                         vertical: 10,
                                       ),
-                                      child: Column(
+                                      child: Row(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            _reports[i].actif,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: i == _selectedIdx
-                                                  ? DashboardTokens
-                                                      .onMatteEmphasis
-                                                  : DashboardTokens.labelGrey,
-                                              fontWeight: FontWeight.w800,
-                                              fontSize: 12,
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                Text(
+                                                  _reports[i].actif,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: i == _selectedIdx
+                                                        ? DashboardTokens
+                                                            .onMatteEmphasis
+                                                        : DashboardTokens
+                                                            .labelGrey,
+                                                    fontWeight: FontWeight.w800,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  _reports[i].sousTitre,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    color:
+                                                        DashboardTokens.muted,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          const SizedBox(width: 8),
                                           Text(
-                                            _reports[i].sousTitre,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: DashboardTokens.muted,
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 11,
+                                            '${_reports[i].globalConfidencePercent}%',
+                                            style: TextStyle(
+                                              color: AnalyseTokens
+                                                  .confidenceColorForPercent(
+                                                _reports[i]
+                                                    .globalConfidencePercent,
+                                              ),
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         ],
@@ -306,6 +348,20 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
                     ),
                   ),
                 ),
+                if (_currentSnapshot != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_currentSnapshot!.globalConfidencePercent}%',
+                    style: TextStyle(
+                      color: AnalyseTokens.confidenceColorForPercent(
+                        _currentSnapshot!.globalConfidencePercent,
+                      ),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+                const SizedBox(width: 4),
                 const Icon(
                   Icons.expand_more,
                   size: 20,

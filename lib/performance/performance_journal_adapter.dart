@@ -1,3 +1,6 @@
+import '../checklist/checklist_page_controller.dart';
+import '../analyse/analyse_report_snapshot.dart';
+import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_models.dart' show TradeListItem, TradeMindset;
 import 'performance_trade_model.dart';
 
@@ -15,8 +18,31 @@ List<Trade> performanceTradesFromJournal(List<TradeListItem> items) {
   return items.map(tradeListItemToPerformanceTrade).toList();
 }
 
+/// Journal → Performance avec % discipline résolus (anneaux jour, confiance analyse).
+List<Trade> performanceTradesFromJournalForPdf(
+  List<TradeListItem> items, {
+  required ChecklistPageController checklist,
+  List<AnalyseReportSnapshot> storedReports = const [],
+}) {
+  return [
+    for (final t in items)
+      tradeListItemToPerformanceTrade(
+        t,
+        disciplineOverride: resolveTradeDisciplineDisplay(
+          trade: t,
+          checklist: checklist,
+          storedReports: storedReports,
+        ),
+      ),
+  ];
+}
+
 /// Un trade du journal → ligne pour stats Performance (durée, créneau horaire, P&L…).
-Trade tradeListItemToPerformanceTrade(TradeListItem t) {
+Trade tradeListItemToPerformanceTrade(
+  TradeListItem t, {
+  TradeDisciplineDisplay? disciplineOverride,
+}) {
+  final discipline = disciplineOverride;
   final date = DateTime(t.entreeAt.year, t.entreeAt.month, t.entreeAt.day);
   final timeOfDay =
       '${t.entreeAt.hour.toString().padLeft(2, '0')}:${t.entreeAt.minute.toString().padLeft(2, '0')}';
@@ -37,10 +63,10 @@ Trade tradeListItemToPerformanceTrade(TradeListItem t) {
     profit: profit,
     win: win,
     commission: t.commissionAmount,
-    checklistPct: t.checklistPct,
-    planPct: t.planPct,
-    strategiePct: t.strategiePct,
-    etatPct: t.etatPct,
+    checklistPct: discipline?.checklistPct ?? t.checklistPct,
+    planPct: discipline?.planPct ?? t.planPct,
+    strategiePct: discipline?.strategiePct ?? t.strategiePct,
+    etatPct: discipline?.etatPct ?? t.etatPct,
     mindsetPrincipe: t.mindset != TradeMindset.feeling,
     lotSize: parseLotSizeFromQuantiteLabel(t.quantiteLabel),
     strategieTitle: t.strategieTitle,
@@ -48,7 +74,7 @@ Trade tradeListItemToPerformanceTrade(TradeListItem t) {
     planNonRespectIds: Set<String>.from(t.planNonRespectIds),
     checklistNonRespectIds: Set<String>.from(t.checklistNonRespectIds),
     etatNonRespectIds: Set<String>.from(t.etatNonRespectIds),
-    planReport: t.planReport,
+    planReport: discipline?.planReport ?? t.planReport,
     psychTags: List<String>.from(t.psychTags),
     assetClass: t.assetClass,
     pair: t.pair,

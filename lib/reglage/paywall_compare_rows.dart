@@ -12,7 +12,7 @@ class PaywallCompareRow {
   final String? liteLabel;
   final bool liteIsCross;
   final String proLabel;
-  /// Badge doré / ambre pour « Analyses IA » (paywall Gold).
+  /// Badge doré / ambre pour « Analyse » (paywall Gold).
   final bool proIsChip;
 }
 

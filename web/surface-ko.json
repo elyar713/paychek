@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "title": "PAYCHEK | 데이터가 수익으로 이어지는 트레이딩 저널"
+  },
+  "nav": {
+    "preview": "미리보기",
+    "process": "프로세스",
+    "pricing": "요금제",
+    "faq": "FAQ",
+    "login": "로그인",
+    "signup": "가입하기"
+  },
+  "hero": {
+    "storeNavAria": "앱 다운로드",
+    "googlePlayAria": "Google Play에서 다운로드",
+    "appStoreAria": "App Store에서 다운로드",
+    "titleHtml": "데이터를 <br> <span class=\"gradient-text\">수익</span>으로 바꾸세요.",
+    "taglineHtml": "<span class=\"text-white font-semibold\">디스플린</span>을 검증 가능한 <span class=\"font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent\">통계적 우위</span>로 전환하기 위해 설계된 트레이딩 저널",
+    "ctaStart": "저널 시작하기",
+    "ctaExplore": "인터페이스 둘러보기"
+  },
+  "tabs": {
+    "dashboard": "대시보드",
+    "checklist": "체크리스트",
+    "mental": "멘탈 상태",
+    "analyse": "분석",
+    "strategie": "전략",
+    "performance": "퍼포먼스",
+    "calendrier": "캘린더",
+    "trade": "트레이드",
+    "ajouter": "트레이드 추가",
+    "pdf": "PDF 내보내기",
+    "csv": "CSV 가져오기"
+  },
+  "preview": {
+    "lightboxExpand": "클릭하여 확대",
+    "previewImgAria": "미리보기 확대",
+    "dialogAria": "확대된 미리보기",
+    "lightboxClose": "닫기",
+    "prevImg": "이전 이미지",
+    "nextImg": "다음 이미지"
+  },
+  "process": {
+    "title": "다음 단계까지의 로드맵",
+    "steps": [
+      {
+        "title": "트레이드 기록",
+        "desc": "속도 우선 UX로 포지션을 몇 초 만에 입력합니다.",
+        "imgAlt": "PAYCHEK 트레이드 추가 매수 레버리지 종목 로트 진입 청산"
+      },
+      {
+        "title": "정기 검토",
+        "desc": "셋업을 디테일하게 분석 반복되는 실수를 줄이고 강점을 강화합니다.",
+        "imgAlt": "PAYCHEK 플랜 검증 규칙 전략 감각"
+      },
+      {
+        "title": "성과 확인",
+        "desc": "감이 아니라 숫자로 진행 상황을 확인하세요.",
+        "imgAlt": "PAYCHEK Lens 디스플린 분석 전략 점수 임계값 알림"
+      }
+    ]
+  },
+  "pricing": {
+    "titleHtml": "<span class=\"text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500\">Pro</span> 플랜을 선택하세요",
+    "subtitle": "기능을 비교하고 분석의 최대 잠재력을 활용하세요.",
+    "period1m": "1개월",
+    "period3m": "3개월",
+    "period1y": "1년",
+    "badgeSave22": "-22%",
+    "badgeSave44": "44% 절약",
+    "liteStandard": "스탠다드",
+    "liteLabel": "Lite",
+    "liteFree": "무료",
+    "liteFeaturesBasic": "기본 기능",
+    "proUnlimited": "무제한",
+    "proLabel": "Pro",
+    "proBadge": "PRO",
+    "ctaCurrent": "현재",
+    "ctaSubscribe": "지금 구독",
+    "rowTrades": "월간 트레이드",
+    "rowEntry": "입력",
+    "rowCalendar": "캘린더",
+    "rowChecklist": "체크리스트",
+    "rowAnalysis": "분석",
+    "rowStrategy": "전략",
+    "rowPerformance": "성과",
+    "rowPsychology": "심리",
+    "rowReports": "리포트",
+    "liteTrades": "월 30건",
+    "liteEntry": "수동 입력만",
+    "liteCalendar": "표준 캘린더",
+    "liteAbsent": "×",
+    "proTrades": "무제한",
+    "proEntry": "CSV 가져오기 + 수동 입력",
+    "proCalendar": "프로 캘린더",
+    "proChecklist": "체크리스트",
+    "proAnalysis": "분석 생성기",
+    "proStrategy": "전략 페이지",
+    "proPerformance": "성과 통계",
+    "proPsychology": "멘탈 상태",
+    "proReports": "PDF보내기",
+    "periods": {
+      "1m": {
+        "price": "US$8.99",
+        "label": "/월",
+        "saving": "월간 결제",
+        "cta": "구독 - 1개월"
+      },
+      "3m": {
+        "price": "US$20.97",
+        "label": "/3개월",
+        "saving": "월 약 US$6.99",
+        "cta": "구독 - 3개월"
+      },
+      "1y": {
+        "price": "US$59.99",
+        "label": "/년",
+        "saving": "월 약 US$4.99",
+        "cta": "구독 - 1년"
+      }
+    },
+    "trialMain": "무료 체험 시작",
+    "trialSub": "7일간 Pro 전 기능"
+  },
+  "faq": {
+    "title": "자주 묻는 질문",
+    "subtitle": "가입 전 꼭 알아두실 PAYCHEK 정보",
+    "items": [
+      {
+        "q": "그냥 단순한 트레이딩 저널인가요?",
+        "aHtml": "<div class=\"text-xs leading-relaxed font-medium space-y-3 text-left\" lang=\"ko\"><p>네 그렇지만 동시에 그렇지도 않습니다.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> 네 깔끔한 UX 덕분에 FX 암호화폐 지수까지 몇 초 만에 기록 엑셀처럼 복잡하지 않습니다.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> 아니오 데이터를 고급 퍼포먼스 지표와 심리 감사로 바꿔 디스플린을 증명할 수 있습니다.</p><p>결론 입력은 간단하지만 결과는 프로 수준입니다.</p></div>"
+      },
+      {
+        "q": "데이터 보안은 어떻게 되나요?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">전 구간 암호화가 적용됩니다 우리는 트레이딩 통계를 팔지 않으며 데이터 주권은 항상 사용자에게 있습니다.</p>"
+      },
+      {
+        "q": "무료 체험은 어떻게 작동하나요?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">가입 즉시 7일간 Pro 기능 전체 이용 가능 기간 종료 후 Lite 또는 Pro 중 선택 가능합니다.</p>"
+      },
+      {
+        "q": "구독을 언제든 해지할 수 있나요?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">네 장기 계약 없이 계정 설정에서 Pro를 해지할 수 있으며 이미 결제한 기간까지는 접속 가능합니다.</p>"
+      },
+      {
+        "q": "어떤 시장에 사용할 수 있나요?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">FX 크립토 인덱스 원자재 주식까지 다양한 자산 클래스를 같은 저널로 추적 가능합니다.</p>"
+      },
+      {
+        "q": "모바일도 지원하나요?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">네 즉각 기록과 실시간 동기화 거친 후 데스크톱에서 심층 리뷰가 가능합니다.</p>"
+      }
+    ]
+  },
+  "footer": {
+    "slogan": "실전 데이터가 반복 가능한 전략으로 바뀌어야 하는 시리어스 트레이더를 위한 플랫폼.",
+    "columnProduct": "제품",
+    "columnCompany": "회사",
+    "columnResources": "리소스",
+    "columnLegal": "법적 안내",
+    "feat": "기능",
+    "pricing": "요금제",
+    "faq": "FAQ",
+    "updates": "업데이트",
+    "about": "소개",
+    "careers": "채용",
+    "affiliate": "제휴",
+    "contact": "문의",
+    "blog": "블로그",
+    "guideTrading": "트레이딩 가이드",
+    "webinars": "웨비나",
+    "documentation": "문서",
+    "privacy": "개인정보",
+    "terms": "약관",
+    "security": "보안",
+    "cookies": "쿠키",
+    "copyright": "© 2024 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.",
+    "designedFor": "DESIGNED FOR PERFORMANCE."
+  },
+  "modals": {
+    "loginTitle": "로그인",
+    "signupTitle": "회원가입",
+    "emailPh": "이메일",
+    "passwordPh": "비밀번호",
+    "fullNamePh": "이름",
+    "trialNoteHtml": "<i class=\"fas fa-gift mr-2\"></i> 7일 무료 체험이 자동으로 활성화됩니다",
+    "loginSubmit": "계속하기",
+    "signupSubmit": "계정 만들기"
+  }
+}

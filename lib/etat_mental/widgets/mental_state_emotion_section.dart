@@ -91,10 +91,13 @@ class MentalStateEmotionSection extends StatelessWidget {
                   final e = c.emotions[i];
                   final wSnap = List<double>.from(c.emotions.map((x) => x.weight));
                   final invSnap = e.inverse;
+                  final initialW = c.emotionsShare100 && c.isEmotionSelected(e.id)
+                      ? c.emotionChipImpactPercent(e).toDouble()
+                      : e.weight;
                   await showMentalWeightModal(
                     context,
                     showPolarity: true,
-                    initialWeight: e.weight,
+                    initialWeight: initialW,
                     initialInverse: e.inverse,
                     onCancelRestore: () {
                       for (var j = 0; j < wSnap.length; j++) {

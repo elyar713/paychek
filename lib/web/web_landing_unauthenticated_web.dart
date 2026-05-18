@@ -25,8 +25,12 @@ int _nextLandingViewTypeId = 0;
 class WebLandingUnauthenticatedWeb extends StatefulWidget {
   const WebLandingUnauthenticatedWeb({
     super.key,
+    required this.hostContext,
     required this.onLocaleSelected,
   });
+
+  /// Contexte sous [MaterialApp] (fourni par [WebAuthGate]) pour [showDialog].
+  final BuildContext hostContext;
 
   final Future<void> Function(String languageCode) onLocaleSelected;
 
@@ -46,6 +50,9 @@ class _WebLandingUnauthenticatedWebState
   late final String _viewType;
   html.IFrameElement? _iframe;
   bool _iframeVisible = false;
+
+  /// Invalide les [addPostFrameCallback] / microtasks après [dispose] ou hot reload.
+  int _uiGeneration = 0;
 
   static void _purgeStaleLandingIframes() {
     for (final el in html.document.querySelectorAll(
@@ -70,10 +77,11 @@ class _WebLandingUnauthenticatedWebState
       },
     );
     _sub = html.window.onMessage.listen(_onWindowMessage);
+    final bootGen = _uiGeneration;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _tearDown) return;
+      if (!_isUiAlive(bootGen)) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _tearDown) return;
+        if (!_isUiAlive(bootGen)) return;
         setState(() => _iframeVisible = true);
         _acceptMessages = true;
         final pending =
@@ -86,6 +94,10 @@ class _WebLandingUnauthenticatedWebState
         }
       });
     });
+  }
+
+  bool _isUiAlive(int generation) {
+    return mounted && !_tearDown && generation == _uiGeneration;
   }
 
   void _registerIframeViewFactory() {
@@ -127,25 +139,21 @@ class _WebLandingUnauthenticatedWebState
     } catch (_) {}
   }
 
-  /// Clics dans l’iframe HTML ne planifient pas de frame Flutter : sans
-  /// [scheduleFrame], les modales auth ne s’ouvrent jamais.
+  /// Clics dans l’iframe HTML : réveille le pipeline Flutter sans [scheduleFrame]
+  /// (évite « Trying to render a disposed EngineFlutterView » au hot reload).
   void _runLandingUiAction(void Function() action) {
     if (!mounted || _tearDown) return;
+    final host = widget.hostContext;
+    if (!host.mounted) return;
+    final gen = _uiGeneration;
     scheduleMicrotask(() {
-      if (!mounted || _tearDown) return;
+      if (!_isUiAlive(gen) || !host.mounted) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _tearDown) return;
+        if (!_isUiAlive(gen) || !host.mounted) return;
         action();
       });
-      final binding = WidgetsBinding.instance;
-      if (!binding.hasScheduledFrame) {
-        try {
-          binding.scheduleFrame();
-        } catch (_) {
-          try {
-            binding.ensureVisualUpdate();
-          } catch (_) {}
-        }
+      if (_isUiAlive(gen)) {
+        setState(() {});
       }
     });
   }
@@ -181,12 +189,13 @@ class _WebLandingUnauthenticatedWebState
     if (type == _kPaychekAuthMessageType) {
       final mode = map['mode']?.toString().toLowerCase();
       _runLandingUiAction(() {
+        final host = widget.hostContext;
         if (mode == 'login' || mode == 'signin' || mode == 'connexion') {
-          unawaited(showWebLandingLoginDialog(context));
+          unawaited(showWebLandingLoginDialog(host));
         } else if (mode == 'signup' ||
             mode == 'register' ||
             mode == 'inscription') {
-          unawaited(showWebLandingSignupDialog(context));
+          unawaited(showWebLandingSignupDialog(host));
         }
       });
       return;
@@ -210,8 +219,10 @@ class _WebLandingUnauthenticatedWebState
       await widget.onLocaleSelected(codeFromLanding);
     }
     if (!mounted || _tearDown) return;
+    final host = widget.hostContext;
+    if (!host.mounted) return;
     final code = ReglageLanguagePrefs.codeFromLocale(
-      AppLocaleScope.of(context).locale,
+      AppLocaleScope.of(host).locale,
     );
     _replyLocaleToLandingIframe(
       jsonEncode(<String, String>{
@@ -224,6 +235,7 @@ class _WebLandingUnauthenticatedWebState
   @override
   void dispose() {
     _tearDown = true;
+    _uiGeneration++;
     _acceptMessages = false;
     _iframeVisible = false;
     _pendingMessages.clear();
@@ -257,6 +269,7 @@ Widget buildWebLandingUnauthenticated(
   Future<void> Function(String languageCode) onLocaleSelected,
 ) {
   return WebLandingUnauthenticatedWeb(
+    hostContext: context,
     onLocaleSelected: onLocaleSelected,
   );
 }

@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../dashboard/dashboard_tokens.dart';
 import '../reglage/paychek_prefs_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
 import '../trade/trade_journal_helper.dart';
@@ -12,7 +13,9 @@ import '../trade/trade_journal_scope.dart';
 import '../trade/trade_models.dart';
 import '../shared/month_pdf_helper.dart';
 import '../questionnaire/user_capital_scope.dart';
+import '../performance/performance_locale_copy.dart';
 import '../web/paychek_web_tokens.dart';
+import '../widgets/paychek_page_header.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_utils.dart';
 import 'calendrier_month_info.dart';
@@ -242,92 +245,54 @@ class _CalendrierPageState extends State<CalendrierPage> {
           ),
         );
 
-        final monthTitleStyle = GoogleFonts.inter(
-          color: Colors.white,
-          fontSize: 13,
+        final monthTitleStyle = GoogleFonts.plusJakartaSans(
+          color: DashboardTokens.onMatteEmphasis,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
+          letterSpacing: 0.4,
         );
 
-        Widget toolbar() {
-          final monthChip = DecoratedBox(
-            decoration: BoxDecoration(
-              color: kCalCardSurface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kCalCardBorderResolved),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.chevron_left, color: kWeekdayColor, size: 22),
-                  onPressed: _prevMonth,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    loc.formatMonthYear(_focusedMonth).toUpperCase(),
-                    style: monthTitleStyle,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.chevron_right, color: kWeekdayColor, size: 22),
-                  onPressed: _nextMonth,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                ),
-              ],
-            ),
-          );
-
-          final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 20,
-              );
-
-          final titleWidget = widget.onNavigateToDashboard != null
-              ? InkWell(
-                  onTap: widget.onNavigateToDashboard,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.chevron_left,
-                            color: Colors.white, size: 18),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            l.calPageTitle,
-                            style: titleStyle,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Text(
-                  l.calPageTitle,
-                  style: titleStyle,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                );
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+        final monthChip = DecoratedBox(
+          decoration: BoxDecoration(
+            color: kCalCardSurface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: kCalCardBorderResolved),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(child: titleWidget),
-              const SizedBox(width: 10),
-              monthChip,
+              IconButton(
+                icon: Icon(Icons.chevron_left, color: kWeekdayColor, size: 20),
+                onPressed: _prevMonth,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  loc.formatMonthYear(_focusedMonth).toUpperCase(),
+                  style: monthTitleStyle,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.chevron_right, color: kWeekdayColor, size: 20),
+                onPressed: _nextMonth,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              ),
             ],
-          );
-        }
+          ),
+        );
+
+        final calSub = perf6(
+          Localizations.localeOf(context).languageCode,
+          'Vue mensuelle, objectifs et trades du jour.',
+          'Monthly view, goals, and daily trades.',
+          'Vista mensual, objetivos y operaciones del día.',
+          'Monatsansicht, Ziele und Trades des Tages.',
+          'Vista mensal, metas e trades do dia.',
+          '월별 보기, 목표, 일별 트레이드.',
+        );
 
         final bg = kIsWeb ? PaychekWebTokens.scaffoldBg : Colors.black;
 
@@ -335,28 +300,50 @@ class _CalendrierPageState extends State<CalendrierPage> {
           color: bg,
           child: SafeArea(
             minimum: EdgeInsets.zero,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(kIsWeb ? 24 : 16, 12, kIsWeb ? 24 : 16, 0),
-              child: Column(
+            child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  toolbar(),
-                  const SizedBox(height: 16),
-                  if (!widget.liteFreemiumRestricted) ...[
-                    Builder(
-                      builder: (context) {
-                        final sym =
-                            UserCapitalScope.of(context).currencySymbol;
-                        return CalendrierMonthInfo(
-                          monthTradesList: monthTradesList,
-                          monthlyObjective: _monthlyObjective,
-                          onShowObjectiveDialog: () =>
-                              _showObjectiveDialog(sym),
-                        );
-                      },
+                  PaychekPageHeader(
+                    onBack: widget.onNavigateToDashboard,
+                    reserveLeadingWidthWhenNoBack:
+                        widget.onNavigateToDashboard == null,
+                    title: l.calPageTitle,
+                    subtitle: calSub,
+                    maxContentWidth: 1180,
+                    trailing: monthChip,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      PaychekPageHeader.horizontalPad(
+                        MediaQuery.sizeOf(context).width,
+                      ),
+                      0,
+                      PaychekPageHeader.horizontalPad(
+                        MediaQuery.sizeOf(context).width,
+                      ),
+                      0,
                     ),
-                    const SizedBox(height: 8),
-                  ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (!widget.liteFreemiumRestricted) ...[
+                          Builder(
+                            builder: (context) {
+                              final sym =
+                                  UserCapitalScope.of(context).currencySymbol;
+                              return CalendrierMonthInfo(
+                                monthTradesList: monthTradesList,
+                                monthlyObjective: _monthlyObjective,
+                                onShowObjectiveDialog: () =>
+                                    _showObjectiveDialog(sym),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: widget.liteFreemiumRestricted
                         ? Center(
@@ -446,7 +433,6 @@ class _CalendrierPageState extends State<CalendrierPage> {
                     ),
                   ),
                 ],
-              ),
             ),
           ),
         );

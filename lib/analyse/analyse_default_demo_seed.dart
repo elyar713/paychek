@@ -21,6 +21,35 @@ AnalyseReportSnapshot? pickStoredAnalyseReportDefaultPreferGold(
   return stored.first;
 }
 
+/// Même rapport (actif + sous-titre) — pour fusionner trade ↔ Mon Analyse.
+bool analyseReportsMatchForPlanLink(
+  AnalyseReportSnapshot a,
+  AnalyseReportSnapshot b,
+) =>
+    a.actif == b.actif && a.sousTitre == b.sousTitre;
+
+/// Dernière version persistée du rapport sélectionné (confiance globale à jour).
+AnalyseReportSnapshot? findStoredAnalyseReportMatch(
+  AnalyseReportSnapshot? selected,
+  List<AnalyseReportSnapshot> stored,
+) {
+  if (selected == null || stored.isEmpty) return null;
+  for (final r in stored) {
+    if (analyseReportsMatchForPlanLink(selected, r)) return r;
+  }
+  return null;
+}
+
+/// % confiance plan : stockage Mon Analyse prioritaire, sinon snapshot local.
+int resolvePlanGlobalConfidencePercent(
+  AnalyseReportSnapshot? selected,
+  List<AnalyseReportSnapshot> stored,
+) {
+  final fresh = findStoredAnalyseReportMatch(selected, stored);
+  if (fresh != null) return fresh.globalConfidencePercent;
+  return selected?.globalConfidencePercent ?? 0;
+}
+
 /// Aperçu dashboard (aligné sur la 1ʳᵉ fiche démo GOLD).
 AnalyseReportSnapshot buildAnalyseDashboardPreviewSnapshot({Locale? locale}) {
   final c = AnalyseController();

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
 import '../l10n/app_localizations.dart';
+import 'mental_state_day_breakdown.dart';
 import 'mental_state_date_utils.dart';
 import 'mental_state_localized_labels.dart';
 import 'mental_state_models.dart';
@@ -306,6 +307,15 @@ class MentalStateController extends ChangeNotifier {
     return _snapshotByDay[key];
   }
 
+  /// Critères et pourcentages du jour (snapshot + score global du calendrier).
+  MentalStateDayBreakdown? dayBreakdownFor(DateTime day, AppLocalizations l) {
+    final score = overallScoreForCalendarDay(day);
+    if (score == null) return null;
+    final snap = snapshotForCalendarDay(day);
+    if (snap == null) return null;
+    return MentalStateDayBreakdown.fromSnapshot(snap, l, score.round());
+  }
+
   /// Rattrapage v1 / données partielles : scores ou snapshots sans liste `touched`.
   void _reconcileTouchedDaysFromScores() {
     if (_touchedDays.isNotEmpty) return;
@@ -454,7 +464,10 @@ class MentalStateController extends ChangeNotifier {
     if (_localizedLabelsLocaleTag == tag) return;
     _localizedLabelsLocaleTag = tag;
     applyMentalStateDefaultLabelsFromL10n(l, this);
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!hasListeners) return;
+      notifyListeners();
+    });
   }
 
   /// Supprime tous les facteurs « routines » (dialogue de confirmation côté UI).
@@ -518,6 +531,21 @@ class MentalStateController extends ChangeNotifier {
   }
 
   bool isEmotionSelected(String id) => selectedEmotionIds.contains(id);
+
+  /// Émotions actuellement sélectionnées (ordre de la liste).
+  List<MentalStateEmotion> get selectedEmotions => [
+        for (final e in emotions)
+          if (selectedEmotionIds.contains(e.id)) e,
+      ];
+
+  /// Part affichée sur la puce : poids libre, ou part parmi les sélectionnées (mode 100 %).
+  int emotionChipImpactPercent(MentalStateEmotion e) =>
+      MentalStateShareLogic.emotionChipImpactPercent(
+        emotion: e,
+        selectedIds: selectedEmotionIds,
+        selected: selectedEmotions,
+        share100: emotionsShare100,
+      );
 
   Future<void> _loadFullBundleIfPresent() async {
     final m = await MentalStateStorage.loadBundleMap();
@@ -804,11 +832,30 @@ class MentalStateController extends ChangeNotifier {
   }
 
   void equalizeEmotionWeights() {
-    MentalStateShareLogic.equalizeEmotionWeights(emotions);
+    if (emotionsShare100 && selectedEmotionIds.isNotEmpty) {
+      MentalStateShareLogic.equalizeEmotionWeights(selectedEmotions);
+    } else {
+      MentalStateShareLogic.equalizeEmotionWeights(emotions);
+    }
+    touch();
   }
 
   void setEmotionShare(int index, double targetPercent) {
+    if (emotionsShare100 &&
+        index >= 0 &&
+        index < emotions.length &&
+        selectedEmotionIds.contains(emotions[index].id) &&
+        selectedEmotionIds.isNotEmpty) {
+      final sel = selectedEmotions;
+      final idxInSel = sel.indexWhere((e) => e.id == emotions[index].id);
+      if (idxInSel >= 0) {
+        MentalStateShareLogic.setEmotionShareSingle(sel, idxInSel, targetPercent);
+        touch();
+        return;
+      }
+    }
     MentalStateShareLogic.setEmotionShareSingle(emotions, index, targetPercent);
+    touch();
   }
 
   void addFactorWithShare(MentalStateMetric m, double targetPercent) {
@@ -847,7 +894,8 @@ class MentalStateController extends ChangeNotifier {
 
   int weightPercent(double w) => w.clamp(0, 100).round();
 
-  int emotionFactorImpactPercent(MentalStateEmotion e) => e.weight.clamp(0, 100).round();
+  int emotionFactorImpactPercent(MentalStateEmotion e) =>
+      emotionChipImpactPercent(e);
 
   double get overallScore {
     double num = 0;

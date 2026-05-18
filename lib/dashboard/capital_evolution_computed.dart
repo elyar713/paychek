@@ -324,8 +324,8 @@ class CapitalEvolutionComputed {
 }
 
 /// Meilleur gain et plus grosse perte (gainAmount) sur une liste de trades.
-/// [worst] / [worstTrade] : uniquement si au moins un trade en perte (gainAmount négatif).
-/// (le plus défavorable = minimum parmi les pertes).
+/// [best] / [bestTrade] : uniquement trades en gain (gainAmount > 0).
+/// [worst] / [worstTrade] : uniquement trades en perte (gainAmount < 0).
 ({
   double? best,
   double? worst,
@@ -339,7 +339,7 @@ tradeBestAndWorst(List<TradeListItem> trades) {
   double? worst;
   for (final t in trades) {
     final g = t.gainAmount;
-    if (best == null || g > best) {
+    if (g > 0 && (best == null || g > best)) {
       best = g;
       bestT = t;
     }

@@ -1,36 +1,30 @@
 import 'dart:async' show unawaited;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
-import 'paywall_compare_rows.dart';
-import 'paywall_compare_split_table.dart';
+import 'paychek_billing_plan.dart';
 import 'paychek_billing_remote.dart';
 import 'paychek_checkout_launch.dart';
+import 'paywall/mobile/paychek_mobile_upgrade_paywall.dart';
+import 'paywall/mobile/paywall_mobile_tokens.dart';
+import 'paywall_compare_rows.dart';
+import 'paywall_compare_split_table.dart';
 import 'stripe_entitlement_sync.dart';
 import 'trial_paywall_config.dart';
 
-/// Tailwind `emerald-500` / `emerald-600` (réf. maquette HTML).
 const Color _kEmerald500 = Color(0xFF10B981);
 const Color _kEmerald600 = Color(0xFF059669);
-
-/// `slate-500` / `slate-400` / `slate-700` (texte secondaire & footer).
 const Color _kSlate500 = Color(0xFF64748B);
 const Color _kSlate400 = Color(0xFF94A3B8);
 const Color _kSlate700 = Color(0xFF334155);
-
 const Color _kPaywallBg = Color(0xFF000000);
-
 const double _kMaxContentWidth = 448;
 
-/// Paywall Pro (essai terminé, passage **Lite** ou upgrade).
-///
-/// Les retours « lien non configuré » / « rien trouvé » sont affichés **dans la carte** (pas de
-/// [SnackBar]) pour éviter les collisions Hero Flutter Web lors de taps répétés sur le même message.
-///
-/// [onDismissLite] non null : bouton pour fermer (feuille Lite) sans souscrire.
+/// Paywall Pro (essai terminé). Mobile : maquette or ; web : legacy émeraude.
 class TrialPaywallOverlay extends StatefulWidget {
   const TrialPaywallOverlay({
     super.key,
@@ -41,13 +35,8 @@ class TrialPaywallOverlay extends StatefulWidget {
   });
 
   final DateTime trialAnchorUtc;
-
-  /// Si non null, date de fin d’accès plein affichée (override admin ou calcul client).
   final DateTime? displayTrialEndUtc;
-
-  /// Après restauration / checkout : `true` si l’utilisateur est encore en **Lite** (pas Pro).
   final Future<bool> Function() onReloadTrialGate;
-
   final VoidCallback? onDismissLite;
 
   @override
@@ -56,23 +45,28 @@ class TrialPaywallOverlay extends StatefulWidget {
 
 class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
   String? _feedbackBanner;
+  PaychekBillingCycle _prefetchCycle = PaychekBillingCycle.annual;
   Uri? _prefetchedCheckoutUri;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_prefetchCheckoutUri());
+    unawaited(_prefetchCheckoutUri(_prefetchCycle));
   }
 
-  Future<void> _prefetchCheckoutUri() async {
+  Future<void> _prefetchCheckoutUri(PaychekBillingCycle cycle) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     final uri = await buildPaywallSubscribeUriAsync(
+      cycle: cycle,
       firebaseEmail: user.email,
       firebaseUid: user.uid,
     );
     if (!mounted) return;
-    setState(() => _prefetchedCheckoutUri = uri);
+    setState(() {
+      _prefetchCycle = cycle;
+      _prefetchedCheckoutUri = uri;
+    });
   }
 
   void _setBanner(String? text) {
@@ -80,14 +74,12 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     setState(() => _feedbackBanner = text);
   }
 
-  /// Police **Inter** comme le HTML (`fonts.googleapis.com/...Inter`).
   TextStyle _font({
     double size = 14,
     FontWeight weight = FontWeight.w500,
     Color? color,
     double height = 1.35,
     double letterSpacing = 0,
-    FontStyle fontStyle = FontStyle.normal,
     List<Shadow>? shadows,
   }) {
     return GoogleFonts.inter(
@@ -96,13 +88,107 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
       height: height,
       letterSpacing: letterSpacing,
       color: color ?? Colors.white,
-      fontStyle: fontStyle,
       shadows: shadows,
     );
   }
 
-  /// Bloc « Plan actuel / Recommandé » + split + prix (comme le HTML).
-  Widget _planCompareBlock(AppLocalizations l10n) {
+  Widget? _feedbackBannerWidget() {
+    final b = _feedbackBanner;
+    if (b == null || b.isEmpty) return null;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A1810),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                b,
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4,
+                  color: _kSlate400,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _trialHeadline(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'PAYCHEK',
+          textAlign: TextAlign.center,
+          style: _font(
+            size: 10,
+            weight: FontWeight.w900,
+            color: _kSlate500,
+            letterSpacing: 4,
+            height: 1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              l10n.paywallHeadlineBefore.trimRight(),
+              textAlign: TextAlign.center,
+              style: _font(
+                size: 30,
+                weight: FontWeight.w800,
+                color: Colors.white,
+                height: 1.15,
+                letterSpacing: -0.6,
+              ),
+            ),
+            Text(
+              l10n.paywallHeadlineAccent,
+              textAlign: TextAlign.center,
+              style: _font(
+                size: 30,
+                weight: FontWeight.w800,
+                color: _kEmerald500,
+                height: 1.15,
+                letterSpacing: -0.6,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            l10n.paywallUpgradeSubtitle,
+            textAlign: TextAlign.center,
+            style: _font(
+              size: 14,
+              weight: FontWeight.w400,
+              color: _kSlate400,
+              height: 1.5,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _webLegacyCompare(AppLocalizations l10n) {
     final capLite = _font(
       size: 9,
       weight: FontWeight.w700,
@@ -132,11 +218,9 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(l10n.paywallCompareCurrentPlan.toUpperCase(), style: capLite),
                     const SizedBox(height: 2),
@@ -146,7 +230,6 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
               ),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(l10n.paywallCompareRecommended.toUpperCase(), style: capPro),
                     const SizedBox(height: 2),
@@ -190,17 +273,25 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     );
   }
 
-  Future<void> _onSubscribe(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _onSubscribe(
+    BuildContext context,
+    AppLocalizations l10n,
+    PaychekBillingCycle cycle,
+  ) async {
     _setBanner(null);
+    if (_prefetchCycle != cycle) {
+      unawaited(_prefetchCheckoutUri(cycle));
+    }
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       _setBanner(l10n.paywallStoreNotConfigured);
       return;
     }
-    var uri = _prefetchedCheckoutUri;
+    var uri = _prefetchCycle == cycle ? _prefetchedCheckoutUri : null;
     if (uri == null) {
       PaychekBillingRemote.invalidateCache();
       uri = await buildPaywallSubscribeUriAsync(
+        cycle: cycle,
         firebaseEmail: user.email,
         firebaseUid: user.uid,
       );
@@ -217,49 +308,65 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     }
   }
 
+  Widget _trialFooterActions(BuildContext context, AppLocalizations l10n) {
+    final dismiss = widget.onDismissLite;
+    return Column(
+      children: [
+        TextButton(
+          onPressed: () async {
+            _setBanner(null);
+            await PaychekStripeEntitlementSync.syncFromStripe(maxAttempts: 3);
+            final stillLite = await widget.onReloadTrialGate();
+            if (!context.mounted) return;
+            if (stillLite) {
+              _setBanner(l10n.paywallRestoreNothingFound);
+            }
+          },
+          child: Text(
+            l10n.paywallRestoreButton,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: PaywallMobileTokens.amber400,
+            ),
+          ),
+        ),
+        if (dismiss != null)
+          TextButton(
+            onPressed: dismiss,
+            child: Text(
+              l10n.paywallContinueFreemium,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: PaywallMobileTokens.neutral500,
+                decoration: TextDecoration.underline,
+                decorationColor: PaywallMobileTokens.neutral500,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    Widget? banner;
-    final b = _feedbackBanner;
-    if (b != null && b.isNotEmpty) {
-      banner = Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A1810),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 22),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    b,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      height: 1.4,
-                      color: _kSlate400,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    if (!kIsWeb) {
+      return Material(
+        color: const Color(0xFF020205),
+        child: SafeArea(
+          child: PaychekMobileUpgradePaywall(
+            showTopClose: false,
+            header: _trialHeadline(l10n),
+            feedbackBanner: _feedbackBannerWidget(),
+            footerActions: _trialFooterActions(context, l10n),
+            onSubscribe: (cycle) => _onSubscribe(context, l10n, cycle),
           ),
         ),
       );
     }
-
-    final dismiss = widget.onDismissLite;
 
     return Material(
       color: _kPaywallBg,
@@ -272,63 +379,14 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'PAYCHEK',
-                    textAlign: TextAlign.center,
-                    style: _font(
-                      size: 10,
-                      weight: FontWeight.w900,
-                      color: _kSlate500,
-                      letterSpacing: 4,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.paywallHeadlineBefore.trimRight(),
-                        textAlign: TextAlign.center,
-                        style: _font(
-                          size: 30,
-                          weight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.15,
-                          letterSpacing: -0.6,
-                        ),
-                      ),
-                      Text(
-                        l10n.paywallHeadlineAccent,
-                        textAlign: TextAlign.center,
-                        style: _font(
-                          size: 30,
-                          weight: FontWeight.w800,
-                          color: _kEmerald500,
-                          height: 1.15,
-                          letterSpacing: -0.6,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      l10n.paywallUpgradeSubtitle,
-                      textAlign: TextAlign.center,
-                      style: _font(
-                        size: 14,
-                        weight: FontWeight.w400,
-                        color: _kSlate400,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
+                  _trialHeadline(l10n),
                   const SizedBox(height: 24),
-                  _planCompareBlock(l10n),
+                  _webLegacyCompare(l10n),
                   const SizedBox(height: 24),
-                  ?banner,
+                  if (_feedbackBannerWidget() != null) ...[
+                    _feedbackBannerWidget()!,
+                    const SizedBox(height: 16),
+                  ],
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
@@ -353,7 +411,11 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () => _onSubscribe(context, l10n),
+                              onTap: () => _onSubscribe(
+                                context,
+                                l10n,
+                                PaychekBillingCycle.annual,
+                              ),
                               borderRadius: BorderRadius.circular(16),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -370,39 +432,7 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
                             ),
                           ),
                         ),
-                        TextButton(
-                          onPressed: () async {
-                            _setBanner(null);
-                            await PaychekStripeEntitlementSync.syncFromStripe(
-                              maxAttempts: 3,
-                            );
-                            final stillLite = await widget.onReloadTrialGate();
-                            if (!context.mounted) return;
-                            if (stillLite) {
-                              _setBanner(l10n.paywallRestoreNothingFound);
-                            }
-                          },
-                          child: Text(
-                            l10n.paywallRestoreButton,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: _kEmerald500,
-                            ),
-                          ),
-                        ),
-                        if (dismiss != null)
-                          TextButton(
-                            onPressed: dismiss,
-                            child: Text(
-                              l10n.paywallContinueFreemium,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: _kSlate500,
-                              ),
-                            ),
-                          ),
+                        _trialFooterActions(context, l10n),
                       ],
                     ),
                   ),

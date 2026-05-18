@@ -3,7 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../checklist/checklist_tokens.dart';
 import '../../performance/performance_custom_lens_card.dart';
-import '../../performance/performance_locale_copy.dart';
+import '../../l10n/app_localizations.dart';
 import '../../performance/performance_paychek_lens_section.dart';
 import '../../web/paychek_web_tokens.dart';
 import '../../web/web_dashboard_config.dart';
@@ -26,16 +26,7 @@ class DashboardPaychekLensSection extends StatelessWidget {
   );
 
   Widget _header(BuildContext context, {required bool webDash}) {
-    final code = Localizations.localeOf(context).languageCode;
-    final title = perf6(
-      code,
-      'Paychek Lens',
-      'Paychek Lens',
-      'Paychek Lens',
-      'Paychek Lens',
-      'Paychek Lens',
-      'Paychek Lens',
-    );
+    final title = AppLocalizations.of(context)!.settingsDashSectionLens;
     final titleColor = webDash
         ? PaychekWebTokens.textGray500
         : ChecklistTokens.sectionTitleOnCardStyle.color;

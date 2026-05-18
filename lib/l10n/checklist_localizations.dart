@@ -3,6 +3,7 @@ import '../checklist/checklist_prompts.dart';
 
 String? _canonicalSectionTitle(String sectionId) {
   return switch (sectionId) {
+    ChecklistPrompts.sectionIdNews => ChecklistPrompts.sectionTitleNews,
     ChecklistPrompts.sectionIdAnalyse => ChecklistPrompts.sectionTitleAnalyse,
     ChecklistPrompts.sectionIdRisque => ChecklistPrompts.sectionTitleRisque,
     ChecklistPrompts.sectionIdPsy => ChecklistPrompts.sectionTitlePsy,
@@ -21,6 +22,7 @@ String checklistSectionTitle(
   if (canonical != null) {
     if (stored != canonical) return stored;
     return switch (sectionId) {
+      ChecklistPrompts.sectionIdNews => l.checklistSectionNews,
       ChecklistPrompts.sectionIdAnalyse => l.checklistSectionAnalyse,
       ChecklistPrompts.sectionIdRisque => l.checklistSectionRisque,
       ChecklistPrompts.sectionIdPsy => l.checklistSectionPsy,
@@ -32,6 +34,10 @@ String checklistSectionTitle(
 
 String? _canonicalItemLabel(String itemId) {
   return switch (itemId) {
+    ChecklistPrompts.itemIdNews1 => ChecklistPrompts.itemLabelNews1,
+    ChecklistPrompts.itemIdNews2 => ChecklistPrompts.itemLabelNews2,
+    ChecklistPrompts.itemIdNews3 => ChecklistPrompts.itemLabelNews3,
+    ChecklistPrompts.itemIdNews4 => ChecklistPrompts.itemLabelNews4,
     ChecklistPrompts.itemIdAnalyse1 => ChecklistPrompts.itemLabelAnalyse1,
     ChecklistPrompts.itemIdAnalyse2 => ChecklistPrompts.itemLabelAnalyse2,
     ChecklistPrompts.itemIdAnalyse3 => ChecklistPrompts.itemLabelAnalyse3,
@@ -56,6 +62,10 @@ String checklistItemLabel(
   if (canonical != null) {
     if (stored != canonical) return stored;
     return switch (itemId) {
+      ChecklistPrompts.itemIdNews1 => l.checklistItemNews1,
+      ChecklistPrompts.itemIdNews2 => l.checklistItemNews2,
+      ChecklistPrompts.itemIdNews3 => l.checklistItemNews3,
+      ChecklistPrompts.itemIdNews4 => l.checklistItemNews4,
       ChecklistPrompts.itemIdAnalyse1 => l.checklistItemAnalyse1,
       ChecklistPrompts.itemIdAnalyse2 => l.checklistItemAnalyse2,
       ChecklistPrompts.itemIdAnalyse3 => l.checklistItemAnalyse3,

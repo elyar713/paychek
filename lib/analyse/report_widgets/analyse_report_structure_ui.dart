@@ -181,7 +181,7 @@ Widget dashboardStructureLevelColumn({
                   children: [
                     _dashboardStructureExtraHeader(
                       context,
-                      label: '${extraPrefix}${i + 2}',
+                      label: '$extraPrefix${i + 2}',
                       line: below[i],
                       headerStyle: headerStyle,
                       uppercaseHeaders: uppercaseHeaders,

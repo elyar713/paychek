@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -15,6 +16,8 @@ import 'widgets/mental_state_global_score_calendar_section.dart';
 import 'widgets/mental_state_overall_gauge.dart';
 import 'widgets/mental_state_routines_section.dart';
 import 'widgets/mental_state_sentiment_card.dart';
+import 'mental_state_date_utils.dart';
+import 'widgets/mental_state_day_detail_card.dart';
 import 'widgets/mental_state_sleep_section.dart';
 
 /// Page « État mental » — singleton [MentalStateController], sections découpées en widgets.
@@ -47,6 +50,37 @@ class _MentalStatePageState extends State<MentalStatePage> {
   bool _editFactors = false;
   bool _editMoment = false;
   bool _editEmotions = false;
+  late DateTime _selectedMentalDay;
+
+  DateTime _mentalAnchorToday() {
+    final anchor = MentalStateDateUtils.liveScoreAnchorCalendarDate(
+      DateTime.now(),
+      _c.mentalDayStart,
+      _c.mentalDayEnd,
+    );
+    return MentalStateDateUtils.dateOnly(anchor);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMentalDay = _mentalAnchorToday();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final l = AppLocalizations.of(context);
+    if (l != null) {
+      _c.ensureLocalizedLabels(Localizations.localeOf(context), l);
+    }
+  }
+
+  void _onMentalDaySelected(DateTime day) {
+    final d = DateTime(day.year, day.month, day.day);
+    if (d.isAfter(_mentalAnchorToday())) return;
+    setState(() => _selectedMentalDay = d);
+  }
 
   final Map<String, GlobalKey<MentalStateInlineEditableNameState>> _emotionLabelKeys = {};
   final Map<String, GlobalKey<MentalStateInlineEditableNameState>> _metricRowLabelKeys = {};
@@ -120,7 +154,14 @@ class _MentalStatePageState extends State<MentalStatePage> {
       child: MentalStateGlobalScoreCalendarSection(
         controller: _c,
         titleStyle: _titleStyle,
+        selectedDay: _selectedMentalDay,
+        onDaySelected: _onMentalDaySelected,
       ),
+    );
+
+    final dayDetailCard = MentalStateDayDetailCard(
+      controller: _c,
+      selectedDay: _selectedMentalDay,
     );
 
     final routinesCard = MentalStateSentimentCard(
@@ -167,6 +208,40 @@ class _MentalStatePageState extends State<MentalStatePage> {
       const gap = 20.0;
       final leftW = (maxContent * 0.38).clamp(260.0, 400.0);
       final rightW = maxContent - leftW - gap;
+      final leftColumn = kIsWeb
+          ? <Widget>[
+              gaugeCard,
+              const SizedBox(height: 16),
+              sleepCard,
+              const SizedBox(height: 16),
+              emotionCard,
+              const SizedBox(height: 16),
+              dayDetailCard,
+            ]
+          : <Widget>[
+              gaugeCard,
+              const SizedBox(height: 16),
+              sleepCard,
+              const SizedBox(height: 16),
+              globalScoreCalendarCard,
+              const SizedBox(height: 16),
+              dayDetailCard,
+            ];
+      final rightColumn = kIsWeb
+          ? <Widget>[
+              routinesCard,
+              const SizedBox(height: 16),
+              momentCard,
+              const SizedBox(height: 16),
+              globalScoreCalendarCard,
+            ]
+          : <Widget>[
+              routinesCard,
+              const SizedBox(height: 16),
+              momentCard,
+              const SizedBox(height: 16),
+              emotionCard,
+            ];
       return Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -180,13 +255,7 @@ class _MentalStatePageState extends State<MentalStatePage> {
                   width: leftW,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      gaugeCard,
-                      const SizedBox(height: 16),
-                      sleepCard,
-                      const SizedBox(height: 16),
-                      globalScoreCalendarCard,
-                    ],
+                    children: leftColumn,
                   ),
                 ),
                 const SizedBox(width: gap),
@@ -194,13 +263,7 @@ class _MentalStatePageState extends State<MentalStatePage> {
                   width: rightW,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      routinesCard,
-                      const SizedBox(height: 16),
-                      momentCard,
-                      const SizedBox(height: 16),
-                      emotionCard,
-                    ],
+                    children: rightColumn,
                   ),
                 ),
               ],
@@ -210,23 +273,43 @@ class _MentalStatePageState extends State<MentalStatePage> {
       );
     }
 
+    final mobileColumn = kIsWeb
+        ? <Widget>[
+            gaugeCard,
+            const SizedBox(height: 16),
+            sleepCard,
+            const SizedBox(height: 16),
+            emotionCard,
+            const SizedBox(height: 16),
+            routinesCard,
+            const SizedBox(height: 16),
+            momentCard,
+            const SizedBox(height: 16),
+            globalScoreCalendarCard,
+            const SizedBox(height: 16),
+            dayDetailCard,
+          ]
+        : <Widget>[
+            gaugeCard,
+            const SizedBox(height: 16),
+            sleepCard,
+            const SizedBox(height: 16),
+            routinesCard,
+            const SizedBox(height: 16),
+            momentCard,
+            const SizedBox(height: 16),
+            emotionCard,
+            const SizedBox(height: 16),
+            globalScoreCalendarCard,
+            const SizedBox(height: 16),
+            dayDetailCard,
+          ];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          gaugeCard,
-          const SizedBox(height: 16),
-          sleepCard,
-          const SizedBox(height: 16),
-          routinesCard,
-          const SizedBox(height: 16),
-          momentCard,
-          const SizedBox(height: 16),
-          emotionCard,
-          const SizedBox(height: 16),
-          globalScoreCalendarCard,
-        ],
+        children: mobileColumn,
       ),
     );
   }
@@ -378,7 +461,6 @@ class _MentalStatePageState extends State<MentalStatePage> {
       listenable: _c,
       builder: (context, _) {
         final l = AppLocalizations.of(context)!;
-        _c.ensureLocalizedLabels(Localizations.localeOf(context), l);
         final score = _c.overallScore;
         final stroke = _gaugeStroke(score);
         final centerCol = _gaugeCenterText(score);

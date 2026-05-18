@@ -3,11 +3,42 @@
 part of 'ajouter_trade_page.dart';
 
 extension _AjouterTradePageStateCsv on _AjouterTradePageState {
+  String _atasXlsxEmptyMessage(
+    AppLocalizations l,
+    AtasXlsxEmptyReason reason,
+  ) {
+    return switch (reason) {
+      AtasXlsxEmptyReason.emptyFile => l.tradeImportAtasXlsxEmptyFile,
+      AtasXlsxEmptyReason.invalidFormat => l.tradeImportAtasXlsxInvalidFormat,
+      AtasXlsxEmptyReason.journalSheetMissing =>
+        l.tradeImportAtasXlsxJournalMissing,
+      AtasXlsxEmptyReason.noTradeRows => l.tradeImportAtasXlsxNoRows,
+    };
+  }
+
+  String _tradeImportEmptyDetail(
+    AppLocalizations l,
+    String source,
+    bool isXlsx,
+  ) {
+    final extensionLabel = isXlsx ? 'XLSX' : 'HTML';
+    return switch (source) {
+      'MT5' => l.tradeImportEmptyMt5(extensionLabel),
+      'TradingView' => l.tradeImportEmptyTradingView,
+      'cTrader' => l.tradeImportEmptyCtrader,
+      'Tradovate' => l.tradeImportEmptyTradovate,
+      'NinjaTrader' => l.tradeImportEmptyNinjaTrader,
+      'ATAS' => l.tradeImportEmptyAtas,
+      _ => l.tradeImportEmptyGeneric,
+    };
+  }
+
   Future<void> _importFromSelectedCsvSource(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final source = _selectedCsvSoftware;
     if (source == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Choisis un logiciel avant l\'import.')),
+        SnackBar(content: Text(l10n.tradeImportPickSoftwareFirst)),
       );
       return;
     }
@@ -56,7 +87,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       if (!context.mounted) return;
       if (!isXlsx && (html == null || html.trim().isEmpty)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fichier vide ou illisible.')),
+          SnackBar(content: Text(l10n.tradeImportEmptyFile)),
         );
         return;
       }
@@ -65,7 +96,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'MT4':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('MT4: utilise un export HTML/HTM.')),
+              SnackBar(content: Text(l10n.tradeImportMt4HtmlOnly)),
             );
             return;
           }
@@ -84,9 +115,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'TradingView':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('TradingView: utilise un export CSV.'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportTradingViewCsvOnly)),
             );
             return;
           }
@@ -95,9 +124,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'cTrader':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('cTrader: utilise un relevé HTML/HTM (compte).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportCtraderHtmlOnly)),
             );
             return;
           }
@@ -106,17 +133,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'Tradovate':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Tradovate: exporte Orders.csv (remplissages).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportTradovateOrdersCsv)),
             );
             return;
           }
           if (!fileNameLower.endsWith('.csv')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Tradovate: choisis un fichier Orders.csv.'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportTradovatePickOrdersCsv)),
             );
             return;
           }
@@ -125,19 +148,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'NinjaTrader':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'NinjaTrader: exporte une grille CSV (Ordres ou exécutions).',
-                ),
-              ),
+              SnackBar(content: Text(l10n.tradeImportNinjaGridCsv)),
             );
             return;
           }
           if (!fileNameLower.endsWith('.csv')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('NinjaTrader: choisis un fichier CSV (grille).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportNinjaPickCsv)),
             );
             return;
           }
@@ -146,17 +163,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'Rithmic':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Rithmic: utilise un export CSV (Recent Orders).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportRithmicCsv)),
             );
             return;
           }
           if (!fileNameLower.endsWith('.csv')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Rithmic: choisis un fichier CSV.'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportRithmicPickCsv)),
             );
             return;
           }
@@ -165,17 +178,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         case 'Quantower':
           if (isXlsx) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Quantower : utilise un export CSV (Orders history).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportQuantowerCsv)),
             );
             return;
           }
           if (!fileNameLower.endsWith('.csv')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Quantower : choisis un fichier CSV (Orders history).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportQuantowerPickCsv)),
             );
             return;
           }
@@ -193,11 +202,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
             if (!context.mounted) return;
             if (bytes == null || bytes.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Impossible de lire le .xlsx (fichier vide ou trop gros pour le navigateur). Réessaie ou rouvre le fichier.',
-                  ),
-                ),
+                SnackBar(content: Text(l10n.tradeImportAtasXlsxReadFailed)),
               );
               return;
             }
@@ -206,7 +211,11 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
             if (!context.mounted) return;
             if (parsedRows.isEmpty && atasOutcome.emptyReason != null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(atasOutcome.emptyReason!)),
+                SnackBar(
+                  content: Text(
+                    _atasXlsxEmptyMessage(l10n, atasOutcome.emptyReason!),
+                  ),
+                ),
               );
               return;
             }
@@ -214,9 +223,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           }
           if (!fileNameLower.endsWith('.csv')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('ATAS: choisis un fichier CSV ou .xlsx (Statistiques).'),
-              ),
+              SnackBar(content: Text(l10n.tradeImportAtasPickCsvXlsx)),
             );
             return;
           }
@@ -224,26 +231,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           break;
         default:
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Import $source pas encore branché.')),
+            SnackBar(content: Text(l10n.tradeImportNotImplemented(source))),
           );
           return;
       }
 
       if (parsedRows.isEmpty) {
-        final extensionLabel = isXlsx ? 'XLSX' : 'HTML';
-        final emptyDetail = source == 'MT5'
-            ? 'MT5 $extensionLabel: aucune ligne Position détectée.'
-            : source == 'TradingView'
-                ? 'TradingView CSV: aucune position fermee detectee.'
-                : source == 'cTrader'
-                    ? 'cTrader HTM/HTML: aucune ligne Historique detectee.'
-                    : source == 'Tradovate'
-                        ? 'Tradovate CSV: aucun round-trip (entrée/sortie) detecte.'
-                        : source == 'NinjaTrader'
-                            ? 'NinjaTrader CSV: aucun round-trip (entrée/sortie) detecte.'
-                            : source == 'ATAS'
-                                ? 'ATAS: aucune ligne reconnue (feuille Journal uniquement).'
-                                : 'Aucune position reconnue pour ce logiciel/fichier.';
+        final emptyDetail = _tradeImportEmptyDetail(l10n, source, isXlsx);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(emptyDetail)),
         );
@@ -258,6 +252,9 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       }
 
       parsedRows.sort((a, b) => a.closeTime.compareTo(b.closeTime));
+
+      final storedAnalyseReports = await AnalyseReportsStorage.loadAll();
+      if (!context.mounted) return;
 
       final store = TradeJournalScope.of(context);
       final portfolioId = UserPortfolioScope.of(context).activePortfolioId;
@@ -291,10 +288,17 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         final net = row.profit;
         final amountLabel =
             '${net >= 0 ? '+' : ''}${net.toStringAsFixed(2).replaceAll('.', ',')}\$';
+        final pair = _normalizeImportedPair(row.symbol);
+        final discipline = resolveTradeDisciplineForEntryDay(
+          entryAt: row.openTime,
+          checklist: widget.checklistController,
+          storedReports: storedAnalyseReports,
+          importedPair: pair,
+        );
         final item = TradeListItem(
           id: baseId,
           syncRev: DateTime.now().millisecondsSinceEpoch,
-          pair: _normalizeImportedPair(row.symbol),
+          pair: pair,
           side: row.side,
           amountLabel: amountLabel,
           gainAmount: net,
@@ -307,16 +311,18 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           quantiteLabel: row.size.toStringAsFixed(2),
           prixEntreeLabel: row.openPrice.toStringAsFixed(5),
           prixSortieLabel: row.closePrice.toStringAsFixed(5),
-          checklistPct: 50,
-          planPct: 50,
+          checklistPct: discipline.checklistPct,
+          planPct: discipline.planPct,
           strategiePct: 50,
-          etatPct: 50,
+          etatPct: discipline.etatPct,
           mindset: TradeMindset.principe,
+          planReport: discipline.planReport,
           // Strategy execution must reflect user-defined strategy, not import source.
           strategieTitle: _strategieChoisie,
           isProfit: net >= 0,
           assetClass: _assetClassForImportedRow(source, row),
-          performanceLite: true,
+          // Discipline renseignée (anneaux jour) → visible dans Performance / Lens.
+          performanceLite: false,
           portfolioId: portfolioId,
         );
         store.add(item);
@@ -324,15 +330,17 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         importedCount++;
       }
       if (!context.mounted) return;
-      final l = AppLocalizations.of(context)!;
+      final dupSuffix = skippedCount > 0
+          ? (importedCount == 0
+              ? l10n.tradeImportDuplicatesOnlySuffix(skippedCount)
+              : l10n.tradeImportDuplicatesSuffix(skippedCount))
+          : '';
       var summary = importedCount == 0
-          ? 'Aucun nouveau trade importé depuis $source'
-                '${skippedCount > 0 ? ' · $skippedCount doublon(s)' : ''}.'
-          : '$importedCount trade(s) importé(s) depuis $source'
-                '${skippedCount > 0 ? ' · $skippedCount doublon(s) ignoré(s)' : ''}.';
+          ? l10n.tradeImportNoneNew(source, dupSuffix)
+          : l10n.tradeImportSummary(importedCount, source, dupSuffix);
       if (skippedLiteMonthlyCap > 0) {
         summary +=
-            ' ${l.ajouterTradeLiteMonthlyLimitImportSkipped(skippedLiteMonthlyCap, TradeLiteMonthlyLimit.maxTradesPerCalendarMonthNonPro)}';
+            ' ${l10n.ajouterTradeLiteMonthlyLimitImportSkipped(skippedLiteMonthlyCap, TradeLiteMonthlyLimit.maxTradesPerCalendarMonthNonPro)}';
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(summary)),
@@ -353,7 +361,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Import échoué: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.tradeImportFailed('$e'))));
       await logPaychekUserCsvImportEvent(
         software: _selectedCsvSoftware ?? 'inconnu',
         status: PaychekCsvImportLogStatus.error,

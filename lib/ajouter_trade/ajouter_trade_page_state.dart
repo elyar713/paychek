@@ -76,10 +76,7 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   AjouterTradeAssetClass? _perfLiteEditAssetClass;
   AjouterTradeSide? _perfLiteEditSide;
 
-  double _checklistRespectPct = 50;
-  double _etatMomentPct = 50;
   double _strategieRespectPct = 50;
-  double _planRespectPct = 50;
 
   String _strategieChoisie = strategieSetupDefaultCardDataList().first.title;
 
@@ -88,6 +85,9 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   Set<String> _etatMomentNonRespectIds = {};
 
   AnalyseReportSnapshot? _planAnalyseSelectedReport;
+
+  /// Cache des rapports Mon Analyse (aligné sur [AnalyseReportsStorage]).
+  List<AnalyseReportSnapshot> _planAnalyseStoredReports = const [];
 
   Set<String> _planAnalyseNonRespectIds = {};
 
@@ -206,9 +206,8 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
       _psychTagInputVisible = true;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _psychTagNewFocus.requestFocus();
-      }
+      if (!mounted) return;
+      _psychTagNewFocus.requestFocus();
     });
   }
 
@@ -258,12 +257,51 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     }
   }
 
+  void _onAnalyseReportsStorageTick() {
+    _refreshPlanAnalyseFromStorage();
+  }
+
+  Future<void> _refreshPlanAnalyseFromStorage() async {
+    final stored = await AnalyseReportsStorage.loadAll();
+    if (!mounted) return;
+    setState(() {
+      _planAnalyseStoredReports = stored;
+      final sel = _planAnalyseSelectedReport;
+      if (sel != null) {
+        final fresh = findStoredAnalyseReportMatch(sel, stored);
+        if (fresh != null) {
+          _planAnalyseSelectedReport = fresh;
+        }
+      } else {
+        final pick = pickStoredAnalyseReportDefaultPreferGold(stored);
+        if (pick != null) {
+          _planAnalyseSelectedReport = pick;
+        }
+      }
+    });
+  }
+
+  void _onPlanAnalyseReportsLoaded(
+    List<AnalyseReportSnapshot> reports,
+    AnalyseReportSnapshot? current,
+  ) {
+    if (!mounted) return;
+    setState(() {
+      _planAnalyseStoredReports = reports;
+      if (current != null) {
+        _planAnalyseSelectedReport = current;
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    AnalyseRealtimeNotifier.reportsTick.addListener(_onAnalyseReportsStorageTick);
     _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(
       WidgetsBinding.instance.platformDispatcher.locale,
     );
+    _refreshPlanAnalyseFromStorage();
     AjouterTradeCustomActifsStorage.load().then((_) {
       if (!mounted) return;
       setState(() {});
@@ -279,23 +317,6 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
           _applyFavoriteActifForClass(_assetClass);
         }
       });
-    });
-    AnalyseReportsStorage.loadAll().then((stored) {
-      if (!mounted) return;
-      final pick = pickStoredAnalyseReportDefaultPreferGold(stored);
-      if (pick != null) {
-        setState(() => _planAnalyseSelectedReport = pick);
-      } else {
-        final appLoc = Localizations.localeOf(context);
-        final platformLoc = WidgetsBinding.instance.platformDispatcher.locale;
-        if (appLoc.languageCode != platformLoc.languageCode) {
-          setState(() {
-            _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(
-              appLoc,
-            );
-          });
-        }
-      }
     });
     widget.editTrade?.addListener(_onEditTradeChanged);
     widget.shellBodyIndex.addListener(_onShellBodyIndexChanged);
@@ -424,15 +445,6 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     return DateFormat("dd MMMM yyyy '•' HH:mm", loc).format(d.toLocal());
   }
 
-  TradeMindset _mapMindset() {
-    if (_tradeMindset == 'feeling') return TradeMindset.feeling;
-    return TradeMindset.principe;
-  }
-
-  TradeSide _mapSide() {
-    // Long = achat, Short = vente (simplification).
-    return _side == AjouterTradeSide.long ? TradeSide.achat : TradeSide.vente;
-  }
   Widget _wrapDisciplineBlock(bool enabled, Widget child) {
     return AbsorbPointer(
       absorbing: !enabled,
@@ -442,6 +454,8 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
 
   @override
   void dispose() {
+    AnalyseRealtimeNotifier.reportsTick
+        .removeListener(_onAnalyseReportsStorageTick);
     widget.editTrade?.removeListener(_onEditTradeChanged);
     widget.shellBodyIndex.removeListener(_onShellBodyIndexChanged);
     _sortieController.removeListener(_onSortieTextChanged);

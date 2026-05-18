@@ -208,7 +208,10 @@ class _PsychNewTagField extends StatelessWidget {
           inputFormatters: [
             LengthLimitingTextInputFormatter(48),
           ],
-          onSubmitted: (_) => onSubmitted(),
+          onSubmitted: (_) {
+            onSubmitted();
+            focusNode.unfocus();
+          },
         ),
       ),
     );

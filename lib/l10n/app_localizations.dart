@@ -232,6 +232,198 @@ abstract class AppLocalizations {
   /// **'{skipped} trade(s) non importé(s) : le plan Lite autorise au plus {max} trades par mois civil.'**
   String ajouterTradeLiteMonthlyLimitImportSkipped(int skipped, int max);
 
+  /// No description provided for @tradeImportPickSoftwareFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis un logiciel avant l\'import.'**
+  String get tradeImportPickSoftwareFirst;
+
+  /// No description provided for @tradeImportEmptyFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier vide ou illisible.'**
+  String get tradeImportEmptyFile;
+
+  /// No description provided for @tradeImportMt4HtmlOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'MT4 : utilise un export HTML/HTM.'**
+  String get tradeImportMt4HtmlOnly;
+
+  /// No description provided for @tradeImportTradingViewCsvOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'TradingView : utilise un export CSV.'**
+  String get tradeImportTradingViewCsvOnly;
+
+  /// No description provided for @tradeImportCtraderHtmlOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'cTrader : utilise un relevé HTML/HTM (compte).'**
+  String get tradeImportCtraderHtmlOnly;
+
+  /// No description provided for @tradeImportTradovateOrdersCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tradovate : exporte Orders.csv (remplissages).'**
+  String get tradeImportTradovateOrdersCsv;
+
+  /// No description provided for @tradeImportTradovatePickOrdersCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tradovate : choisis un fichier Orders.csv.'**
+  String get tradeImportTradovatePickOrdersCsv;
+
+  /// No description provided for @tradeImportNinjaGridCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'NinjaTrader : exporte une grille CSV (Ordres ou exécutions).'**
+  String get tradeImportNinjaGridCsv;
+
+  /// No description provided for @tradeImportNinjaPickCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'NinjaTrader : choisis un fichier CSV (grille).'**
+  String get tradeImportNinjaPickCsv;
+
+  /// No description provided for @tradeImportRithmicCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rithmic : utilise un export CSV (Recent Orders).'**
+  String get tradeImportRithmicCsv;
+
+  /// No description provided for @tradeImportRithmicPickCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rithmic : choisis un fichier CSV.'**
+  String get tradeImportRithmicPickCsv;
+
+  /// No description provided for @tradeImportQuantowerCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantower : utilise un export CSV (Orders history).'**
+  String get tradeImportQuantowerCsv;
+
+  /// No description provided for @tradeImportQuantowerPickCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantower : choisis un fichier CSV (Orders history).'**
+  String get tradeImportQuantowerPickCsv;
+
+  /// No description provided for @tradeImportAtasXlsxReadFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de lire le .xlsx (fichier vide ou trop gros pour le navigateur). Réessaie ou rouvre le fichier.'**
+  String get tradeImportAtasXlsxReadFailed;
+
+  /// No description provided for @tradeImportAtasPickCsvXlsx.
+  ///
+  /// In fr, this message translates to:
+  /// **'ATAS : choisis un fichier CSV ou .xlsx (Statistiques).'**
+  String get tradeImportAtasPickCsvXlsx;
+
+  /// No description provided for @tradeImportAtasXlsxEmptyFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier vide.'**
+  String get tradeImportAtasXlsxEmptyFile;
+
+  /// No description provided for @tradeImportAtasXlsxInvalidFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce fichier n\'est pas un .xlsx Excel valide (en-tête manquant). Réexporte depuis ATAS.'**
+  String get tradeImportAtasXlsxInvalidFormat;
+
+  /// No description provided for @tradeImportAtasXlsxJournalMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Feuille « Journal » introuvable ou classeur illisible. Vérifie l\'export Statistiques .xlsx.'**
+  String get tradeImportAtasXlsxJournalMissing;
+
+  /// No description provided for @tradeImportAtasXlsxNoRows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune ligne de trade reconnue. Ouvre la feuille Journal : colonnes Instrument, Open time, Open/Close volume.'**
+  String get tradeImportAtasXlsxNoRows;
+
+  /// No description provided for @tradeImportNotImplemented.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import {source} pas encore branché.'**
+  String tradeImportNotImplemented(String source);
+
+  /// No description provided for @tradeImportEmptyMt5.
+  ///
+  /// In fr, this message translates to:
+  /// **'MT5 {extension} : aucune ligne Position détectée.'**
+  String tradeImportEmptyMt5(String extension);
+
+  /// No description provided for @tradeImportEmptyTradingView.
+  ///
+  /// In fr, this message translates to:
+  /// **'TradingView CSV : aucune position fermée détectée.'**
+  String get tradeImportEmptyTradingView;
+
+  /// No description provided for @tradeImportEmptyCtrader.
+  ///
+  /// In fr, this message translates to:
+  /// **'cTrader HTML : aucune ligne Historique détectée.'**
+  String get tradeImportEmptyCtrader;
+
+  /// No description provided for @tradeImportEmptyTradovate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tradovate CSV : aucun round-trip (entrée/sortie) détecté.'**
+  String get tradeImportEmptyTradovate;
+
+  /// No description provided for @tradeImportEmptyNinjaTrader.
+  ///
+  /// In fr, this message translates to:
+  /// **'NinjaTrader CSV : aucun round-trip (entrée/sortie) détecté.'**
+  String get tradeImportEmptyNinjaTrader;
+
+  /// No description provided for @tradeImportEmptyAtas.
+  ///
+  /// In fr, this message translates to:
+  /// **'ATAS : aucune ligne reconnue (feuille Journal uniquement).'**
+  String get tradeImportEmptyAtas;
+
+  /// No description provided for @tradeImportEmptyGeneric.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune position reconnue pour ce logiciel/fichier.'**
+  String get tradeImportEmptyGeneric;
+
+  /// No description provided for @tradeImportNoneNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun nouveau trade importé depuis {source}{duplicates}.'**
+  String tradeImportNoneNew(String source, String duplicates);
+
+  /// No description provided for @tradeImportSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} trade(s) importé(s) depuis {source}{duplicates}.'**
+  String tradeImportSummary(int count, String source, String duplicates);
+
+  /// No description provided for @tradeImportDuplicatesSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' · {count} doublon(s) ignoré(s)'**
+  String tradeImportDuplicatesSuffix(int count);
+
+  /// No description provided for @tradeImportDuplicatesOnlySuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' · {count} doublon(s)'**
+  String tradeImportDuplicatesOnlySuffix(int count);
+
+  /// No description provided for @tradeImportFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import échoué : {error}'**
+  String tradeImportFailed(String error);
+
   /// No description provided for @ajouterTradeSectionEtatMoment.
   ///
   /// In fr, this message translates to:
@@ -483,6 +675,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Plan d’analyse'**
   String get ajouterTradeDisciplinePlanTitle;
+
+  /// No description provided for @ajouterTradeDisciplineConfidencePlanTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan de confiance'**
+  String get ajouterTradeDisciplineConfidencePlanTitle;
 
   /// No description provided for @ajouterTradeDisciplinePlanSubtitle.
   ///
@@ -1894,6 +2092,102 @@ abstract class AppLocalizations {
   /// **'Gains / Pertes'**
   String get calcWinsLosses;
 
+  /// No description provided for @calcErrorInvalidBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde initial invalide.'**
+  String get calcErrorInvalidBalance;
+
+  /// No description provided for @calcErrorTradesRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le nombre de trades doit être entre 1 et 2000.'**
+  String get calcErrorTradesRange;
+
+  /// No description provided for @calcErrorWinRateRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le win rate doit être entre 0 et 100.'**
+  String get calcErrorWinRateRange;
+
+  /// No description provided for @calcErrorRiskRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le risque (%) doit être entre 0 et 100.'**
+  String get calcErrorRiskRange;
+
+  /// No description provided for @calcErrorInvalidRiskReward.
+  ///
+  /// In fr, this message translates to:
+  /// **'Risk:Reward invalide.'**
+  String get calcErrorInvalidRiskReward;
+
+  /// No description provided for @calcErrorInvalidLot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lot invalide.'**
+  String get calcErrorInvalidLot;
+
+  /// No description provided for @calcErrorInvalidEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix d\'entrée invalide.'**
+  String get calcErrorInvalidEntry;
+
+  /// No description provided for @calcErrorInvalidSl.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stop loss invalide.'**
+  String get calcErrorInvalidSl;
+
+  /// No description provided for @calcErrorInvalidTp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Take profit invalide.'**
+  String get calcErrorInvalidTp;
+
+  /// No description provided for @calcErrorEntrySlIdentical.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée et SL ne peuvent pas être identiques.'**
+  String get calcErrorEntrySlIdentical;
+
+  /// No description provided for @calcDisclaimerEstimates.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attention : ces calculs ne sont pas des chiffres contractuels. Ils servent uniquement à donner une idée.'**
+  String get calcDisclaimerEstimates;
+
+  /// No description provided for @calcHeaderSubtitleEstimates.
+  ///
+  /// In fr, this message translates to:
+  /// **'Simulations rendement et ratio — valeurs indicatives.'**
+  String get calcHeaderSubtitleEstimates;
+
+  /// No description provided for @calcMarketIndex.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indice'**
+  String get calcMarketIndex;
+
+  /// No description provided for @calcMarketFutures.
+  ///
+  /// In fr, this message translates to:
+  /// **'Future'**
+  String get calcMarketFutures;
+
+  /// No description provided for @calcMarketStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action'**
+  String get calcMarketStock;
+
+  /// No description provided for @calcMarketCommodities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Matières premières'**
+  String get calcMarketCommodities;
+
   /// No description provided for @calcWorstBalance.
   ///
   /// In fr, this message translates to:
@@ -1996,6 +2290,66 @@ abstract class AppLocalizations {
   /// **'Avant de prendre position, assurez-vous de valider tous les critères de votre plan de trading.'**
   String get checklistIntroBody;
 
+  /// No description provided for @checklistDailyCalendarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'CHECKLIST PAR JOUR'**
+  String get checklistDailyCalendarTitle;
+
+  /// No description provided for @checklistDailyUncheckedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'NON COCHÉS'**
+  String get checklistDailyUncheckedTitle;
+
+  /// No description provided for @checklistDailyUncheckedNoActivity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune activité ce jour-là.'**
+  String get checklistDailyUncheckedNoActivity;
+
+  /// No description provided for @checklistDailyUncheckedNoDue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun critère prévu ce jour-là.'**
+  String get checklistDailyUncheckedNoDue;
+
+  /// No description provided for @checklistDailyUncheckedAllDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les critères du jour sont cochés.'**
+  String get checklistDailyUncheckedAllDone;
+
+  /// No description provided for @checklistDailyUncheckedNoHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun détail checklist enregistré pour ce jour. Le suivi des critères non cochés est disponible à partir d’aujourd’hui.'**
+  String get checklistDailyUncheckedNoHistory;
+
+  /// No description provided for @checklistItemNews1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Calendrier économique consulté (FED, CPI, NFP, PIB…).'**
+  String get checklistItemNews1;
+
+  /// No description provided for @checklistItemNews2.
+  ///
+  /// In fr, this message translates to:
+  /// **'FOMC / FED : pas de trade pendant l’annonce.'**
+  String get checklistItemNews2;
+
+  /// No description provided for @checklistItemNews3.
+  ///
+  /// In fr, this message translates to:
+  /// **'CPI (inflation) : horaire et impact anticipés.'**
+  String get checklistItemNews3;
+
+  /// No description provided for @checklistItemNews4.
+  ///
+  /// In fr, this message translates to:
+  /// **'NFP (emplois US) : fenêtre à risque identifiée.'**
+  String get checklistItemNews4;
+
   /// No description provided for @checklistItemAnalyse1.
   ///
   /// In fr, this message translates to:
@@ -2074,6 +2428,12 @@ abstract class AppLocalizations {
   /// **'CL'**
   String get checklistProgressCl;
 
+  /// No description provided for @checklistSectionNews.
+  ///
+  /// In fr, this message translates to:
+  /// **'NEWS · CALENDRIER ÉCONOMIQUE'**
+  String get checklistSectionNews;
+
   /// No description provided for @checklistSectionAnalyse.
   ///
   /// In fr, this message translates to:
@@ -2091,6 +2451,78 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'GESTION DU RISQUE'**
   String get checklistSectionRisque;
+
+  /// No description provided for @checklistScheduleTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rappel de l’élément'**
+  String get checklistScheduleTitle;
+
+  /// No description provided for @checklistScheduleDefaultHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 · Règle par défaut'**
+  String get checklistScheduleDefaultHeading;
+
+  /// No description provided for @checklistScheduleModeDaily.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les jours'**
+  String get checklistScheduleModeDaily;
+
+  /// No description provided for @checklistScheduleModeWeekly.
+  ///
+  /// In fr, this message translates to:
+  /// **'1× / semaine'**
+  String get checklistScheduleModeWeekly;
+
+  /// No description provided for @checklistScheduleModeSpecificDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date précise'**
+  String get checklistScheduleModeSpecificDate;
+
+  /// No description provided for @checklistScheduleUserDateHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'2 · Date choisie'**
+  String get checklistScheduleUserDateHeading;
+
+  /// No description provided for @checklistSchedulePickDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une date'**
+  String get checklistSchedulePickDate;
+
+  /// No description provided for @checklistScheduleWeekHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'3 · Jour de la semaine'**
+  String get checklistScheduleWeekHeading;
+
+  /// No description provided for @checklistScheduleNextOccurrence.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prochaine date : {date}'**
+  String checklistScheduleNextOccurrence(String date);
+
+  /// No description provided for @checklistScheduleWarningHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'4 · Heure d’avertissement'**
+  String get checklistScheduleWarningHeading;
+
+  /// No description provided for @checklistSchedulePickTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir l’heure'**
+  String get checklistSchedulePickTime;
+
+  /// No description provided for @checklistScheduleCalendarTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règlage date et rappel'**
+  String get checklistScheduleCalendarTooltip;
 
   /// No description provided for @clearAll.
   ///
@@ -2745,6 +3177,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Nom de la routine (ex : Sport, Lecture)'**
   String get mentalRoutineFieldLabel;
+
+  /// No description provided for @mentalDayDetailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'CRITÈRES DU JOUR'**
+  String get mentalDayDetailTitle;
+
+  /// No description provided for @mentalDayDetailNoData.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune donnée enregistrée pour ce jour. Modifiez votre état mental pour l’enregistrer.'**
+  String get mentalDayDetailNoData;
+
+  /// No description provided for @mentalDayDetailGlobalScore.
+  ///
+  /// In fr, this message translates to:
+  /// **'SCORE GLOBAL'**
+  String get mentalDayDetailGlobalScore;
 
   /// No description provided for @mentalGlobalScoreCalendarTitle.
   ///
@@ -3793,7 +4243,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileSubscribeButton.
   ///
   /// In fr, this message translates to:
-  /// **'Passer au Pro (49,90 \$ / an — abonnement)'**
+  /// **'Passer au Pro (dès 8,99 \$ / mois)'**
   String get profileSubscribeButton;
 
   /// No description provided for @profileManageSubscriptionButton.
@@ -3915,6 +4365,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Créer ton identité'**
   String get authTerminalCtaSignup;
+
+  /// No description provided for @webLandingLoginSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bon retour sur Paychek.'**
+  String get webLandingLoginSubtitle;
+
+  /// No description provided for @webLandingSignupSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejoins l\'élite des traders.'**
+  String get webLandingSignupSubtitle;
+
+  /// No description provided for @webLandingLoginCta.
+  ///
+  /// In fr, this message translates to:
+  /// **'SE CONNECTER'**
+  String get webLandingLoginCta;
+
+  /// No description provided for @webLandingSignupCta.
+  ///
+  /// In fr, this message translates to:
+  /// **'ESSAYER GRATUITEMENT'**
+  String get webLandingSignupCta;
+
+  /// No description provided for @webLandingNoAccountLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAS DE COMPTE ?'**
+  String get webLandingNoAccountLabel;
+
+  /// No description provided for @webLandingRegisterLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'INSCRIRE'**
+  String get webLandingRegisterLink;
+
+  /// No description provided for @webLandingAlreadyMemberLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉJÀ MEMBRE ?'**
+  String get webLandingAlreadyMemberLabel;
+
+  /// No description provided for @webLandingLoginLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONNEXION'**
+  String get webLandingLoginLink;
 
   /// No description provided for @authTerminalEncryptedPrefix.
   ///
@@ -4324,16 +4822,160 @@ abstract class AppLocalizations {
   /// **'Export PDF'**
   String get paywallProFeature9;
 
+  /// No description provided for @paywallMobilePlanAnnualTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 An (12 Mois)'**
+  String get paywallMobilePlanAnnualTitle;
+
+  /// No description provided for @paywallMobilePlanQuarterlyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'3 Mois'**
+  String get paywallMobilePlanQuarterlyTitle;
+
+  /// No description provided for @paywallMobilePlanMonthlyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 Mois'**
+  String get paywallMobilePlanMonthlyTitle;
+
+  /// No description provided for @paywallMobilePlanPerMonthLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soit {price} \$ US / mois'**
+  String paywallMobilePlanPerMonthLine(String price);
+
+  /// No description provided for @paywallMobilePlanPerMonthPrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soit '**
+  String get paywallMobilePlanPerMonthPrefix;
+
+  /// No description provided for @paywallMobilePlanPerMonthPriceSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' \$ US'**
+  String get paywallMobilePlanPerMonthPriceSuffix;
+
+  /// No description provided for @paywallMobilePlanPerMonthEnd.
+  ///
+  /// In fr, this message translates to:
+  /// **' / mois'**
+  String get paywallMobilePlanPerMonthEnd;
+
+  /// No description provided for @paywallMobilePlanTotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{total} \$'**
+  String paywallMobilePlanTotalLine(String total);
+
+  /// No description provided for @paywallMobilePlanAnnualBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturé à l\'année'**
+  String get paywallMobilePlanAnnualBilling;
+
+  /// No description provided for @paywallMobilePlanQuarterlyBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les 3 mois'**
+  String get paywallMobilePlanQuarterlyBilling;
+
+  /// No description provided for @paywallMobilePlanMonthlyBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturé au mois'**
+  String get paywallMobilePlanMonthlyBilling;
+
+  /// No description provided for @paywallMobilePlanMonthlyCommitment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Engagement mensuel'**
+  String get paywallMobilePlanMonthlyCommitment;
+
+  /// No description provided for @paywallMobilePlanSavings44.
+  ///
+  /// In fr, this message translates to:
+  /// **'Économisez 44%'**
+  String get paywallMobilePlanSavings44;
+
+  /// No description provided for @paywallMobilePlanPopular.
+  ///
+  /// In fr, this message translates to:
+  /// **'Populaire'**
+  String get paywallMobilePlanPopular;
+
+  /// No description provided for @paywallMobileCompareFeatureCol.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fonctionnalité'**
+  String get paywallMobileCompareFeatureCol;
+
+  /// No description provided for @paywallMobileRowTrades.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trades / mois'**
+  String get paywallMobileRowTrades;
+
+  /// No description provided for @paywallMobileRowEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisie des données'**
+  String get paywallMobileRowEntry;
+
+  /// No description provided for @paywallMobileRowCalendar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Calendrier'**
+  String get paywallMobileRowCalendar;
+
+  /// No description provided for @paywallMobileRowChecklist.
+  ///
+  /// In fr, this message translates to:
+  /// **'Checklist'**
+  String get paywallMobileRowChecklist;
+
+  /// No description provided for @paywallMobileRowAnalysis.
+  ///
+  /// In fr, this message translates to:
+  /// **'Générateur d\'analyse'**
+  String get paywallMobileRowAnalysis;
+
+  /// No description provided for @paywallMobileRowStrategy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Page Stratégie'**
+  String get paywallMobileRowStrategy;
+
+  /// No description provided for @paywallMobileRowStats.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stats de performance'**
+  String get paywallMobileRowStats;
+
+  /// No description provided for @paywallMobileRowMental.
+  ///
+  /// In fr, this message translates to:
+  /// **'État mental'**
+  String get paywallMobileRowMental;
+
+  /// No description provided for @paywallMobileRowExport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Export PDF'**
+  String get paywallMobileRowExport;
+
   /// No description provided for @paywallPriceAnnualHighlight.
   ///
   /// In fr, this message translates to:
-  /// **'49,90 \$ US / an'**
+  /// **'59,99 \$ US / an'**
   String get paywallPriceAnnualHighlight;
 
   /// No description provided for @paywallPriceApproxPerMonth.
   ///
   /// In fr, this message translates to:
-  /// **'Soit environ 4,15 \$ US / mois'**
+  /// **'Soit environ 4,99 \$ US / mois'**
   String get paywallPriceApproxPerMonth;
 
   /// No description provided for @paywallTrialEndedBody.
@@ -4347,12 +4989,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'En Lite, seuls l’ajout d’un trade et le calendrier restent disponibles. Le reste est réservé aux abonnés Pro.'**
   String get paywallLiteLimitedHint;
-
-  /// No description provided for @paywallProPriceAnnual.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pro : 49,90 \$ US / an'**
-  String get paywallProPriceAnnual;
 
   /// No description provided for @paywallContinueFreemium.
   ///
@@ -4467,12 +5103,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Une question ou une idée ? Nous sommes à ton écoute.'**
   String get supportFeedbackSubtitle;
-
-  /// No description provided for @supportFeedbackBack.
-  ///
-  /// In fr, this message translates to:
-  /// **'Retour'**
-  String get supportFeedbackBack;
 
   /// No description provided for @supportActionEmailLabel.
   ///
@@ -4683,6 +5313,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Envoi impossible. Vérifie la connexion puis réessaie.'**
   String get supportFormSubmitError;
+
+  /// No description provided for @supportErrorEmailOpenFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouverture e-mail impossible : {error}'**
+  String supportErrorEmailOpenFailed(String error);
+
+  /// No description provided for @supportErrorEmailAppUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir l\'app e-mail. Vérifie qu\'une messagerie est installée.'**
+  String get supportErrorEmailAppUnavailable;
 
   /// No description provided for @supportFormSubmitSavedPartialAttachment.
   ///
@@ -5938,6 +6580,12 @@ abstract class AppLocalizations {
   /// **'Évolution du capital'**
   String get settingsDashSectionEvolution;
 
+  /// No description provided for @settingsDashSectionLens.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paychek Lens'**
+  String get settingsDashSectionLens;
+
   /// No description provided for @tradingSection.
   ///
   /// In fr, this message translates to:
@@ -5983,7 +6631,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCgv1Body.
   ///
   /// In fr, this message translates to:
-  /// **'Les présentes CGV régissent l\'abonnement donnant accès à l\'offre « Premium » de l\'application Paychek, un outil de journal de trading et de gestion de risque. L\'accès est fourni par abonnement annuel, tacitement reconduit chaque année jusqu\'à résiliation.'**
+  /// **'Les présentes CGV régissent l\'abonnement donnant accès à l\'offre « Pro » (Premium) de l\'application Paychek, un outil de journal de trading et de gestion de risque. L\'accès est fourni par abonnement mensuel, trimestriel ou annuel, tacitement reconduit à chaque échéance jusqu\'à résiliation.'**
   String get settingsCgv1Body;
 
   /// No description provided for @settingsCgv2Title.
@@ -6007,7 +6655,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCgv3Body.
   ///
   /// In fr, this message translates to:
-  /// **'Abonnement direct : le tarif est fixé à 49,90 \$ US par an (renouvellement automatique jusqu\'à résiliation).\n\nOffre Partenaire : L\'accès peut être offert gratuitement si l\'utilisateur remplit les conditions de parrainage auprès d\'un de nos partenaires (Prop Firm ou Broker).\n\nPaychek se réserve le droit de modifier ses prix à tout moment pour les nouveaux clients.'**
+  /// **'Abonnement direct : les formules Pro sont facturées en dollars américains (US\$), via Stripe, avec renouvellement automatique jusqu\'à résiliation :\n• 8,99 \$ US / mois\n• 20,97 \$ US / 3 mois\n• 59,99 \$ US / an\n\nOffre Partenaire : L\'accès peut être offert gratuitement si l\'utilisateur remplit les conditions de parrainage auprès d\'un de nos partenaires (Prop Firm ou Broker).\n\nPaychek se réserve le droit de modifier ses prix à tout moment pour les nouveaux clients.'**
   String get settingsCgv3Body;
 
   /// No description provided for @settingsCgv4Title.
@@ -6031,7 +6679,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCgv5Body.
   ///
   /// In fr, this message translates to:
-  /// **'L\'accès offert via un partenaire est conditionné par la validation de l\'affiliation par ledit partenaire.\n\nSi le partenaire refuse l\'affiliation (pour non-respect des règles de dépôt ou de trade), Paychek se réserve le droit de révoquer l\'accès Premium ou de demander le paiement du tarif standard.'**
+  /// **'L\'accès offert via un partenaire est conditionné par la validation de l\'affiliation par ledit partenaire.\n\nSi le partenaire refuse l\'affiliation (pour non-respect des règles de dépôt ou de trade), Paychek se réserve le droit de révoquer l\'accès Premium ou de demander le paiement des tarifs Pro en vigueur.'**
   String get settingsCgv5Body;
 
   /// No description provided for @settingsCgv6Title.

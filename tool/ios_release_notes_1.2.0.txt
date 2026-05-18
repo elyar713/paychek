@@ -1,0 +1,19 @@
+=== App Store Connect — « Quoi de neuf » (version 1.2.0) ===
+
+--- Français ---
+• En-têtes de pages unifiés et navigation retour plus cohérente
+• Paywall Pro : nouveaux tarifs (8,99 $ / mois, 20,97 $ / 3 mois, 59,99 $ / an)
+• Centre d’aide, support, CGV et confidentialité améliorés
+• Corrections et performances
+
+--- English ---
+• Unified page headers and more consistent back navigation
+• Pro paywall: new pricing ($8.99/month, $20.97/3 months, $59.99/year)
+• Improved help center, support, terms and privacy pages
+• Bug fixes and performance improvements
+
+--- Notes internes (build) ---
+Version affichée : 1.2.0
+Build number : 3
+Bundle ID : pro.paychek.app
+Commande Mac : ./tool/build_ios_release.sh

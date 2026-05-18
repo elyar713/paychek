@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+﻿import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
@@ -14,6 +14,7 @@ import 'dashboard_home_layout_scope.dart';
 import 'dashboard_home_strategie_teaser.dart';
 import '../reglage/user_profile_scope.dart';
 import '../web/paychek_web_tokens.dart';
+import '../web/web_dashboard_capital_evolution_pair.dart';
 import '../web/web_dashboard_checklist_analyse_pair.dart';
 import '../web/web_dashboard_config.dart';
 import 'pages/capital/widgets/capital_balance_card.dart';
@@ -181,7 +182,118 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
         .toList();
   }
 
-  /// Web : capital + évolution ; checklist + analyse ; état + stratégie + this week + calendrier ; puis le reste.
+  static const _analyseChecklistPairGap = 12.0;
+  static const _analyseChecklistMinSideBySide = 360.0;
+
+  /// Mobile : rapport d’analyse (gauche) + checklist (droite).
+  Widget _buildMobileAnalyseChecklistPair({
+    required bool hasAnalyse,
+    required bool hasCheck,
+  }) {
+    const analyseId = DashboardHomeLayoutKeys.analyse;
+    const checkId = DashboardHomeLayoutKeys.checklist;
+
+    if (!hasAnalyse && !hasCheck) return const SizedBox.shrink();
+
+    if (hasAnalyse && hasCheck) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          const gap = _analyseChecklistPairGap;
+          if (constraints.maxWidth < _analyseChecklistMinSideBySide + gap) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionForId(analyseId),
+                const SizedBox(height: gap),
+                _sectionForId(checkId),
+              ],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: _sectionForId(analyseId),
+                ),
+              ),
+              const SizedBox(width: gap),
+              Expanded(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: _sectionForId(checkId),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    if (hasAnalyse) return _sectionForId(analyseId);
+    return _sectionForId(checkId);
+  }
+
+  /// Accueil mobile : capital puis paire analyse / checklist, puis le reste.
+  Widget _buildMobileHomeSections(List<String> orderedVisibleIds) {
+    const capId = DashboardHomeLayoutKeys.capitalBalance;
+    const checkId = DashboardHomeLayoutKeys.checklist;
+    const analyseId = DashboardHomeLayoutKeys.analyse;
+
+    final ids = _mobileHomeSectionOrder(orderedVisibleIds);
+    final hasCap = ids.contains(capId);
+    final hasAnalyse = ids.contains(analyseId);
+    final hasCheck = ids.contains(checkId);
+    final showCheckAnalysePair = hasAnalyse || hasCheck;
+
+    final children = <Widget>[];
+    var needsGap = false;
+
+    void addGap() {
+      if (needsGap) children.add(const SizedBox(height: 20));
+      needsGap = true;
+    }
+
+    for (final id in ids) {
+      if (id == analyseId || id == checkId) continue;
+
+      if (id == capId) {
+        addGap();
+        children.add(_sectionForId(capId));
+        if (showCheckAnalysePair) {
+          children.add(const SizedBox(height: 20));
+          children.add(
+            _buildMobileAnalyseChecklistPair(
+              hasAnalyse: hasAnalyse,
+              hasCheck: hasCheck,
+            ),
+          );
+        }
+        continue;
+      }
+
+      addGap();
+      children.add(_sectionForId(id));
+    }
+
+    if (!hasCap && showCheckAnalysePair) {
+      children.insert(
+        0,
+        _buildMobileAnalyseChecklistPair(
+          hasAnalyse: hasAnalyse,
+          hasCheck: hasCheck,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
+    );
+  }
+
+  /// Web : capital + évolution ; analyse + checklist ; état + stratégie ; this week + calendrier ; puis le reste.
   Widget _buildWebHomeSections(List<String> orderedVisibleIds) {
     const capId = DashboardHomeLayoutKeys.capitalBalance;
     const evoId = DashboardHomeLayoutKeys.capitalEvolution;
@@ -216,14 +328,21 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     final showCheckAnalyseRow = hasCheck || hasAnalyse;
     final showEtatStratRow = hasEtat || hasStrat;
 
-    final gapAfterCapital =
-        showCapitalRow &&
-        (showCheckAnalyseRow || showEtatStratRow || hasPaychekLens || rest.isNotEmpty);
+    final gapAfterCapital = showCapitalRow &&
+        (showCheckAnalyseRow ||
+            showEtatStratRow ||
+            hasPaychekLens ||
+            rest.isNotEmpty);
     final gapAfterCheckAnalyse =
         showCheckAnalyseRow && (showEtatStratRow || hasPaychekLens || rest.isNotEmpty);
+    final gapAfterEtatStrat =
+        showEtatStratRow && (hasPaychekLens || rest.isNotEmpty);
     final gapAfterPaychekLens = hasPaychekLens && rest.isNotEmpty;
     final gapBeforePaychekLens = hasPaychekLens &&
-        (showCapitalRow || showCheckAnalyseRow || showEtatStratRow || WebDashboardConfig.useLeftRail);
+        (showCapitalRow ||
+            showCheckAnalyseRow ||
+            showEtatStratRow ||
+            WebDashboardConfig.useLeftRail);
 
     /// Ligne capital + évolution : capital ~27 %, évolution ~73 %.
     const webCapitalRowFlex = 10;
@@ -256,19 +375,13 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                     final capW = inner * webCapitalRowFlex / sumFlex;
                     final evoW = inner - capW;
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: capW,
-                          child: _sectionForId(capId),
-                        ),
-                        SizedBox(width: webCapitalPairGap),
-                        SizedBox(
-                          width: evoW,
-                          child: _sectionForId(evoId),
-                        ),
-                      ],
+                    return WebDashboardCapitalEvolutionPair(
+                      gap: webCapitalPairGap,
+                      capitalWidth: capW,
+                      evolutionWidth: evoW,
+                      capitalChild: _sectionForId(capId),
+                      evolutionChild:
+                          _sectionForId(evoId, webPairStretch: true),
                     );
                   },
                 )
@@ -306,8 +419,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
             builder: (context, constraints) {
               final wide = constraints.maxWidth >= 720;
               final webRail = WebDashboardConfig.useLeftRail;
-              /// Web large + rail : gauche = État mental, puis Stratégie, puis This week ;
-              /// droite = Calendrier (à la place de l’ancienne pile strat + this week).
+              /// Web large + rail : gauche = État mental, puis Stratégie ; droite = Calendrier.
               if (webRail && wide && hasEtat && hasStrat) {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,7 +466,6 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                 );
               }
               if (wide && hasEtat && hasStrat) {
-                /// 50 % / 50 % (flex 1:1). Pas de hauteur forcée : scroll vertical infini.
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -407,6 +518,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               return WebDashboardPairedCard(child: _sectionForId(stratId));
             },
           ),
+        if (gapAfterEtatStrat) const SizedBox(height: 20),
         if (WebDashboardConfig.useLeftRail)
           LayoutBuilder(
             builder: (context, constraints) {
@@ -503,16 +615,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                     if (WebDashboardConfig.useLeftRail) {
                       return _buildWebHomeSections(ids);
                     }
-                    final mobileIds = _mobileHomeSectionOrder(ids);
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (var i = 0; i < mobileIds.length; i++) ...[
-                          if (i > 0) const SizedBox(height: 20),
-                          _sectionForId(mobileIds[i]),
-                        ],
-                      ],
-                    );
+                    return _buildMobileHomeSections(ids);
                   },
                 ),
                 const SizedBox(height: 28),

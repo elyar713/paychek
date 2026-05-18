@@ -114,6 +114,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
           setState(() {
             _assetClass = v;
             _applyFavoriteActifForClass(v);
+            _clearPerfLitePreserve();
           });
           _requestGainRecalc();
         },
@@ -135,7 +136,10 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             AjouterTradeFavoriteActifStorage.clear(_assetClass);
           }
         },
-        onActifChanged: (v) => setState(() => _actif = v),
+        onActifChanged: (v) => setState(() {
+          _actif = v;
+          _clearPerfLitePreserve();
+        }),
         onBreakevenChanged: (v) {
           setState(() {
             _breakeven = v;
@@ -236,13 +240,16 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             children: [
               AjouterTradeWebTopBar(
                 onBack: widget.onBack,
-                onSave: () {
-                  _saveTradeToJournal(context);
-                  widget.onNavigateToTrade?.call();
+                onSave: () async {
+                  final ok = await _saveTradeToJournal(context);
+                  if (ok && context.mounted) {
+                    widget.onNavigateToTrade?.call();
+                  }
                 },
-                onSaveAndNext: () {
-                  _saveTradeToJournal(context);
-                  _resetForNextTrade();
+                onSaveAndNext: () async {
+                  final ok = await _saveTradeToJournal(context);
+                  if (!context.mounted) return;
+                  if (ok) _resetForNextTrade();
                 },
               ),
               Expanded(
@@ -253,32 +260,35 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                     if (!wide) {
                       return SingleChildScrollView(
                         padding: pad,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            buildDirectionBar(),
-                            const SizedBox(height: 20),
-                            buildInstrumentCard(),
-                            const SizedBox(height: 20),
-                            _ajouterTradeGainMindsetColumn(
-                              context,
-                              l,
-                              locale,
-                              labelStyle,
-                              mutedStyle,
-                              titleStyle,
-                              entreeSortieDtStyle,
-                              checkboxLabelStyle,
-                              disciplineCardDec: webDisciplineCardDec,
-                              sectionHeaderColor: webSectionLabelColor,
-                            ),
-                            const SizedBox(height: 20),
-                            liteLockDisciplineExtras(psychCard),
-                            const SizedBox(height: 20),
-                            liteLockDisciplineExtras(screenshotCard),
-                            const SizedBox(height: 20),
-                            liteLockDisciplineExtras(csvCard),
-                          ],
+                        child: Form(
+                          canPop: false,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              buildDirectionBar(),
+                              const SizedBox(height: 20),
+                              buildInstrumentCard(),
+                              const SizedBox(height: 20),
+                              _ajouterTradeGainMindsetColumn(
+                                context,
+                                l,
+                                locale,
+                                labelStyle,
+                                mutedStyle,
+                                titleStyle,
+                                entreeSortieDtStyle,
+                                checkboxLabelStyle,
+                                disciplineCardDec: webDisciplineCardDec,
+                                sectionHeaderColor: webSectionLabelColor,
+                              ),
+                              const SizedBox(height: 20),
+                              liteLockDisciplineExtras(psychCard),
+                              const SizedBox(height: 20),
+                              liteLockDisciplineExtras(screenshotCard),
+                              const SizedBox(height: 20),
+                              liteLockDisciplineExtras(csvCard),
+                            ],
+                          ),
                         ),
                       );
                     }
@@ -287,8 +297,10 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                     // Contrôleurs dans un StatefulWidget séparé (hot reload ne réinitialise pas les nouveaux champs de PageState).
                     return Padding(
                       padding: pad,
-                      child: _AjouterTradeWebWideDoubleColumn(
-                        leftColumn: Column(
+                      child: Form(
+                        canPop: false,
+                        child: _AjouterTradeWebWideDoubleColumn(
+                          leftColumn: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             buildDirectionBar(),
@@ -327,6 +339,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                             liteLockDisciplineExtras(psychCard),
                           ],
                         ),
+                        ),
                       ),
                     );
                   },
@@ -344,9 +357,19 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AjouterTradePageAppBar(
-              titleStyle: titleStyle,
+            PaychekPageHeader(
               onBack: widget.onBack,
+              title: l.ajouterTradePageTitle,
+              subtitle: perf6(
+                locale.languageCode,
+                'Saisissez les détails du trade et la discipline.',
+                'Enter trade details and discipline.',
+                'Introduce los datos del trade y la disciplina.',
+                'Trade-Details und Disziplin erfassen.',
+                'Preencha os dados do trade e a disciplina.',
+                '트레이드 정보와 규율을 입력하세요.',
+              ),
+              maxContentWidth: 1180,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -354,39 +377,51 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    buildDirectionBar(),
-                    const SizedBox(height: 20),
-                    buildInstrumentCard(),
-                    const SizedBox(height: 20),
-                    _ajouterTradeGainMindsetColumn(
-                      context,
-                      l,
-                      locale,
-                      labelStyle,
-                      mutedStyle,
-                      titleStyle,
-                      entreeSortieDtStyle,
-                      checkboxLabelStyle,
-                      disciplineCardDec: webDisciplineCardDec,
-                      sectionHeaderColor: webSectionLabelColor,
-                    ),
-                    const SizedBox(height: 20),
-                    liteLockDisciplineExtras(psychCard),
-                    const SizedBox(height: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            child: liteLockDisciplineExtras(screenshotCard)),
-                        const SizedBox(width: 12),
-                        Expanded(child: liteLockDisciplineExtras(csvCard)),
-                      ],
+                    Form(
+                      canPop: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          buildDirectionBar(),
+                          const SizedBox(height: 20),
+                          buildInstrumentCard(),
+                          const SizedBox(height: 20),
+                          _ajouterTradeGainMindsetColumn(
+                            context,
+                            l,
+                            locale,
+                            labelStyle,
+                            mutedStyle,
+                            titleStyle,
+                            entreeSortieDtStyle,
+                            checkboxLabelStyle,
+                            disciplineCardDec: webDisciplineCardDec,
+                            sectionHeaderColor: webSectionLabelColor,
+                          ),
+                          const SizedBox(height: 20),
+                          liteLockDisciplineExtras(psychCard),
+                          const SizedBox(height: 20),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  child:
+                                      liteLockDisciplineExtras(screenshotCard)),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                  child: liteLockDisciplineExtras(csvCard)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
                     FilledButton(
-                      onPressed: () {
-                        _saveTradeToJournal(context);
-                        widget.onNavigateToTrade?.call();
+                      onPressed: () async {
+                        final ok = await _saveTradeToJournal(context);
+                        if (ok && context.mounted) {
+                          widget.onNavigateToTrade?.call();
+                        }
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: DashboardTokens.accent,
@@ -403,9 +438,10 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton(
-                      onPressed: () {
-                        _saveTradeToJournal(context);
-                        _resetForNextTrade();
+                      onPressed: () async {
+                        final ok = await _saveTradeToJournal(context);
+                        if (!context.mounted) return;
+                        if (ok) _resetForNextTrade();
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: DashboardTokens.onMatteEmphasis,

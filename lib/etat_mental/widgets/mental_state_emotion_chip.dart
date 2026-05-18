@@ -36,10 +36,13 @@ class MentalStateEmotionChip extends StatelessWidget {
       fontWeight: FontWeight.w600,
       color: active ? Colors.black : Colors.white,
     );
+    final impactPct = controller.emotionChipImpactPercent(emotion);
     final pctStyle = GoogleFonts.plusJakartaSans(
       fontSize: 9,
       fontWeight: FontWeight.w600,
-      color: emotion.inverse ? MentalStateTokens.matteRed : MentalStateTokens.matteGreen,
+      color: active
+          ? (emotion.inverse ? MentalStateTokens.matteRed : MentalStateTokens.matteGreen)
+          : const Color(0xFF666666),
     );
     final iconColor = active ? const Color(0xFF555555) : const Color(0xFF888888);
     final dividerColor = active ? const Color(0xFFE0E0E0) : const Color(0xFF333333);
@@ -74,7 +77,7 @@ class MentalStateEmotionChip extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 4),
-              Text('${controller.emotionFactorImpactPercent(emotion)}%', style: pctStyle),
+              Text('$impactPct%', style: pctStyle),
               if (editEmotions) ...[
                 const SizedBox(width: 8),
                 Container(

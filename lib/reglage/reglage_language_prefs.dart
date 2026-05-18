@@ -42,24 +42,34 @@ abstract final class ReglageLanguagePrefs {
     return null;
   }
 
-  /// Après connexion : reprend le choix fait sur la landing (`__guest`) si le compte n’a pas encore de langue.
-  static Future<void> promoteGuestLanguageToCurrentAccountIfNeeded() async {
+  /// Après connexion : reprend le choix fait sur la landing (`__guest`) si le compte
+  /// n’a pas encore de langue **ou** si le guest est plus récent (choix explicite landing).
+  ///
+  /// Retourne `true` si une promotion a eu lieu (le merge cloud ne doit pas l’écraser).
+  static Future<bool> promoteGuestLanguageToCurrentAccountIfNeeded() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) return false;
     final p = await SharedPreferences.getInstance();
     await _migrateLegacyGlobalIfNeeded(p);
     final scopedCodeKey = paychekScopedPrefsKey(_kLanguageCodeBase);
-    if (_readCodeIfValid(p.getString(scopedCodeKey)) != null) return;
+    final scopedAtKey = paychekScopedPrefsKey(_kUpdatedAtMsBase);
 
     final guestCode = _readCodeIfValid(
       p.getString(_guestScopedKey(_kLanguageCodeBase)),
     );
-    if (guestCode == null) return;
+    if (guestCode == null) return false;
 
-    final guestAtKey = _guestScopedKey(_kUpdatedAtMsBase);
-    final ms =
-        p.getInt(guestAtKey) ?? DateTime.now().millisecondsSinceEpoch;
+    final guestMs = p.getInt(_guestScopedKey(_kUpdatedAtMsBase)) ?? 0;
+    final scopedCode = _readCodeIfValid(p.getString(scopedCodeKey));
+    final scopedMs = p.getInt(scopedAtKey) ?? 0;
+
+    if (scopedCode != null && scopedMs >= guestMs && guestMs > 0) {
+      return false;
+    }
+
+    final ms = DateTime.now().millisecondsSinceEpoch;
     await save(guestCode, updatedAtMillis: ms);
+    return true;
   }
 
   static Future<String> loadCode() async {

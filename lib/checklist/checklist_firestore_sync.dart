@@ -157,12 +157,7 @@ abstract final class ChecklistFirestoreSync {
           'id': s.id,
           'title': s.title,
           'items': [
-            for (final i in s.items)
-              <String, dynamic>{
-                'id': i.id,
-                'label': i.label,
-                'checked': i.checked,
-              },
+            for (final i in s.items) ChecklistSectionsStorage.encodeItem(i),
           ],
         },
     ];

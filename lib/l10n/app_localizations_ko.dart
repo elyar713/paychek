@@ -79,6 +79,127 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get tradeImportPickSoftwareFirst => '가져오기 전에 플랫폼을 선택하세요.';
+
+  @override
+  String get tradeImportEmptyFile => '파일이 비어 있거나 읽을 수 없습니다.';
+
+  @override
+  String get tradeImportMt4HtmlOnly => 'MT4: HTML/HTM보내기를 사용하세요.';
+
+  @override
+  String get tradeImportTradingViewCsvOnly => 'TradingView: CSV보내기를 사용하세요.';
+
+  @override
+  String get tradeImportCtraderHtmlOnly => 'cTrader: HTML/HTM 계정 명세서를 사용하세요.';
+
+  @override
+  String get tradeImportTradovateOrdersCsv => 'Tradovate: Orders.csv(체결)를보내세요.';
+
+  @override
+  String get tradeImportTradovatePickOrdersCsv =>
+      'Tradovate: Orders.csv 파일을 선택하세요.';
+
+  @override
+  String get tradeImportNinjaGridCsv => 'NinjaTrader: CSV 그리드(주문 또는 체결)를보내세요.';
+
+  @override
+  String get tradeImportNinjaPickCsv => 'NinjaTrader: CSV 파일(그리드)을 선택하세요.';
+
+  @override
+  String get tradeImportRithmicCsv => 'Rithmic: CSV보내기(Recent Orders)를 사용하세요.';
+
+  @override
+  String get tradeImportRithmicPickCsv => 'Rithmic: CSV 파일을 선택하세요.';
+
+  @override
+  String get tradeImportQuantowerCsv =>
+      'Quantower: CSV보내기(Orders history)를 사용하세요.';
+
+  @override
+  String get tradeImportQuantowerPickCsv =>
+      'Quantower: CSV 파일(Orders history)을 선택하세요.';
+
+  @override
+  String get tradeImportAtasXlsxReadFailed =>
+      '.xlsx를 읽을 수 없습니다(비어 있거나 브라우저에서 너무 큼). 다시 시도하세요.';
+
+  @override
+  String get tradeImportAtasPickCsvXlsx => 'ATAS: CSV 또는 .xlsx 파일(통계)을 선택하세요.';
+
+  @override
+  String get tradeImportAtasXlsxEmptyFile => '빈 파일입니다.';
+
+  @override
+  String get tradeImportAtasXlsxInvalidFormat =>
+      '유효한 Excel .xlsx가 아닙니다(헤더 없음). ATAS에서 다시보내세요.';
+
+  @override
+  String get tradeImportAtasXlsxJournalMissing =>
+      'Journal 시트를 찾을 수 없거나 통합 문서를 읽을 수 없습니다. 통계 .xlsx보내기를 확인하세요.';
+
+  @override
+  String get tradeImportAtasXlsxNoRows =>
+      '인식된 거래 행이 없습니다. Journal 시트를 여세요: Instrument, Open time, Open/Close volume 열.';
+
+  @override
+  String tradeImportNotImplemented(String source) {
+    return '$source 가져오기는 아직 지원되지 않습니다.';
+  }
+
+  @override
+  String tradeImportEmptyMt5(String extension) {
+    return 'MT5 $extension: Position 행이 감지되지 않았습니다.';
+  }
+
+  @override
+  String get tradeImportEmptyTradingView =>
+      'TradingView CSV: 청산된 포지션이 감지되지 않았습니다.';
+
+  @override
+  String get tradeImportEmptyCtrader =>
+      'cTrader HTML: 기록(Historique) 행이 감지되지 않았습니다.';
+
+  @override
+  String get tradeImportEmptyTradovate =>
+      'Tradovate CSV: 라운드트립(진입/청산)이 감지되지 않았습니다.';
+
+  @override
+  String get tradeImportEmptyNinjaTrader =>
+      'NinjaTrader CSV: 라운드트립(진입/청산)이 감지되지 않았습니다.';
+
+  @override
+  String get tradeImportEmptyAtas => 'ATAS: 인식된 행 없음(Journal 시트만).';
+
+  @override
+  String get tradeImportEmptyGeneric => '이 플랫폼/파일에 대해 인식된 포지션이 없습니다.';
+
+  @override
+  String tradeImportNoneNew(String source, String duplicates) {
+    return '$source에서 새 거래를 가져오지 못했습니다$duplicates.';
+  }
+
+  @override
+  String tradeImportSummary(int count, String source, String duplicates) {
+    return '$source에서 $count건을 가져왔습니다$duplicates.';
+  }
+
+  @override
+  String tradeImportDuplicatesSuffix(int count) {
+    return ' · 중복 $count건 무시';
+  }
+
+  @override
+  String tradeImportDuplicatesOnlySuffix(int count) {
+    return ' · 중복 $count건';
+  }
+
+  @override
+  String tradeImportFailed(String error) {
+    return '가져오기 실패: $error';
+  }
+
+  @override
   String get ajouterTradeSectionEtatMoment => '현재 상태';
 
   @override
@@ -211,6 +332,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ajouterTradeDisciplinePlanTitle => '분석 계획';
+
+  @override
+  String get ajouterTradeDisciplineConfidencePlanTitle => '신뢰 계획';
 
   @override
   String get ajouterTradeDisciplinePlanSubtitle => '리포트, 피드백';
@@ -960,6 +1084,54 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calcWinsLosses => '승 / 패';
 
   @override
+  String get calcErrorInvalidBalance => '초기 잔고가 유효하지 않습니다.';
+
+  @override
+  String get calcErrorTradesRange => '거래 수는 1~2000 사이여야 합니다.';
+
+  @override
+  String get calcErrorWinRateRange => '승률은 0~100 사이여야 합니다.';
+
+  @override
+  String get calcErrorRiskRange => '리스크(%)는 0~100 사이여야 합니다.';
+
+  @override
+  String get calcErrorInvalidRiskReward => 'Risk:Reward가 유효하지 않습니다.';
+
+  @override
+  String get calcErrorInvalidLot => '로트가 유효하지 않습니다.';
+
+  @override
+  String get calcErrorInvalidEntry => '진입 가격이 유효하지 않습니다.';
+
+  @override
+  String get calcErrorInvalidSl => '손절가가 유효하지 않습니다.';
+
+  @override
+  String get calcErrorInvalidTp => '익절가가 유효하지 않습니다.';
+
+  @override
+  String get calcErrorEntrySlIdentical => '진입가와 SL은 같을 수 없습니다.';
+
+  @override
+  String get calcDisclaimerEstimates => '주의: 이 계산은 계약상 수치가 아닙니다. 참고용입니다.';
+
+  @override
+  String get calcHeaderSubtitleEstimates => '수익·비율 시뮬레이션 — 참고 값입니다.';
+
+  @override
+  String get calcMarketIndex => '지수';
+
+  @override
+  String get calcMarketFutures => '선물';
+
+  @override
+  String get calcMarketStock => '주식';
+
+  @override
+  String get calcMarketCommodities => '원자재';
+
+  @override
   String get calcWorstBalance => '최저 잔고';
 
   @override
@@ -1011,6 +1183,37 @@ class AppLocalizationsKo extends AppLocalizations {
   String get checklistIntroBody => '포지션에 들어가기 전에 트레이딩 플랜의 모든 기준을 확인하세요.';
 
   @override
+  String get checklistDailyCalendarTitle => '일별 체크리스트';
+
+  @override
+  String get checklistDailyUncheckedTitle => '미체크';
+
+  @override
+  String get checklistDailyUncheckedNoActivity => '이 날 활동이 없습니다.';
+
+  @override
+  String get checklistDailyUncheckedNoDue => '이 날 예정된 기준이 없습니다.';
+
+  @override
+  String get checklistDailyUncheckedAllDone => '이 날 기준이 모두 체크되었습니다.';
+
+  @override
+  String get checklistDailyUncheckedNoHistory =>
+      '이 날의 체크리스트 세부 정보가 저장되지 않았습니다. 미체크 기준 추적은 오늘부터 이용할 수 있습니다.';
+
+  @override
+  String get checklistItemNews1 => '경제 캘린더 확인 (FED, CPI, NFP, GDP…).';
+
+  @override
+  String get checklistItemNews2 => 'FOMC / FED: 발표 중 거래 없음.';
+
+  @override
+  String get checklistItemNews3 => 'CPI(인플레이션): 시간·영향 예상 확인.';
+
+  @override
+  String get checklistItemNews4 => 'NFP(미국 고용): 위험 구간 파악.';
+
+  @override
   String get checklistItemAnalyse1 => '배경 추세(HTF)가 나의 아이디어와 맞습니다.';
 
   @override
@@ -1050,6 +1253,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get checklistProgressCl => 'CL';
 
   @override
+  String get checklistSectionNews => 'NEWS · 경제 캘린더';
+
+  @override
   String get checklistSectionAnalyse => '기술적 분석';
 
   @override
@@ -1057,6 +1263,44 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get checklistSectionRisque => '리스크 관리';
+
+  @override
+  String get checklistScheduleTitle => 'Item reminder';
+
+  @override
+  String get checklistScheduleDefaultHeading => '1 · Default rule';
+
+  @override
+  String get checklistScheduleModeDaily => 'Every day';
+
+  @override
+  String get checklistScheduleModeWeekly => 'Once a week';
+
+  @override
+  String get checklistScheduleModeSpecificDate => 'Specific date';
+
+  @override
+  String get checklistScheduleUserDateHeading => '2 · Chosen date';
+
+  @override
+  String get checklistSchedulePickDate => 'Pick a date';
+
+  @override
+  String get checklistScheduleWeekHeading => '3 · Day of week';
+
+  @override
+  String checklistScheduleNextOccurrence(String date) {
+    return 'Next date: $date';
+  }
+
+  @override
+  String get checklistScheduleWarningHeading => '4 · Alert time';
+
+  @override
+  String get checklistSchedulePickTime => 'Pick time';
+
+  @override
+  String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
 
   @override
   String get clearAll => '모두 지우기';
@@ -1406,6 +1650,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mentalRoutineFieldLabel => '루틴 이름(예: 운동, 독서)';
+
+  @override
+  String get mentalDayDetailTitle => '일별 기준';
+
+  @override
+  String get mentalDayDetailNoData => '이 날짜에 기록된 데이터가 없습니다. 정신 상태를 수정하면 저장됩니다.';
+
+  @override
+  String get mentalDayDetailGlobalScore => '전체 점수';
 
   @override
   String get mentalGlobalScoreCalendarTitle => '일별 전체 점수';
@@ -1959,7 +2212,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get profileSubscribeButton => 'Pro로 업그레이드 (연 \$49.90 구독)';
+  String get profileSubscribeButton => 'Pro로 업그레이드 (월 \$8.99부터)';
 
   @override
   String get profileManageSubscriptionButton => '구독 관리';
@@ -2020,6 +2273,30 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get authTerminalCtaSignup => '아이덴티티 만들기';
+
+  @override
+  String get webLandingLoginSubtitle => 'Paychek에 다시 오신 것을 환영합니다.';
+
+  @override
+  String get webLandingSignupSubtitle => '트레이더 엘리트에 합류하세요.';
+
+  @override
+  String get webLandingLoginCta => '로그인';
+
+  @override
+  String get webLandingSignupCta => '무료 체험';
+
+  @override
+  String get webLandingNoAccountLabel => '계정이 없으신가요?';
+
+  @override
+  String get webLandingRegisterLink => '가입하기';
+
+  @override
+  String get webLandingAlreadyMemberLabel => '이미 회원이신가요?';
+
+  @override
+  String get webLandingLoginLink => '로그인';
 
   @override
   String get authTerminalEncryptedPrefix => '암호화 노드:';
@@ -2246,10 +2523,86 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywallProFeature9 => 'PDF보내기';
 
   @override
-  String get paywallPriceAnnualHighlight => '연 US\$49.90';
+  String get paywallMobilePlanAnnualTitle => '1년 (12개월)';
 
   @override
-  String get paywallPriceApproxPerMonth => '월 약 US\$4.15';
+  String get paywallMobilePlanQuarterlyTitle => '3개월';
+
+  @override
+  String get paywallMobilePlanMonthlyTitle => '1개월';
+
+  @override
+  String paywallMobilePlanPerMonthLine(String price) {
+    return '월 $price US\$';
+  }
+
+  @override
+  String get paywallMobilePlanPerMonthPrefix => '월 ';
+
+  @override
+  String get paywallMobilePlanPerMonthPriceSuffix => ' US\$';
+
+  @override
+  String get paywallMobilePlanPerMonthEnd => '';
+
+  @override
+  String paywallMobilePlanTotalLine(String total) {
+    return '$total US\$';
+  }
+
+  @override
+  String get paywallMobilePlanAnnualBilling => '연간 결제';
+
+  @override
+  String get paywallMobilePlanQuarterlyBilling => '3개월마다';
+
+  @override
+  String get paywallMobilePlanMonthlyBilling => '월간 결제';
+
+  @override
+  String get paywallMobilePlanMonthlyCommitment => '월 단위 약정';
+
+  @override
+  String get paywallMobilePlanSavings44 => '44% 절약';
+
+  @override
+  String get paywallMobilePlanPopular => '인기';
+
+  @override
+  String get paywallMobileCompareFeatureCol => '기능';
+
+  @override
+  String get paywallMobileRowTrades => '월간 트레이드';
+
+  @override
+  String get paywallMobileRowEntry => '데이터 입력';
+
+  @override
+  String get paywallMobileRowCalendar => '캘린더';
+
+  @override
+  String get paywallMobileRowChecklist => '체크리스트';
+
+  @override
+  String get paywallMobileRowAnalysis => '분석 생성기';
+
+  @override
+  String get paywallMobileRowStrategy => '전략 페이지';
+
+  @override
+  String get paywallMobileRowStats => '성과 통계';
+
+  @override
+  String get paywallMobileRowMental => '멘탈 상태';
+
+  @override
+  String get paywallMobileRowExport => 'PDF보내기';
+
+  @override
+  String get paywallPriceAnnualHighlight => '연 US\$59.99';
+
+  @override
+  String get paywallPriceApproxPerMonth => '월 약 US\$4.99';
 
   @override
   String paywallTrialEndedBody(String date) {
@@ -2259,9 +2612,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get paywallLiteLimitedHint =>
       'Lite에서는 트레이드 추가와 캘린더만 사용할 수 있습니다. 나머지는 Pro 구독이 필요합니다.';
-
-  @override
-  String get paywallProPriceAnnual => 'Pro: 연 US\$49.90';
 
   @override
   String get paywallContinueFreemium => 'Lite로 계속 (제한적 이용)';
@@ -2320,9 +2670,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get supportFeedbackSubtitle => '질문이나 아이디어가 있나요? 기다리고 있어요.';
-
-  @override
-  String get supportFeedbackBack => '뒤로';
 
   @override
   String get supportActionEmailLabel => '이메일';
@@ -2431,6 +2778,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get supportFormSubmitError => '전송 실패. 연결을 확인하세요.';
+
+  @override
+  String supportErrorEmailOpenFailed(String error) {
+    return '이메일을 열 수 없습니다: $error';
+  }
+
+  @override
+  String get supportErrorEmailAppUnavailable =>
+      '이메일 앱을 열 수 없습니다. 메일 앱이 설치되어 있는지 확인하세요.';
 
   @override
   String get supportFormSubmitSavedPartialAttachment =>
@@ -3105,6 +3461,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsDashSectionEvolution => '자본 변화';
 
   @override
+  String get settingsDashSectionLens => 'Paychek Lens';
+
+  @override
   String get tradingSection => '트레이딩';
 
   @override
@@ -3127,7 +3486,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsCgv1Body =>
-      '본 CGV는 트레이딩 일지 및 리스크 관리 도구인 Paychek 애플리케이션의 \"프리미엄\" 이용 구독을 규율합니다. 이용권은 매년 자동 갱신되는 연 구독으로 제공되며, 해지 시까지 갱신됩니다.';
+      '본 CGV는 트레이딩 일지 및 리스크 관리 도구인 Paychek 애플리케이션의 \"Pro\"(프리미엄) 이용 구독을 규율합니다. 이용권은 월간·분기·연간 구독으로 제공되며, 해지 시까지 각 결제 주기마다 자동 갱신됩니다.';
 
   @override
   String get settingsCgv2Title => '2. 제공 서비스';
@@ -3141,7 +3500,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsCgv3Body =>
-      '직접 구독: 가격은 연 49.90달러(USD)이며, 해지 시까지 자동 갱신됩니다.\n\n파트너 제공: 사용자가 당사 파트너(프롭 펌 또는 브로커) 중 한 곳의 추천 조건을 충족하면 무료로 제공될 수 있습니다.\n\nPaychek는 신규 고객에 대해 언제든지 가격을 변경할 권리를 보유합니다.';
+      '직접 구독: Pro 요금제는 Stripe를 통해 미국 달러(USD)로 청구되며, 해지 시까지 자동 갱신됩니다:\n• 월 US\$8.99\n• 3개월 US\$20.97\n• 연 US\$59.99\n\n파트너 제공: 사용자가 당사 파트너(프롭 펌 또는 브로커) 중 한 곳의 추천 조건을 충족하면 무료로 제공될 수 있습니다.\n\nPaychek는 신규 고객에 대해 언제든지 가격을 변경할 권리를 보유합니다.';
 
   @override
   String get settingsCgv4Title => '4. 청약 철회 및 환불';
@@ -3155,7 +3514,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsCgv5Body =>
-      '파트너를 통한 이용은 해당 파트너의 소속(제휴) 승인에 따라 제공됩니다.\n\n파트너가 소속을 거부하는 경우(입금 또는 거래 규칙 미준수 등), Paychek는 프리미엄 이용을 철회하거나 표준 요금 결제를 요구할 권리를 보유합니다.';
+      '파트너를 통한 이용은 해당 파트너의 소속(제휴) 승인에 따라 제공됩니다.\n\n파트너가 소속을 거부하는 경우(입금 또는 거래 규칙 미준수 등), Paychek는 프리미엄 이용을 철회하거나 적용 중인 Pro 요금 결제를 요구할 권리를 보유합니다.';
 
   @override
   String get settingsCgv6Title => '6. 리스크 고지 (트레이딩)';

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+﻿import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -89,82 +89,113 @@ class CapitalEvolutionCard extends StatelessWidget {
               );
             }
 
-            return Container(
-              width: double.infinity,
-              padding: DashboardTokens.cardPadding,
-              decoration: cardDecoration ?? DashboardTokens.cardDecoration(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (kIsWeb) ...[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            l.dashboardCapitalEvolutionTitle.toUpperCase(),
-                            style: GoogleFonts.plusJakartaSans(
-                              color: PaychekWebTokens.textGray500,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ),
-                        if (!hideTimeframePills)
-                          TimeframePills(
-                            labels: tfLabels,
-                            selectedIndex: timeframeIndex,
-                            onChanged: onTimeframeChanged,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 11),
-                  ],
-                  Column(
+            final chartSection = CapitalEvolutionChartSection(
+              timeframeIndex: timeframeIndex,
+              onOpenTradeById: onOpenTradeById,
+              sparklineHeight: 122,
+              showTradeExtremes: false,
+            );
+
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // En scroll web, la hauteur parente est souvent non bornée : pas de
+                // [Expanded] ni de `height: infinity` (assertion box.dart + écran noir).
+                final stretchChart = webPairStretch &&
+                    kIsWeb &&
+                    constraints.hasBoundedHeight &&
+                    constraints.maxHeight.isFinite;
+
+                return Container(
+                  width: double.infinity,
+                  padding: DashboardTokens.cardPadding,
+                  decoration: cardDecoration ?? DashboardTokens.cardDecoration(),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize:
+                        stretchChart ? MainAxisSize.max : MainAxisSize.min,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              amountHeading(),
-                              const SizedBox(height: 6),
-                              tradesLine,
-                            ],
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: const Alignment(-0.22, 1),
-                              child: WeeklyThisWeekSection(
-                                compactOnly: true,
-                                compactPart:
-                                    WeeklyThisWeekCompactPart.barsOnly,
+                      if (kIsWeb) ...[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l.dashboardCapitalEvolutionTitle.toUpperCase(),
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: PaychekWebTokens.textGray500,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                ),
                               ),
                             ),
+                            if (!hideTimeframePills)
+                              TimeframePills(
+                                labels: tfLabels,
+                                selectedIndex: timeframeIndex,
+                                onChanged: onTimeframeChanged,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 11),
+                      ],
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  amountHeading(),
+                                  const SizedBox(height: 6),
+                                  tradesLine,
+                                ],
+                              ),
+                              Expanded(
+                                child: Align(
+                                  alignment: const Alignment(-0.22, 1),
+                                  child: WeeklyThisWeekSection(
+                                    compactOnly: true,
+                                    compactPart:
+                                        WeeklyThisWeekCompactPart.barsOnly,
+                                  ),
+                                ),
+                              ),
+                              WeeklyThisWeekSection(
+                                compactOnly: true,
+                                compactPart:
+                                    WeeklyThisWeekCompactPart.extremesOnly,
+                                includeTradeExtremes: true,
+                                onOpenTradeById: onOpenTradeById,
+                              ),
+                            ],
                           ),
-                          WeeklyThisWeekSection(
-                            compactOnly: true,
-                            compactPart:
-                                WeeklyThisWeekCompactPart.extremesOnly,
-                            includeTradeExtremes: true,
-                            onOpenTradeById: onOpenTradeById,
-                          ),
+                          const SizedBox(height: 10),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      if (stretchChart)
+                        Expanded(
+                          child: LayoutBuilder(
+                            builder: (context, chartConstraints) {
+                              final chartH = chartConstraints.maxHeight
+                                  .clamp(72.0, double.infinity);
+                              return CapitalEvolutionChartSection(
+                                timeframeIndex: timeframeIndex,
+                                onOpenTradeById: onOpenTradeById,
+                                sparklineHeight: chartH,
+                                showTradeExtremes: false,
+                              );
+                            },
+                          ),
+                        )
+                      else
+                        chartSection,
                     ],
                   ),
-                  CapitalEvolutionChartSection(
-                    timeframeIndex: timeframeIndex,
-                    onOpenTradeById: onOpenTradeById,
-                    sparklineHeight: 122,
-                    showTradeExtremes: false,
-                  ),
-                ],
-              ),
+                );
+              },
             );
       },
     );

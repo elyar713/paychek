@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../checklist/checklist_page_controller.dart';
 import '../l10n/app_localizations.dart';
+import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_models.dart';
 import '../trade/trade_session.dart';
 import '../trade/trade_stats.dart';
@@ -13,15 +15,21 @@ Future<void> exportMonthPdf({
   required List<TradeListItem> monthTrades,
   required double? initialCapital,
   String filenamePrefix = 'trades_month',
+  ChecklistPageController? checklistController,
 }) async {
-  // Calculer les statistiques du mois
-  double avgPct(List<double> xs) =>
-      xs.isEmpty ? 0.0 : (xs.fold<double>(0.0, (a, b) => a + b) / xs.length);
-
-  final avgChecklist = avgPct(monthTrades.map((e) => e.checklistPct).toList());
-  final avgPlan = avgPct(monthTrades.map((e) => e.planPct).toList());
-  final avgStrategie = avgPct(monthTrades.map((e) => e.strategiePct).toList());
-  final avgEtat = avgPct(monthTrades.map((e) => e.etatPct).toList());
+  final checklist = await checklistControllerReadyForPdfExport(
+    checklistController,
+  );
+  final storedReports = await loadAnalyseReportsForPdfExport();
+  final disciplineAvgs = averageDisciplineDisplayForTrades(
+    monthTrades,
+    checklist,
+    storedReports,
+  );
+  final avgChecklist = disciplineAvgs.checklist;
+  final avgPlan = disciplineAvgs.plan;
+  final avgStrategie = disciplineAvgs.strategie;
+  final avgEtat = disciplineAvgs.etat;
   final winMonth = computeTradeStats(monthTrades).winRatePctDisplay;
   final principeCount =
       monthTrades.where((e) => e.mindset == TradeMindset.principe).length;

@@ -13,6 +13,7 @@ import '../ajouter_trade/ajouter_trade_plan_analyse_feedback_items.dart';
 import '../analyse/analyse_report_pdf_platform.dart' as pdf_platform;
 import '../checklist/checklist_page_controller.dart';
 import '../etat_mental/mental_state_controller.dart';
+import 'trade_discipline_day_snapshot.dart';
 import 'trade_models.dart';
 
 String _safePdfFileName(TradeListItem t) {
@@ -303,6 +304,16 @@ Future<Uint8List> buildTradePdf(
   required AppLocalizations l,
   ChecklistPageController? checklistController,
 }) async {
+  final checklist = await checklistControllerReadyForPdfExport(
+    checklistController,
+  );
+  final storedReports = await loadAnalyseReportsForPdfExport();
+  final discipline = resolveTradeDisciplineDisplay(
+    trade: t,
+    checklist: checklist,
+    storedReports: storedReports,
+  );
+
   final doc = pw.Document(title: 'Trade ${t.pair}', author: 'Paychek');
 
   Uint8List? screenshotBytes;
@@ -332,7 +343,7 @@ Future<Uint8List> buildTradePdf(
   final duree = _formatDuration(l, t.entreeAt, t.sortieAt);
   final session = tradeSessionLabel(l, tradeSessionBucketId(t.entreeAt));
   final nonPlan = _resolvePlanNonRespect(t, l);
-  final nonChecklist = _resolveChecklistNonRespect(t, checklistController, l);
+  final nonChecklist = _resolveChecklistNonRespect(t, checklist, l);
   final nonStrategie = _resolveStrategieNonRespect(t, l);
   final nonEtat = _resolveEtatNonRespect(t);
 
@@ -444,12 +455,15 @@ Future<Uint8List> buildTradePdf(
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelChecklist),
-                          t.checklistPct,
+                          discipline.checklistPct,
                         ),
                       ),
                       pw.SizedBox(width: 12),
                       pw.Expanded(
-                        child: _pctBar(_t(l.tradeLabelPlan), t.planPct),
+                        child: _pctBar(
+                          _t(l.tradeLabelPlan),
+                          discipline.planPct,
+                        ),
                       ),
                     ],
                   ),
@@ -459,12 +473,15 @@ Future<Uint8List> buildTradePdf(
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelStrategie),
-                          t.strategiePct,
+                          discipline.strategiePct,
                         ),
                       ),
                       pw.SizedBox(width: 12),
                       pw.Expanded(
-                        child: _pctBar(_t(l.tradeLabelEtat), t.etatPct),
+                        child: _pctBar(
+                          _t(l.tradeLabelEtat),
+                          discipline.etatPct,
+                        ),
                       ),
                     ],
                   ),

@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 
+/// Hauteur des pilules Actif / Qté / Entrée / Sortie (carte instrument).
+const double kAjouterTradeInstrumentFieldHeight = 36;
+
 /// Libellé au-dessus + pilule remplissable (hauteur alignée sur [AjouterTradeDirectionBar]).
 class AjouterTradeLabeledFieldBox extends StatelessWidget {
   const AjouterTradeLabeledFieldBox({
@@ -37,12 +40,12 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
   /// Largeur fixe de la pilule ; si `null`, la pilule s’étire ([Expanded]) sur la ligne.
   final double? fieldWidth;
 
-  /// À droite de la pilule (ex. engrenage).
+  /// À droite de la pilule, séparé (ex. engrenage réglages quantité).
   final Widget? fieldTrailing;
 
-  static const double _defaultFieldHeight = 36;
+  static const double _defaultFieldHeight = kAjouterTradeInstrumentFieldHeight;
   static const double _radius = 10;
-  static const double _trailingGap = 2;
+  static const double _trailingGap = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +61,17 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
               fontWeight: FontWeight.w800,
               fontSize: fs,
             );
-    final hintStyle = baseValueStyle.copyWith(
+    final centeredStyle = baseValueStyle.copyWith(
+      height: 1.0,
+      leadingDistribution: TextLeadingDistribution.even,
+    );
+    final hintStyle = centeredStyle.copyWith(
       color: DashboardTokens.muted.withValues(alpha: 0.55),
       fontWeight: FontWeight.w600,
     );
 
     final h = fieldHeight ?? _defaultFieldHeight;
+    final horizontalPad = fs <= 11 ? 6.0 : 8.0;
     final fieldBox = Container(
       height: h,
       decoration: BoxDecoration(
@@ -72,17 +80,22 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
         border: Border.all(color: DashboardTokens.cardBoxBorder),
       ),
       alignment: Alignment.center,
+      padding: EdgeInsets.symmetric(horizontal: horizontalPad),
       child: TextField(
         controller: controller,
         enabled: true,
         keyboardType: keyboardType,
         textCapitalization: textCapitalization,
         inputFormatters: inputFormatters,
+        maxLines: 1,
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
-        style: baseValueStyle,
+        textInputAction: TextInputAction.done,
+        onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+        style: centeredStyle,
         cursorColor: DashboardTokens.accent,
         showCursor: true,
+        scrollPadding: EdgeInsets.zero,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: hintStyle,
@@ -91,7 +104,7 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: fs <= 11 ? 6 : 8),
+          contentPadding: EdgeInsets.zero,
           isCollapsed: true,
         ),
       ),
@@ -117,10 +130,7 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
             else
               Expanded(child: fieldBox),
             if (fieldTrailing != null) ...[
-              if (fieldWidth != null)
-                const Spacer()
-              else
-                SizedBox(width: _trailingGap),
+              SizedBox(width: _trailingGap),
               fieldTrailing!,
             ],
           ],

@@ -38,6 +38,96 @@
       }
     }
   },
+  "tradeImportPickSoftwareFirst": "Choisis un logiciel avant l'import.",
+  "tradeImportEmptyFile": "Fichier vide ou illisible.",
+  "tradeImportMt4HtmlOnly": "MT4 : utilise un export HTML/HTM.",
+  "tradeImportTradingViewCsvOnly": "TradingView : utilise un export CSV.",
+  "tradeImportCtraderHtmlOnly": "cTrader : utilise un relevé HTML/HTM (compte).",
+  "tradeImportTradovateOrdersCsv": "Tradovate : exporte Orders.csv (remplissages).",
+  "tradeImportTradovatePickOrdersCsv": "Tradovate : choisis un fichier Orders.csv.",
+  "tradeImportNinjaGridCsv": "NinjaTrader : exporte une grille CSV (Ordres ou exécutions).",
+  "tradeImportNinjaPickCsv": "NinjaTrader : choisis un fichier CSV (grille).",
+  "tradeImportRithmicCsv": "Rithmic : utilise un export CSV (Recent Orders).",
+  "tradeImportRithmicPickCsv": "Rithmic : choisis un fichier CSV.",
+  "tradeImportQuantowerCsv": "Quantower : utilise un export CSV (Orders history).",
+  "tradeImportQuantowerPickCsv": "Quantower : choisis un fichier CSV (Orders history).",
+  "tradeImportAtasXlsxReadFailed": "Impossible de lire le .xlsx (fichier vide ou trop gros pour le navigateur). Réessaie ou rouvre le fichier.",
+  "tradeImportAtasPickCsvXlsx": "ATAS : choisis un fichier CSV ou .xlsx (Statistiques).",
+  "tradeImportAtasXlsxEmptyFile": "Fichier vide.",
+  "tradeImportAtasXlsxInvalidFormat": "Ce fichier n'est pas un .xlsx Excel valide (en-tête manquant). Réexporte depuis ATAS.",
+  "tradeImportAtasXlsxJournalMissing": "Feuille « Journal » introuvable ou classeur illisible. Vérifie l'export Statistiques .xlsx.",
+  "tradeImportAtasXlsxNoRows": "Aucune ligne de trade reconnue. Ouvre la feuille Journal : colonnes Instrument, Open time, Open/Close volume.",
+  "tradeImportNotImplemented": "Import {source} pas encore branché.",
+  "@tradeImportNotImplemented": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportEmptyMt5": "MT5 {extension} : aucune ligne Position détectée.",
+  "@tradeImportEmptyMt5": {
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportEmptyTradingView": "TradingView CSV : aucune position fermée détectée.",
+  "tradeImportEmptyCtrader": "cTrader HTML : aucune ligne Historique détectée.",
+  "tradeImportEmptyTradovate": "Tradovate CSV : aucun round-trip (entrée/sortie) détecté.",
+  "tradeImportEmptyNinjaTrader": "NinjaTrader CSV : aucun round-trip (entrée/sortie) détecté.",
+  "tradeImportEmptyAtas": "ATAS : aucune ligne reconnue (feuille Journal uniquement).",
+  "tradeImportEmptyGeneric": "Aucune position reconnue pour ce logiciel/fichier.",
+  "tradeImportNoneNew": "Aucun nouveau trade importé depuis {source}{duplicates}.",
+  "@tradeImportNoneNew": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportSummary": "{count} trade(s) importé(s) depuis {source}{duplicates}.",
+  "@tradeImportSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportDuplicatesSuffix": " · {count} doublon(s) ignoré(s)",
+  "@tradeImportDuplicatesSuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeImportDuplicatesOnlySuffix": " · {count} doublon(s)",
+  "@tradeImportDuplicatesOnlySuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeImportFailed": "Import échoué : {error}",
+  "@tradeImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "ajouterTradeSectionEtatMoment": "ÉTAT DU MOMENT",
   "ajouterTradeImagePickerClose": "Fermer",
   "ajouterTradeImagePickerTitle": "Source de l’image",
@@ -98,6 +188,7 @@
   "ajouterTradeDisciplineStrategieTitle": "Stratégie",
   "ajouterTradeDisciplineStrategieSubtitle": "Setup, rétroaction",
   "ajouterTradeDisciplinePlanTitle": "Plan d’analyse",
+  "ajouterTradeDisciplineConfidencePlanTitle": "Plan de confiance",
   "ajouterTradeDisciplinePlanSubtitle": "Rapport, rétroaction",
   "ajouterTradeDisciplineChecklistTitle": "Checklist",
   "ajouterTradeDisciplineChecklistSubtitle": "Points à respecter",
@@ -394,6 +485,22 @@
   "calcTradeReturnTableTitle": "Résultats trade return",
   "calcWin": "Gain",
   "calcWinsLosses": "Gains / Pertes",
+  "calcErrorInvalidBalance": "Solde initial invalide.",
+  "calcErrorTradesRange": "Le nombre de trades doit être entre 1 et 2000.",
+  "calcErrorWinRateRange": "Le win rate doit être entre 0 et 100.",
+  "calcErrorRiskRange": "Le risque (%) doit être entre 0 et 100.",
+  "calcErrorInvalidRiskReward": "Risk:Reward invalide.",
+  "calcErrorInvalidLot": "Lot invalide.",
+  "calcErrorInvalidEntry": "Prix d'entrée invalide.",
+  "calcErrorInvalidSl": "Stop loss invalide.",
+  "calcErrorInvalidTp": "Take profit invalide.",
+  "calcErrorEntrySlIdentical": "Entrée et SL ne peuvent pas être identiques.",
+  "calcDisclaimerEstimates": "Attention : ces calculs ne sont pas des chiffres contractuels. Ils servent uniquement à donner une idée.",
+  "calcHeaderSubtitleEstimates": "Simulations rendement et ratio — valeurs indicatives.",
+  "calcMarketIndex": "Indice",
+  "calcMarketFutures": "Future",
+  "calcMarketStock": "Action",
+  "calcMarketCommodities": "Matières premières",
   "calcWorstBalance": "Pire solde",
   "calculateRatio": "Calculer le ratio",
   "cancel": "Annuler",
@@ -411,6 +518,16 @@
   "checklistDeleteSectionTitle": "Supprimer la section ?",
   "checklistEditSectionHint": "Titre",
   "checklistIntroBody": "Avant de prendre position, assurez-vous de valider tous les critères de votre plan de trading.",
+  "checklistDailyCalendarTitle": "CHECKLIST PAR JOUR",
+  "checklistDailyUncheckedTitle": "NON COCHÉS",
+  "checklistDailyUncheckedNoActivity": "Aucune activité ce jour-là.",
+  "checklistDailyUncheckedNoDue": "Aucun critère prévu ce jour-là.",
+  "checklistDailyUncheckedAllDone": "Tous les critères du jour sont cochés.",
+  "checklistDailyUncheckedNoHistory": "Aucun détail checklist enregistré pour ce jour. Le suivi des critères non cochés est disponible à partir d’aujourd’hui.",
+  "checklistItemNews1": "Calendrier économique consulté (FED, CPI, NFP, PIB…).",
+  "checklistItemNews2": "FOMC / FED : pas de trade pendant l’annonce.",
+  "checklistItemNews3": "CPI (inflation) : horaire et impact anticipés.",
+  "checklistItemNews4": "NFP (emplois US) : fenêtre à risque identifiée.",
   "checklistItemAnalyse1": "La tendance de fond (HTF) est alignée avec mon idée.",
   "checklistItemAnalyse2": "Le prix est sur une zone clé (Support/Résistance, Order Block).",
   "checklistItemAnalyse3": "J'ai une confirmation d'entrée claire (Pattern, Divergence).",
@@ -424,9 +541,27 @@
   "checklistMenuEdit": "Éditer",
   "checklistPageTitle": "Checklist",
   "checklistProgressCl": "CL",
+  "checklistSectionNews": "NEWS · CALENDRIER ÉCONOMIQUE",
   "checklistSectionAnalyse": "ANALYSE TECHNIQUE",
   "checklistSectionPsy": "PSYCHOLOGIE",
   "checklistSectionRisque": "GESTION DU RISQUE",
+  "checklistScheduleTitle": "Rappel de l’élément",
+  "checklistScheduleDefaultHeading": "1 · Règle par défaut",
+  "checklistScheduleModeDaily": "Tous les jours",
+  "checklistScheduleModeWeekly": "1× / semaine",
+  "checklistScheduleModeSpecificDate": "Date précise",
+  "checklistScheduleUserDateHeading": "2 · Date choisie",
+  "checklistSchedulePickDate": "Choisir une date",
+  "checklistScheduleWeekHeading": "3 · Jour de la semaine",
+  "checklistScheduleNextOccurrence": "Prochaine date : {date}",
+  "@checklistScheduleNextOccurrence": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "checklistScheduleWarningHeading": "4 · Heure d’avertissement",
+  "checklistSchedulePickTime": "Choisir l’heure",
+  "checklistScheduleCalendarTooltip": "Règlage date et rappel",
   "clearAll": "Tout effacer",
   "confirm": "Confirmer",
   "currencyNameHint": "ex. CHF, XOF",
@@ -548,6 +683,9 @@
   "mentalRestTitle": "REPOS",
   "mentalRiskAppetite": "Peur",
   "mentalRoutineFieldLabel": "Nom de la routine (ex : Sport, Lecture)",
+  "mentalDayDetailTitle": "CRITÈRES DU JOUR",
+  "mentalDayDetailNoData": "Aucune donnée enregistrée pour ce jour. Modifiez votre état mental pour l’enregistrer.",
+  "mentalDayDetailGlobalScore": "SCORE GLOBAL",
   "mentalGlobalScoreCalendarTitle": "SCORE GLOBAL PAR JOUR",
   "mentalCalendarDayStartDialogTitle": "Début",
   "mentalCalendarDayWindowStartLabel": "Début",
@@ -757,7 +895,7 @@
       }
     }
   },
-  "profileSubscribeButton": "Passer au Pro (49,90 $ / an — abonnement)",
+  "profileSubscribeButton": "Passer au Pro (dès 8,99 $ / mois)",
   "profileManageSubscriptionButton": "Gérer l'abonnement",
   "profileUpgradeLabel": "Upgrade",
   "profileEditSavedSnack": "Profil mis à jour",
@@ -778,6 +916,14 @@
   "authTerminalTagline": "Maîtrise l'esprit, maîtrise le trade",
   "authTerminalCtaLogin": "Lancer le terminal",
   "authTerminalCtaSignup": "Créer ton identité",
+  "webLandingLoginSubtitle": "Bon retour sur Paychek.",
+  "webLandingSignupSubtitle": "Rejoins l'élite des traders.",
+  "webLandingLoginCta": "SE CONNECTER",
+  "webLandingSignupCta": "ESSAYER GRATUITEMENT",
+  "webLandingNoAccountLabel": "PAS DE COMPTE ?",
+  "webLandingRegisterLink": "S'INSCRIRE",
+  "webLandingAlreadyMemberLabel": "DÉJÀ MEMBRE ?",
+  "webLandingLoginLink": "CONNEXION",
   "authTerminalEncryptedPrefix": "Nœud chiffré :",
   "authTerminalEncryptedStatus": "Actif",
   "authTerminalHintEmail": "nom@terminal.com",
@@ -867,8 +1013,42 @@
   "paywallProFeature7": "Statistiques performance",
   "paywallProFeature8": "État mental",
   "paywallProFeature9": "Export PDF",
-  "paywallPriceAnnualHighlight": "49,90 $ US / an",
-  "paywallPriceApproxPerMonth": "Soit environ 4,15 $ US / mois",
+  "paywallMobilePlanAnnualTitle": "1 An (12 Mois)",
+  "paywallMobilePlanQuarterlyTitle": "3 Mois",
+  "paywallMobilePlanMonthlyTitle": "1 Mois",
+  "paywallMobilePlanPerMonthLine": "Soit {price} $ US / mois",
+  "@paywallMobilePlanPerMonthLine": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "paywallMobilePlanPerMonthPrefix": "Soit ",
+  "paywallMobilePlanPerMonthPriceSuffix": " $ US",
+  "paywallMobilePlanPerMonthEnd": " / mois",
+  "paywallMobilePlanTotalLine": "{total} $",
+  "@paywallMobilePlanTotalLine": {
+    "placeholders": {
+      "total": { "type": "String" }
+    }
+  },
+  "paywallMobilePlanAnnualBilling": "Facturé à l'année",
+  "paywallMobilePlanQuarterlyBilling": "Tous les 3 mois",
+  "paywallMobilePlanMonthlyBilling": "Facturé au mois",
+  "paywallMobilePlanMonthlyCommitment": "Engagement mensuel",
+  "paywallMobilePlanSavings44": "Économisez 44%",
+  "paywallMobilePlanPopular": "Populaire",
+  "paywallMobileCompareFeatureCol": "Fonctionnalité",
+  "paywallMobileRowTrades": "Trades / mois",
+  "paywallMobileRowEntry": "Saisie des données",
+  "paywallMobileRowCalendar": "Calendrier",
+  "paywallMobileRowChecklist": "Checklist",
+  "paywallMobileRowAnalysis": "Générateur d'analyse",
+  "paywallMobileRowStrategy": "Page Stratégie",
+  "paywallMobileRowStats": "Stats de performance",
+  "paywallMobileRowMental": "État mental",
+  "paywallMobileRowExport": "Export PDF",
+  "paywallPriceAnnualHighlight": "59,99 $ US / an",
+  "paywallPriceApproxPerMonth": "Soit environ 4,99 $ US / mois",
   "paywallTrialEndedBody": "Ton essai gratuit de 7 jours (nouvelle inscription) s’est terminé le {date}. Sans abonnement Pro, tu passes en version Lite.",
   "@paywallTrialEndedBody": {
     "placeholders": {
@@ -878,7 +1058,6 @@
     }
   },
   "paywallLiteLimitedHint": "En Lite, seuls l’ajout d’un trade et le calendrier restent disponibles. Le reste est réservé aux abonnés Pro.",
-  "paywallProPriceAnnual": "Pro : 49,90 $ US / an",
   "paywallContinueFreemium": "Continuer en Lite (accès limité)",
   "paywallSubscribeButton": "S’abonner maintenant",
   "paywallRestoreButton": "J’ai déjà un abonnement",
@@ -898,7 +1077,6 @@
   "supportFeedbackTitleLead": "Support & ",
   "supportFeedbackTitleAccent": "Feedback",
   "supportFeedbackSubtitle": "Une question ou une idée ? Nous sommes à ton écoute.",
-  "supportFeedbackBack": "Retour",
   "supportActionEmailLabel": "E-mail",
   "supportActionEmailHint": "Réponse sous 24 h",
   "supportActionDocsLabel": "Docs",
@@ -934,6 +1112,15 @@
   "supportFormSubmitFirestoreDone": "Merci — ta demande est enregistrée. L’équipe peut la consulter avec la pièce jointe dans le back-office.",
   "supportFormSubmitSending": "Envoi en cours…",
   "supportFormSubmitError": "Envoi impossible. Vérifie la connexion puis réessaie.",
+  "supportErrorEmailOpenFailed": "Ouverture e-mail impossible : {error}",
+  "@supportErrorEmailOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supportErrorEmailAppUnavailable": "Impossible d'ouvrir l'app e-mail. Vérifie qu'une messagerie est installée.",
   "supportFormSubmitSavedPartialAttachment": "Ton message est enregistré, mais la pièce jointe n’a pas été envoyée (réseau, délai dépassé ou Storage non activé dans Firebase). Vérifie la console projet ou réessaie plus tard.",
   "supportQuickHelpTitle": "Aide rapide",
   "supportFaqWhereDataQ": "Où sont mes données ?",
@@ -1193,6 +1380,7 @@
   "settingsDashSectionStrategie": "Stratégie",
   "settingsDashSectionWeekly": "Performance hebdomadaire",
   "settingsDashSectionEvolution": "Évolution du capital",
+  "settingsDashSectionLens": "Paychek Lens",
   "tradingSection": "Trading",
   "settingsCgvSection": "CGV",
   "settingsCgvPageTitle": "Conditions générales de vente",
@@ -1200,15 +1388,15 @@
   "settingsCgvRowSubtitle": "Consulter le texte dans l’application",
   "settingsCgvDocHeading": "CONDITIONS GÉNÉRALES DE VENTE (CGV) - PAYCHEK",
   "settingsCgv1Title": "1. Objet",
-  "settingsCgv1Body": "Les présentes CGV régissent l'abonnement donnant accès à l'offre « Premium » de l'application Paychek, un outil de journal de trading et de gestion de risque. L'accès est fourni par abonnement annuel, tacitement reconduit chaque année jusqu'à résiliation.",
+  "settingsCgv1Body": "Les présentes CGV régissent l'abonnement donnant accès à l'offre « Pro » (Premium) de l'application Paychek, un outil de journal de trading et de gestion de risque. L'accès est fourni par abonnement mensuel, trimestriel ou annuel, tacitement reconduit à chaque échéance jusqu'à résiliation.",
   "settingsCgv2Title": "2. Services Fournis",
   "settingsCgv2Body": "L'accès Premium débloque l'intégralité des fonctionnalités de l'application (Statistiques avancées, calcul automatique de risque, export de données). L'accès est lié au compte utilisateur créé lors de l'inscription.",
   "settingsCgv3Title": "3. Tarifs et Paiement",
-  "settingsCgv3Body": "Abonnement direct : le tarif est fixé à 49,90 $ US par an (renouvellement automatique jusqu'à résiliation).\n\nOffre Partenaire : L'accès peut être offert gratuitement si l'utilisateur remplit les conditions de parrainage auprès d'un de nos partenaires (Prop Firm ou Broker).\n\nPaychek se réserve le droit de modifier ses prix à tout moment pour les nouveaux clients.",
+  "settingsCgv3Body": "Abonnement direct : les formules Pro sont facturées en dollars américains (US$), via Stripe, avec renouvellement automatique jusqu'à résiliation :\n• 8,99 $ US / mois\n• 20,97 $ US / 3 mois\n• 59,99 $ US / an\n\nOffre Partenaire : L'accès peut être offert gratuitement si l'utilisateur remplit les conditions de parrainage auprès d'un de nos partenaires (Prop Firm ou Broker).\n\nPaychek se réserve le droit de modifier ses prix à tout moment pour les nouveaux clients.",
   "settingsCgv4Title": "4. Droit de Rétractation et Remboursement",
   "settingsCgv4Body": "Conformément à la loi sur les produits numériques :\n\nEn raison de la nature numérique du service et de l'accès immédiat au contenu dès le paiement, l'utilisateur accepte que le service commence immédiatement et renonce expressément à son droit de rétractation de 14 jours.\n\nAucun remboursement ne sera effectué une fois l'accès Premium activé, sauf en cas de défaut technique majeur rendant l'application inutilisable.",
   "settingsCgv5Title": "5. Clause Spécifique \"Offre Partenaire\"",
-  "settingsCgv5Body": "L'accès offert via un partenaire est conditionné par la validation de l'affiliation par ledit partenaire.\n\nSi le partenaire refuse l'affiliation (pour non-respect des règles de dépôt ou de trade), Paychek se réserve le droit de révoquer l'accès Premium ou de demander le paiement du tarif standard.",
+  "settingsCgv5Body": "L'accès offert via un partenaire est conditionné par la validation de l'affiliation par ledit partenaire.\n\nSi le partenaire refuse l'affiliation (pour non-respect des règles de dépôt ou de trade), Paychek se réserve le droit de révoquer l'accès Premium ou de demander le paiement des tarifs Pro en vigueur.",
   "settingsCgv6Title": "6. Avertissement sur les Risques (Trading)",
   "settingsCgv6Body": "Paychek n'est pas un conseiller financier. L'application est un outil technique de gestion et d'analyse.\n\nLe trading comporte des risques élevés de perte de capital. L'utilisateur est seul responsable de ses décisions de trading.\n\nPaychek ne pourra être tenu responsable des pertes financières subies par l'utilisateur sur les marchés financiers.",
   "settingsCgv7Title": "7. Disponibilité du Service",

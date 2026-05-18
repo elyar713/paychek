@@ -1,0 +1,173 @@
+{
+  "meta": { "title": "PAYCHEK | Convierta sus datos en resultados consistentes" },
+  "nav": {
+    "preview": "Vista previa",
+    "process": "Proceso",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse"
+  },
+  "hero": {
+    "storeNavAria": "Descargar la aplicación",
+    "googlePlayAria": "Consígala en Google Play",
+    "appStoreAria": "Descárguela en App Store",
+    "titleHtml": "CONVIERTA SUS <br> <span class=\"gradient-text\">DATOS</span> EN BENEFICIOS.",
+    "taglineHtml": "El journal de trading creado para transformar su <span class=\"text-white font-semibold\">disciplina</span> en un <span class=\"font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent\">margen estadístico</span>",
+    "ctaStart": "Empezar mi journal",
+    "ctaExplore": "Explorar la interfaz"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "checklist": "Checklist",
+    "mental": "Estado Mental",
+    "analyse": "Mi análisis",
+    "strategie": "Estrategia",
+    "performance": "Performance",
+    "calendrier": "Calendario",
+    "trade": "Trades",
+    "ajouter": "Añadir trade",
+    "pdf": "Exportación PDF",
+    "csv": "Importación CSV"
+  },
+  "preview": {
+    "lightboxExpand": "Pulse para ampliar",
+    "previewImgAria": "Ampliar vista previa",
+    "dialogAria": "Vista previa ampliada",
+    "lightboxClose": "Cerrar",
+    "prevImg": "Imagen anterior",
+    "nextImg": "Imagen siguiente"
+  },
+  "process": {
+    "title": "Su camino hacia la excelencia",
+    "steps": [
+      {
+        "title": "Registre su trade",
+        "desc": "Capture posiciones en segundos gracias a un flujo diseñado para la velocidad.",
+        "imgAlt": "PAYCHEK — Añadir trade: compra/long, activo, lotes, entrada y salida"
+      },
+      {
+        "title": "Analice cada operación",
+        "desc": "Desglose setups, amplíe sus fortalezas y elimina errores recurrentes.",
+        "imgAlt": "PAYCHEK — Validación del plan: principio / intuición, estrategia y reglas"
+      },
+      {
+        "title": "Vea rendimiento verificable",
+        "desc": "Siga evoluciones reales para decidir con datos, sin adivinar.",
+        "imgAlt": "PAYCHEK Lens — disciplina analítica, puntuaciones de estrategia y alertas"
+      }
+    ]
+  },
+  "pricing": {
+    "titleHtml": "Elija su plan <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500\">Pro</span>",
+    "subtitle": "Compare funciones y desbloquee todo el potencial de sus análisis.",
+    "period1m": "1 Mes",
+    "period3m": "3 Meses",
+    "period1y": "1 Año",
+    "badgeSave22": "-22%",
+    "badgeSave44": "AHORRE 44%",
+    "liteStandard": "ESTÁNDAR",
+    "liteLabel": "Lite",
+    "liteFree": "Gratis",
+    "liteFeaturesBasic": "Funciones básicas",
+    "proUnlimited": "ILIMITADO",
+    "proLabel": "Pro",
+    "proBadge": "PRO",
+    "ctaCurrent": "ACTUAL",
+    "ctaSubscribe": "SUSCRIBIRSE AHORA",
+    "rowTrades": "Trades / mes",
+    "rowEntry": "Entrada",
+    "rowCalendar": "Calendario",
+    "rowChecklist": "Checklist",
+    "rowAnalysis": "Análisis",
+    "rowStrategy": "Estrategia",
+    "rowPerformance": "Rendimiento",
+    "rowPsychology": "Psicología",
+    "rowReports": "Informes",
+    "liteTrades": "30 trades / mes",
+    "liteEntry": "Solo registro manual",
+    "liteCalendar": "Calendario estándar",
+    "liteAbsent": "×",
+    "proTrades": "Ilimitado",
+    "proEntry": "Importación CSV + registro manual",
+    "proCalendar": "Calendario Pro",
+    "proChecklist": "Checklist",
+    "proAnalysis": "Generador de análisis",
+    "proStrategy": "Página de estrategia",
+    "proPerformance": "Estadísticas de rendimiento",
+    "proPsychology": "Estado mental",
+    "proReports": "Exportación PDF",
+    "periods": {
+      "1m": { "price": "8,99 $", "label": "/ mes", "saving": "Facturación mensual", "cta": "SUSCRIBIR - 1 MES" },
+      "3m": { "price": "20,97 $", "label": "/ 3 meses", "saving": "Unos 6,99 $ / mes", "cta": "SUSCRIBIR - 3 MESES" },
+      "1y": { "price": "59,99 $", "label": "/ año", "saving": "Unos 4,99 $ / mes", "cta": "SUSCRIBIR - 1 AÑO" }
+    },
+    "trialMain": "Iniciar mi prueba gratuita",
+    "trialSub": "Acceso completo durante 7 días"
+  },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Lo que necesita saber sobre PAYCHEK",
+    "items": [
+      {
+        "q": "¿Es PAYCHEK únicamente un journal de trading sencillo?",
+        "aHtml": "<div class=\"text-xs leading-relaxed font-medium space-y-3 text-left\" lang=\"es\"><p>Sí… y también no.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> Sí, porque la interfaz sigue liviana para que registre Forex, Crypto o Índices en segundos sin depender de hojas de cálculo frágiles.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> No, porque detrás existe un motor de análisis sólido: convierte registros en métricas de performance y revisa disciplina mental con precisión.</p><p>En resumen: la captura sigue siendo simple; los resultados profesionales.</p></div>"
+      },
+      {
+        "q": "¿Mis datos están seguros?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Por supuesto. La información va cifrada y nunca vendemos estadísticas privadas — usted mantiene el control total.</p>"
+      },
+      {
+        "q": "¿Cómo funciona la prueba gratuita?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Al crear la cuenta disfruta 7 días con todas las herramientas Pro. Cuando expire podrá mantener Lite o cambiar de plan sin fricciones.</p>"
+      },
+      {
+        "q": "¿Puedo cancelar el abono?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Sí PAYCHEK no exige compromisos puede cancelar Pro desde configuración cuando desee manteniendo acceso hasta cerrar ciclo pagado.</p>"
+      },
+      {
+        "q": "¿En qué mercados puedo usarlo?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">En todos los grandes mercados líquidos: Forex Crypto Índices materias primas acciones mismo journal para cualquier clase de activos.</p>"
+      },
+      {
+        "q": "¿Hay app móvil?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Sí registre donde opera sincronización en tiempo real y profundidad analítica al volver al escritorio.</p>"
+      }
+    ]
+  },
+  "footer": {
+    "slogan": "La infraestructura para traders profesionales que transforman registros dispersos en ventaja reproducible.",
+    "columnProduct": "Producto",
+    "columnCompany": "Empresa",
+    "columnResources": "Recursos",
+    "columnLegal": "Legal",
+    "feat": "Funciones",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "updates": "Novedades",
+    "about": "Nosotros",
+    "careers": "Carreras",
+    "affiliate": "Afiliados",
+    "contact": "Contacto",
+    "blog": "Blog",
+    "guideTrading": "Guía de trading",
+    "webinars": "Webinars",
+    "documentation": "Documentación",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "security": "Seguridad",
+    "cookies": "Cookies",
+    "copyright": "© 2024 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.",
+    "designedFor": "DESIGNED FOR PERFORMANCE."
+  },
+  "modals": {
+    "loginTitle": "Inicio de sesión",
+    "signupTitle": "Crear cuenta",
+    "emailPh": "Correo electrónico",
+    "passwordPh": "Contraseña",
+    "fullNamePh": "Nombre completo",
+    "trialNoteHtml": "<i class=\"fas fa-gift mr-2\"></i> Activamos automáticamente su prueba de 7 días",
+    "loginSubmit": "Entrar",
+    "signupSubmit": "Crear mi cuenta"
+  }
+}

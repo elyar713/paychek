@@ -31,6 +31,18 @@ class PaychekPageHeader extends StatelessWidget {
 
   static double horizontalPad(double width) => width >= _kBreakpoint ? 24.0 : 20.0;
 
+  /// Overlay shell ([onCloseInShell]) ou [Navigator.maybePop] si une route est empilée.
+  static VoidCallback? resolveBack(
+    BuildContext context, {
+    VoidCallback? onCloseInShell,
+  }) {
+    if (onCloseInShell != null) return onCloseInShell;
+    if (Navigator.of(context).canPop()) {
+      return () => Navigator.of(context).maybePop();
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(

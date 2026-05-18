@@ -298,15 +298,10 @@ void _ajouterTradeToggleTradeDateTimeOverlay(
   final box = rowKey.currentContext?.findRenderObject() as RenderBox?;
   final measured =
       (box != null && box.hasSize) ? box.size.width : 240.0;
-  // Sortie : la rangée date s’étire sur toute la colonne (alignStart) — sans plafond,
-  // le popover prend ~demi-écran et part trop à droite. On calque la largeur utile
-  // sur la colonne Entrée (ConstrainedBox 188 px).
-  final widthBasis = entree
-      ? measured
-      : math.min(
-          measured,
-          AjouterTradeDateAndCheckboxColumn.checkboxBlockMaxWidth,
-        );
+  final widthBasis = math.min(
+    measured,
+    AjouterTradeDateAndCheckboxColumn.checkboxBlockMaxWidth,
+  );
   final screenW = MediaQuery.sizeOf(context).width;
   final popoverW = math.min(
     math.max(widthBasis, 232.0),

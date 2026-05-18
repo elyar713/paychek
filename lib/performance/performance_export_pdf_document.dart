@@ -10,6 +10,8 @@ Future<Uint8List> buildPerformancePdf({
   required StrategieGestionRisqueParams gestionParams,
   double? capitalAmount,
   required int journalItemCount,
+  required List<PerformanceCustomLensSavedCard> customLensSavedCards,
+  required List<ChecklistSectionData> checklistSections,
   required AppLocalizations l,
   required Locale uiLocale,
 }) async {
@@ -227,6 +229,8 @@ Future<Uint8List> buildPerformancePdf({
         pw.SizedBox(height: 12),
         _headerWinrateRow(locale, l, wrPct, agg, sourceLine),
         pw.SizedBox(height: 12),
+        _capitalEvolutionChartSection(locale, l, tm, capitalAmount),
+        pw.SizedBox(height: 12),
         _sectionTitle('PAYCHEK LENS'),
         _card(
           children: [
@@ -266,6 +270,13 @@ Future<Uint8List> buildPerformancePdf({
               for (final w in warnings.take(8)) _pdfBulletLine(w, warningStyle: true),
             ],
           ],
+        ),
+        ..._customLensPdfSection(
+          locale: locale,
+          l: l,
+          trades: t,
+          savedCards: customLensSavedCards,
+          checklistSections: checklistSections,
         ),
         pw.SizedBox(height: 10),
         _sectionTitle(

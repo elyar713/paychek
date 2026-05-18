@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kIsWeb;
+import 'paychek_billing_plan.dart';
 import 'paychek_billing_remote.dart';
 import 'paychek_checkout_launch.dart';
 import 'trial_paywall_config.dart';
 
-Future<bool> openPaychekSubscriptionFlow() async {
+Future<bool> openPaychekSubscriptionFlow({
+  PaychekBillingCycle cycle = PaychekBillingCycle.annual,
+}) async {
   final user = FirebaseAuth.instance.currentUser;
   final email = user?.email;
   final uid = user?.uid;
@@ -13,6 +16,7 @@ Future<bool> openPaychekSubscriptionFlow() async {
   if (kIsWeb) {
     PaychekBillingRemote.invalidateCache();
     final uri = await buildPaywallSubscribeUriAsync(
+      cycle: cycle,
       firebaseEmail: email,
       firebaseUid: uid,
     );
@@ -33,6 +37,7 @@ Future<bool> openPaychekSubscriptionFlow() async {
     default:
       PaychekBillingRemote.invalidateCache();
       final uri = await buildPaywallSubscribeUriAsync(
+        cycle: cycle,
         firebaseEmail: email,
         firebaseUid: uid,
       );

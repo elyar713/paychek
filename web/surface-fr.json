@@ -1,0 +1,173 @@
+{
+  "meta": {"title": "PAYCHEK | Transformez vos données en profits"},
+  "nav": {
+    "preview": "Aperçu",
+    "process": "Processus",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "login": "Connexion",
+    "signup": "S'inscrire"
+  },
+  "hero": {
+    "storeNavAria": "Télécharger l'application",
+    "googlePlayAria": "Télécharger sur Google Play",
+    "appStoreAria": "Télécharger sur l'App Store",
+    "titleHtml": "TRANSFORMEZ VOS <br> <span class=\"gradient-text\">DONNÉES</span> EN PROFITS.",
+    "taglineHtml": "Le journal de trading conçu pour transformer votre <span class=\"text-white font-semibold\">discipline</span> en <span class=\"font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent\">avantage statistique</span>",
+    "ctaStart": "Démarrer mon journal",
+    "ctaExplore": "Explorer l'interface"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "checklist": "Checklist",
+    "mental": "État Mental",
+    "analyse": "Mon analyse",
+    "strategie": "My Strategy",
+    "performance": "Performance",
+    "calendrier": "Calendrier",
+    "trade": "Trade",
+    "ajouter": "Ajouter",
+    "pdf": "Export PDF",
+    "csv": "Import CSV"
+  },
+  "preview": {
+    "lightboxExpand": "Cliquer pour agrandir",
+    "previewImgAria": "Agrandir l'aperçu",
+    "dialogAria": "Aperçu agrandi",
+    "lightboxClose": "Fermer",
+    "prevImg": "Image précédente",
+    "nextImg": "Image suivante"
+  },
+  "process": {
+    "title": "Votre Parcours Vers le Sommet",
+    "steps": [
+      {
+        "title": "Ajoutez votre trade",
+        "desc": "Saisissez vos positions en quelques secondes. Une interface pensée pour la rapidité.",
+        "imgAlt": "PAYCHEK — Ajouter un trade : saisie Buy/Long, actif, lots, entrée et sortie"
+      },
+      {
+        "title": "Faites les points",
+        "desc": "Analysez chaque setup. Identifiez vos points forts et corrigez vos erreurs récurrentes.",
+        "imgAlt": "PAYCHEK — Validation du plan : Principe / Feeling, stratégie et règles"
+      },
+      {
+        "title": "Obtenez la performance",
+        "desc": "Visualisez votre progression. Prenez des décisions basées sur des données réelles.",
+        "imgAlt": "PAYCHEK Lens — analyse de la discipline, scores stratégie et alertes de seuils"
+      }
+    ]
+  },
+  "pricing": {
+    "titleHtml": "Choisissez votre formule <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500\">Pro</span>",
+    "subtitle": "Comparez nos fonctionnalités et débloquez la puissance maximale de vos analyses.",
+    "period1m": "1 Mois",
+    "period3m": "3 Mois",
+    "period1y": "1 An",
+    "badgeSave22": "-22%",
+    "badgeSave44": "ÉCO. 44%",
+    "liteStandard": "STANDARD",
+    "liteLabel": "Lite",
+    "liteFree": "Gratuit",
+    "liteFeaturesBasic": "Fonctionnalités de base",
+    "proUnlimited": "ILLIMITÉ",
+    "proLabel": "Pro",
+    "proBadge": "PRO",
+    "ctaCurrent": "ACTUEL",
+    "ctaSubscribe": "S'ABONNER MAINTENANT",
+    "rowTrades": "Trades / mois",
+    "rowEntry": "Saisie",
+    "rowCalendar": "Calendrier",
+    "rowChecklist": "Checklist",
+    "rowAnalysis": "Analyse",
+    "rowStrategy": "Stratégie",
+    "rowPerformance": "Performances",
+    "rowPsychology": "Psychologie",
+    "rowReports": "Rapports",
+    "liteTrades": "30 Trades / mois",
+    "liteEntry": "Saisie manuelle uniquement",
+    "liteCalendar": "Calendrier standard",
+    "liteAbsent": "×",
+    "proTrades": "Illimité",
+    "proEntry": "Import CSV + saisie manuelle",
+    "proCalendar": "Calendrier Pro",
+    "proChecklist": "Checklist",
+    "proAnalysis": "Générateur d'analyse",
+    "proStrategy": "Page Stratégie",
+    "proPerformance": "Statistiques performance",
+    "proPsychology": "État mental",
+    "proReports": "Export PDF",
+    "periods": {
+      "1m": { "price": "8,99 $", "label": "/ mois", "saving": "Facturé mensuellement", "cta": "S'ABONNER - 1 MOIS" },
+      "3m": { "price": "20,97 $", "label": "/ 3 mois", "saving": "Soit environ 6,99 $ / mois", "cta": "S'ABONNER - 3 MOIS" },
+      "1y": { "price": "59,99 $", "label": "/ an", "saving": "Soit environ 4,99 $ / mois", "cta": "S'ABONNER - 1 AN" }
+    },
+    "trialMain": "Démarrer mon essai gratuit",
+    "trialSub": "Accès complet pendant 7 jours"
+  },
+  "faq": {
+    "title": "Questions Fréquentes",
+    "subtitle": "Tout ce que vous devez savoir sur PAYCHEK",
+    "items": [
+      {
+        "q": "PAYCHEK est-il un journal de trading simple ?",
+        "aHtml": "<div class=\"text-xs leading-relaxed font-medium space-y-3 text-left\" lang=\"fr\"><p>Oui et non.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> Oui, car son interface est épurée pour vous simplifier la tâche. En quelques secondes, vous journalisez vos trades sur le Forex, la Crypto ou les Indices sans la lourdeur d'un fichier Excel.</p><p><span class=\"text-gray-500 select-none\" aria-hidden=\"true\">•</span> Non, car derrière cette simplicité se cache un moteur d'analyse puissant. PAYCHEK transforme vos saisies en statistiques de performance avancées et audite votre discipline pour identifier précisément vos forces et vos faiblesses psychologiques.</p><p>En résumé : La saisie est simple, mais les résultats sont professionnels.</p></div>"
+      },
+      {
+        "q": "Mes données sont-elles sécurisées ?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Absolument. Vos données sont chiffrées de bout en bout. Nous ne partageons jamais vos statistiques de trading et vous restez le seul propriétaire de vos informations.</p>"
+      },
+      {
+        "q": "Comment fonctionne l'essai gratuit ?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Lors de votre inscription, vous bénéficiez de 7 jours d'accès complet à toutes les fonctionnalités Pro. À la fin de l'essai, vous pouvez choisir de passer au plan Pro ou de rester sur la version Lite gratuite.</p>"
+      },
+      {
+        "q": "Puis-je annuler mon abonnement ?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Oui, PAYCHEK est sans engagement. Vous pouvez annuler votre abonnement Pro à tout moment depuis vos paramètres de compte. Vous conserverez vos accès jusqu'à la fin de la période payée.</p>"
+      },
+      {
+        "q": "Sur quels marchés puis-je utiliser PAYCHEK ?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Partout. Que vous soyez sur le Forex, les Cryptos, les Indices, les Matières premières ou les Actions, l'application s'adapte à votre actif pour suivre vos performances avec précision.</p>"
+      },
+      {
+        "q": "L'application est-elle disponible sur mobile ?",
+        "aHtml": "<p class=\"text-xs leading-relaxed font-medium\">Oui, PAYCHEK est conçu pour vous accompagner partout. Journalisez vos trades instantanément depuis votre smartphone et retrouvez vos analyses synchronisées en temps réel.</p>"
+      }
+    ]
+  },
+  "footer": {
+    "slogan": "Le terminal ultime pour les traders sérieux qui souhaitent transformer leurs données en stratégie rentable.",
+    "columnProduct": "Produit",
+    "columnCompany": "Société",
+    "columnResources": "Ressources",
+    "columnLegal": "Légal",
+    "feat": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "updates": "Mises à jour",
+    "about": "À propos",
+    "careers": "Carrières",
+    "affiliate": "Affiliation",
+    "contact": "Contact",
+    "blog": "Blog",
+    "guideTrading": "Guide Trading",
+    "webinars": "Webinaires",
+    "documentation": "Documentation",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "security": "Sécurité",
+    "cookies": "Cookies",
+    "copyright": "© 2024 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.",
+    "designedFor": "DESIGNED FOR PERFORMANCE."
+  },
+  "modals": {
+    "loginTitle": "Connexion",
+    "signupTitle": "Inscription",
+    "emailPh": "Email",
+    "passwordPh": "Mot de passe",
+    "fullNamePh": "Nom complet",
+    "trialNoteHtml": "<i class=\"fas fa-gift mr-2\"></i> Votre essai de 7 jours sera activé automatiquement",
+    "loginSubmit": "Entrer",
+    "signupSubmit": "Créer mon compte"
+  }
+}

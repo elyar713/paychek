@@ -37,6 +37,96 @@
       }
     }
   },
+  "tradeImportPickSoftwareFirst": "Escolhe uma plataforma antes de importar.",
+  "tradeImportEmptyFile": "Ficheiro vazio ou ilegível.",
+  "tradeImportMt4HtmlOnly": "MT4: usa uma exportação HTML/HTM.",
+  "tradeImportTradingViewCsvOnly": "TradingView: usa uma exportação CSV.",
+  "tradeImportCtraderHtmlOnly": "cTrader: usa um extrato HTML/HTM (conta).",
+  "tradeImportTradovateOrdersCsv": "Tradovate: exporta Orders.csv (execuções).",
+  "tradeImportTradovatePickOrdersCsv": "Tradovate: escolhe um ficheiro Orders.csv.",
+  "tradeImportNinjaGridCsv": "NinjaTrader: exporta uma grelha CSV (ordens ou execuções).",
+  "tradeImportNinjaPickCsv": "NinjaTrader: escolhe um ficheiro CSV (grelha).",
+  "tradeImportRithmicCsv": "Rithmic: usa uma exportação CSV (Recent Orders).",
+  "tradeImportRithmicPickCsv": "Rithmic: escolhe um ficheiro CSV.",
+  "tradeImportQuantowerCsv": "Quantower: usa uma exportação CSV (Orders history).",
+  "tradeImportQuantowerPickCsv": "Quantower: escolhe um ficheiro CSV (Orders history).",
+  "tradeImportAtasXlsxReadFailed": "Não foi possível ler o .xlsx (vazio ou demasiado grande para o browser). Tenta novamente.",
+  "tradeImportAtasPickCsvXlsx": "ATAS: escolhe um ficheiro CSV ou .xlsx (Estatísticas).",
+  "tradeImportAtasXlsxEmptyFile": "Ficheiro vazio.",
+  "tradeImportAtasXlsxInvalidFormat": "Não é um .xlsx Excel válido (cabeçalho em falta). Exporta novamente a partir do ATAS.",
+  "tradeImportAtasXlsxJournalMissing": "Folha Journal não encontrada ou livro ilegível. Verifica a exportação Estatísticas .xlsx.",
+  "tradeImportAtasXlsxNoRows": "Nenhuma linha de negociação reconhecida. Abre a folha Journal: colunas Instrument, Open time, Open/Close volume.",
+  "tradeImportNotImplemented": "Importação {source} ainda não disponível.",
+  "@tradeImportNotImplemented": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportEmptyMt5": "MT5 {extension}: nenhuma linha Position detetada.",
+  "@tradeImportEmptyMt5": {
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportEmptyTradingView": "TradingView CSV: nenhuma posição fechada detetada.",
+  "tradeImportEmptyCtrader": "cTrader HTML: nenhuma linha Histórico detetada.",
+  "tradeImportEmptyTradovate": "Tradovate CSV: nenhum round-trip (entrada/saída) detetado.",
+  "tradeImportEmptyNinjaTrader": "NinjaTrader CSV: nenhum round-trip (entrada/saída) detetado.",
+  "tradeImportEmptyAtas": "ATAS: nenhuma linha reconhecida (apenas folha Journal).",
+  "tradeImportEmptyGeneric": "Nenhuma posição reconhecida para esta plataforma/ficheiro.",
+  "tradeImportNoneNew": "Nenhuma negociação nova importada de {source}{duplicates}.",
+  "@tradeImportNoneNew": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportSummary": "{count} negociação(ões) importada(s) de {source}{duplicates}.",
+  "@tradeImportSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportDuplicatesSuffix": " · {count} duplicado(s) ignorado(s)",
+  "@tradeImportDuplicatesSuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeImportDuplicatesOnlySuffix": " · {count} duplicado(s)",
+  "@tradeImportDuplicatesOnlySuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tradeImportFailed": "Importação falhou: {error}",
+  "@tradeImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "ajouterTradeSectionEtatMoment": "ESTADO ATUAL",
   "ajouterTradeImagePickerClose": "Fechar",
   "ajouterTradeImagePickerTitle": "Fonte da imagem",
@@ -97,6 +187,7 @@
   "ajouterTradeDisciplineStrategieTitle": "Estratégia",
   "ajouterTradeDisciplineStrategieSubtitle": "Configuração, feedback",
   "ajouterTradeDisciplinePlanTitle": "Analysis plan",
+  "ajouterTradeDisciplineConfidencePlanTitle": "Plano de confiança",
   "ajouterTradeDisciplinePlanSubtitle": "Relatório, feedback",
   "ajouterTradeDisciplineChecklistTitle": "Checklist",
   "ajouterTradeDisciplineChecklistSubtitle": "Pontos a seguir",
@@ -393,6 +484,22 @@
   "calcTradeReturnTableTitle": "Resultados retorno DA negociação",
   "calcWin": "Vitória",
   "calcWinsLosses": "Ganhos / Perdas",
+  "calcErrorInvalidBalance": "Saldo inicial inválido.",
+  "calcErrorTradesRange": "O número de negociações deve estar entre 1 e 2000.",
+  "calcErrorWinRateRange": "A taxa de vitória deve estar entre 0 e 100.",
+  "calcErrorRiskRange": "O risco (%) deve estar entre 0 e 100.",
+  "calcErrorInvalidRiskReward": "Risk:Reward inválido.",
+  "calcErrorInvalidLot": "Lote inválido.",
+  "calcErrorInvalidEntry": "Preço de entrada inválido.",
+  "calcErrorInvalidSl": "Stop loss inválido.",
+  "calcErrorInvalidTp": "Take profit inválido.",
+  "calcErrorEntrySlIdentical": "Entrada e SL não podem ser idênticos.",
+  "calcDisclaimerEstimates": "Atenção: estes cálculos não são valores contratuais. Servem apenas como referência.",
+  "calcHeaderSubtitleEstimates": "Simulações de rendimento e ratio — valores indicativos.",
+  "calcMarketIndex": "Índice",
+  "calcMarketFutures": "Futuro",
+  "calcMarketStock": "Ação",
+  "calcMarketCommodities": "Matérias-primas",
   "calcWorstBalance": "Pior saldo",
   "calculateRatio": "Calcular razão",
   "cancel": "Cancelar",
@@ -410,6 +517,16 @@
   "checklistDeleteSectionTitle": "Remove seção",
   "checklistEditSectionHint": "Título",
   "checklistIntroBody": "Antes de assumir uma posição, certifique-se de validar todos os critérios do seu plano de negociação.",
+  "checklistDailyCalendarTitle": "CHECKLIST POR DIA",
+  "checklistDailyUncheckedTitle": "NÃO MARCADOS",
+  "checklistDailyUncheckedNoActivity": "Nenhuma atividade neste dia.",
+  "checklistDailyUncheckedNoDue": "Nenhum critério previsto para este dia.",
+  "checklistDailyUncheckedAllDone": "Todos os critérios do dia estão marcados.",
+  "checklistDailyUncheckedNoHistory": "Nenhum detalhe da checklist foi guardado para este dia. O acompanhamento de critérios não marcados está disponível a partir de hoje.",
+  "checklistItemNews1": "Calendário económico consultado (FED, CPI, NFP, PIB…).",
+  "checklistItemNews2": "FOMC / FED: sem trade durante o anúncio.",
+  "checklistItemNews3": "CPI (inflação): hora e impacto previstos.",
+  "checklistItemNews4": "NFP (emprego EUA): janela de risco identificada.",
   "checklistItemAnalyse1": "A tendência de fundo (HTF) se alinha à minha ideia.",
   "checklistItemAnalyse2": "O preço está em uma zona-chave (Suporte/Resistência, Bloco de Pedidos).",
   "checklistItemAnalyse3": "Tenho uma confirmação de entrada clara (Padrão, Divergência).",
@@ -423,9 +540,27 @@
   "checklistMenuEdit": "Editar",
   "checklistPageTitle": "Checklist",
   "checklistProgressCl": "CL",
+  "checklistSectionNews": "NEWS · CALENDÁRIO ECONÓMICO",
   "checklistSectionAnalyse": "ANÁLISE TÉCNICA",
   "checklistSectionPsy": "PSICOLOGIA",
   "checklistSectionRisque": "GESTÃO DE RISCOS",
+  "checklistScheduleTitle": "Item reminder",
+  "checklistScheduleDefaultHeading": "1 · Default rule",
+  "checklistScheduleModeDaily": "Every day",
+  "checklistScheduleModeWeekly": "Once a week",
+  "checklistScheduleModeSpecificDate": "Specific date",
+  "checklistScheduleUserDateHeading": "2 · Chosen date",
+  "checklistSchedulePickDate": "Pick a date",
+  "checklistScheduleWeekHeading": "3 · Day of week",
+  "checklistScheduleNextOccurrence": "Next date: {date}",
+  "@checklistScheduleNextOccurrence": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "checklistScheduleWarningHeading": "4 · Alert time",
+  "checklistSchedulePickTime": "Pick time",
+  "checklistScheduleCalendarTooltip": "Date and reminder settings",
   "clearAll": "Limpar Tudo",
   "confirm": "Confirmar",
   "currencyNameHint": "por exemplo, CHF, XOF",
@@ -547,6 +682,9 @@
   "mentalRestTitle": "REST",
   "mentalRiskAppetite": "Medo",
   "mentalRoutineFieldLabel": "Nome da rotina (por exemplo, esporte, leitura)",
+  "mentalDayDetailTitle": "CRITÉRIOS DO DIA",
+  "mentalDayDetailNoData": "Sem dados para este dia. Atualize o seu estado mental para guardar.",
+  "mentalDayDetailGlobalScore": "PONTUAÇÃO GLOBAL",
   "mentalGlobalScoreCalendarTitle": "PONTUAÇÃO GLOBAL POR DIA",
   "mentalSleepEnough": "Dormiu o suficiente",
   "mentalSleepImpact": "Impacto",
@@ -750,7 +888,7 @@
       }
     }
   },
-  "profileSubscribeButton": "Passar ao Pro (49,90 $ / ano — assinatura)",
+  "profileSubscribeButton": "Passar ao Pro (a partir de 8,99 $ / mês)",
   "profileManageSubscriptionButton": "Gerir subscrição",
   "profileUpgradeLabel": "Upgrade",
   "profileEditSavedSnack": "Perfil atualizado",
@@ -771,6 +909,14 @@
   "authTerminalTagline": "Domine a mente, domine o trade",
   "authTerminalCtaLogin": "Abrir terminal",
   "authTerminalCtaSignup": "Criar identidade",
+  "webLandingLoginSubtitle": "Bem-vindo de volta ao Paychek.",
+  "webLandingSignupSubtitle": "Junta-te à elite dos traders.",
+  "webLandingLoginCta": "ENTRAR",
+  "webLandingSignupCta": "EXPERIMENTAR GRÁTIS",
+  "webLandingNoAccountLabel": "SEM CONTA?",
+  "webLandingRegisterLink": "REGISTAR",
+  "webLandingAlreadyMemberLabel": "JÁ ÉS MEMBRO?",
+  "webLandingLoginLink": "ENTRAR",
   "authTerminalEncryptedPrefix": "Nó encriptado:",
   "authTerminalEncryptedStatus": "Ativo",
   "authTerminalHintEmail": "nome@terminal.com",
@@ -860,8 +1006,42 @@
   "paywallProFeature7": "Estatísticas de performance",
   "paywallProFeature8": "Estado mental",
   "paywallProFeature9": "Exportação PDF",
-  "paywallPriceAnnualHighlight": "US$ 49,90 / ano",
-  "paywallPriceApproxPerMonth": "Cerca de US$ 4,15 / mês",
+  "paywallMobilePlanAnnualTitle": "1 ano (12 meses)",
+  "paywallMobilePlanQuarterlyTitle": "3 meses",
+  "paywallMobilePlanMonthlyTitle": "1 mês",
+  "paywallMobilePlanPerMonthLine": "Cerca de {price} $ US / mês",
+  "@paywallMobilePlanPerMonthLine": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "paywallMobilePlanPerMonthPrefix": "Cerca de ",
+  "paywallMobilePlanPerMonthPriceSuffix": " $ US",
+  "paywallMobilePlanPerMonthEnd": " / mês",
+  "paywallMobilePlanTotalLine": "{total} $",
+  "@paywallMobilePlanTotalLine": {
+    "placeholders": {
+      "total": { "type": "String" }
+    }
+  },
+  "paywallMobilePlanAnnualBilling": "Faturado anualmente",
+  "paywallMobilePlanQuarterlyBilling": "A cada 3 meses",
+  "paywallMobilePlanMonthlyBilling": "Faturado mensalmente",
+  "paywallMobilePlanMonthlyCommitment": "Compromisso mensal",
+  "paywallMobilePlanSavings44": "Poupe 44%",
+  "paywallMobilePlanPopular": "Popular",
+  "paywallMobileCompareFeatureCol": "Funcionalidade",
+  "paywallMobileRowTrades": "Trades / mês",
+  "paywallMobileRowEntry": "Entrada de dados",
+  "paywallMobileRowCalendar": "Calendário",
+  "paywallMobileRowChecklist": "Checklist",
+  "paywallMobileRowAnalysis": "Gerador de análise",
+  "paywallMobileRowStrategy": "Página Estratégia",
+  "paywallMobileRowStats": "Estatísticas de desempenho",
+  "paywallMobileRowMental": "Estado mental",
+  "paywallMobileRowExport": "Exportação PDF",
+  "paywallPriceAnnualHighlight": "US$ 59,99 / ano",
+  "paywallPriceApproxPerMonth": "Cerca de US$ 4,99 / mês",
   "paywallTrialEndedBody": "Seus 7 dias grátis (novo cadastro) terminaram em {date}. Sem Pro, você fica no plano Lite.",
   "@paywallTrialEndedBody": {
     "placeholders": {
@@ -871,7 +1051,6 @@
     }
   },
   "paywallLiteLimitedHint": "No Lite, só adicionar trade e o calendário ficam abertos. O restante exige Pro.",
-  "paywallProPriceAnnual": "Pro: US$ 49,90 / ano",
   "paywallContinueFreemium": "Continuar no Lite (acesso limitado)",
   "paywallSubscribeButton": "Assinar agora",
   "paywallRestoreButton": "Já sou assinante",
@@ -1076,6 +1255,7 @@
   "settingsDashSectionStrategie": "Estratégia",
   "settingsDashSectionWeekly": "Desempenho semanal",
   "settingsDashSectionEvolution": "Evolução do capital",
+  "settingsDashSectionLens": "Paychek Lens",
   "tradingSection": "Negociação",
   "settingsCgvSection": "Termos legais",
   "settingsCgvPageTitle": "Condições gerais de venda",
@@ -1083,15 +1263,15 @@
   "settingsCgvRowSubtitle": "Ler o texto completo na aplicação",
   "settingsCgvDocHeading": "CONDIÇÕES GERAIS DE VENDA (CGV) - PAYCHEK",
   "settingsCgv1Title": "1. Objeto",
-  "settingsCgv1Body": "As presentes CGV regem a subscrição de acesso «Premium» à aplicação Paychek, uma ferramenta de diário de trading e gestão de risco. O acesso é fornecido por subscrição anual, renovada automaticamente todos os anos até cancelamento.",
+  "settingsCgv1Body": "As presentes CGV regem a subscrição de acesso «Pro» (Premium) à aplicação Paychek, uma ferramenta de diário de trading e gestão de risco. O acesso é fornecido por subscrição mensal, trimestral ou anual, renovada automaticamente em cada período até cancelamento.",
   "settingsCgv2Title": "2. Serviços prestados",
   "settingsCgv2Body": "O acesso Premium desbloqueia todas as funcionalidades da aplicação (estatísticas avançadas, cálculo automático de risco, exportação de dados). O acesso está associado à conta de utilizador criada no registo.",
   "settingsCgv3Title": "3. Preços e pagamento",
-  "settingsCgv3Body": "Subscrição direta: o preço é de 49,90 $ USD por ano (renovação automática até cancelamento).\n\nOferta de parceiro: O acesso pode ser oferecido gratuitamente se o utilizador cumprir as condições de referência junto de um dos nossos parceiros (Prop Firm ou broker).\n\nA Paychek reserva-se o direito de alterar os preços a qualquer momento para novos clientes.",
+  "settingsCgv3Body": "Subscrição direta: os planos Pro são faturados em dólares americanos (USD) via Stripe, com renovação automática até cancelamento:\n• US$ 8,99 / mês\n• US$ 20,97 / 3 meses\n• US$ 59,99 / ano\n\nOferta de parceiro: O acesso pode ser oferecido gratuitamente se o utilizador cumprir as condições de referência junto de um dos nossos parceiros (Prop Firm ou broker).\n\nA Paychek reserva-se o direito de alterar os preços a qualquer momento para novos clientes.",
   "settingsCgv4Title": "4. Direito de livre resolução e reembolso",
   "settingsCgv4Body": "Em conformidade com a legislação sobre produtos digitais:\n\nDevido à natureza digital do serviço e ao acesso imediato ao conteúdo após o pagamento, o utilizador aceita que o serviço comece de imediato e renuncia expressamente ao direito de livre resolução de 14 dias.\n\nNão será efetuado reembolso após a ativação do acesso Premium, exceto em caso de falha técnica grave que torne a aplicação inutilizável.",
   "settingsCgv5Title": "5. Cláusula específica \"Oferta de parceiro\"",
-  "settingsCgv5Body": "O acesso concedido através de um parceiro depende da validação da afiliação por esse parceiro.\n\nSe o parceiro recusar a afiliação (por incumprimento das regras de depósito ou de trading), a Paychek reserva-se o direito de revogar o acesso Premium ou exigir o pagamento do preço normal.",
+  "settingsCgv5Body": "O acesso concedido através de um parceiro depende da validação da afiliação por esse parceiro.\n\nSe o parceiro recusar a afiliação (por incumprimento das regras de depósito ou de trading), a Paychek reserva-se o direito de revogar o acesso Premium ou exigir o pagamento das tarifas Pro em vigor.",
   "settingsCgv6Title": "6. Aviso de riscos (Trading)",
   "settingsCgv6Body": "A Paychek não é um consultor financeiro. A aplicação é uma ferramenta técnica de gestão e análise.\n\nO trading envolve um elevado risco de perda de capital. O utilizador é o único responsável pelas suas decisões de trading.\n\nA Paychek não poderá ser responsabilizada por perdas financeiras do utilizador nos mercados.",
   "settingsCgv7Title": "7. Disponibilidade do serviço",
@@ -1269,7 +1449,6 @@
   "supportFeedbackTitleLead": "Suporte e ",
   "supportFeedbackTitleAccent": "Feedback",
   "supportFeedbackSubtitle": "Dúvida ou ideia? Estamos a ouvir-te.",
-  "supportFeedbackBack": "Voltar",
   "supportActionEmailLabel": "E-mail",
   "supportActionEmailHint": "Resposta até 24 h",
   "supportActionDocsLabel": "Docs",
@@ -1305,6 +1484,15 @@
   "supportFormSubmitFirestoreDone": "Obrigado — mensagem guardada. A equipa vê na consola admin.",
   "supportFormSubmitSending": "A enviar…",
   "supportFormSubmitError": "Envio falhou. Verifica a ligação.",
+  "supportErrorEmailOpenFailed": "Não foi possível abrir o e-mail: {error}",
+  "@supportErrorEmailOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supportErrorEmailAppUnavailable": "Não foi possível abrir a app de e-mail. Verifica se tens um cliente instalado.",
   "supportFormSubmitSavedPartialAttachment": "Mensagem guardada sem anexo (rede, tempo ou Storage). Verifica o Firebase.",
   "supportQuickHelpTitle": "Ajuda rápida",
   "supportFaqWhereDataQ": "Onde estão os meus dados?",

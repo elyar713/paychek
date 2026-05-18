@@ -276,7 +276,6 @@ class _ReglageProfileViewPageState extends State<ReglageProfileViewPage>
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     final profile = _profile;
     final e = profile.email.trim();
@@ -498,49 +497,12 @@ class _ReglageProfileViewPageState extends State<ReglageProfileViewPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (isWebUi)
-            PaychekPageHeader(
-              title: l10n.accountPageTitle,
-              subtitle: l10n.profileViewDetailsSection,
-              onBack: widget.embeddedInReglageOverlay ? back : back,
-              maxContentWidth: _kWebAccountMaxWidth,
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: back,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.chevron_left_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.accountPageTitle,
-                          style: t.labelMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ) ??
-                              const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          PaychekPageHeader(
+            title: l10n.accountPageTitle,
+            subtitle: l10n.profileViewDetailsSection,
+            onBack: back,
+            maxContentWidth: _kWebAccountMaxWidth,
+          ),
           Expanded(
             child: isWebUi
                 ? Align(

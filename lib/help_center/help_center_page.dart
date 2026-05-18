@@ -8,12 +8,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
+import '../widgets/paychek_page_header.dart';
 import 'help_center_guide_assets.dart';
 import 'help_center_launch_links.dart';
 import 'help_center_store_badge_bytes.dart';
 
 class HelpCenterPage extends StatefulWidget {
-  const HelpCenterPage({super.key});
+  const HelpCenterPage({super.key, this.onCloseInShell});
+
+  /// Dashboard overlay : fermeture sans [Navigator.pop].
+  final VoidCallback? onCloseInShell;
 
   @override
   State<HelpCenterPage> createState() => _HelpCenterPageState();
@@ -101,56 +105,14 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
 
     final web = kIsWeb;
     final bg = web ? PaychekWebTokens.scaffoldBg : Colors.black;
-    final hPad = web ? 24.0 : 16.0;
-    final vPadTop = web ? 12.0 : 8.0;
-    final canPop = Navigator.of(context).canPop();
+    final hPad = PaychekPageHeader.horizontalPad(
+      MediaQuery.sizeOf(context).width,
+    );
 
     final column = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (canPop)
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => Navigator.of(context).maybePop(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-                  child: Icon(
-                    Icons.chevron_left_rounded,
-                    color: Colors.white,
-                    size: web ? 26 : 22,
-                  ),
-                ),
-              ),
-            if (canPop) const SizedBox(width: 2),
-            Expanded(
-              child: Text(
-                l10n.helpCenterTitle,
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w800,
-                  fontSize: web ? 22 : 20,
-                  color: Colors.white,
-                  height: 1.2,
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: web ? 10 : 8),
-        Text(
-          l10n.helpCenterSubtitle,
-          style: GoogleFonts.plusJakartaSans(
-            color: web
-                ? PaychekWebTokens.textGray500
-                : DashboardTokens.labelGrey,
-            height: 1.4,
-            fontSize: web ? 14 : 13,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        SizedBox(height: web ? 20 : 14),
+        SizedBox(height: web ? 4 : 0),
         _VersionToggle(
           mobileLabel: l10n.helpCenterVersionMobile,
           webLabel: l10n.helpCenterVersionWeb,
@@ -269,23 +231,39 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: web
-            ? Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: _kWebHelpMaxWidth,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(hPad, vPadTop, hPad, 20),
-                    child: column,
-                  ),
-                ),
-              )
-            : Padding(
-                padding: EdgeInsets.fromLTRB(hPad, vPadTop, hPad, 16),
-                child: column,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PaychekPageHeader(
+              onBack: PaychekPageHeader.resolveBack(
+                context,
+                onCloseInShell: widget.onCloseInShell,
               ),
+              title: l10n.helpCenterTitle,
+              subtitle: l10n.helpCenterSubtitle,
+              maxContentWidth: _kWebHelpMaxWidth,
+            ),
+            Expanded(
+              child: web
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: _kWebHelpMaxWidth,
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 20),
+                          child: column,
+                        ),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 16),
+                      child: column,
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

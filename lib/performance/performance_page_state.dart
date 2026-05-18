@@ -501,10 +501,23 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
     final gestion = _gestionParams ?? StrategieGestionRisqueParams.defaults;
     final capStore = UserCapitalScope.of(context);
     final capital = UserPortfolioScope.of(context).effectiveCapitalAmount(capStore);
+    final customLensCards = await PerformanceCustomLensStorage.loadSavedCards();
+    final checklistSections =
+        await ChecklistSectionsStorage.load() ?? defaultNouveauTradeSections();
+    final checklist = await checklistControllerReadyForPdfExport(null);
+    final storedReports = await loadAnalyseReportsForPdfExport();
+    if (!mounted) return;
+    final journalItems = activeJournalTradesOrDemo(context);
+    final resolvedTrades = performanceTradesFromJournalForPdf(
+      journalItems,
+      checklist: checklist,
+      storedReports: storedReports,
+    );
+    final visibleResolved = filterTradesByRange(resolvedTrades, _range);
     await exportPerformancePdf(
       context,
-      disciplineTrades: _disciplineVisibleTrades,
-      visibleTradesForAssets: _visibleTrades,
+      disciplineTrades: visibleResolved,
+      visibleTradesForAssets: visibleResolved,
       periodFilter: _periodFilter,
       anchor: _anchorDate,
       customStart: _customStartDate,
@@ -512,6 +525,8 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
       gestionParams: gestion,
       capitalAmount: capital,
       journalItemCount: activeJournalTradesOrDemo(context).length,
+      customLensSavedCards: customLensCards,
+      checklistSections: checklistSections,
       l: AppLocalizations.of(context)!,
       uiLocale: Localizations.localeOf(context),
     );

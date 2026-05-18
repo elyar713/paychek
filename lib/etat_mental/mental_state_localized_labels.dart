@@ -20,6 +20,31 @@ void applyMentalStateDefaultLabelsFromL10n(
   }
 }
 
+String mentalStateMetricDisplayLabel(
+  AppLocalizations l,
+  String id,
+  String stored,
+) {
+  final t = stored.trim();
+  final localized =
+      _routineFactorLabel(l, id) ?? _momentMetricLabel(l, id);
+  if (t.isNotEmpty && (localized == null || t != localized)) return t;
+  if (localized != null) return localized;
+  return t.isEmpty ? id : t;
+}
+
+String mentalStateEmotionDisplayLabel(
+  AppLocalizations l,
+  String id,
+  String stored,
+) {
+  final t = stored.trim();
+  final localized = _defaultEmotionLabel(l, id);
+  if (t.isNotEmpty && (localized == null || t != localized)) return t;
+  if (localized != null) return localized;
+  return t.isEmpty ? id : t;
+}
+
 String? _routineFactorLabel(AppLocalizations l, String id) {
   switch (id) {
     case 'meditation':

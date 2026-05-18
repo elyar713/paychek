@@ -1,0 +1,308 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "lead": "Trade with institutional discipline—not emotional noise.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Capital & balance:",
+        "body": "Liquidity health sits front-and-center."
+      },
+      {
+        "icon": "fa-sticky-note",
+        "label": "Your playbook note:",
+        "body": "No more scrambling for scribbles—the bias check lives right on the lane where you approve risk."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Checklist:",
+        "body": "Tap once to certify every playbook rule straight from mission control."
+      },
+      {
+        "icon": "fa-gauge",
+        "label": "Mind state:",
+        "body": "A live needle shows whether you're cleared to operate—or should pause the session cold."
+      },
+      {
+        "icon": "fa-calendar-alt",
+        "label": "Calendar:",
+        "body": "Equity arcs captured month over month."
+      },
+      {
+        "icon": "fa-chess-knight",
+        "label": "Your strategy:",
+        "body": "The plan never leaves sight."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK dashboard preview capture",
+      "PAYCHEK dashboard — mindset, strategy and calendar collage"
+    ]
+  },
+  "checklist": {
+    "title": "Checklist",
+    "lead": "Your procedural green-light before sizing risk",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "360° validation:",
+        "body": "Technique, risk, mindset—triple-check telemetry before committing size."
+      },
+      {
+        "icon": "fa-circle-notch",
+        "label": "Visual completion arc:",
+        "body": "The ring fills as gates close. Execute long/short orders only once the halo is sealed."
+      },
+      {
+        "icon": "fa-link",
+        "label": "Zero amnesia:",
+        "body": "Money-management doctrine is scripted into ritual."
+      },
+      {
+        "icon": "fa-file-pdf",
+        "label": "PDF audits:",
+        "body": "Export timestamped receipts of discipline whenever you debrief sponsors or coaches."
+      }
+    ],
+    "imgAlt": "PAYCHEK checklist module screenshot"
+  },
+  "mental": {
+    "title": "Mindset",
+    "lead": "The tape punishes burnout. PAYCHEK is the biometric air-traffic tower that clears you—or grounds you—with iron discipline.",
+    "descPoints": [
+      {
+        "icon": "fa-chart-line",
+        "label": "Performance compass:",
+        "body": "A composite readiness score fed by rituals—sleep, training, mindfulness—signals when you're truly sharp enough to dominate."
+      },
+      {
+        "icon": "fa-sliders",
+        "label": "Momentum snapshot:",
+        "body": "Swipe once to gauge focus, energy and stress spikes. Crimson gauges trigger warnings before behavioural blow-ups arrive."
+      },
+      {
+        "icon": "fa-face-smile",
+        "label": "Emotional telemetry:",
+        "body": "Label euphoria, tilt or neutrality to starve revenge trading and fragile confidence spirals."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Pro warmup ritual:",
+        "body": "Lock pre-session habits. Prepared operators monetize preparation."
+      }
+    ],
+    "imgAlt": "PAYCHEK mindset module screenshot"
+  },
+  "analyse": {
+    "title": "Analysis workspace",
+    "lead": "Run live dossiers merging trade plans, granular technical blocks and wrap-up briefings.",
+    "descPoints": [
+      {
+        "icon": "fa-file-lines",
+        "label": "Plan worksheet:",
+        "body": "Direction, frames, dominant trend, regime and conviction live on one glass pane."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Deep dives:",
+        "body": "Structure, indicators, smart-money context, liquidity, volume shelves and annotated captures."
+      },
+      {
+        "icon": "fa-file-export",
+        "label": "Executive wrap:",
+        "body": "Seal the dossier with a confidence score synced to instrument history."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK weekly swing narrative card",
+      "PAYCHEK structure, indicators and liquidity sheets",
+      "PAYCHEK trade plan worksheet",
+      "PAYCHEK rollup confidence + export stack"
+    ]
+  },
+  "strategie": {
+    "title": "Strategy",
+    "lead": "Most desks lose the playbook mid-session. PAYCHEK pins it visibly so behavioural drift never wins.",
+    "descPoints": [
+      {
+        "icon": "fa-sliders",
+        "label": "Custom pillars:",
+        "body": "Engineer frameworks that mirror your playbook—not canned templates borrowed online."
+      },
+      {
+        "icon": "fa-pen-to-square",
+        "label": "Conviction ledger:",
+        "body": "Narrate the thesis beside every actionable idea."
+      },
+      {
+        "icon": "fa-bullseye",
+        "label": "Instant alignment:",
+        "body": "No tab hunting; the playbook rides on Dashboard so rituals stay repeatable."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Setup score:",
+        "body": "Rate idea quality upstream of execution—filter mediocre scalps upstream."
+      }
+    ],
+    "imgAlt": "PAYCHEK strategy module — playbook, risk, sessions, setups"
+  },
+  "performance": {
+    "title": "Performance",
+    "lead": "Stop guessing where losses leak—quantify each friction point.",
+    "descPoints": [
+      {
+        "icon": "fa-brain",
+        "label": "Mind-map analytics:",
+        "body": "Stack principle-driven trades beside gut trades to visualize emotional drag on expectancy."
+      },
+      {
+        "icon": "fa-clock",
+        "label": "Golden hour radar:",
+        "body": "Surface the clock windows delivering edge so energy focuses only when payoff density peaks."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Session telemetry:",
+        "body": "Win rate, payoff ratios, sizing—slice data like a volatility desk adjusts models."
+      },
+      {
+        "icon": "fa-layer-group",
+        "label": "Intensity guardrails:",
+        "body": "Pin daily trade cadence ceilings to choke overtrading and defend capital throughput."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK performance — traded volume and symbol heatmap",
+      "PAYCHEK performance — timeframe volume, payoff hours, hold durations",
+      "PAYCHEK performance — mindset vs execution interplay"
+    ]
+  },
+  "calendrier": {
+    "title": "Calendar",
+    "lead": "Chromed history that surfaces strengths—and surgically trims mistakes.",
+    "desc": "Month-at-a-glance P&L. Spot winning streak rhythms and dissect red sessions without folklore.",
+    "imgAlt": "PAYCHEK calendar — streaks, net curve, summary tiles"
+  },
+  "trade": {
+    "title": "Trade book",
+    "lead": "Move beyond blindly clicking bids—vault institutional-grade trade stories.",
+    "descPoints": [
+      {
+        "icon": "fa-book",
+        "label": "Chronological ledger:",
+        "body": "Every ticket stored with autopilot expectancy math translating gross into net profitability."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Technical dossier:",
+        "body": "Clip charts alongside thesis notes so revisit reviews never reinvent context cold."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Discipline forensics:",
+        "body": "Instantly expose which playbook clauses executed versus which impulses hijacked sizing."
+      },
+      {
+        "icon": "fa-pen",
+        "label": "Reflection journal:",
+        "body": "Tag emotions plus intuition so hindsight turns into playbook upgrades—not déjà vu."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Micro metrics:",
+        "body": "True payoff ratio, time in market and bleed from fees—capital math without excuses."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK trade book — filtered table and PnL ribbons",
+      "PAYCHEK trade book — granular ticket drill-down",
+      "PAYCHEK trade book — weekly recap with session overlay"
+    ]
+  },
+  "pdf": {
+    "title": "PDF export",
+    "lead": "Blueprint audit packs that prove repeatable process to investors—or your future self.",
+    "descPoints": [
+      {
+        "icon": "fa-chess-knight",
+        "label": "Strategy folio:",
+        "body": "Bundle doctrine and technical pillars into signed-off documentation."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Instrument reviews:",
+        "body": "Archive scenarios plus annotated captures collected during every session sprint."
+      },
+      {
+        "icon": "fa-file-lines",
+        "label": "Ticket folios:",
+        "body": "Each fill exports with journaling, playbook tags and behavioural scoring."
+      },
+      {
+        "icon": "fa-calendar-week",
+        "label": "Cadence audits:",
+        "body": "Generate weekly dossiers powering structured post-trade reviews."
+      },
+      {
+        "icon": "fa-chart-column",
+        "label": "Performance dossiers:",
+        "body": "Compile daily-weekly-monthly composites into briefing-ready PDFs."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK PDF — journal performance synopsis + checklist",
+      "PAYCHEK PDF — analytic brief (structure, KPI stack)",
+      "PAYCHEK PDF — playbook including risk grids + sessions",
+      "PAYCHEK PDF — week trade recap rollup",
+      "PAYCHEK PDF — granular ticket dossier fields"
+    ]
+  },
+  "csv": {
+    "title": "CSV import",
+    "lead": "Nine execution venues supported—drag the export, PAYCHEK auto-detects schema.",
+    "descPoints": [
+      {
+        "icon": "fa-file-csv",
+        "label": "Interop coverage:",
+        "body": "MT4 · MT5 · TradingView · Tradovate · cTrader · NinjaTrader · Quantower · ATAS · Rithmic."
+      },
+      {
+        "icon": "fa-wand-magic-sparkles",
+        "label": "Wizarded ingest:",
+        "body": "Vendor-specific flows accept CSV/HTML bundles without manual remap theatre."
+      },
+      {
+        "icon": "fa-chart-line",
+        "label": "Unified blotter:",
+        "body": "Imported tickets inherit analytics, payoff screens and outbound PDF tooling automatically."
+      }
+    ],
+    "imgAlt": "PAYCHEK CSV wizard — brokerage selector grid"
+  },
+  "ajouter": {
+    "title": "Add trade",
+    "lead": "Capture fills with algo precision and discretionary clarity fused.",
+    "descPoints": [
+      {
+        "icon": "fa-bolt",
+        "label": "Rapid blotter:",
+        "body": "Intent-built UI slashes keyboard distance so latency never breaks journaling habit."
+      },
+      {
+        "icon": "fa-calculator",
+        "label": "Smart netting:",
+        "body": "Entry, exit and fee inputs auto-comp net expectancy without brittle spreadsheets."
+      },
+      {
+        "icon": "fa-clipboard-check",
+        "label": "Behaviour filter:",
+        "body": "Flag instantly whether executions honour rules—or slide into discretionary drift."
+      }
+    ],
+    "imgAlts": [
+      "PAYCHEK add trade — ticker, sizing, timestamps",
+      "PAYCHEK add trade — playbook plus checklist toggles"
+    ]
+  }
+}

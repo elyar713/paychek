@@ -1,7 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 
+import '../../dashboard/dashboard_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../checklist_item_schedule.dart';
+import '../checklist_item_schedule_summary.dart';
 import '../checklist_tokens.dart';
+import 'checklist_schedule_calendar_button.dart';
 
 /// Ligne : case Ã  cocher **carrÃ©e** + libellÃ© (carte gris foncÃ©).
 /// En mode Ã©dition section ([onLineDelete] non null), la case devient une icÃ´ne supprimer.
@@ -19,6 +23,9 @@ class ChecklistItemRow extends StatelessWidget {
     this.onLabelSubmitted,
     this.onAddLineAfter,
     this.onTapEditLabel,
+    this.onSectionEditInteract,
+    this.schedule,
+    this.onScheduleChanged,
   });
 
   final String label;
@@ -41,6 +48,12 @@ class ChecklistItemRow extends StatelessWidget {
   /// En mode Â« Modifier Â» : tap sur le libellÃ© pour le modifier.
   final VoidCallback? onTapEditLabel;
 
+  /// En mode Â« Modifier Â» : avant tap poubelle / libellÃ© (évite sortie d’édition).
+  final VoidCallback? onSectionEditInteract;
+
+  final ChecklistItemSchedule? schedule;
+  final ValueChanged<ChecklistItemSchedule>? onScheduleChanged;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
@@ -55,6 +68,55 @@ class ChecklistItemRow extends StatelessWidget {
               )
             : ChecklistTokens.itemLabelOnCardStyle);
 
+    Widget mainTapTarget = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (onLineDelete != null)
+          _LineDeleteButton(
+            onTap: onLineDelete!,
+            onTapDown: onSectionEditInteract,
+          )
+        else
+          _SquareCheck(checked: checked),
+        const SizedBox(width: ChecklistTokens.itemRowCheckGap),
+        Expanded(
+          child: editingLabel &&
+                  labelEditController != null &&
+                  labelFocusNode != null
+              ? TextField(
+                    controller: labelEditController,
+                    focusNode: labelFocusNode,
+                    style: ChecklistTokens.itemLabelOnCardStyle,
+                    cursorColor: ChecklistTokens.itemLabelOnCardStyle.color,
+                    maxLines: null,
+                    minLines: 1,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      hintText: l.checklistItemHint,
+                      hintStyle: ChecklistTokens.itemLabelOnCardStyle.copyWith(
+                        color: const Color(0xFF6A6A6A),
+                      ),
+                    ),
+                    onSubmitted: (_) => onLabelSubmitted?.call(),
+                  )
+              : _buildStaticLabel(lineStyle),
+        ),
+      ],
+    );
+
+    if (onLineDelete == null && !editingLabel) {
+      mainTapTarget = Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onChanged(!checked),
+          child: mainTapTarget,
+        ),
+      );
+    }
+
     final row = Padding(
       padding: const EdgeInsets.symmetric(
         vertical: ChecklistTokens.itemRowVerticalPadding,
@@ -62,36 +124,14 @@ class ChecklistItemRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (onLineDelete != null)
-            _LineDeleteButton(onTap: onLineDelete!)
-          else
-            _SquareCheck(checked: checked),
-          const SizedBox(width: ChecklistTokens.itemRowCheckGap),
-          Expanded(
-            child: editingLabel &&
-                    labelEditController != null &&
-                    labelFocusNode != null
-                ? TextField(
-                      controller: labelEditController,
-                      focusNode: labelFocusNode,
-                      style: ChecklistTokens.itemLabelOnCardStyle,
-                      cursorColor: ChecklistTokens.itemLabelOnCardStyle.color,
-                      maxLines: null,
-                      minLines: 1,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                        hintText: l.checklistItemHint,
-                        hintStyle: ChecklistTokens.itemLabelOnCardStyle.copyWith(
-                          color: const Color(0xFF6A6A6A),
-                        ),
-                      ),
-                      onSubmitted: (_) => onLabelSubmitted?.call(),
-                    )
-                : _buildStaticLabel(lineStyle),
-          ),
+          Expanded(child: mainTapTarget),
+          if (onScheduleChanged != null) ...[
+            const SizedBox(width: 2),
+            ChecklistScheduleCalendarButton(
+              schedule: schedule ?? const ChecklistItemSchedule(),
+              onScheduleChanged: onScheduleChanged!,
+            ),
+          ],
           if (onAddLineAfter != null) ...[
             const SizedBox(width: 4),
             Material(
@@ -114,20 +154,43 @@ class ChecklistItemRow extends StatelessWidget {
       ),
     );
 
+    final sched = schedule ?? const ChecklistItemSchedule();
+    final summary = onScheduleChanged != null
+        ? checklistItemScheduleSummaryLine(context, sched)
+        : null;
+    final summaryColor = sched.isNonDailyDisplay
+        ? ChecklistTokens.scheduleCustomSummary
+        : DashboardTokens.accent.withValues(alpha: 0.92);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        onLineDelete != null
-            ? row
-            : editingLabel
-                ? row
-                : Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => onChanged(!checked),
-                      child: row,
-                    ),
-                  ),
+        if (summary != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 18 + ChecklistTokens.itemRowCheckGap,
+              right: 4,
+              top: ChecklistTokens.scheduleSummaryPaddingTop,
+              bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: ChecklistTokens.scheduleSummaryFontSize,
+                  height: 1.15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.15,
+                  color: summaryColor,
+                ),
+              ),
+            ),
+          ),
+        ],
+        row,
         if (showDividerBelow)
           Divider(height: 1, thickness: 1, color: ChecklistTokens.dividerOnCard),
       ],
@@ -145,6 +208,7 @@ class ChecklistItemRow extends StatelessWidget {
       return Material(
         color: Colors.transparent,
         child: InkWell(
+          onTapDown: (_) => onSectionEditInteract?.call(),
           onTap: onTapEditLabel,
           child: content,
         ),
@@ -155,15 +219,20 @@ class ChecklistItemRow extends StatelessWidget {
 }
 
 class _LineDeleteButton extends StatelessWidget {
-  const _LineDeleteButton({required this.onTap});
+  const _LineDeleteButton({
+    required this.onTap,
+    this.onTapDown,
+  });
 
   final VoidCallback onTap;
+  final VoidCallback? onTapDown;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        onTapDown: (_) => onTapDown?.call(),
         onTap: onTap,
         borderRadius: BorderRadius.circular(4),
         child: Container(
@@ -176,7 +245,7 @@ class _LineDeleteButton extends StatelessWidget {
           child: const Icon(
             Icons.delete_outline_rounded,
             size: 15,
-            color: Color(0xFF9A9A9A),
+            color: ChecklistTokens.sectionProgressRingRed,
           ),
         ),
       ),

@@ -37,10 +37,7 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
       _entreeController.text = (t.prixEntreeLabel ?? '');
       _sortieController.text = (t.prixSortieLabel ?? '');
 
-      _checklistRespectPct = t.checklistPct;
-      _planRespectPct = t.planPct;
       _strategieRespectPct = t.strategiePct;
-      _etatMomentPct = t.etatPct;
 
       _strategieChoisie = t.strategieTitle;
       _planAnalyseSelectedReport =

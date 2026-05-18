@@ -31,7 +31,8 @@ function callerIsPaychekSuperadmin(request) {
 }
 
 const {onCall, onRequest, HttpsError} = require("firebase-functions/v2/https");
-const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const {onDocumentCreated, onDocumentWritten} =
+  require("firebase-functions/v2/firestore");
 const {defineSecret, defineString} = require("firebase-functions/params");
 const express = require("express");
 const nodemailer = require("nodemailer");
@@ -710,17 +711,26 @@ function paychekApplyEmailPlaceholders(template, vars) {
  * @param {string} out
  * @param {Record<string, string|undefined|null>} vars
  */
+/** Variantes HTML / maquettes pour le prénom dans les e-mails de bienvenue. */
+function paychekNormalizeWelcomeTemplateTokens(html) {
+  let h = `${html}`.normalize("NFC");
+  h = h.split("[Pr&#233;nom]").join("[Prénom]");
+  h = h.split("[Pr&eacute;nom]").join("[Prénom]");
+  h = h.split("[Prenom]").join("[Prénom]");
+  h = h.split("[PRENOM]").join("[Prénom]");
+  h = h.split("［Prénom］").join("[Prénom]");
+  return h;
+}
+
 function paychekApplyLegacyMaquetteTokens(out, vars) {
-  let o = `${out}`;
+  let o = paychekNormalizeWelcomeTemplateTokens(out);
   const prenom =
     vars.firstName != null && `${vars.firstName}`.trim() !== "" ?
       String(vars.firstName) :
       vars.nomUtilisateur != null && `${vars.nomUtilisateur}`.trim() !== "" ?
         String(vars.nomUtilisateur) :
-        null;
-  if (prenom !== null) {
-    o = o.split("[Prénom]").join(prenom);
-  }
+        "Trader";
+  o = o.split("[Prénom]").join(prenom);
   if (vars.messagePreview != null && `${vars.messagePreview}`.trim() !== "") {
     const mp = String(vars.messagePreview);
     o = o.split("[Aperçu du message de l'utilisateur...]").join(mp);
@@ -2401,12 +2411,16 @@ async function resolveWelcomeSignupHtml(db, varsRaw) {
   const privacyHrefEsc = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
 
   return customHtml ?
-    paychekApplyEmailPlaceholders(customHtml, {
-      firstName: safeFirst,
-      trialDays: safeTrial,
-      supportHref: supportHrefEsc,
-      privacyHref: privacyHrefEsc,
-    }) :
+    paychekApplyEmailPlaceholders(
+        paychekNormalizeWelcomeTemplateTokens(customHtml),
+        {
+          firstName: safeFirst,
+          nomUtilisateur: safeFirst,
+          trialDays: safeTrial,
+          supportHref: supportHrefEsc,
+          privacyHref: privacyHrefEsc,
+        },
+    ) :
     buildWelcomeSignupHtml({
       firstName: safeFirst,
       trialDays: safeTrial,
@@ -2472,8 +2486,11 @@ async function paychekSendWelcomeSignupEmail(db, passRaw, payload) {
   );
 }
 
-/** E-mail de bienvenue lorsque `paychek_users/{uid}` est créé (première synchro profil). */
-exports.paychekWelcomeEmailOnSignup = onDocumentCreated(
+/**
+ * E-mail de bienvenue : déclenché à la création / mise à jour de `paychek_users/{uid}`.
+ * Attend `firstName` ou `displayName` Auth pour éviter `[Prénom]` littéral (course web).
+ */
+exports.paychekWelcomeEmailOnSignup = onDocumentWritten(
   {
     document: "paychek_users/{userId}",
     region: "europe-west1",
@@ -2482,11 +2499,14 @@ exports.paychekWelcomeEmailOnSignup = onDocumentCreated(
     memory: "256MiB",
   },
   async (event) => {
-    const snapshot = event.data;
-    if (!snapshot) return;
+    const after = event.data?.after;
+    if (!after?.exists) return;
 
     const uid = `${event.params.userId ?? ""}`.trim();
     if (!uid) return;
+
+    const fsData = after.data() ?? {};
+    if (fsData.welcomeSignupEmailSentAt) return;
 
     const rawPass = paychekSmtpPassword.value();
     const pass = normalizeSmtpPassword(rawPass);
@@ -2507,8 +2527,6 @@ exports.paychekWelcomeEmailOnSignup = onDocumentCreated(
       return;
     }
 
-    const fsData = snapshot.data() ?? {};
-
     /** @type {import("firebase-admin/auth").UserRecord | null} */
     let authUser = null;
     try {
@@ -2518,13 +2536,24 @@ exports.paychekWelcomeEmailOnSignup = onDocumentCreated(
       return;
     }
 
+    const fsFirst = `${fsData.firstName ?? ""}`.trim();
+    const fsDn = `${fsData.displayName ?? ""}`.trim();
+    const authDn = `${authUser.displayName ?? ""}`.trim();
+    const before = event.data?.before;
+    const isCreate = !before?.exists;
+    if (isCreate && !fsFirst && !fsDn && !authDn) {
+      return;
+    }
+
     const to = `${authUser.email ?? fsData.email ?? ""}`.trim();
     if (!to.includes("@")) {
       console.warn("paychekWelcomeEmailOnSignup: pas d’e-mail pour", uid);
       return;
     }
 
-    const firstName = greetingFirstNameWelcome(fsData, authUser);
+    const freshSnap = await after.ref.get();
+    const freshData = freshSnap.data() ?? fsData;
+    const firstName = greetingFirstNameWelcome(freshData, authUser);
     const db = admin.firestore();
 
     try {
@@ -2534,6 +2563,10 @@ exports.paychekWelcomeEmailOnSignup = onDocumentCreated(
         firstName,
         trialDays: PAYCHEK_WELCOME_TRIAL_DAYS,
       });
+      await after.ref.set(
+          {welcomeSignupEmailSentAt: admin.firestore.FieldValue.serverTimestamp()},
+          {merge: true},
+      );
     } catch (err) {
       console.error("paychekWelcomeEmailOnSignup: envoi", err);
     }

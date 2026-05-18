@@ -5,6 +5,7 @@ import '../dashboard/dashboard_home_layout_keys.dart';
 import '../dashboard/dashboard_home_layout_scope.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/paychek_page_header.dart';
 
 /// Réglages des sections de l’accueil : ordre (glisser) + activation.
 class ReglageDashboardLayoutPage extends StatelessWidget {
@@ -26,7 +27,7 @@ class ReglageDashboardLayoutPage extends StatelessWidget {
       case DashboardHomeLayoutKeys.strategie:
         return l.settingsDashSectionStrategie;
       case DashboardHomeLayoutKeys.paychekLens:
-        return 'Paychek Lens';
+        return l.settingsDashSectionLens;
       case DashboardHomeLayoutKeys.capitalEvolution:
         return l.settingsDashSectionEvolution;
       default:
@@ -41,35 +42,16 @@ class ReglageDashboardLayoutPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          l10n.settingsDashLayoutTitle,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            child: Text(
-              l10n.settingsDashLayoutReorderHint,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: DashboardTokens.muted,
-                height: 1.35,
-              ),
-            ),
+          PaychekPageHeader(
+            onBack: () => Navigator.of(context).pop(),
+            title: l10n.settingsDashLayoutTitle,
+            subtitle: l10n.settingsDashLayoutReorderHint,
+            subtitleMaxLines: 2,
+            maxContentWidth: 720,
           ),
           Expanded(
             child: ListenableBuilder(
@@ -187,6 +169,7 @@ class ReglageDashboardLayoutPage extends StatelessWidget {
               ),
             ),
         ],
+        ),
       ),
     );
   }
