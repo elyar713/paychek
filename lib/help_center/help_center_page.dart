@@ -329,11 +329,6 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         mobileBody: l10n.helpCenterArticleExportPdfBody,
         webBody: l10n.helpCenterArticleExportPdfBody,
       ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleResetDataTitle,
-        mobileBody: l10n.helpCenterArticleResetDataBody,
-        webBody: l10n.helpCenterArticleResetDataBody,
-      ),
     ];
   }
 }

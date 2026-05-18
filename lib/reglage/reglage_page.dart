@@ -2,15 +2,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../dashboard/dashboard_home_layout_scope.dart';
 import '../dashboard/widgets/paychek_plan_minimal_badge.dart';
-import '../dashboard/dashboard_home_layout_store.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../questionnaire/user_capital_store.dart';
-import '../trade/trade_journal_scope.dart';
-import '../trade/trade_journal_store.dart';
 import '../help_center/help_center_page.dart';
 import '../web/paychek_web_tokens.dart';
 import '../widgets/paychek_page_header.dart';
@@ -23,7 +19,6 @@ import 'reglage_portfolios_manager_sheet.dart';
 import 'user_portfolio_models.dart';
 import 'user_portfolio_scope.dart';
 import 'user_portfolio_store.dart';
-import 'reglage_app_local_data_reset.dart';
 import 'reglage_cgv_terms_page.dart';
 import 'reglage_privacy_policy_page.dart';
 import 'reglage_profile_connect_constants.dart'
@@ -34,7 +29,6 @@ import 'reglage_profile_view_page.dart';
 import 'support_feedback_page.dart';
 import 'trial_access_prefs.dart';
 import 'user_profile_scope.dart';
-import 'user_profile_store.dart';
 
 part 'reglage_page_tokens.dart';
 part 'reglage_page_profile_section.dart';
@@ -319,20 +313,6 @@ class _ReglagePageState extends State<ReglagePage> {
             _CgvSection(
               onOpenCgv: widget.onOpenCgvTerms,
               onOpenPrivacy: widget.onOpenPrivacyPolicy,
-            ),
-            SizedBox(height: gap),
-            _DataResetSection(
-              capitalStore: store,
-              portfolioStore: portfolioStore,
-              profileStore: UserProfileScope.of(context),
-              journalStore: TradeJournalScope.of(context),
-              layoutStore: DashboardHomeLayoutScope.of(context),
-              localeController: localeController,
-              tradingWeek: tradingWeek,
-              onResetComplete: () {
-                _loadProfile();
-                _loadAccountEntitlement();
-              },
             ),
             if (_profile.inscrit) ...[
               SizedBox(height: gap + 12),

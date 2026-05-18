@@ -515,6 +515,7 @@ class _DashboardPageState extends State<DashboardPage>
           key: const ValueKey<String>('tab_trade'),
           checklistController: _checklistController,
           openTradeIdNotifier: _openTradeIdNotifier,
+          onNavigateToDashboard: () => _applyTabIndex(0),
           onEditTrade: (t) {
             if (_liteRestricted) {
               _showLitePaywallSheet();

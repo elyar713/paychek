@@ -1831,6 +1831,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTrade => 'Trade';
 
   @override
+  String get tradePageIntro => 'Journal, filtres et fiches trades.';
+
+  @override
   String get ok => 'OK';
 
   @override
@@ -2914,7 +2917,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get supportFaqWhereDataA =>
-      'Tes données sont stockées sur cet appareil (préférences, journal, portfolios). Une déconnexion ou une réinitialisation dans Réglages > Données peut les effacer — pense aux exports PDF si tu veux des archives.';
+      'Tes données sont stockées sur cet appareil (préférences, journal, portfolios) et synchronisées avec ton compte si tu es connecté. Pour des archives, exporte en PDF depuis l’app. La déconnexion ne supprime pas le cloud : reconnecte-toi pour retrouver tes données.';
 
   @override
   String get supportFaqFeatureQ => 'Besoin d’une nouvelle fonctionnalité ?';

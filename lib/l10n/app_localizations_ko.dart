@@ -1764,6 +1764,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navTrade => '거래';
 
   @override
+  String get tradePageIntro => '일지·필터·트레이드 카드.';
+
+  @override
   String get ok => '확인';
 
   @override

@@ -1831,6 +1831,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navTrade => 'Handel';
 
   @override
+  String get tradePageIntro => 'Journal, Filter und Trade-Karten.';
+
+  @override
   String get ok => 'OK';
 
   @override
@@ -2912,7 +2915,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get supportFaqWhereDataA =>
-      'Daten liegen auf diesem Gerät (Einstellungen, Journal, Portfolios). Abmelden oder „Lokale Daten löschen“ entfernt sie — nutze PDF-Exporte für Archive.';
+      'Daten liegen auf diesem Gerät (Einstellungen, Journal, Portfolios) und synchronisieren sich mit deinem Konto, wenn du angemeldet bist. Nutze PDF-Exporte für Archive. Abmelden löscht keine Cloud-Daten — melde dich wieder an, um sie wiederherzustellen.';
 
   @override
   String get supportFaqFeatureQ => 'Neue Funktion gewünscht?';

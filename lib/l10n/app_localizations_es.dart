@@ -1834,6 +1834,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrade => 'Comercio';
 
   @override
+  String get tradePageIntro => 'Diario, filtros y fichas de trades.';
+
+  @override
   String get ok => 'DE ACUERDO';
 
   @override
@@ -2914,7 +2917,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get supportFaqWhereDataA =>
-      'Tus datos están en este dispositivo (preferencias, diario, carteras). Cerrar sesión o borrar datos locales puede eliminarlos — exporta PDFs si necesitas archivos.';
+      'Tus datos están en este dispositivo (preferencias, diario, carteras) y se sincronizan con tu cuenta si has iniciado sesión. Exporta PDFs si necesitas archivos. Cerrar sesión no borra la nube: vuelve a iniciar sesión para recuperarlos.';
 
   @override
   String get supportFaqFeatureQ => '¿Necesitas una función nueva?';

@@ -44,42 +44,40 @@ extension _TradePageBuild on _TradePageState {
             .length;
         final countOpen = baseForBar.where((e) => e.sortieAt == null).length;
 
-        final tradeSub = perf6(
-          Localizations.localeOf(context).languageCode,
-          'Journal, filtres et fiches trades.',
-          'Journal, filters, and trade records.',
-          'Diario, filtros y fichas de trades.',
-          'Journal, Filter und Trade-Karten.',
-          'Diário, filtros e registros de trades.',
-          '일지·필터·트레이드 카드.',
-        );
-
         return ColoredBox(
           color: TradeTokens.bg,
           child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                PaychekPageHeader(
-                  onBack: null,
-                  title: l.navTrade,
-                  subtitle: tradeSub,
-                  maxContentWidth: 1180,
-                ),
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, lc) {
-                      final hPad = PaychekPageHeader.horizontalPad(lc.maxWidth);
-                      final maxW = math.min(1180.0, math.max(0.0, lc.maxWidth - 2 * hPad));
-                      return SingleChildScrollView(
-                        controller: _scrollController,
-                        padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 24),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final hPad = PaychekPageHeader.horizontalPad(constraints.maxWidth);
+                final maxW = math.min(
+                  1180.0,
+                  math.max(0.0, constraints.maxWidth - 2 * hPad),
+                );
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    PaychekPageHeader(
+                      onBack: widget.onNavigateToDashboard,
+                      reserveLeadingWidthWhenNoBack:
+                          widget.onNavigateToDashboard == null,
+                      title: l.navTrade,
+                      subtitle: l.tradePageIntro,
+                      subtitleMaxLines: 2,
+                      maxContentWidth: 1180,
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(hPad, 12, hPad, 0),
                         child: Center(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: maxW),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
+                            child: SingleChildScrollView(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.only(bottom: 24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
                   if (openPositions.isNotEmpty) ...[
                     Wrap(
                       spacing: 8,
@@ -289,14 +287,15 @@ extension _TradePageBuild on _TradePageState {
                         ),
                       ),
                 ],
+                              ),
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );

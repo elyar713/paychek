@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../checklist/checklist_page_controller.dart';
 import '../l10n/app_localizations.dart';
-import '../performance/performance_locale_copy.dart';
 import '../widgets/paychek_page_header.dart';
 import '../l10n/app_localizations_month.dart';
 import '../dashboard/widgets/timeframe_pills.dart';
@@ -48,6 +47,7 @@ class TradePage extends StatefulWidget {
     required this.checklistController,
     required this.onEditTrade,
     this.openTradeIdNotifier,
+    this.onNavigateToDashboard,
   });
 
   final ChecklistPageController checklistController;
@@ -55,6 +55,9 @@ class TradePage extends StatefulWidget {
 
   /// Depuis le dashboard (meilleur / pire trade) : ouvre lâ€™onglet puis dÃ©plie ce trade.
   final ValueNotifier<String?>? openTradeIdNotifier;
+
+  /// Retour vers lâ€™onglet accueil (dashboard).
+  final VoidCallback? onNavigateToDashboard;
 
   @override
   State<TradePage> createState() => _TradePageState();

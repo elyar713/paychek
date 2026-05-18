@@ -3388,6 +3388,12 @@ abstract class AppLocalizations {
   /// **'Trade'**
   String get navTrade;
 
+  /// No description provided for @tradePageIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal, filtres et fiches trades.'**
+  String get tradePageIntro;
+
   /// No description provided for @ok.
   ///
   /// In fr, this message translates to:
@@ -5347,7 +5353,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportFaqWhereDataA.
   ///
   /// In fr, this message translates to:
-  /// **'Tes données sont stockées sur cet appareil (préférences, journal, portfolios). Une déconnexion ou une réinitialisation dans Réglages > Données peut les effacer — pense aux exports PDF si tu veux des archives.'**
+  /// **'Tes données sont stockées sur cet appareil (préférences, journal, portfolios) et synchronisées avec ton compte si tu es connecté. Pour des archives, exporte en PDF depuis l’app. La déconnexion ne supprime pas le cloud : reconnecte-toi pour retrouver tes données.'**
   String get supportFaqWhereDataA;
 
   /// No description provided for @supportFaqFeatureQ.

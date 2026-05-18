@@ -1819,6 +1819,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTrade => 'Trade';
 
   @override
+  String get tradePageIntro => 'Journal, filters, and trade records.';
+
+  @override
   String get ok => 'OK';
 
   @override
@@ -2881,7 +2884,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supportFaqWhereDataA =>
-      'Your data is stored on this device (preferences, journal, portfolios). Signing out or using Settings > Erase data removes it locally — export PDFs if you need archives.';
+      'Your data is stored on this device (preferences, journal, portfolios) and syncs with your account when signed in. Export PDFs from the app if you need archives. Signing out does not delete cloud data — sign back in to restore it.';
 
   @override
   String get supportFaqFeatureQ => 'Want a new feature?';
