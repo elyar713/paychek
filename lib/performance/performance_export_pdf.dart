@@ -13,6 +13,8 @@ import 'performance_custom_lens_logic.dart';
 import 'performance_custom_lens_model.dart';
 import 'performance_custom_lens_plan.dart';
 import '../analyse/analyse_report_pdf_platform.dart' as pdf_platform;
+import '../shared/paychek_pdf_fonts.dart';
+import '../shared/paychek_pdf_text.dart';
 import '../strategie/strategie_gestion_risque_storage.dart';
 import '../strategie/strategie_horaires_sessions_storage.dart';
 import '../strategie/strategie_setups_store.dart';
@@ -34,8 +36,35 @@ part 'performance_export_pdf_capital_chart.dart';
 String _p(Locale locale, String fr, String en, String es, String de, String pt, String ko) =>
     performancePickLocale(locale, fr, en, es, de, pt, ko);
 
-/// True pendant [buildPerformancePdf] si locale coréenne et chargement Noto Sans KR OK.
-bool _pdfHangulMode = false;
+/// Locale coréenne pendant [buildPerformancePdf] (polices + repli hangoul).
+bool _perfPdfKo = false;
+
+String _pdfText(String s) => paychekPdfNormalize(s);
+
+pw.Widget _pdfW(
+  String? value, {
+  bool bold = false,
+  double fontSize = 9,
+  PdfColor? color,
+  double? height,
+  double? letterSpacing,
+  pw.TextAlign? textAlign,
+  pw.FontStyle fontStyle = pw.FontStyle.normal,
+  int? maxLines,
+}) {
+  return PaychekPdfFonts.text(
+    value,
+    preferHangulPrimary: _perfPdfKo,
+    bold: bold,
+    fontSize: fontSize,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+    textAlign: textAlign,
+    fontStyle: fontStyle,
+    maxLines: maxLines,
+  );
+}
 
 Future<void> exportPerformancePdf(
   BuildContext context, {

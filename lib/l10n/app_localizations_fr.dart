@@ -2325,6 +2325,39 @@ class AppLocalizationsFr extends AppLocalizations {
       'Saisissez une adresse e-mail valide';
 
   @override
+  String get accountChangePasswordButton => 'Modifier le mot de passe';
+
+  @override
+  String get accountChangePasswordDialogTitle => 'Modifier le mot de passe';
+
+  @override
+  String get accountChangePasswordCurrentLabel => 'Mot de passe actuel';
+
+  @override
+  String get accountChangePasswordNewLabel => 'Nouveau mot de passe';
+
+  @override
+  String get accountChangePasswordConfirmLabel =>
+      'Confirmer le nouveau mot de passe';
+
+  @override
+  String get accountChangePasswordCta => 'ENREGISTRER';
+
+  @override
+  String get accountChangePasswordSuccessSnack => 'Mot de passe mis à jour';
+
+  @override
+  String get accountChangePasswordCurrentMissing =>
+      'Saisis ton mot de passe actuel';
+
+  @override
+  String get accountChangePasswordRequiresRecentLogin =>
+      'Pour des raisons de sécurité, reconnecte-toi puis réessaie.';
+
+  @override
+  String get accountChangePasswordForgotLink => 'Mot de passe oublié ?';
+
+  @override
   String get accountAuthSectionTitle => 'Connexion';
 
   @override

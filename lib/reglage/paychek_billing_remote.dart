@@ -8,6 +8,12 @@ import 'paychek_billing_plan.dart';
 const String kPaychekAppConfigCollection = 'paychek_app_config';
 const String kPaychekBillingDocId = 'billing';
 
+/// Clés Stripe (pk / sk) — lecture / écriture **admin** uniquement (`firestore.rules`).
+const String kPaychekStripeKeysDocId = 'stripe_keys';
+
+const String kFieldStripePublishableKey = 'stripePublishableKey';
+const String kFieldStripeSecretKey = 'stripeSecretKey';
+
 const String kFieldStripeCheckoutUrl = 'stripeCheckoutUrl';
 const String kFieldStripeCheckoutUrlMonthly = 'stripeCheckoutUrlMonthly';
 const String kFieldStripeCheckoutUrlQuarterly = 'stripeCheckoutUrlQuarterly';

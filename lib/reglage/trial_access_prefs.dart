@@ -45,6 +45,7 @@ Future<
       DateTime? trialFreemiumOverrideUntilUtc,
       bool docPro,
       DateTime? subscriptionTierUpdatedAtUtc,
+      DateTime? subscriptionCurrentPeriodEndUtc,
     })> _readPaychekUserTrialBootstrap(
   User u,
 ) async {
@@ -59,6 +60,7 @@ Future<
         trialFreemiumOverrideUntilUtc: null,
         docPro: false,
         subscriptionTierUpdatedAtUtc: null,
+        subscriptionCurrentPeriodEndUtc: null,
       );
     }
     final d = snap.data();
@@ -68,6 +70,7 @@ Future<
         trialFreemiumOverrideUntilUtc: null,
         docPro: false,
         subscriptionTierUpdatedAtUtc: null,
+        subscriptionCurrentPeriodEndUtc: null,
       );
     }
     final ts = d['createdAt'];
@@ -85,12 +88,18 @@ Future<
     if (rawTierUp is Timestamp) {
       subscriptionTierUpdatedAtUtc = rawTierUp.toDate().toUtc();
     }
+    DateTime? subscriptionCurrentPeriodEndUtc;
+    final rawPeriodEnd = d[kPaychekUserFieldSubscriptionCurrentPeriodEnd];
+    if (rawPeriodEnd is Timestamp) {
+      subscriptionCurrentPeriodEndUtc = rawPeriodEnd.toDate().toUtc();
+    }
     if (d['isPremium'] == true) {
       return (
         createdAtUtc: createdUtc,
         trialFreemiumOverrideUntilUtc: overrideUntilUtc,
         docPro: true,
         subscriptionTierUpdatedAtUtc: subscriptionTierUpdatedAtUtc,
+        subscriptionCurrentPeriodEndUtc: subscriptionCurrentPeriodEndUtc,
       );
     }
     final tier = d['subscriptionTier']?.toString().trim().toLowerCase();
@@ -100,6 +109,7 @@ Future<
       trialFreemiumOverrideUntilUtc: overrideUntilUtc,
       docPro: pro,
       subscriptionTierUpdatedAtUtc: subscriptionTierUpdatedAtUtc,
+      subscriptionCurrentPeriodEndUtc: subscriptionCurrentPeriodEndUtc,
     );
   } catch (e, st) {
     debugPrint('[Paychek] _readPaychekUserTrialBootstrap: $e\n$st');
@@ -108,6 +118,7 @@ Future<
       trialFreemiumOverrideUntilUtc: null,
       docPro: false,
       subscriptionTierUpdatedAtUtc: null,
+      subscriptionCurrentPeriodEndUtc: null,
     );
   }
 }
@@ -123,6 +134,7 @@ DateTime? _resolveProSinceUtc({
     DateTime? trialFreemiumOverrideUntilUtc,
     bool docPro,
     DateTime? subscriptionTierUpdatedAtUtc,
+    DateTime? subscriptionCurrentPeriodEndUtc,
   }) row,
 }) {
   if (subRow.active && subRow.proSinceUtc != null) {
@@ -173,7 +185,6 @@ class AccountEntitlementSnapshot {
 
   /// Début de la période Pro : `subscriber_entitlements.proSinceUtc` (Stripe) ou
   /// [kPaychekUserFieldSubscriptionTierUpdatedAt] (passage Pro par l’admin).
-  /// Sur le **web**, l’UI affiche une licence d’**un an civil** à partir de cette date.
   final DateTime? proSinceUtc;
 }
 
@@ -248,7 +259,7 @@ abstract final class TrialAccessPrefs {
     }
   }
 
-  /// Licence Pro affichée sur le **web** : même instant, un an plus tard (calendrier UTC).
+  /// Secours admin (sans échéance Stripe) : +1 an civil à partir de [proSinceUtc].
   static DateTime? webProLicenseEndUtc(DateTime? proSinceUtc) {
     if (proSinceUtc == null) return null;
     final u = proSinceUtc.toUtc();
@@ -264,23 +275,18 @@ abstract final class TrialAccessPrefs {
     );
   }
 
-  /// Fin Pro affichée : sur le **web**, la date la plus tardive entre la licence civile +1 an et
-  /// l’échéance Firestore (`currentPeriodEnd`, prolongée côté Functions par les jours d’essai
-  /// restants si achat Pro pendant l’essai Lite).
+  /// Fin Pro affichée : priorité à l’échéance Stripe / Firestore (`currentPeriodEnd`, déjà
+  /// prolongée côté Functions si achat pendant l’essai). Secours +1 an civil uniquement sans
+  /// date d’échéance (ex. Pro accordé par l’admin).
   static DateTime? proSubscriptionDisplayEndUtc({
     required bool isWebUi,
     DateTime? proSinceUtc,
     DateTime? subscriptionPeriodEndUtc,
   }) {
-    final licenseEnd = webProLicenseEndUtc(proSinceUtc);
-    if (!isWebUi) {
-      return subscriptionPeriodEndUtc ?? licenseEnd;
+    if (subscriptionPeriodEndUtc != null) {
+      return subscriptionPeriodEndUtc;
     }
-    if (licenseEnd == null) return subscriptionPeriodEndUtc;
-    if (subscriptionPeriodEndUtc == null) return licenseEnd;
-    return licenseEnd.isAfter(subscriptionPeriodEndUtc)
-        ? licenseEnd
-        : subscriptionPeriodEndUtc;
+    return webProLicenseEndUtc(proSinceUtc);
   }
 
   /// Back-office : priorité à l’échéance Firestore (`currentPeriodEnd`, inclut crédit essai côté
@@ -354,6 +360,7 @@ abstract final class TrialAccessPrefs {
           DateTime? trialFreemiumOverrideUntilUtc,
           bool docPro,
           DateTime? subscriptionTierUpdatedAtUtc,
+          DateTime? subscriptionCurrentPeriodEndUtc,
         });
     final subRow = parallel[1]
         as ({bool active, DateTime? periodEndUtc, DateTime? proSinceUtc});
@@ -423,8 +430,9 @@ abstract final class TrialAccessPrefs {
     final remoteSubEnt = localSub || subRow.active;
     final isPro = localSub || remoteSubEnt || row.docPro;
 
-    final DateTime? subscriptionPeriodEndUtc =
-        isPro ? subRow.periodEndUtc : null;
+    final DateTime? subscriptionPeriodEndUtc = isPro
+        ? (subRow.periodEndUtc ?? row.subscriptionCurrentPeriodEndUtc)
+        : null;
     final DateTime? proSinceUtc = isPro
         ? _resolveProSinceUtc(
             subRow: subRow,

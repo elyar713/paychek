@@ -25,7 +25,8 @@ class MentalStateDayDetailCard extends StatelessWidget {
   final MentalStateController controller;
   final DateTime selectedDay;
 
-  static const double criteriaScrollMaxHeight = 220;
+  static const double _criteriaScrollBaseHeight = 220;
+  static const double criteriaScrollMaxHeight = _criteriaScrollBaseHeight * 1.03;
 
   static DateTime _dateOnly(DateTime d) =>
       DateTime(d.year, d.month, d.day);

@@ -4,6 +4,62 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../strategie_tokens.dart';
+import 'strategie_setup_rule_styles.dart';
+import 'strategie_setup_tag_format.dart';
+
+/// Crayon d’édition setup — même rendu partout (carte, barre de choix rapide).
+class StrategieSetupEditIconButton extends StatelessWidget {
+  const StrategieSetupEditIconButton({
+    super.key,
+    required this.onPressed,
+  });
+
+  final VoidCallback onPressed;
+
+  static const iconHit = BoxConstraints(minWidth: 32, minHeight: 32);
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return IconButton(
+      padding: EdgeInsets.zero,
+      constraints: iconHit,
+      tooltip: l.checklistMenuEdit,
+      icon: const Icon(
+        LucideIcons.pencil,
+        size: 16,
+        color: StrategieTokens.labelMuted,
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
+/// Poubelle setup — même rendu que sur la carte en mode Modifier.
+class StrategieSetupDeleteIconButton extends StatelessWidget {
+  const StrategieSetupDeleteIconButton({
+    super.key,
+    required this.onPressed,
+  });
+
+  final VoidCallback onPressed;
+
+  static const iconHit = BoxConstraints(minWidth: 32, minHeight: 32);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      constraints: iconHit,
+      icon: const Icon(
+        Icons.delete_outline_rounded,
+        size: 18,
+        color: StrategieTokens.riskRed,
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
 
 /// Données d’une carte « Setup » (liste éditable).
 class StrategieSetupCardData {
@@ -73,7 +129,6 @@ class StrategieSetupCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    const iconHit = BoxConstraints(minWidth: 32, minHeight: 32);
     final titleStyle = webDashboardPreview
         ? GoogleFonts.plusJakartaSans(
             fontSize: 17,
@@ -130,7 +185,7 @@ class StrategieSetupCard extends StatelessWidget {
                             ? l.strategieSetupRemoveFromDashboard
                             : l.strategieSetupShowOnDashboard,
                         padding: EdgeInsets.zero,
-                        constraints: iconHit,
+                        constraints: StrategieSetupEditIconButton.iconHit,
                         icon: Icon(
                           isDashboardStarred
                               ? Icons.star_rounded
@@ -142,28 +197,9 @@ class StrategieSetupCard extends StatelessWidget {
                         ),
                       ),
                     if (onEditTap != null)
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: iconHit,
-                        tooltip: l.checklistMenuEdit,
-                        icon: Icon(
-                          LucideIcons.pencil,
-                          size: 16,
-                          color: StrategieTokens.labelMuted,
-                        ),
-                        onPressed: onEditTap,
-                      ),
+                      StrategieSetupEditIconButton(onPressed: onEditTap!),
                     if (onDeleteTap != null)
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: iconHit,
-                        icon: Icon(
-                          Icons.delete_outline_rounded,
-                          size: 18,
-                          color: StrategieTokens.riskRed,
-                        ),
-                        onPressed: onDeleteTap,
-                      ),
+                      StrategieSetupDeleteIconButton(onPressed: onDeleteTap!),
                   ],
                 ),
             ],
@@ -283,8 +319,8 @@ class StrategieSetupCard extends StatelessWidget {
         ),
         Expanded(
           flex: 6,
-          child: Text(
-            v,
+          child: StrategieSetupTaggedBodyText(
+            text: v,
             style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -316,8 +352,8 @@ class StrategieSetupCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(
-          v,
+        StrategieSetupTaggedBodyText(
+          text: v,
           style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -358,17 +394,22 @@ class _RuleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headingColor = maquetteStyle
-        ? StrategieTokens.maquetteHeadingOrange
-        : (webDashboardPreview
-            ? StrategieSetupCard._webRuleHeadingGold
-            : r.headingColor);
+    final headingColor = webDashboardPreview
+        ? StrategieSetupCard._webRuleHeadingGold
+        : StrategieSetupRuleStyles.headingColorForIcon(r.icon);
+    final iconColor = webDashboardPreview
+        ? StrategieSetupCard._webRuleHeadingGold
+        : StrategieSetupRuleStyles.iconColorForIcon(r.icon);
     final headingText =
         (webDashboardPreview || maquetteStyle) ? r.heading.toUpperCase() : r.heading;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(r.icon, size: 18, color: StrategieTokens.labelMuted),
+        Icon(
+          r.icon,
+          size: StrategieSetupRuleStyles.iconSize,
+          color: iconColor,
+        ),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -385,8 +426,8 @@ class _RuleBlock extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              Text(
-                r.body,
+              StrategieSetupTaggedBodyText(
+                text: r.body,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,

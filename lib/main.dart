@@ -47,6 +47,8 @@ import 'analyse/analyse_realtime_notifier.dart';
 import 'ajouter_trade/ajouter_trade_custom_actifs_storage.dart';
 import 'checklist/checklist_firestore_sync.dart';
 import 'checklist/checklist_realtime_notifier.dart';
+import 'shared/paychek_frame_callbacks.dart';
+import 'shared/paychek_widgets_binding.dart';
 
 /// Analytics (GA4) : implémentation pigeon **Android, iOS, macOS, Web** — pas de host Windows/Linux.
 bool get _firebaseAnalyticsHostAvailable {
@@ -86,7 +88,8 @@ void _warnIfAnalyticsUnavailableOnDesktop() {
 }
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  PaychekWidgetsBinding.ensureInitialized();
+  PaychekFrameCallbacks.bumpGeneration();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -222,9 +225,7 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
       // Sur web, `load()` déclenche `notifyListeners()` (SharedPreferences) et peut tomber
       // pendant une phase de layout/hot reload → erreurs type "_RenderDeferredLayoutBox mutated".
       // On décale au frame suivant pour éviter toute mutation pendant `performLayout`.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        s.load();
-      });
+      PaychekFrameCallbacks.runPostFrame(s.load);
       s.addListener(_scheduleDashboardLayoutCloudPush);
     }
     return _dashboardHomeLayoutStore!;
@@ -254,7 +255,18 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
         ),
       );
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    PaychekFrameCallbacks.runPostFrame(() {
+      unawaited(_bootstrapAfterFirstFrame());
+    });
+    widget.capitalStore.addListener(_scheduleCapitalPortfolioCloudPush);
+    widget.portfolioStore.addListener(_scheduleCapitalPortfolioCloudPush);
+    _tradingWeek.addListener(_scheduleTradingWeekCloudPush);
+    MentalStateController.instance.addListener(_scheduleMentalStateCloudPush);
+    StrategieSetupsStore.notifier.addListener(_scheduleStrategieCloudPush);
+    StrategieSetupUsageStore.notifier.addListener(_scheduleStrategieCloudPush);
+  }
+
+  Future<void> _bootstrapAfterFirstFrame() async {
       final sess = FirebaseAuth.instance.currentUser;
       if (sess != null) {
         // Best-effort : prefs locales / guest d’abord ; merge cloud sans bloquer l’hydratation.
@@ -281,13 +293,12 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
       }
       if (!mounted) return;
       _startRealtimeSyncIfSignedIn();
-    });
-    widget.capitalStore.addListener(_scheduleCapitalPortfolioCloudPush);
-    widget.portfolioStore.addListener(_scheduleCapitalPortfolioCloudPush);
-    _tradingWeek.addListener(_scheduleTradingWeekCloudPush);
-    MentalStateController.instance.addListener(_scheduleMentalStateCloudPush);
-    StrategieSetupsStore.notifier.addListener(_scheduleStrategieCloudPush);
-    StrategieSetupUsageStore.notifier.addListener(_scheduleStrategieCloudPush);
+  }
+
+  @override
+  void reassemble() {
+    PaychekFrameCallbacks.bumpGeneration();
+    super.reassemble();
   }
 
   void _stopRealtimeSync() {
@@ -687,6 +698,7 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
                 listenable: localeCtrl,
                 builder: (context, _) {
                   return MaterialApp(
+                  title: 'Paychek — Journal de trading',
                   debugShowCheckedModeBanner: false,
                   navigatorObservers: [
                     if (Firebase.apps.isNotEmpty && _firebaseAnalyticsHostAvailable)

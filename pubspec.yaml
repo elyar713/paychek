@@ -99,6 +99,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/branding/app_icon.svg
+    - assets/fonts/
     - assets/logos/csv_sources/
     - assets/help_center/
 

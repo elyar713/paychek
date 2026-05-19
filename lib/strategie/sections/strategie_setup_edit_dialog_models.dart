@@ -3,7 +3,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../strategie_tokens.dart';
 import '../widgets/strategie_setup_card.dart';
-import '../widgets/strategie_setup_cards_content.dart';
+import '../widgets/strategie_setup_rule_styles.dart';
+import '../widgets/strategie_setup_tag_format.dart';
+
+export '../widgets/strategie_setup_tag_format.dart';
 
 /// Données renvoyées par le dialogue **Modifier Setup** (tags + nom + couleur).
 class StrategieSetupEditDialogResult {
@@ -36,15 +39,9 @@ class StrategieSetupEditDialogResult {
 StrategieSetupCardData strategieSetupCardDataFromEditResult(
   StrategieSetupEditDialogResult r,
 ) {
-  String joinOrDash(List<String> l) {
-    if (l.isEmpty) return '—';
-    return l.join(' · ');
-  }
+  String joinOrDash(List<String> l) => strategieSetupJoinTags(l);
 
-  String joinCsv(List<String> l) {
-    if (l.isEmpty) return '—';
-    return l.join(', ');
-  }
+  String joinCsv(List<String> l) => strategieSetupJoinTags(l);
 
   return StrategieSetupCardData(
     title: r.modelName.trim().isEmpty ? 'Untitled' : r.modelName.trim(),
@@ -55,53 +52,28 @@ StrategieSetupCardData strategieSetupCardDataFromEditResult(
     signalText: joinOrDash(r.signals),
     signalColor: r.dotColor,
     ruleBlocks: [
-      StrategieSetupRuleBlock(
+      StrategieSetupRuleStyles.block(
         icon: LucideIcons.crosshair,
         heading: 'PRECISE ENTRY',
-        headingColor: strategieSetupRuleHeadingTan,
         body: joinOrDash(r.entreePrecise),
       ),
-      StrategieSetupRuleBlock(
+      StrategieSetupRuleStyles.block(
         icon: LucideIcons.shield,
         heading: 'INVALIDATION (STOP LOSS)',
-        headingColor: StrategieTokens.riskRed,
         body: joinOrDash(r.invalidation),
       ),
-      StrategieSetupRuleBlock(
+      StrategieSetupRuleStyles.block(
         icon: LucideIcons.circleDot,
         heading: 'CIBLE (TAKE PROFIT)',
-        headingColor: StrategieTokens.emerald,
         body: joinOrDash(r.cible),
       ),
-      StrategieSetupRuleBlock(
+      StrategieSetupRuleStyles.block(
         icon: LucideIcons.lock,
         heading: 'GESTION (BREAKEVEN / PARTIELS)',
-        headingColor: StrategieTokens.labelMuted,
         body: joinOrDash(r.gestion),
       ),
     ],
   );
-}
-
-List<String> strategieSetupSplitCsv(String s) {
-  if (s.isEmpty || s == '—') return [];
-  return s
-      .split(',')
-      .map((e) => e.trim())
-      .where((e) => e.isNotEmpty)
-      .toList();
-}
-
-List<String> strategieSetupBodyToTags(String body) {
-  if (body.isEmpty || body == '—') return [];
-  if (body.contains(' · ')) {
-    return body
-        .split(' · ')
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
-        .toList();
-  }
-  return [body];
 }
 
 Color strategieSetupClosestPresetColor(Color c) {

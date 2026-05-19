@@ -206,7 +206,7 @@ class _DayCell extends StatelessWidget {
 
     Color? pctColor;
     if (pct != null && !isFuture) {
-      pctColor = MentalStateTokens.ringStrokeForScore(pct!);
+      pctColor = MentalStateTokens.calendarDayPercentColor(pct!);
     }
 
     final borderColor = isSelected

@@ -427,7 +427,9 @@ class _MentalStatePageState extends State<MentalStatePage> {
   }
 
   void _deleteEmotionAt(int index) {
-    final removedId = _c.emotions[index].id;
+    final removed = _c.emotions[index];
+    _c.freezeDeletedEmotionInDailySnapshots(removed);
+    final removedId = removed.id;
     _c.emotions.removeAt(index);
     if (_c.emotions.isNotEmpty && _c.emotionsShare100) {
       _c.equalizeEmotionWeights();

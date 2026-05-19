@@ -40,6 +40,7 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 const Stripe = require("stripe");
+const emailI18n = require("./email_i18n");
 
 const paychekSmtpPassword = defineSecret("PAYCHEK_SMTP_PASSWORD");
 
@@ -79,8 +80,6 @@ const paychekStripeSecretKey = defineSecret("PAYCHEK_STRIPE_SECRET_KEY");
 const paychekStripeWebhookSecret = defineSecret("PAYCHEK_STRIPE_WEBHOOK_SECRET");
 
 const COMPANY_NAME = "Paychek";
-/** Délai annoncé dans l’accusé de réception (texte FR). */
-const ACK_RESPONSE_DELAY_FR = "48 heures";
 /** Lien Base de connaissances dans l’e-mail automatique — à ajuster selon votre site réel. */
 const KNOWLEDGE_BASE_URL_FR = "https://paychek.pro/";
 /** Politique de confidentialité (site web). */
@@ -404,27 +403,10 @@ function humanTicketLabel(ticketData, ticketId) {
 }
 
 /** Ligne « référence » pour le mail client. */
-function footerClientTicketRef(ticketData, ticketId) {
+function footerClientTicketRef(locale, ticketData, ticketId) {
   const r = `${ticketData?.ticketRef ?? ""}`.trim();
-  if (r.length >= 6) {
-    return `Référence dossier : ${r}`;
-  }
-  return `Référence dossier : ${ticketId}`;
-}
-
-function kindLabelFr(kindRaw) {
-  const k = `${kindRaw ?? ""}`.trim();
-  switch (k) {
-  case "account":
-    return "Compte";
-  case "billing":
-    return "Facturation";
-  case "feature":
-    return "Idée / fonctionnalité";
-  case "other":
-  default:
-    return k === "" ? "Autre demande" : k;
-  }
+  const ref = r.length >= 6 ? r : ticketId;
+  return emailI18n.pack(locale).footerTicketRef(ref);
 }
 
 function ackSubjectLine(kindFr, description) {
@@ -435,63 +417,40 @@ function ackSubjectLine(kindFr, description) {
   return `${kindFr} — ${ex.slice(0, 57)}…`;
 }
 
-/** `createdAt` Firestore Timestamp ou absent. */
-function formatOpeningDateFrench(createdAt) {
-  let d;
-  if (createdAt && typeof createdAt.toDate === "function") {
-    d = createdAt.toDate();
-  } else {
-    d = new Date();
-  }
-  return d.toLocaleString("fr-FR", {
-    dateStyle: "long",
-    timeStyle: "short",
-    timeZone: "Europe/Paris",
-  });
-}
-
 /** Extrait du message utilisateur pour l’accusé de réception (texte brut, tronqué). */
-function buildAcknowledgmentDescriptionPreview(ticketData) {
+function buildAcknowledgmentDescriptionPreview(ticketData, locale) {
   const raw = `${ticketData.description ?? ""}`.replace(/\s+/g, " ").trim();
-  if (!raw) return "(aucun texte saisi)";
+  if (!raw) return emailI18n.pack(locale).noMessagePreview;
   const max = 500;
   return raw.length > max ? `${raw.slice(0, max)}…` : raw;
 }
 
-function buildUserAcknowledgmentText(ticketData, ticketLabels) {
+function buildUserAcknowledgmentText(ticketData, ticketLabels, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const p = emailI18n.pack(loc).ack;
   const displayNameRaw = `${ticketData.replyDisplayName ?? ""}`.trim();
   const greeting = displayNameRaw ?
-    `Bonjour ${displayNameRaw},` :
-    "Bonjour,";
+    p.greetingNamed(displayNameRaw) :
+    p.greeting;
   const sujetConcern = `${ticketLabels.sujetLine}`;
+  const delay = emailI18n.pack(loc).responseDelay;
 
   return (
     `${greeting}\n\n` +
-    `Nous vous informons que nous avons bien reçu votre demande ` +
-    `concernant « ${sujetConcern} ». ` +
-    "Un membre de notre équipe technique a été assigné à votre dossier.\n\n" +
-    "Récapitulatif de votre ticket :\n\n" +
-    `Numéro de référence : #${ticketLabels.label}\n` +
-    `Date d’ouverture : ${ticketLabels.opened}\n` +
-    "Statut actuel : En cours de traitement\n\n" +
-    "Nous nous efforçons de répondre à toutes les demandes sous un délai de " +
-    `${ACK_RESPONSE_DELAY_FR}. ` +
-    "En attendant, vous pouvez consulter notre base de connaissances :\n" +
-    `${KNOWLEDGE_BASE_URL_FR}\n\n` +
-    "Vous recevrez une notification dès qu'une mise à jour sera disponible. " +
-    "Si vous avez des informations complémentaires à ajouter, " +
-    `répondez simplement à cet e-mail (ou écrivez-nous depuis l’application ${COMPANY_NAME}).\n\n` +
-    "Cordialement,\n\n" +
-    `L'équipe Support ${COMPANY_NAME}`
+    p.body(sujetConcern, delay, KNOWLEDGE_BASE_URL_FR, COMPANY_NAME) +
+    `\n${p.refLine(ticketLabels.label)}\n` +
+    `${p.openedLine(ticketLabels.opened)}\n`
   );
 }
 
-function buildUserAcknowledgmentHtml(ticketData, ticketLabels) {
+function buildUserAcknowledgmentHtml(ticketData, ticketLabels, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const strings = emailI18n.pack(loc).ack;
   const ticketLabel = escapeHtml(ticketLabels.label);
   const nomUtilisateur = escapeHtml(ticketUserGreetingName(ticketData));
-  const ackDelay = escapeHtml("48 heures");
+  const ackDelay = escapeHtml(emailI18n.pack(loc).responseDelay);
   const messagePreview = plainTextToHtmlBr(
-      buildAcknowledgmentDescriptionPreview(ticketData),
+      buildAcknowledgmentDescriptionPreview(ticketData, loc),
   );
   const supportHref = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
@@ -499,11 +458,11 @@ function buildUserAcknowledgmentHtml(ticketData, ticketLabels) {
   const followTicketHref = supportHref;
 
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${loc}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket de Support PAYCHEK</title>
+    <title>${escapeHtml(strings.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -635,40 +594,39 @@ function buildUserAcknowledgmentHtml(ticketData, ticketLabels) {
 
         <div class="content">
             <div style="text-align: center;">
-                <div class="support-badge">Requête Reçue</div>
-                <h1>Nous analysons votre demande.</h1>
-                <p style="color: #888888; font-size: 16px;">Bonjour ${nomUtilisateur}, votre ticket de support a été ouvert.</p>
+                <div class="support-badge">${strings.badge}</div>
+                <h1>${strings.h1}</h1>
+                <p style="color: #888888; font-size: 16px;">${strings.htmlGreeting(nomUtilisateur)}</p>
             </div>
 
             <div class="ticket-box">
                 <div class="ticket-info">
-                    <span class="ticket-label">Référence</span>
+                    <span class="ticket-label">${strings.refLabel}</span>
                     <span class="ticket-value">#${ticketLabel}</span>
                 </div>
                 <div class="divider"></div>
                 <div class="ticket-info">
-                    <span class="ticket-label">Délai estimé</span>
+                    <span class="ticket-label">${strings.delayLabel}</span>
                     <span class="ticket-value" style="color: #c5a059;">${ackDelay}</span>
                 </div>
             </div>
 
             <div class="message-preview">
-                <div class="preview-title">Rappel de votre message</div>
+                <div class="preview-title">${strings.previewTitle}</div>
                 <div class="preview-content">
                     ${messagePreview}
                 </div>
             </div>
 
             <p style="text-align: center; color: #444444; font-size: 12px; margin-top: 50px;">
-                Vous recevrez une notification dès qu'un analyste aura traité votre dossier. 
-                Inutile de renvoyer une demande pour la même requête.
+                ${strings.footerNote}
             </p>
         </div>
 
         <div class="footer">
             <p>
                 <strong>PAYCHEK SUPPORT LABS</strong> — PRECISION & RIGOR.<br><br>
-                <a href="${supportHref}" style="color: #555555;">Centre d'aide</a> &nbsp;•&nbsp; <a href="${followTicketHref}" style="color: #555555;">Suivre mon ticket</a>
+                <a href="${supportHref}" style="color: #555555;">${strings.helpCenter}</a> &nbsp;•&nbsp; <a href="${followTicketHref}" style="color: #555555;">${strings.followTicket}</a>
             </p>
         </div>
     </div>
@@ -755,7 +713,95 @@ function paychekApplyLegacyMaquetteTokens(out, vars) {
   if (vars.ticketStatusLabel != null && `${vars.ticketStatusLabel}`.trim() !== "") {
     o = o.split("Résolu / En attente").join(String(vars.ticketStatusLabel));
   }
+  const periodEnd =
+    vars.periodEndFr != null && `${vars.periodEndFr}`.trim() !== "" ?
+      String(vars.periodEndFr) :
+      vars.validUntil != null && `${vars.validUntil}`.trim() !== "" ?
+        String(vars.validUntil) :
+        "";
+  if (periodEnd !== "") {
+    o = o.split("[Date de fin]").join(periodEnd);
+    o = o.split("[Date de renouvellement]").join(periodEnd);
+    o = o.split("[Date anniversaire]").join(periodEnd);
+    o = o.split("[Valide jusqu'au]").join(periodEnd);
+    o = o.split("[Valide jusqu’au]").join(periodEnd);
+  }
   return o;
+}
+
+/**
+ * @param {unknown} raw
+ * @return {FirebaseFirestore.Timestamp | null}
+ */
+function paychekCoerceFirestoreTimestamp(raw) {
+  if (raw == null) return null;
+  if (raw instanceof admin.firestore.Timestamp) return raw;
+  if (typeof raw === "object" && typeof raw.toDate === "function") {
+    try {
+      raw.toDate();
+      return /** @type {FirebaseFirestore.Timestamp} */ (raw);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  if (typeof raw === "object") {
+    const sec =
+      typeof raw.seconds === "number" ?
+        raw.seconds :
+        typeof raw._seconds === "number" ?
+          raw._seconds :
+          null;
+    if (sec != null) {
+      const ns =
+        typeof raw.nanoseconds === "number" ?
+          raw.nanoseconds :
+          typeof raw._nanoseconds === "number" ?
+            raw._nanoseconds :
+            0;
+      return admin.firestore.Timestamp.fromMillis(
+          sec * 1000 + Math.floor(ns / 1e6),
+      );
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {import("stripe").Stripe.Subscription} sub
+ * @param {FirebaseFirestore.Timestamp | null} proSinceUtc
+ */
+function paychekPeriodFromStripeSubscription(sub, proSinceUtc) {
+  /** @type {FirebaseFirestore.Timestamp | null} */
+  let currentPeriodEnd = null;
+  let nextProSince = proSinceUtc;
+  if (typeof sub.current_period_end === "number" && sub.current_period_end > 0) {
+    currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
+        sub.current_period_end * 1000,
+    );
+  }
+  if (
+      !currentPeriodEnd &&
+      sub.items &&
+      Array.isArray(sub.items.data)
+  ) {
+    for (const item of sub.items.data) {
+      if (
+        typeof item.current_period_end === "number" &&
+        item.current_period_end > 0
+      ) {
+        currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
+            item.current_period_end * 1000,
+        );
+        break;
+      }
+    }
+  }
+  if (typeof sub.current_period_start === "number" && sub.current_period_start > 0) {
+    nextProSince = admin.firestore.Timestamp.fromMillis(
+        sub.current_period_start * 1000,
+    );
+  }
+  return {currentPeriodEnd, proSinceUtc: nextProSince};
 }
 
 /** Retours à la ligne -> <br> (contenu déjà échappé). */
@@ -828,7 +874,8 @@ function supportCsatMailtoHref(ticketLabel, ratingKey, mailFromAddr) {
 }
 
 /** Fragment HTML « pièce jointe » pour les mails réponse staff (déjà échappé). */
-function buildStaffSupportAttachmentBlock(attachmentShownFileName) {
+function buildStaffSupportAttachmentBlock(attachmentShownFileName, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
   const safeAttachName =
     typeof attachmentShownFileName === "string" &&
       attachmentShownFileName.trim().length > 0 ?
@@ -837,13 +884,13 @@ function buildStaffSupportAttachmentBlock(attachmentShownFileName) {
   if (!safeAttachName.length) return "";
   return (
     `<p style="color:#94a3b8;font-size:13px;line-height:1.55;margin:-8px 0 22px;">` +
-      `<strong style="color:#ffffff;">Pièce jointe</strong>&nbsp;: ` +
-      `${safeAttachName} — ce fichier est joint à cet e-mail.` +
+      emailI18n.pack(loc).attachmentBlock(safeAttachName) +
     `</p>`
   );
 }
 
-async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels) {
+async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
   let custom = "";
   try {
     const data = await paychekLoadEmailTemplateOverrides(db);
@@ -851,7 +898,7 @@ async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels) {
   } catch (e) {
     console.warn("resolveUserAcknowledgmentHtml: lecture Firestore", e);
   }
-  if (!custom) return buildUserAcknowledgmentHtml(ticketData, ticketLabels);
+  if (!custom) return buildUserAcknowledgmentHtml(ticketData, ticketLabels, loc);
 
   const supportHrefEsc = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
@@ -861,9 +908,9 @@ async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels) {
     opened: escapeHtml(ticketLabels.opened),
     sujet: escapeHtml(ticketLabels.sujetLine),
     nomUtilisateur: escapeHtml(ticketUserGreetingName(ticketData)),
-    ackDelay: escapeHtml(ACK_RESPONSE_DELAY_FR),
+    ackDelay: escapeHtml(emailI18n.pack(loc).responseDelay),
     messagePreview: plainTextToHtmlBr(
-        buildAcknowledgmentDescriptionPreview(ticketData),
+        buildAcknowledgmentDescriptionPreview(ticketData, loc),
     ),
     priorityLabel: escapeHtml(
         `${ticketLabels.kindFr ?? ""}`.trim() || "Standard",
@@ -875,6 +922,7 @@ async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels) {
 }
 
 async function resolveStaffSupportReplyHtml(db, opts) {
+  const loc = emailI18n.normalizePaychekEmailLocale(opts.locale);
   let custom = "";
   try {
     const data = await paychekLoadEmailTemplateOverrides(db);
@@ -902,6 +950,7 @@ async function resolveStaffSupportReplyHtml(db, opts) {
       nomAgent,
       attachmentShownFileName,
       mailFromForCsat,
+      locale: loc,
     });
   }
 
@@ -911,18 +960,19 @@ async function resolveStaffSupportReplyHtml(db, opts) {
   const messageHtml = plainTextToHtmlBr(messageBodyPlain);
   const safeInit = escapeHtml(initialesAgent);
   const safeAgent = escapeHtml(nomAgent);
-  const pjBlock = buildStaffSupportAttachmentBlock(attachmentShownFileName);
+  const pjBlock = buildStaffSupportAttachmentBlock(attachmentShownFileName, loc);
+  const csat = emailI18n.pack(loc).csat;
 
-  const csatPoor = supportCsatMailtoHref(ticketLabel, "Insuffisant", mailFromForCsat);
-  const csatOk = supportCsatMailtoHref(ticketLabel, "Moyen", mailFromForCsat);
-  const csatGood = supportCsatMailtoHref(ticketLabel, "Bien", mailFromForCsat);
-  const csatGreat = supportCsatMailtoHref(ticketLabel, "Excellent", mailFromForCsat);
+  const csatPoor = supportCsatMailtoHref(ticketLabel, csat.poor, mailFromForCsat);
+  const csatOk = supportCsatMailtoHref(ticketLabel, csat.ok, mailFromForCsat);
+  const csatGood = supportCsatMailtoHref(ticketLabel, csat.good, mailFromForCsat);
+  const csatGreat = supportCsatMailtoHref(ticketLabel, csat.great, mailFromForCsat);
 
   const supportHrefEsc = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
   );
   const journalHrefEsc = supportHrefEsc;
-  const ticketStatusLabel = escapeHtml("En attente de votre retour");
+  const ticketStatusLabel = escapeHtml(emailI18n.pack(loc).ticketStatusPending);
 
   return paychekApplyEmailPlaceholders(custom, {
     ticketLabel: safeLabel,
@@ -955,7 +1005,10 @@ function buildStaffSupportReplyHtml({
   nomAgent,
   attachmentShownFileName,
   mailFromForCsat,
+  locale,
 }) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const strings = emailI18n.pack(loc).staffReply;
   const safeLabel = escapeHtml(ticketLabel);
   const safeNom = escapeHtml(nomUtilisateur);
   const safeSujet = escapeHtml(sujetTicketPlain);
@@ -963,7 +1016,7 @@ function buildStaffSupportReplyHtml({
   const safeInit = escapeHtml(initialesAgent).trim();
   const safeAgent = escapeHtml(nomAgent);
 
-  const pjBlock = buildStaffSupportAttachmentBlock(attachmentShownFileName);
+  const pjBlock = buildStaffSupportAttachmentBlock(attachmentShownFileName, loc);
 
   const supportHref = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
@@ -971,11 +1024,11 @@ function buildStaffSupportReplyHtml({
   const journalHref = supportHref;
 
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${loc}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réponse — PAYCHEK</title>
+    <title>${escapeHtml(strings.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -1099,10 +1152,10 @@ function buildStaffSupportReplyHtml({
 
         <div class="content">
             <div style="text-align: center;">
-                <div class="reply-badge">Réponse</div>
-                <h1>Mise à jour de votre dossier.</h1>
-                <p style="color: #888888; font-size: 15px;">Bonjour ${safeNom}, un analyste a apporté une réponse à votre demande.</p>
-                <p style="color: #666666; font-size: 13px; margin-top: 8px;">Sujet : <strong style="color:#aaaaaa;">«&nbsp;${safeSujet}&nbsp;»</strong></p>
+                <div class="reply-badge">${strings.badge}</div>
+                <h1>${strings.h1}</h1>
+                <p style="color: #888888; font-size: 15px;">${strings.intro(safeNom)}</p>
+                <p style="color: #666666; font-size: 13px; margin-top: 8px;">${strings.subjectLine(safeSujet)}</p>
             </div>
 
             <div class="agent-message">
@@ -1110,27 +1163,26 @@ function buildStaffSupportReplyHtml({
                 ${pjBlock}
                 <div class="agent-signature">
                     <strong>${safeAgent}</strong>${safeInit ? ` <span style="color:#555555;">· ${safeInit}</span>` : ""}<br>
-                    Support — PAYCHEK
+                    ${strings.supportLine}
                 </div>
             </div>
 
             <div class="ticket-meta">
                 <div class="meta-row">
-                    <span class="meta-label">Référence Ticket</span>
+                    <span class="meta-label">${strings.refLabel}</span>
                     <span class="meta-value">#${safeLabel}</span>
                 </div>
             </div>
 
             <p style="text-align: center; color: #444444; font-size: 11px; margin-top: 40px; text-transform: uppercase; letter-spacing: 1px;">
-                Si vous avez d'autres questions, répondez simplement à cet email.<br>
-                Ce fil de discussion sera automatiquement clos dans 48h sans réponse de votre part.
+                ${strings.footerNote}
             </p>
         </div>
 
         <div class="footer">
             <p>
                 <strong>PAYCHEK SUPPORT LABS</strong> — PRECISION & RIGOR.<br><br>
-                <a href="${supportHref}" style="color: #555555;">Centre d'aide</a> &nbsp;•&nbsp; <a href="${journalHref}" style="color: #555555;">Accéder à mon journal</a>
+                <a href="${supportHref}" style="color: #555555;">${strings.helpCenter}</a> &nbsp;•&nbsp; <a href="${journalHref}" style="color: #555555;">${strings.myJournal}</a>
             </p>
         </div>
     </div>
@@ -1312,12 +1364,17 @@ exports.sendStaffSupportEmail = onCall(
     }
 
     const kind = `${t.kind ?? "other"}`.trim() || "other";
-    const kindFr = kindLabelFr(kind);
     const label = humanTicketLabel(t, ticketId);
-    const subject = `Paychek — Réponse à votre demande · ${kindFr} (#${label})`;
-
     const staffFromToken = `${request.auth.token.email ?? ""}`.trim();
     const ticketOwnerUid = `${t.userId ?? ""}`.trim();
+    const locale = await emailI18n.paychekResolveEmailLocale(
+        db,
+        ticketOwnerUid,
+        t,
+    );
+    const kindLocalized = emailI18n.kindLabel(locale, kind);
+    const subject = emailI18n.pack(locale).staffReplySubject(kindLocalized, label);
+    const staffReplyStrings = emailI18n.pack(locale).staffReply;
 
     let mailAttachments = [];
     if (attachmentStoragePathRaw) {
@@ -1369,24 +1426,23 @@ exports.sendStaffSupportEmail = onCall(
       staffInitialsFromEmail(staffFromToken);
 
     const pjLine = mailAttachments.length > 0 ?
-      `\n\n— Pièce jointe : ${mailAttachments[0].filename}\n` :
+      staffReplyStrings.attachmentLine(mailAttachments[0].filename) :
       "";
 
     const textBody =
       `${messageBody}${pjLine}\n\n` +
       "---\n" +
-      `Pour toute précision ou suite à donner à ta demande : merci de ne pas répondre à cet e-mail. ` +
-      `Ouvre un nouveau ticket dans l’application Paychek (Réglages · Support) en indiquant la référence #${label}.\n\n` +
-      `${footerClientTicketRef(t, ticketId)}\n` +
+      `${staffReplyStrings.textFooter(label)}\n\n` +
+      `${footerClientTicketRef(locale, t, ticketId)}\n` +
       (staffFromToken.includes("@") ?
         `Support Paychek : ${staffFromToken}\n` :
         "") +
-      "Merci d'utiliser Paychek.\n";
+      `${staffReplyStrings.thanks}\n`;
 
     const htmlBody = await resolveStaffSupportReplyHtml(db, {
       ticketLabel: label,
       nomUtilisateur: ticketUserGreetingName(t),
-      sujetTicketPlain: ackSubjectLine(kindFr, t.description),
+      sujetTicketPlain: ackSubjectLine(kindLocalized, t.description),
       messageBodyPlain: messageBody,
       initialesAgent: initialesAgentAffiche,
       nomAgent: nomAgentAffiche,
@@ -1394,6 +1450,7 @@ exports.sendStaffSupportEmail = onCall(
         mailAttachments[0].filename :
         "",
       mailFromForCsat: id.mailFrom,
+      locale,
     });
 
     try {
@@ -1505,19 +1562,26 @@ exports.notifyStaffOnSupportTicketCreated = onDocumentCreated(
     if (replyEmail.includes("@")) {
       try {
         const db = admin.firestore();
-        const kindFr = kindLabelFr(kind);
-        const opened = formatOpeningDateFrench(t.createdAt);
-        const sujetLine = ackSubjectLine(kindFr, desc);
+        const locale = await emailI18n.paychekResolveEmailLocale(db, uid, t);
+        const kindLocalized = emailI18n.kindLabel(locale, kind);
+        const opened = emailI18n.formatOpeningDate(locale, t.createdAt);
+        const sujetLine = ackSubjectLine(kindLocalized, desc);
         const ackLabels = {
           label,
           opened,
           sujetLine,
-          kindFr,
+          kindFr: kindLocalized,
         };
-        const ackBody = buildUserAcknowledgmentText(t, ackLabels);
-        const ackHtml = await resolveUserAcknowledgmentHtml(db, t, ackLabels);
+        const ackBody = buildUserAcknowledgmentText(t, ackLabels, locale);
+        const ackHtml = await resolveUserAcknowledgmentHtml(
+            db,
+            t,
+            ackLabels,
+            locale,
+        );
+        const ackSubjectPrefix = emailI18n.pack(locale).ackSubjectPrefix(label);
         const ackSubject =
-          `[Ticket #${label}] Confirmation de réception de votre demande - ` +
+          `${ackSubjectPrefix}` +
           `${sujetLine.replace(/\r?\n/g, " ").slice(0, 100)}${sujetLine.length > 100 ? "…" : ""}`;
 
         await sendPaychekMailOutbound(
@@ -1844,17 +1908,19 @@ function paychekFormatFrenchDateParis(ts) {
  * @param {{clientName: string, periodEndFr: string, txnSuffix: string}} v
  *        — valeurs déjà échappées (escapeHtml).
  */
-function buildProAccessConfirmedHtml(v) {
+function buildProAccessConfirmedHtml(v, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const s = emailI18n.pack(loc).pro;
   const supportHref = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
   );
   const privacyHref = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${loc}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accès Pro Confirmé - PAYCHEK</title>
+    <title>${escapeHtml(s.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -1923,15 +1989,19 @@ function buildProAccessConfirmedHtml(v) {
             margin: 40px 0;
         }
 
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .receipt-table td {
+            padding: 0 0 12px 0;
             font-size: 14px;
+            vertical-align: top;
         }
 
         .receipt-label { color: #555555; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
-        .receipt-value { color: #ffffff; font-weight: 500; }
+        .receipt-value { color: #ffffff; font-weight: 500; text-align: right; }
 
         .divider {
             height: 1px;
@@ -1974,7 +2044,7 @@ function buildProAccessConfirmedHtml(v) {
             .content { padding: 0 25px 50px 25px !important; }
             h1 { font-size: 26px; }
             .receipt-card { padding: 20px; }
-            .receipt-row { font-size: 13px; }
+            .receipt-table td { font-size: 13px; }
         }
     </style>
 </head>
@@ -1986,48 +2056,51 @@ function buildProAccessConfirmedHtml(v) {
 
         <div class="content" style="padding: 0 50px 50px 50px;">
             <div style="text-align: center;">
-                <div class="success-badge">Activation Immédiate</div>
-                <h1>Bienvenue dans l'accès <span class="gold-text">PRO</span>.</h1>
-                <p style="color: #666666; font-size: 16px; margin-bottom: 0;">Votre abonnement <strong>Pro Access</strong> est désormais opérationnel sur Paychek.</p>
+                <div class="success-badge">${s.badge}</div>
+                <h1>${s.h1}</h1>
+                <p style="color: #666666; font-size: 16px; margin-bottom: 0;">${s.intro}</p>
             </div>
 
             <div class="receipt-card">
-                <div class="receipt-row">
-                    <span class="receipt-label">Client</span>
-                    <span class="receipt-value">${v.clientName}</span>
-                </div>
-                <div class="receipt-row">
-                    <span class="receipt-label">Plan Actuel</span>
-                    <span class="receipt-value"><span class="gold-text">PRO</span> ACCESS</span>
-                </div>
+                <table class="receipt-table" role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td class="receipt-label">${s.clientLabel}</td>
+                    <td class="receipt-value">${v.clientName}</td>
+                </tr>
+                <tr>
+                    <td class="receipt-label">${s.planLabel}</td>
+                    <td class="receipt-value"><span class="gold-text">PRO</span> ACCESS</td>
+                </tr>
+                </table>
                 <div class="divider"></div>
-                <div class="receipt-row">
-                    <span class="receipt-label">Statut du Compte</span>
-                    <span class="receipt-value" style="color: #c5a059;">ACTIF</span>
-                </div>
-                <div class="receipt-row">
-                    <span class="receipt-label">Valide jusqu'au</span>
-                    <span class="receipt-value">${v.periodEndFr}</span>
-                </div>
+                <table class="receipt-table" role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td class="receipt-label">${s.statusLabel}</td>
+                    <td class="receipt-value" style="color: #c5a059;">${s.statusActive}</td>
+                </tr>
+                <tr>
+                    <td class="receipt-label">${s.validUntilLabel}</td>
+                    <td class="receipt-value">${v.periodEndFr}</td>
+                </tr>
+                </table>
             </div>
 
             <div style="margin-top: 50px;">
                 <div class="feature-item">
-                    <div class="feature-title">Analyses Avancées</div>
-                    <div class="feature-desc">Accédez à votre Edge Ratio, vos statistiques de psychologie et vos graphiques de performance en temps réel.</div>
+                    <div class="feature-title">${s.featTitle}</div>
+                    <div class="feature-desc">${s.featDesc}</div>
                 </div>
             </div>
 
             <p style="text-align: center; font-size: 11px; color: #333333; margin-top: 40px; text-transform: uppercase; letter-spacing: 1px;">
-                ID Transaction : #PC-${v.txnSuffix}<br>
-                Une copie de votre facture est disponible dans vos paramètres.
+                ${s.txnLine(v.txnSuffix)}
             </p>
         </div>
 
         <div class="footer">
             <p>
                 <strong>PAYCHEK LABS</strong> — L'EXCELLENCE DANS LA DISCIPLINE.<br><br>
-                <a href="${supportHref}" style="color: #555555;">Support</a> &nbsp;•&nbsp; <a href="${privacyHref}" style="color: #555555;">Confidentialité</a>
+                <a href="${supportHref}" style="color: #555555;">${emailI18n.pack(loc).welcome.support}</a> &nbsp;•&nbsp; <a href="${privacyHref}" style="color: #555555;">${emailI18n.pack(loc).welcome.privacy}</a>
             </p>
         </div>
     </div>
@@ -2077,7 +2150,8 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
     clientLine = to.split("@")[0] || "Client";
   }
 
-  const periodEndFr = paychekFormatFrenchDateParis(periodEndTs);
+  const locale = await emailI18n.paychekResolveEmailLocale(db, uid, u);
+  const periodEndFr = emailI18n.paychekFormatPeriodEndDate(locale, periodEndTs);
   const txnSuffix = paychekProMailTxnSuffix(session);
 
   const safeClient = escapeHtml(clientLine);
@@ -2097,27 +2171,31 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
   );
   const privacyHrefEsc = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
 
+  const placeholderVars = {
+    clientName: safeClient,
+    periodEndFr: safeEnd,
+    periodEnd: safeEnd,
+    validUntil: safeEnd,
+    dateFin: safeEnd,
+    dateFinAbonnement: safeEnd,
+    txnSuffix: safeTxn,
+    supportHref: supportHrefEsc,
+    privacyHref: privacyHrefEsc,
+  };
+
   const html = customHtml ?
-    paychekApplyEmailPlaceholders(customHtml, {
-      clientName: safeClient,
-      periodEndFr: safeEnd,
-      txnSuffix: safeTxn,
-      supportHref: supportHrefEsc,
-      privacyHref: privacyHrefEsc,
-    }) :
+    paychekApplyEmailPlaceholders(customHtml, placeholderVars) :
     buildProAccessConfirmedHtml({
       clientName: safeClient,
       periodEndFr: safeEnd,
       txnSuffix: safeTxn,
-    });
+    }, locale);
 
-  const text =
-    `Bonjour ${clientLine},\n\n` +
-    `Votre accès Pro Paychek est confirmé.\n\n` +
-    `Plan : PRO ACCESS\n` +
-    `Valide jusqu'au : ${periodEndFr}\n` +
-    `ID transaction : #PC-${txnSuffix}\n\n` +
-    `Merci d'utiliser Paychek.\n`;
+  const text = emailI18n.pack(locale).pro.text(
+      clientLine,
+      periodEndFr,
+      txnSuffix,
+  );
 
   await sendPaychekMailOutbound(
       {
@@ -2125,7 +2203,7 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
         to,
         bcc: id.mailBcc,
         replyTo: id.mailFrom,
-        subject: "Paychek — Accès Pro confirmé",
+        subject: emailI18n.pack(locale).proSubject,
         text,
         html,
       },
@@ -2172,17 +2250,19 @@ function greetingFirstNameWelcome(fsData, authUser) {
  * @param {{firstName: string, trialDays: number|string, supportHref: string, privacyHref: string}} v
  * Valeurs déjà échappées pour insertion HTML.
  */
-function buildWelcomeSignupHtml(v) {
+function buildWelcomeSignupHtml(v, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const s = emailI18n.pack(loc).welcome;
   const fn = v.firstName;
   const td = v.trialDays;
   const sh = v.supportHref;
   const ph = v.privacyHref;
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${loc}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue sur PAYCHEK</title>
+    <title>${escapeHtml(s.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -2346,47 +2426,47 @@ function buildWelcomeSignupHtml(v) {
 
         <div class="content">
             <div style="text-align: center;">
-                <div class="welcome-badge">Compte Créé</div>
-                <h1>Le trading est une science de la donnée.</h1>
-                <p style="color: #888888; font-size: 16px;">Bonjour ${fn}, bienvenue sur l'outil qui va changer votre discipline.</p>
+                <div class="welcome-badge">${s.badge}</div>
+                <h1>${s.h1}</h1>
+                <p style="color: #888888; font-size: 16px;">${s.intro(fn)}</p>
             </div>
 
             <div class="trial-box">
-                <div class="trial-title">Offre de Bienvenue</div>
-                <div class="trial-days">${td} JOURS PRO</div>
-                <p style="color: #888888; font-size: 14px; margin: 0;">Découvrez l'intégralité des outils analytiques PAYCHEK sans aucune restriction.</p>
+                <div class="trial-title">${s.trialTitle}</div>
+                <div class="trial-days">${s.trialDays(td)}</div>
+                <p style="color: #888888; font-size: 14px; margin: 0;">${s.trialDesc}</p>
             </div>
 
             <div class="quote-box">
-                "On ne peut pas améliorer ce que l'on ne mesure pas."
+                "${s.quote}"
             </div>
 
             <div class="feature-grid">
                 <div class="feature-item">
                     <div class="feature-dot">→</div>
                     <div>
-                        <div class="feature-title">Analyses de Psychologie</div>
-                        <div class="feature-desc">Identifiez vos biais cognitifs et vos erreurs récurrentes grâce à nos algorithmes.</div>
+                        <div class="feature-title">${s.feat1Title}</div>
+                        <div class="feature-desc">${s.feat1Desc}</div>
                     </div>
                 </div>
                 <div class="feature-item">
                     <div class="feature-dot">→</div>
                     <div>
-                        <div class="feature-title">Statistiques Avancées</div>
-                        <div class="feature-desc">Win-rate, Profit Factor, et Edge Ratio calculés en temps réel sur tous vos trades.</div>
+                        <div class="feature-title">${s.feat2Title}</div>
+                        <div class="feature-desc">${s.feat2Desc}</div>
                     </div>
                 </div>
             </div>
 
             <p style="text-align: center; color: #444444; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 50px;">
-                Aucune carte bancaire requise pour débuter l'essai.
+                ${s.noCard}
             </p>
         </div>
 
         <div class="footer">
             <p>
                 <strong>PAYCHEK LABS</strong> — DISCIPLINE IS FREEDOM.<br><br>
-                <a href="${sh}" style="color: #555555;">Support</a> &nbsp;•&nbsp; <a href="${ph}" style="color: #555555;">Confidentialité</a>
+                <a href="${sh}" style="color: #555555;">${s.support}</a> &nbsp;•&nbsp; <a href="${ph}" style="color: #555555;">${s.privacy}</a>
             </p>
         </div>
     </div>
@@ -2394,7 +2474,8 @@ function buildWelcomeSignupHtml(v) {
 </html>`;
 }
 
-async function resolveWelcomeSignupHtml(db, varsRaw) {
+async function resolveWelcomeSignupHtml(db, varsRaw, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
   let customHtml = "";
   try {
     const tplData = await paychekLoadEmailTemplateOverrides(db);
@@ -2426,7 +2507,7 @@ async function resolveWelcomeSignupHtml(db, varsRaw) {
       trialDays: safeTrial,
       supportHref: supportHrefEsc,
       privacyHref: privacyHrefEsc,
-    });
+    }, loc);
 }
 
 /**
@@ -2458,18 +2539,18 @@ async function paychekSendWelcomeSignupEmail(db, passRaw, payload) {
 
   const firstNameRaw = `${payload.firstName ?? ""}`.trim() || "Trader";
   const trialDays = payload.trialDays ?? PAYCHEK_WELCOME_TRIAL_DAYS;
+  const locale = await emailI18n.paychekResolveEmailLocale(
+      db,
+      payload.uid,
+      null,
+  );
 
   const html = await resolveWelcomeSignupHtml(db, {
     firstName: firstNameRaw,
     trialDays,
-  });
+  }, locale);
 
-  const text =
-    `Bonjour ${firstNameRaw},\n\n` +
-    `Bienvenue sur Paychek.\n\n` +
-    `Votre compte est créé : profitez de ${trialDays} jours d’accès Pro pour explorer les outils analytiques.\n\n` +
-    `Rendez-vous dans l’application pour commencer.\n\n` +
-    `— L’équipe Paychek\n`;
+  const text = emailI18n.pack(locale).welcome.text(firstNameRaw, trialDays);
 
   await sendPaychekMailOutbound(
       {
@@ -2477,7 +2558,7 @@ async function paychekSendWelcomeSignupEmail(db, passRaw, payload) {
         to,
         bcc: id.mailBcc,
         replyTo: id.mailFrom,
-        subject: "Paychek — Bienvenue",
+        subject: emailI18n.pack(locale).welcomeSubject,
         text,
         html,
       },
@@ -2614,24 +2695,42 @@ async function paychekStripePeriodFromSession(stripe, session) {
   let currentPeriodEnd = null;
   /** @type {FirebaseFirestore.Timestamp | null} */
   let proSinceUtc = null;
-  const subId = session.subscription;
-  if (subId && typeof subId === "string") {
+
+  const applySub = (sub) => {
+    const p = paychekPeriodFromStripeSubscription(sub, proSinceUtc);
+    currentPeriodEnd = p.currentPeriodEnd || currentPeriodEnd;
+    proSinceUtc = p.proSinceUtc;
+  };
+
+  const subRef = session.subscription;
+  if (subRef && typeof subRef === "object" && !Array.isArray(subRef)) {
+    applySub(/** @type {import("stripe").Stripe.Subscription} */ (subRef));
+  } else if (typeof subRef === "string") {
     try {
-      const sub = await stripe.subscriptions.retrieve(subId);
-      if (sub.current_period_end) {
-        currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
-            sub.current_period_end * 1000,
-        );
-      }
-      if (sub.current_period_start) {
-        proSinceUtc = admin.firestore.Timestamp.fromMillis(
-            sub.current_period_start * 1000,
-        );
-      }
+      const sub = await stripe.subscriptions.retrieve(subRef);
+      applySub(sub);
     } catch (e) {
       console.warn("paychekStripe: subscription period", e);
     }
   }
+
+  if (!currentPeriodEnd && session.id) {
+    try {
+      const full = await stripe.checkout.sessions.retrieve(session.id, {
+        expand: ["subscription"],
+      });
+      const exp = full.subscription;
+      if (exp && typeof exp === "object" && !Array.isArray(exp)) {
+        applySub(/** @type {import("stripe").Stripe.Subscription} */ (exp));
+      } else if (typeof exp === "string") {
+        const sub = await stripe.subscriptions.retrieve(exp);
+        applySub(sub);
+      }
+    } catch (e) {
+      console.warn("paychekStripe: session expand subscription", e);
+    }
+  }
+
   if (!proSinceUtc) {
     const sc = session.created;
     if (typeof sc === "number" && sc > 0) {
@@ -2641,6 +2740,48 @@ async function paychekStripePeriodFromSession(stripe, session) {
     }
   }
   return {currentPeriodEnd, proSinceUtc};
+}
+
+/**
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {import("stripe").Stripe} stripe
+ * @param {string} uid
+ * @param {import("stripe").Stripe.Checkout.Session} session
+ * @param {unknown} periodEndHint
+ * @return {Promise<FirebaseFirestore.Timestamp | null>}
+ */
+async function paychekResolveProEmailPeriodEndTs(db, stripe, uid, session, periodEndHint) {
+  let ts = paychekCoerceFirestoreTimestamp(periodEndHint);
+  if (ts) return ts;
+
+  try {
+    const ent = await db.collection("subscriber_entitlements").doc(uid).get();
+    if (ent.exists) {
+      ts = paychekCoerceFirestoreTimestamp(ent.data()?.currentPeriodEnd);
+      if (ts) return ts;
+    }
+  } catch (e) {
+    console.warn("paychekProEmail: entitlements", e);
+  }
+
+  try {
+    const user = await db.collection("paychek_users").doc(uid).get();
+    if (user.exists) {
+      ts = paychekCoerceFirestoreTimestamp(
+          user.data()?.subscriptionCurrentPeriodEnd,
+      );
+      if (ts) return ts;
+    }
+  } catch (e) {
+    console.warn("paychekProEmail: paychek_users", e);
+  }
+
+  if (stripe && session) {
+    const p = await paychekStripePeriodFromSession(stripe, session);
+    if (p.currentPeriodEnd) return p.currentPeriodEnd;
+  }
+
+  return null;
 }
 
 /** Aligné sur `kPaychekTrialDuration` (Dart) — 7 j après inscription si pas d’override. */
@@ -3102,7 +3243,13 @@ async function paychekHandleStripeEvent(stripe, event, passRaw) {
 
   try {
     const uSnap = await db.collection("paychek_users").doc(uid).get();
-    const periodEnd = uSnap.data()?.subscriptionCurrentPeriodEnd;
+    const periodEnd = await paychekResolveProEmailPeriodEndTs(
+        db,
+        stripe,
+        uid,
+        session,
+        uSnap.data()?.subscriptionCurrentPeriodEnd,
+    );
     await paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, periodEnd);
   } catch (e) {
     console.warn("paychekStripeWebhook: e-mail accès Pro", e);
@@ -3239,13 +3386,16 @@ function paychekRefundGreetingFirstNameFromUserDoc(data) {
  * @param {{ firstName: string, amountDisplay: string, approvalDateFr: string, supportHref: string, privacyHref: string }} v
  *        — valeurs déjà passées par escapeHtml où nécessaire.
  */
-function buildRefundConfirmedHtml(v) {
+function buildRefundConfirmedHtml(v, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const s = emailI18n.pack(loc).refund;
+  const refundDelay = emailI18n.pack(loc).refundDelay;
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${loc}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmation de Remboursement - PAYCHEK</title>
+    <title>${escapeHtml(s.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -3371,43 +3521,42 @@ function buildRefundConfirmedHtml(v) {
 
         <div class="content">
             <div style="text-align: center;">
-                <div class="status-badge">Information</div>
-                <h1>Remboursement — confirmation</h1>
-                <p style="color: #888888; font-size: 15px;">Bonjour ${v.firstName}, suite à votre demande, nous vous confirmons un remboursement d’un montant de <strong style="color:#e8e8e8;">${v.amountDisplay}</strong>.</p>
+                <div class="status-badge">${s.badge}</div>
+                <h1>${s.h1}</h1>
+                <p style="color: #888888; font-size: 15px;">${s.intro(v.firstName, v.amountDisplay)}</p>
             </div>
 
             <div class="refund-box">
                 <div class="refund-row">
-                    <span class="refund-label">Montant du remboursement</span>
+                    <span class="refund-label">${s.amountLabel}</span>
                     <span class="refund-value" style="color: #c5a059; font-weight: 700;">${v.amountDisplay}</span>
                 </div>
                 <div class="refund-row">
-                    <span class="refund-label">Date d'approbation</span>
+                    <span class="refund-label">${s.approvalLabel}</span>
                     <span class="refund-value">${v.approvalDateFr}</span>
                 </div>
                 <div class="divider"></div>
                 <div class="refund-row">
-                    <span class="refund-label">Délai estimé</span>
-                    <span class="refund-value" style="color: #c5a059;">48h à 72h</span>
+                    <span class="refund-label">${s.delayLabel}</span>
+                    <span class="refund-value" style="color: #c5a059;">${refundDelay}</span>
                 </div>
             </div>
 
             <div class="note-box">
                 <p class="note-text">
-                    <strong>Information importante :</strong> le crédit est effectué sur le moyen de paiement utilisé lors de l’achat. Un délai supplémentaire peut être appliqué par votre banque avant l’affichage sur votre compte.
+                    ${s.note}
                 </p>
             </div>
 
             <p style="text-align: center; color: #444444; font-size: 11px; margin-top: 50px; line-height: 1.8;">
-                Nous vous remercions de votre confiance.<br>
-                Votre historique reste consultable dans votre espace personnel.
+                ${s.thanks}
             </p>
         </div>
 
         <div class="footer">
             <p>
                 <strong>PAYCHEK LABS</strong> — PRECISION & RIGOR.<br><br>
-                <a href="${v.supportHref}" style="color: #555555;">Support</a> &nbsp;•&nbsp; <a href="${v.privacyHref}" style="color: #555555;">Confidentialité</a>
+                <a href="${v.supportHref}" style="color: #555555;">${emailI18n.pack(loc).welcome.support}</a> &nbsp;•&nbsp; <a href="${v.privacyHref}" style="color: #555555;">${emailI18n.pack(loc).welcome.privacy}</a>
             </p>
         </div>
     </div>
@@ -3452,18 +3601,17 @@ async function paychekSendRefundNotifyEmail(
     console.warn("refundEmail: lecture paychek_users", e);
   }
 
+  const locale = await emailI18n.paychekResolveEmailLocale(db, uid, u);
   const firstNameRaw = paychekRefundGreetingFirstNameFromUserDoc(u);
   const fn = escapeHtml(firstNameRaw);
   const amountDisplay = escapeHtml(amountLabelPlain);
-  const approvalDatePlain = new Date().toLocaleDateString("fr-FR", {
-    dateStyle: "long",
-    timeZone: "Europe/Paris",
-  });
+  const approvalDatePlain = emailI18n.formatApprovalDate(locale, new Date());
   const approvalDateFr = escapeHtml(approvalDatePlain);
   const supportHref = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
   );
   const privacyHref = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
+  const refundDelay = emailI18n.pack(locale).refundDelay;
 
   const html = buildRefundConfirmedHtml({
     firstName: fn,
@@ -3471,14 +3619,14 @@ async function paychekSendRefundNotifyEmail(
     approvalDateFr,
     supportHref,
     privacyHref,
-  });
+  }, locale);
 
-  const text =
-    `Bonjour ${firstNameRaw},\n\n` +
-    `Nous vous confirmons un remboursement d’un montant de ${amountLabelPlain} suite à votre demande.\n\n` +
-    `Date (information) : ${approvalDatePlain}\n` +
-    "Délai bancaire habituellement observé : 48h à 72h après traitement par l’établissement payeur.\n\n" +
-    "— Paychek\n";
+  const text = emailI18n.pack(locale).refund.text(
+      firstNameRaw,
+      amountLabelPlain,
+      approvalDatePlain,
+      refundDelay,
+  );
 
   await sendPaychekMailOutbound(
       {
@@ -3486,7 +3634,7 @@ async function paychekSendRefundNotifyEmail(
         to,
         bcc: id.mailBcc,
         replyTo: id.mailFrom,
-        subject: "Paychek — Remboursement (information)",
+        subject: emailI18n.pack(locale).refundSubject,
         text,
         html,
       },

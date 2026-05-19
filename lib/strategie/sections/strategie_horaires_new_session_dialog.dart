@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -114,6 +115,37 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
     });
   }
 
+  Widget _buildStartEndTimeFields(AppLocalizations l) {
+    final startField = _timeFieldWithOptionalWheels(
+      label: l.strategieTimeStartLabel,
+      value: _start,
+      pick: _TimePick.start,
+    );
+    final endField = _timeFieldWithOptionalWheels(
+      label: l.strategieTimeEndOptionalLabel,
+      value: _end,
+      pick: _TimePick.end,
+    );
+    if (kIsWeb) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          startField,
+          const SizedBox(height: 16),
+          endField,
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: startField),
+        const SizedBox(width: 12),
+        Expanded(child: endField),
+      ],
+    );
+  }
+
   Widget _timeFieldWithOptionalWheels({
     required String label,
     required TimeOfDay? value,
@@ -194,10 +226,13 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
         side: const BorderSide(color: Color(0xFF222222)),
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 320),
+        constraints: BoxConstraints(maxWidth: kIsWeb ? 360 : 320),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
+            physics: _openTimePick != null
+                ? const NeverScrollableScrollPhysics()
+                : const ClampingScrollPhysics(),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -264,26 +299,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _timeFieldWithOptionalWheels(
-                        label: l.strategieTimeStartLabel,
-                        value: _start,
-                        pick: _TimePick.start,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _timeFieldWithOptionalWheels(
-                        label: l.strategieTimeEndOptionalLabel,
-                        value: _end,
-                        pick: _TimePick.end,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildStartEndTimeFields(l),
                 const SizedBox(height: 16),
                 Text(l.strategieZoneType, style: _labelStyle),
                 const SizedBox(height: 8),

@@ -68,10 +68,10 @@ Widget buildStrategieSetupModelesPopupMenu({
         value: _stValueModify,
         child: Row(
           children: [
-            Icon(
+            const Icon(
               LucideIcons.pencil,
-              size: 18,
-              color: ChecklistTokens.sectionPopupMenuItemStyle.color,
+              size: 16,
+              color: StrategieTokens.labelMuted,
             ),
             const SizedBox(width: 8),
             Text(

@@ -12,6 +12,7 @@ import 'package:path/path.dart' as path;
 import 'paychek_support_read_file_bytes.dart';
 import 'paychek_support_routing.dart';
 import 'paychek_user_firestore.dart';
+import 'reglage_language_prefs.dart';
 
 /// Collection racine synchronisée avec [firestore.rules].
 const String kPaychekSupportTicketsCollection = 'paychek_support_tickets';
@@ -179,9 +180,12 @@ Future<bool> submitPaychekSupportTicket({
     }
   }
 
+  final appLang = await ReglageLanguagePrefs.loadCode();
   final ticketPayload = <String, dynamic>{
     'userId': uid,
     'ticketRef': paychekSupportNewTicketRef(),
+    if (ReglageLanguagePrefs.availableCodes.contains(appLang))
+      'appLanguageCode': appLang,
     if (dn != null && dn.isNotEmpty) 'replyDisplayName': dn,
     if (replyFirstName.isNotEmpty) 'replyFirstName': replyFirstName,
     if (replyLastName.isNotEmpty) 'replyLastName': replyLastName,

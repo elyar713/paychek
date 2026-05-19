@@ -13,10 +13,10 @@ import '../l10n/app_localizations.dart';
 import '../widgets/paychek_page_header.dart';
 import '../widgets/paychek_minimal_upgrade_button.dart';
 import '../web/paychek_web_tokens.dart';
+import 'paychek_change_password_dialog.dart';
 import 'paychek_gold_upgrade_sheet.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_prefs.dart';
-import 'subscription_launch_helper.dart';
 import 'trial_access_prefs.dart'
     show
         AccountEntitlementSnapshot,
@@ -398,6 +398,17 @@ class _ReglageProfileViewPageState extends State<ReglageProfileViewPage>
                 fieldDecoration: (label) =>
                     _profileFieldDecoration(label, isWebUi: isWebUi),
               ),
+              if (paychekUserHasEmailPasswordProvider(
+                FirebaseAuth.instance.currentUser,
+              )) ...[
+                SizedBox(height: isWebUi ? 14 : 12),
+                _ChangePasswordButton(
+                  isWebUi: isWebUi,
+                  busy: _saveBusy || _editing,
+                  email: e,
+                  label: l10n.accountChangePasswordButton,
+                ),
+              ],
               SizedBox(height: isWebUi ? 16 : 14),
               if (_editing)
                 Row(
@@ -981,20 +992,6 @@ class _SubscriptionActionButton extends StatelessWidget {
 
     return FilledButton(
       onPressed: () async {
-        if (isPro) {
-          final ok = await openPaychekSubscriptionFlow();
-          if (!context.mounted) return;
-          if (!ok) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.paywallStoreNotConfigured),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: const Color(0xFF2A2A2A),
-              ),
-            );
-          }
-          return;
-        }
         await onNonProSubscribe();
       },
       style: FilledButton.styleFrom(
@@ -1092,6 +1089,52 @@ class _ProfileAvatar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ChangePasswordButton extends StatelessWidget {
+  const _ChangePasswordButton({
+    required this.isWebUi,
+    required this.busy,
+    required this.email,
+    required this.label,
+  });
+
+  final bool isWebUi;
+  final bool busy;
+  final String email;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent =
+        isWebUi ? PaychekWebTokens.accentEmerald : _kBrandTeal;
+    final borderClr =
+        isWebUi ? PaychekWebTokens.borderGray800 : const Color(0xFF26262A);
+
+    return OutlinedButton.icon(
+      onPressed: busy || email.isEmpty
+          ? null
+          : () => unawaited(showPaychekChangePasswordDialog(
+                context,
+                email: email,
+              )),
+      icon: Icon(Icons.lock_reset_outlined, size: 20, color: accent),
+      label: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontWeight: FontWeight.w800,
+          fontSize: 14,
+          color: accent,
+        ),
+      ),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: accent,
+        side: BorderSide(color: borderClr),
+        minimumSize: const Size.fromHeight(48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
     );
   }
 }

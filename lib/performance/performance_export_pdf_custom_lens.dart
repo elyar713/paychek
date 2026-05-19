@@ -88,19 +88,19 @@ List<pw.Widget> _customLensPdfSection({
       ),
     ),
     pw.SizedBox(height: 4),
-    pw.Text(
-      _pdfText(
-        _p(
-          locale,
-          'Cartes enregistrées depuis Performance (filtre période actif).',
-          'Cards saved from Performance (current period filter).',
-          'Tarjetas guardadas en Rendimiento (filtro de período activo).',
-          'Gespeicherte Karten aus Performance (aktueller Periodenfilter).',
-          'Cartões guardados em Performance (filtro de período ativo).',
-          '퍼포먼스에서 저장한 카드(현재 기간 필터).',
-        ),
+    _pdfW(
+      _p(
+        locale,
+        'Cartes enregistrées depuis Performance (filtre période actif).',
+        'Cards saved from Performance (current period filter).',
+        'Tarjetas guardadas en Rendimiento (filtro de período activo).',
+        'Gespeicherte Karten aus Performance (aktueller Periodenfilter).',
+        'Cartões guardados em Performance (filtro de período ativo).',
+        '퍼포먼스에서 저장한 카드(현재 기간 필터).',
       ),
-      style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600, height: 1.35),
+      fontSize: 8,
+      color: _kMuted,
+      height: 1.35,
     ),
   ];
 
@@ -124,19 +124,19 @@ List<pw.Widget> _customLensPdfSection({
     blocks.add(pw.SizedBox(height: 8));
     blocks.add(
       _card(
+        bg: _kCardBg,
         children: [
-          pw.Text(
-            _pdfText(elementLabel),
-            style: pw.TextStyle(
-              fontSize: 11,
-              fontWeight: pw.FontWeight.bold,
-              color: PdfColors.grey900,
-            ),
+          _pdfW(
+            elementLabel,
+            bold: true,
+            fontSize: 11,
+            color: _kPrimary,
           ),
           pw.SizedBox(height: 4),
-          pw.Text(
-            _pdfText(_customLensDimensionPdfLabel(locale, config.dimension)),
-            style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+          _pdfW(
+            _customLensDimensionPdfLabel(locale, config.dimension),
+            fontSize: 8,
+            color: _kMuted,
           ),
           pw.SizedBox(height: 10),
           for (var i = 0; i < bands.length; i++) ...[

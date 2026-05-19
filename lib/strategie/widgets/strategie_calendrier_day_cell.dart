@@ -80,16 +80,9 @@ class StrategieCalendrierDayCell extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        InkWell(
-          onTap: onSelectDay,
-          borderRadius: BorderRadius.circular(4),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Text(
-              '$day',
-              style: dayDigitsStyle(digitColor),
-            ),
-          ),
+        Text(
+          '$day',
+          style: dayDigitsStyle(digitColor),
         ),
         const SizedBox(height: 1),
         if (!isFuture && strategiePct != null)
@@ -148,20 +141,24 @@ class StrategieCalendrierDayCell extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(kDayCellRadius),
       ),
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          color: tileColors.bg,
-          borderRadius: BorderRadius.circular(kDayCellRadius),
-          border: tileColors.border == null
-              ? null
-              : Border.all(
-                  color: tileColors.border!,
-                  width: 0.8,
-                ),
+      child: InkWell(
+        onTap: isFuture ? null : onSelectDay,
+        borderRadius: BorderRadius.circular(kDayCellRadius),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: tileColors.bg,
+            borderRadius: BorderRadius.circular(kDayCellRadius),
+            border: tileColors.border == null
+                ? null
+                : Border.all(
+                    color: tileColors.border!,
+                    width: 0.8,
+                  ),
+          ),
+          child: withTooltip,
         ),
-        child: withTooltip,
       ),
     );
   }

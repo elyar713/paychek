@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../reglage/paychek_prefs_scope.dart';
 import 'checklist_daily_day_snapshot.dart';
 
-/// Historique local : % checklist + ids non cochés par jour calendaire.
+/// Historique local : % checklist + lignes non cochées par jour calendaire.
 abstract final class ChecklistDailyCompletionStorage {
   ChecklistDailyCompletionStorage._();
 
@@ -47,6 +47,40 @@ abstract final class ChecklistDailyCompletionStorage {
     }
   }
 
+  static ChecklistUncheckedDayEntry? _decodeEntry(dynamic v) {
+    if (v is! Map) return null;
+    final m = Map<String, dynamic>.from(v);
+    final itemId = m['itemId']?.toString() ?? m['id']?.toString() ?? '';
+    if (itemId.isEmpty) return null;
+    return ChecklistUncheckedDayEntry(
+      sectionId: m['sectionId']?.toString() ?? '',
+      sectionTitle: m['sectionTitle']?.toString() ?? '',
+      itemId: itemId,
+      itemLabel: m['itemLabel']?.toString() ?? m['label']?.toString() ?? '',
+    );
+  }
+
+  static List<ChecklistUncheckedDayEntry> _decodeUncheckedList(dynamic raw) {
+    if (raw is! List) return const [];
+    final entries = <ChecklistUncheckedDayEntry>[];
+    for (final v in raw) {
+      if (v is String && v.isNotEmpty) {
+        entries.add(
+          ChecklistUncheckedDayEntry(
+            sectionId: '',
+            sectionTitle: '',
+            itemId: v,
+            itemLabel: '',
+          ),
+        );
+        continue;
+      }
+      final e = _decodeEntry(v);
+      if (e != null) entries.add(e);
+    }
+    return entries;
+  }
+
   static Map<int, ChecklistDailyDaySnapshot>? _decodeMap(String raw) {
     try {
       final decoded = jsonDecode(raw);
@@ -63,13 +97,10 @@ abstract final class ChecklistDailyCompletionStorage {
         if (v is Map) {
           final m = Map<String, dynamic>.from(v);
           final pct = (m['percent'] as num?)?.round() ?? 0;
-          final idsRaw = m['unchecked'];
-          final ids = idsRaw is List
-              ? idsRaw.map((x) => x.toString()).where((s) => s.isNotEmpty).toList()
-              : <String>[];
+          final entries = _decodeUncheckedList(m['unchecked']);
           out[k] = ChecklistDailyDaySnapshot(
             percent: pct.clamp(0, 100),
-            uncheckedItemIds: ids,
+            uncheckedEntries: entries,
           );
         }
       }
@@ -85,7 +116,15 @@ abstract final class ChecklistDailyCompletionStorage {
     for (final e in map.entries) {
       encoded['${e.key}'] = <String, dynamic>{
         'percent': e.value.percent,
-        'unchecked': e.value.uncheckedItemIds,
+        'unchecked': [
+          for (final u in e.value.uncheckedEntries)
+            <String, dynamic>{
+              'sectionId': u.sectionId,
+              'sectionTitle': u.sectionTitle,
+              'itemId': u.itemId,
+              'itemLabel': u.itemLabel,
+            },
+        ],
       };
     }
     await p.setString(_kV2, jsonEncode(encoded));

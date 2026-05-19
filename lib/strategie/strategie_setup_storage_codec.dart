@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'widgets/strategie_setup_card.dart';
+import 'widgets/strategie_setup_rule_styles.dart';
 
 const _jsonV = 1;
 
@@ -34,9 +33,7 @@ Map<String, dynamic> encodeStrategieSetupCardData(StrategieSetupCardData d) {
     'ruleBlocks': [
       for (final b in d.ruleBlocks)
         <String, dynamic>{
-          'iconCodePoint': b.icon.codePoint,
-          'iconFontFamily': b.icon.fontFamily,
-          'iconFontPackage': b.icon.fontPackage,
+          'iconKey': StrategieSetupRuleStyles.iconKeyForIcon(b.icon),
           'heading': b.heading,
           'headingColor': _argb(b.headingColor),
           'body': b.body,
@@ -49,18 +46,19 @@ StrategieSetupCardData decodeStrategieSetupCardData(Map<String, dynamic> m) {
   final blocks = <StrategieSetupRuleBlock>[];
   final raw = m['ruleBlocks'];
   if (raw is List) {
-    for (final e in raw) {
+    for (var i = 0; i < raw.length; i++) {
+      final e = raw[i];
       if (e is! Map) continue;
       final em = Map<String, dynamic>.from(e);
+      final icon = StrategieSetupRuleStyles.iconFromKey(
+        em['iconKey'] as String?,
+        blockIndex: i,
+      );
       blocks.add(
         StrategieSetupRuleBlock(
-          // IMPORTANT:
-          // In release mode, Flutter's icon tree-shaking requires IconData to be const.
-          // Stored (dynamic) IconData from JSON prevents tree-shaking and breaks release builds.
-          // We therefore use a stable Lucide icon here.
-          icon: LucideIcons.checkCircle2,
+          icon: icon,
           heading: em['heading'] as String? ?? '',
-          headingColor: _color(em['headingColor']),
+          headingColor: StrategieSetupRuleStyles.headingColorForIcon(icon),
           body: em['body'] as String? ?? '',
         ),
       );

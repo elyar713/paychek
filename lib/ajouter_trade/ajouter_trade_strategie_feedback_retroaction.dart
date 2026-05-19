@@ -4,6 +4,33 @@ import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_feedback_reference.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
+import '../strategie/widgets/strategie_setup_tag_format.dart';
+
+/// Ligne « point à revoir » : un id stable + le libellé affiché (un élément / tag).
+class StrategieFeedbackCheckItem {
+  const StrategieFeedbackCheckItem({
+    required this.id,
+    required this.label,
+  });
+
+  final String id;
+  final String label;
+}
+
+List<StrategieFeedbackCheckItem> strategieFeedbackItemsFromDisplay(
+  String idPrefix,
+  String display,
+) {
+  final tags = strategieSetupDisplayToTags(display);
+  if (tags.isEmpty) return const [];
+  return [
+    for (var i = 0; i < tags.length; i++)
+      StrategieFeedbackCheckItem(
+        id: '${idPrefix}_$i',
+        label: tags[i],
+      ),
+  ];
+}
 
 /// Contenu déroulant : bravo / liste de contrôle « non respect » selon le % stratégie.
 class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
@@ -103,9 +130,7 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
           StrategieFeedbackCheckRow(
             l: l,
             id: 'mes_regles_$i',
-            titre: l.ajouterTradeStrategieRuleN(i + 1),
-            corps: regles[i],
-            labelStyle: labelStyle,
+            label: regles[i],
             bodyStyle: bodyStyle,
             estNonRespecte: nonRespectSelection.contains('mes_regles_$i'),
             onToggle: onToggleNonRespect,
@@ -115,55 +140,55 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
             l.ajouterTradeStrategieSetupModelsWithTitle(data!.title),
             labelStyle,
           ),
-          StrategieFeedbackCheckRow(
+          ..._setupTagSection(
             l: l,
-            id: 'setup_timeframes',
-            titre: l.strategieTimeframes,
-            corps: data!.timeframes,
+            sectionTitle: l.strategieTimeframes,
+            idPrefix: 'setup_timeframes',
+            display: data!.timeframes,
             labelStyle: labelStyle,
             bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('setup_timeframes'),
+            nonRespectSelection: nonRespectSelection,
             onToggle: onToggleNonRespect,
           ),
-          StrategieFeedbackCheckRow(
+          ..._setupTagSection(
             l: l,
-            id: 'setup_indicateurs',
-            titre: l.strategieIndicators,
-            corps: data!.indicateurs,
+            sectionTitle: l.strategieIndicators,
+            idPrefix: 'setup_indicateurs',
+            display: data!.indicateurs,
             labelStyle: labelStyle,
             bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('setup_indicateurs'),
+            nonRespectSelection: nonRespectSelection,
             onToggle: onToggleNonRespect,
           ),
-          StrategieFeedbackCheckRow(
+          ..._setupTagSection(
             l: l,
-            id: 'setup_pattern',
-            titre: l.ajouterTradeStrategieRowPattern,
-            corps: data!.pattern,
+            sectionTitle: l.ajouterTradeStrategieRowPattern,
+            idPrefix: 'setup_pattern',
+            display: data!.pattern,
             labelStyle: labelStyle,
             bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('setup_pattern'),
+            nonRespectSelection: nonRespectSelection,
             onToggle: onToggleNonRespect,
           ),
-          StrategieFeedbackCheckRow(
+          ..._setupTagSection(
             l: l,
-            id: 'setup_signal',
-            titre: l.ajouterTradeStrategieRowSignal,
-            corps: data!.signalText,
+            sectionTitle: l.ajouterTradeStrategieRowSignal,
+            idPrefix: 'setup_signal',
+            display: data!.signalText,
             labelStyle: labelStyle,
             bodyStyle: bodyStyle,
-            estNonRespecte: nonRespectSelection.contains('setup_signal'),
+            nonRespectSelection: nonRespectSelection,
             onToggle: onToggleNonRespect,
           ),
           for (var i = 0; i < data!.ruleBlocks.length; i++)
-            StrategieFeedbackCheckRow(
+            ..._setupTagSection(
               l: l,
-              id: 'setup_rule_$i',
-              titre: data!.ruleBlocks[i].heading,
-              corps: data!.ruleBlocks[i].body,
+              sectionTitle: data!.ruleBlocks[i].heading,
+              idPrefix: 'setup_rule_$i',
+              display: data!.ruleBlocks[i].body,
               labelStyle: labelStyle,
               bodyStyle: bodyStyle,
-              estNonRespecte: nonRespectSelection.contains('setup_rule_$i'),
+              nonRespectSelection: nonRespectSelection,
               onToggle: onToggleNonRespect,
             ),
         ] else ...[
@@ -184,6 +209,50 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
       ],
     );
   }
+}
+
+List<Widget> _setupTagSection({
+  required AppLocalizations l,
+  required String sectionTitle,
+  required String idPrefix,
+  required String display,
+  required TextStyle labelStyle,
+  required TextStyle bodyStyle,
+  required Set<String> nonRespectSelection,
+  required ValueChanged<String> onToggle,
+}) {
+  final items = strategieFeedbackItemsFromDisplay(idPrefix, display);
+  if (items.isEmpty) return const [];
+  return [
+    StrategieFeedbackSectionHeader(sectionTitle, labelStyle, top: 6),
+    ..._checkRowsForItems(
+      l: l,
+      items: items,
+      bodyStyle: bodyStyle,
+      nonRespectSelection: nonRespectSelection,
+      onToggle: onToggle,
+    ),
+  ];
+}
+
+List<Widget> _checkRowsForItems({
+  required AppLocalizations l,
+  required List<StrategieFeedbackCheckItem> items,
+  required TextStyle bodyStyle,
+  required Set<String> nonRespectSelection,
+  required ValueChanged<String> onToggle,
+}) {
+  return [
+    for (final item in items)
+      StrategieFeedbackCheckRow(
+        l: l,
+        id: item.id,
+        label: item.label,
+        bodyStyle: bodyStyle,
+        estNonRespecte: nonRespectSelection.contains(item.id),
+        onToggle: onToggle,
+      ),
+  ];
 }
 
 class StrategieFeedbackSectionHeader extends StatelessWidget {
@@ -221,9 +290,7 @@ class StrategieFeedbackCheckRow extends StatelessWidget {
     super.key,
     required this.l,
     required this.id,
-    required this.titre,
-    required this.corps,
-    required this.labelStyle,
+    required this.label,
     required this.bodyStyle,
     required this.estNonRespecte,
     required this.onToggle,
@@ -231,16 +298,14 @@ class StrategieFeedbackCheckRow extends StatelessWidget {
 
   final AppLocalizations l;
   final String id;
-  final String titre;
-  final String corps;
-  final TextStyle labelStyle;
+  final String label;
   final TextStyle bodyStyle;
   final bool estNonRespecte;
   final ValueChanged<String> onToggle;
 
   @override
   Widget build(BuildContext context) {
-    final t = corps.trim();
+    final t = label.trim();
     if (t.isEmpty || t == '—') return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -257,7 +322,7 @@ class StrategieFeedbackCheckRow extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 1, right: 8),
                   child: Semantics(
-                    label: l.ajouterTradeNonRespectedSemantic(titre),
+                    label: l.ajouterTradeNonRespectedSemantic(t),
                     checked: estNonRespecte,
                     child: SizedBox(
                       width: 16,
@@ -287,13 +352,14 @@ class StrategieFeedbackCheckRow extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(titre, style: labelStyle),
-                      const SizedBox(height: 3),
-                      Text(t, style: bodyStyle),
-                    ],
+                  child: Text(
+                    t,
+                    style: bodyStyle.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: estNonRespecte
+                          ? DashboardTokens.negative.withValues(alpha: 0.92)
+                          : bodyStyle.color,
+                    ),
                   ),
                 ),
               ],

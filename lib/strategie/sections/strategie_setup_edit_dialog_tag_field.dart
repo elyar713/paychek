@@ -17,13 +17,25 @@ class StrategieSetupTagField extends StatefulWidget {
   final ValueChanged<List<String>> onChanged;
 
   @override
-  State<StrategieSetupTagField> createState() => _StrategieSetupTagFieldState();
+  StrategieSetupTagFieldState createState() => StrategieSetupTagFieldState();
+
+  /// Tags affichés + texte encore dans le champ (sans appuyer sur +).
+  static List<String> mergePending(List<String> tags, String pendingText) {
+    final t = pendingText.trim();
+    if (t.isEmpty) return List<String>.from(tags);
+    return [...tags, t];
+  }
 }
 
-class _StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
+class StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
   late final TextEditingController _c;
 
   static const _chipBg = Color(0xFF2A2A2A);
+
+  /// Utilisé à l'enregistrement du dialogue Modifier setup.
+  List<String> tagsIncludingPending() {
+    return StrategieSetupTagField.mergePending(widget.tags, _c.text);
+  }
 
   @override
   void initState() {

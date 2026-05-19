@@ -51,6 +51,36 @@ class ChecklistPageView extends StatelessWidget {
       final section = displaySections[i];
       final sectionDisplayTitle =
           checklistSectionTitle(l, section.id, section.title);
+
+      Widget itemRow(int j, {required bool editing}) {
+        final item = section.items[j];
+        final rowChecked = item.isCompletedForCurrentPeriod();
+        final expired = item.isExpiredMissed();
+        return ChecklistItemRow(
+          label: checklistItemLabel(l, item.id, item.label),
+          checked: rowChecked,
+          expiredMissed: expired,
+          onChanged: (v) => c.toggleItem(section.id, item.id, v),
+          schedule: item.schedule ?? const ChecklistItemSchedule(),
+          onScheduleChanged: editing
+              ? (sched) => c.updateItemSchedule(section.id, item.id, sched)
+              : null,
+          onSectionEditInteract:
+              editing ? c.markSectionEditInteraction : null,
+          onLineDelete: editing
+              ? () => c.removeItemFromSection(section.id, item.id)
+              : null,
+          editingLabel: c.editingItemId == item.id,
+          labelEditController: c.itemLabelEditController,
+          labelFocusNode: c.itemLabelFocusNode,
+          onLabelSubmitted: c.commitItemLabelEdit,
+          onTapEditLabel: c.editingItemId == item.id
+              ? null
+              : () => c.startEditItemLabel(section.id, item.id),
+          showDividerBelow: j < section.items.length - 1,
+        );
+      }
+
       return c.editingSectionId == section.id
           ? ChecklistSectionCard(
                 key: c.sectionEditCardKey,
@@ -65,44 +95,7 @@ class ChecklistPageView extends StatelessWidget {
                     c.onSectionMenu(section.id, v, context),
                 children: [
                   for (var j = 0; j < section.items.length; j++)
-                    ChecklistItemRow(
-                      label: checklistItemLabel(
-                        l,
-                        section.items[j].id,
-                        section.items[j].label,
-                      ),
-                      checked: section.items[j].checked,
-                      onChanged: (v) => c.toggleItem(
-                        section.id,
-                        section.items[j].id,
-                        v,
-                      ),
-                      schedule: section.items[j].schedule ??
-                          const ChecklistItemSchedule(),
-                      onScheduleChanged: (sched) => c.updateItemSchedule(
-                        section.id,
-                        section.items[j].id,
-                        sched,
-                      ),
-                      onSectionEditInteract: c.markSectionEditInteraction,
-                      onLineDelete: () => c.removeItemFromSection(
-                        section.id,
-                        section.items[j].id,
-                      ),
-                      editingLabel:
-                          c.editingItemId == section.items[j].id,
-                      labelEditController: c.itemLabelEditController,
-                      labelFocusNode: c.itemLabelFocusNode,
-                      onLabelSubmitted: c.commitItemLabelEdit,
-                      onTapEditLabel:
-                          c.editingItemId == section.items[j].id
-                              ? null
-                              : () => c.startEditItemLabel(
-                                    section.id,
-                                    section.items[j].id,
-                                  ),
-                      showDividerBelow: true,
-                    ),
+                    itemRow(j, editing: true),
                   _sectionAddLineRow(
                     onInteract: c.markSectionEditInteraction,
                     onTap: () => c.addLineToSection(section.id),
@@ -120,40 +113,7 @@ class ChecklistPageView extends StatelessWidget {
                   c.onSectionMenu(section.id, v, context),
               children: [
                 for (var j = 0; j < section.items.length; j++)
-                  ChecklistItemRow(
-                    label: checklistItemLabel(
-                      l,
-                      section.items[j].id,
-                      section.items[j].label,
-                    ),
-                    checked: section.items[j].checked,
-                    onChanged: (v) => c.toggleItem(
-                      section.id,
-                      section.items[j].id,
-                      v,
-                    ),
-                    schedule: section.items[j].schedule ??
-                        const ChecklistItemSchedule(),
-                    onScheduleChanged: (sched) => c.updateItemSchedule(
-                      section.id,
-                      section.items[j].id,
-                      sched,
-                    ),
-                    onLineDelete: null,
-                    editingLabel:
-                        c.editingItemId == section.items[j].id,
-                    labelEditController: c.itemLabelEditController,
-                    labelFocusNode: c.itemLabelFocusNode,
-                    onLabelSubmitted: c.commitItemLabelEdit,
-                    onTapEditLabel:
-                        c.editingItemId == section.items[j].id
-                            ? null
-                            : () => c.startEditItemLabel(
-                                  section.id,
-                                  section.items[j].id,
-                                ),
-                    showDividerBelow: j < section.items.length - 1,
-                  ),
+                  itemRow(j, editing: false),
               ],
             );
     }

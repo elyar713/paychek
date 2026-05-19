@@ -33,7 +33,7 @@ String languageFlagEmoji(String code) {
     case ReglageLanguagePrefs.codeFrench:
       return '🇫🇷';
     case ReglageLanguagePrefs.codeEnglish:
-      return '🇬🇧';
+      return '🇺🇸';
     case ReglageLanguagePrefs.codeSpanish:
       return '🇪🇸';
     case ReglageLanguagePrefs.codePortuguese:
@@ -43,7 +43,7 @@ String languageFlagEmoji(String code) {
     case ReglageLanguagePrefs.codeKorean:
       return '🇰🇷';
     default:
-      return '🇬🇧';
+      return '🇺🇸';
   }
 }
 

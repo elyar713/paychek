@@ -1,3 +1,4 @@
+import 'checklist_item_period.dart';
 import 'checklist_item_schedule.dart';
 import 'checklist_prompts.dart';
 
@@ -7,17 +8,33 @@ class ChecklistItemData {
     required this.id,
     required this.label,
     this.checked = false,
+    this.checkedAt,
     this.schedule,
   });
 
   final String id;
   final String label;
   final bool checked;
+
+  /// Instant local de la coche (période journalière / hebdo / date).
+  final DateTime? checkedAt;
   final ChecklistItemSchedule? schedule;
+
+  /// Coche comptée pour la période en cours ([ChecklistItemPeriod]).
+  bool isCompletedForCurrentPeriod([DateTime? now]) =>
+      ChecklistItemPeriod.isCompletedForSchedule(this, now ?? DateTime.now());
+
+  bool isCompletedForCalendarDay(DateTime day) =>
+      ChecklistItemPeriod.isCompletedForCalendarDay(this, day);
+
+  bool isExpiredMissed([DateTime? now]) =>
+      ChecklistItemPeriod.isExpiredMissed(this, now ?? DateTime.now());
 
   ChecklistItemData copyWith({
     String? label,
     bool? checked,
+    DateTime? checkedAt,
+    bool clearCheckedAt = false,
     ChecklistItemSchedule? schedule,
     bool clearSchedule = false,
   }) {
@@ -25,6 +42,7 @@ class ChecklistItemData {
       id: id,
       label: label ?? this.label,
       checked: checked ?? this.checked,
+      checkedAt: clearCheckedAt ? null : (checkedAt ?? this.checkedAt),
       schedule: clearSchedule ? null : (schedule ?? this.schedule),
     );
   }

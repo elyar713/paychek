@@ -44,6 +44,14 @@ class ChecklistTokens {
     height: 1.35,
   );
 
+  /// Ligne dont l'échéance est passée sans coche (hebdo / date précise).
+  static const itemLabelExpiredStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Color(0xFF5C5C5C),
+    height: 1.35,
+  );
+
   /// Fond de section : noir quasiment pur, très subtil contraste.
   static const cardBg = Color(0xFF080808);
 

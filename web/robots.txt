@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /landing.html
+Allow: /privacy.html
+Allow: /terms.html
+
+# Application Flutter (contenu chargé en JS) — la landing reste la page marketing indexable.
+Disallow: /admin-hub/
+
+Sitemap: https://paychek.pro/sitemap.xml

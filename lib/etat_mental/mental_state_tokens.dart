@@ -34,4 +34,10 @@ class MentalStateTokens {
     if (score >= 45) return Colors.white;
     return matteRed;
   }
+
+  /// % jour sur le mini-calendrier (historique inclus) : ≥ 50 % vert, sinon rouge.
+  static Color calendarDayPercentColor(double score) {
+    if (score >= 50) return matteGreen;
+    return matteRed;
+  }
 }

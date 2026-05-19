@@ -28,6 +28,7 @@ import 'web/paychek_web_tokens.dart';
 import 'web/plus_web_left_rail.dart';
 import 'web/web_dashboard_body.dart';
 import 'web/web_dashboard_config.dart';
+import 'shared/paychek_frame_callbacks.dart';
 import 'ajouter_trade/ajouter_trade_page.dart';
 import 'calendrier/calendrier_page.dart';
 import 'help_center/help_center_page.dart';
@@ -186,7 +187,7 @@ class _DashboardPageState extends State<DashboardPage>
     WidgetsBinding.instance.addObserver(this);
     AnalyseRealtimeNotifier.tick.addListener(_reloadAnalyseHomePreview);
     AnalyseRealtimeNotifier.reportsTick.addListener(_reloadAnalyseHomePreview);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    PaychekFrameCallbacks.runPostFrame(() {
       _checklistController.hydrateFromStorage();
       _checkPaychekRemoteAccessGate();
     });

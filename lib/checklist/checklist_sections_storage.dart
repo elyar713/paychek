@@ -20,6 +20,8 @@ abstract final class ChecklistSectionsStorage {
       'id': item.id,
       'label': item.label,
       'checked': item.checked,
+      if (item.checkedAt != null)
+        'checkedAtMs': item.checkedAt!.toUtc().millisecondsSinceEpoch,
       if (item.schedule != null) 'schedule': item.schedule!.toJson(),
     };
   }
@@ -70,11 +72,17 @@ abstract final class ChecklistSectionsStorage {
           final lab = it['label'];
           if (iid is! String || lab is! String) continue;
           final sched = ChecklistItemSchedule.fromJson(it['schedule']);
+          DateTime? checkedAt;
+          final ms = it['checkedAtMs'];
+          if (ms is int) {
+            checkedAt = DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+          }
           items.add(
             ChecklistItemData(
               id: iid,
               label: lab,
               checked: it['checked'] == true,
+              checkedAt: checkedAt,
               schedule: sched,
             ),
           );

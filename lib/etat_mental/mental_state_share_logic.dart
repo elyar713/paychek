@@ -164,22 +164,11 @@ class MentalStateShareLogic {
     emotions[emotions.length - 1].weight += d;
   }
 
-  /// Part affichée sur une puce émotion (0 si non sélectionnée).
+  /// Poids affiché sur la puce (réglage engrenage), qu’elle soit sélectionnée ou non.
   static int emotionChipImpactPercent({
     required MentalStateEmotion emotion,
-    required Set<String> selectedIds,
-    required List<MentalStateEmotion> selected,
-    required bool share100,
   }) {
-    if (!selectedIds.contains(emotion.id)) return 0;
-    final w = emotion.weight.clamp(0, 100);
-    if (!share100) return w.round();
-    final sum = selected.fold<double>(
-      0,
-      (s, e) => s + e.weight.clamp(0, 100),
-    );
-    if (sum <= 0) return 0;
-    return (100.0 * w / sum).round().clamp(0, 100);
+    return emotion.weight.clamp(0, 100).round();
   }
 
   static void equalizeEmotionWeights(List<MentalStateEmotion> emotions) {

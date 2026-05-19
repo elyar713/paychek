@@ -6,6 +6,7 @@ import '../auth/post_auth_gate.dart';
 import '../reglage/app_locale_scope.dart';
 import 'web_landing_auth_dialogs.dart';
 import 'web_landing_unauthenticated.dart';
+import '../shared/paychek_frame_callbacks.dart';
 
 /// Web :
 /// - non connecté → landing HTML (`web/landing.html` dans une iframe) ;
@@ -27,7 +28,7 @@ class _WebAuthGateState extends State<WebAuthGate> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    PaychekFrameCallbacks.runPostFrame(() {
       if (!mounted || !kIsWeb || _openedUrlAuth) return;
       final auth = Uri.base.queryParameters['auth']?.toLowerCase().trim();
       if (auth == null) return;
@@ -37,7 +38,7 @@ class _WebAuthGateState extends State<WebAuthGate> {
       } else if (auth == 'login' || auth == 'signin' || auth == 'connexion') {
         showWebLandingLoginDialog(context);
       }
-    });
+    }, context: context);
   }
 
   @override

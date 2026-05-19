@@ -14,11 +14,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Facturation web (Stripe) : URL Payment Link + interrupteur — écriture admin uniquement.
+    // Facturation web (Stripe) : Payment Links (mensuel / trimestriel / annuel) — écriture admin.
     match /paychek_app_config/billing {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && request.auth.token.admin == true
-        && request.resource.data.keys().hasOnly(['stripeCheckoutUrl', 'stripeBillingEnabled', 'updatedAt'])
+        && request.resource.data.keys().hasOnly([
+          'stripeCheckoutUrl',
+          'stripeCheckoutUrlMonthly',
+          'stripeCheckoutUrlQuarterly',
+          'stripeCheckoutUrlAnnual',
+          'stripeBillingEnabled',
+          'updatedAt',
+        ])
         && (!('stripeCheckoutUrl' in request.resource.data) || (
           request.resource.data.stripeCheckoutUrl is string
           && request.resource.data.stripeCheckoutUrl.size() < 2100
@@ -27,8 +34,61 @@ service cloud.firestore {
             || request.resource.data.stripeCheckoutUrl.matches('^https://.+')
           )
         ))
+        && (!('stripeCheckoutUrlMonthly' in request.resource.data) || (
+          request.resource.data.stripeCheckoutUrlMonthly is string
+          && request.resource.data.stripeCheckoutUrlMonthly.size() < 2100
+          && (
+            request.resource.data.stripeCheckoutUrlMonthly == ''
+            || request.resource.data.stripeCheckoutUrlMonthly.matches('^https://.+')
+          )
+        ))
+        && (!('stripeCheckoutUrlQuarterly' in request.resource.data) || (
+          request.resource.data.stripeCheckoutUrlQuarterly is string
+          && request.resource.data.stripeCheckoutUrlQuarterly.size() < 2100
+          && (
+            request.resource.data.stripeCheckoutUrlQuarterly == ''
+            || request.resource.data.stripeCheckoutUrlQuarterly.matches('^https://.+')
+          )
+        ))
+        && (!('stripeCheckoutUrlAnnual' in request.resource.data) || (
+          request.resource.data.stripeCheckoutUrlAnnual is string
+          && request.resource.data.stripeCheckoutUrlAnnual.size() < 2100
+          && (
+            request.resource.data.stripeCheckoutUrlAnnual == ''
+            || request.resource.data.stripeCheckoutUrlAnnual.matches('^https://.+')
+          )
+        ))
         && (!('stripeBillingEnabled' in request.resource.data)
           || request.resource.data.stripeBillingEnabled is bool)
+        && (!('updatedAt' in request.resource.data)
+          || request.resource.data.updatedAt is timestamp);
+      allow delete: if false;
+    }
+
+    // Clés Stripe (pk / sk) — admin uniquement (ne pas exposer sk aux clients).
+    match /paychek_app_config/stripe_keys {
+      allow read, create, update: if request.auth != null && request.auth.token.admin == true
+        && request.resource.data.keys().hasOnly([
+          'stripePublishableKey',
+          'stripeSecretKey',
+          'updatedAt',
+        ])
+        && (!('stripePublishableKey' in request.resource.data) || (
+          request.resource.data.stripePublishableKey is string
+          && request.resource.data.stripePublishableKey.size() < 400
+          && (
+            request.resource.data.stripePublishableKey == ''
+            || request.resource.data.stripePublishableKey.matches('^pk_(test|live)_.+')
+          )
+        ))
+        && (!('stripeSecretKey' in request.resource.data) || (
+          request.resource.data.stripeSecretKey is string
+          && request.resource.data.stripeSecretKey.size() < 400
+          && (
+            request.resource.data.stripeSecretKey == ''
+            || request.resource.data.stripeSecretKey.matches('^sk_(test|live)_.+')
+          )
+        ))
         && (!('updatedAt' in request.resource.data)
           || request.resource.data.updatedAt is timestamp);
       allow delete: if false;

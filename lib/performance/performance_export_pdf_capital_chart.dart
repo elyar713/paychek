@@ -1,9 +1,5 @@
 part of 'performance_export_pdf.dart';
 
-// Palette alignée dashboard / checklist PDF.
-final PdfColor _kCapGrid = PdfColor.fromHex('E2E8F0');
-final PdfColor _kCapMuted = PdfColor.fromHex('64748B');
-
 class _CapitalChartModel {
   const _CapitalChartModel({
     required this.values,
@@ -116,61 +112,54 @@ pw.Widget _capitalEvolutionChartSection(
   double? initialCapital,
 ) {
   final model = _buildCapitalChartModel(trades, initialCapital);
-  final title = _pdfText(l.dashboardCapitalEvolutionTitle.toUpperCase());
-  final subtitle = _pdfText(
-    _p(
-      locale,
-      'Capital cumule (profit + frais), ordre chronologique.',
-      'Cumulative capital (profit + fees), chronological order.',
-      'Capital acumulado (beneficio + comisiones), orden cronologico.',
-      'Kumuliertes Kapital (Gewinn + Gebuehren), chronologisch.',
-      'Capital acumulado (lucro + taxas), ordem cronologica.',
-      '누적 자본(손익+수수료), 시간순.',
-    ),
-  );
-
   return pw.Container(
     padding: const pw.EdgeInsets.all(14),
     decoration: pw.BoxDecoration(
       color: PdfColors.white,
-      border: pw.Border.all(color: _kCapGrid),
-      borderRadius: pw.BorderRadius.circular(12),
+      border: pw.Border.all(color: _kBorder, width: 0.8),
+      borderRadius: pw.BorderRadius.circular(10),
     ),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: [
-        pw.Text(
-          title,
-          style: pw.TextStyle(
-            fontSize: 10,
-            fontWeight: pw.FontWeight.bold,
-            color: _kCapMuted,
-            letterSpacing: 1.1,
-          ),
+        _pdfW(
+          l.dashboardCapitalEvolutionTitle.toUpperCase(),
+          bold: true,
+          fontSize: 10,
+          color: _kAccent,
+          letterSpacing: 0.8,
         ),
         pw.SizedBox(height: 4),
-        pw.Text(
-          subtitle,
-          style: pw.TextStyle(fontSize: 9, color: _kCapMuted),
+        _pdfW(
+          _p(
+            locale,
+            'Capital cumulé (profit + frais), ordre chronologique.',
+            'Cumulative capital (profit + fees), chronological order.',
+            'Capital acumulado (beneficio + comisiones), orden cronológico.',
+            'Kumuliertes Kapital (Gewinn + Gebühren), chronologisch.',
+            'Capital acumulado (lucro + taxas), ordem cronológica.',
+            '누적 자본(손익+수수료), 시간순.',
+          ),
+          fontSize: 9,
+          color: _kMuted,
         ),
         pw.SizedBox(height: 12),
         _capitalEvolutionChartSvg(model),
         if (trades.isEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 8),
-            child: pw.Text(
-              _pdfText(
-                _p(
-                  locale,
-                  'Aucun trade sur la periode selectionnee.',
-                  'No trades in the selected period.',
-                  'Sin operaciones en el periodo seleccionado.',
-                  'Keine Trades im gewaehlten Zeitraum.',
-                  'Nenhum trade no periodo selecionado.',
-                  '선택 기간에 트레이드 없음.',
-                ),
+            child: _pdfW(
+              _p(
+                locale,
+                'Aucun trade sur la période sélectionnée.',
+                'No trades in the selected period.',
+                'Sin operaciones en el período seleccionado.',
+                'Keine Trades im gewählten Zeitraum.',
+                'Nenhum trade no período selecionado.',
+                '선택 기간에 트레이드 없음.',
               ),
-              style: pw.TextStyle(fontSize: 8.5, color: _kCapMuted),
+              fontSize: 8.5,
+              color: _kMuted,
             ),
           ),
       ],
@@ -231,7 +220,7 @@ pw.Widget _capitalEvolutionChartSvg(_CapitalChartModel model) {
     final x = xAt(i).toStringAsFixed(2);
     final y = yAt(model.values[i]).toStringAsFixed(2);
     dots.writeln(
-      '<circle cx="$x" cy="$y" r="2.8" fill="#0F172A" stroke="#FFFFFF" stroke-width="1"/>',
+      '<circle cx="$x" cy="$y" r="2.8" fill="#0D9488" stroke="#FFFFFF" stroke-width="1"/>',
     );
   }
 
@@ -259,7 +248,7 @@ pw.Widget _capitalEvolutionChartSvg(_CapitalChartModel model) {
   <rect x="0" y="0" width="$chartW" height="$chartH" fill="#FFFFFF" rx="6"/>
   $gridLines
   <path d="$area" fill="#E2E8F0" fill-opacity="0.85"/>
-  <path d="$line" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="$line" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   $dots
   $yLabels
   $xLabels

@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import 'ajouter_trade_shell_scope.dart';
 import 'ajouter_trade_strategie_feedback_retroaction.dart';
 import '../strategie/widgets/strategie_setup_cards_content.dart';
+import '../shared/paychek_frame_callbacks.dart';
 
 /// Menu déroulant (overlay) comme le choix de stratégie : rétroaction selon le % « Stratégie respectée ».
 class AjouterTradeStrategieFeedbackMenu extends StatefulWidget {
@@ -61,7 +62,7 @@ class _AjouterTradeStrategieFeedbackMenuState
     if (cleared) {
       // Évite de déclencher un setState du parent pendant son build
       // (le parent écoute souvent ce callback via setState).
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      PaychekFrameCallbacks.runPostFrame(() {
         if (!mounted) return;
         widget.onNonRespectSelectionChanged
             ?.call(Set<String>.from(_nonRespectSelection));

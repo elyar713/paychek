@@ -2,14 +2,17 @@ part of 'performance_export_pdf.dart';
 
 pw.Widget _chipTag(String text, PdfColor fg) {
   return pw.Container(
-    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
     decoration: pw.BoxDecoration(
-      color: PdfColors.grey200,
+      color: _kCardBg,
+      border: pw.Border.all(color: _kBorder, width: 0.6),
       borderRadius: pw.BorderRadius.circular(6),
     ),
-    child: pw.Text(
-      _pdfText(text),
-      style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: fg),
+    child: _pdfW(
+      text,
+      bold: true,
+      fontSize: 8,
+      color: fg,
     ),
   );
 }
@@ -22,10 +25,10 @@ pw.Widget _headerWinrateRow(
   String sourceLine,
 ) {
   return pw.Container(
-    padding: const pw.EdgeInsets.all(14),
+    padding: const pw.EdgeInsets.all(16),
     decoration: pw.BoxDecoration(
-      border: pw.Border.all(color: PdfColors.grey300),
-      borderRadius: pw.BorderRadius.circular(12),
+      border: pw.Border.all(color: _kBorder, width: 0.8),
+      borderRadius: pw.BorderRadius.circular(10),
       color: PdfColors.white,
     ),
     child: pw.Row(
@@ -36,28 +39,24 @@ pw.Widget _headerWinrateRow(
           height: 92,
           decoration: pw.BoxDecoration(
             shape: pw.BoxShape.circle,
-            border: pw.Border.all(color: _cGreen(), width: 6),
+            border: pw.Border.all(color: _kAccent, width: 5),
           ),
           child: pw.Center(
             child: pw.Column(
               mainAxisAlignment: pw.MainAxisAlignment.center,
               children: [
-                pw.Text(
+                _pdfW(
                   '$wrPct%',
-                  style: pw.TextStyle(
-                    fontSize: 20,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.grey900,
-                  ),
+                  bold: true,
+                  fontSize: 22,
+                  color: _kPrimary,
                 ),
-                pw.Text(
+                _pdfW(
                   'WINRATE',
-                  style: pw.TextStyle(
-                    fontSize: 7,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.grey600,
-                    letterSpacing: 0.8,
-                  ),
+                  bold: true,
+                  fontSize: 7,
+                  color: _kMuted,
+                  letterSpacing: 0.9,
                 ),
               ],
             ),
@@ -68,36 +67,36 @@ pw.Widget _headerWinrateRow(
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                _pdfText(sourceLine),
-                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey800),
+              _pdfW(
+                sourceLine,
+                fontSize: 10,
+                color: PdfColors.grey800,
+                height: 1.35,
               ),
-              pw.SizedBox(height: 8),
+              pw.SizedBox(height: 10),
               _legendRow(l.tradeFilterWinner, '${agg.wins}', _cGreen()),
-              pw.SizedBox(height: 4),
+              pw.SizedBox(height: 5),
               _legendRow(l.tradeFilterLoser, '${agg.losses}', _cRed()),
-              pw.SizedBox(height: 4),
+              pw.SizedBox(height: 5),
               _legendRow(l.tradeFilterBreakeven, '${agg.breakeven}', _cGrey()),
+              pw.SizedBox(height: 10),
+              pw.Container(height: 1, color: _kBorder),
               pw.SizedBox(height: 8),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Text(
+                  _pdfW(
                     _p(locale, 'TOTAL TRADES', 'TOTAL TRADES', 'TOTAL DE TRADES', 'TRADES GESAMT', 'TOTAL DE TRADES', '전체 트레이드'),
-                    style: pw.TextStyle(
-                      fontSize: 9,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey600,
-                      letterSpacing: 0.8,
-                    ),
+                    bold: true,
+                    fontSize: 8,
+                    color: _kMuted,
+                    letterSpacing: 0.7,
                   ),
-                  pw.Text(
+                  _pdfW(
                     '${agg.total}',
-                    style: pw.TextStyle(
-                      fontSize: 12,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey900,
-                    ),
+                    bold: true,
+                    fontSize: 14,
+                    color: _kPrimary,
                   ),
                 ],
               ),
@@ -113,14 +112,15 @@ pw.Widget _legendRow(String label, String value, PdfColor dot) {
   return pw.Row(
     children: [
       pw.Container(
-        width: 6,
-        height: 6,
+        width: 7,
+        height: 7,
         decoration: pw.BoxDecoration(color: dot, shape: pw.BoxShape.circle),
       ),
       pw.SizedBox(width: 8),
-      pw.Text(
-        _pdfText('$label $value'),
-        style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800),
+      _pdfW(
+        '$label $value',
+        fontSize: 9,
+        color: PdfColors.grey800,
       ),
     ],
   );
@@ -133,19 +133,22 @@ pw.Widget _horaireRow(Locale locale, String label, double wr, int count) {
       ? '- · $count $w'
       : '${(wr * 100).round()}% WR · $count $w';
   return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 5),
+    padding: const pw.EdgeInsets.only(bottom: 6),
     child: pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
         pw.Expanded(
-          child: pw.Text(
-            _pdfText(label),
-            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey900),
+          child: _pdfW(
+            label,
+            fontSize: 9,
+            color: PdfColors.grey900,
           ),
         ),
-        pw.Text(
-          _pdfText(right),
-          style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: c),
+        _pdfW(
+          right,
+          bold: true,
+          fontSize: 9,
+          color: c,
         ),
       ],
     ),
@@ -159,11 +162,17 @@ pw.Widget _statPdfRow(Locale locale, String label, double wr, int n, PdfColor co
     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
     children: [
       pw.Expanded(
-        child: pw.Text(_pdfText(label), style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey900)),
+        child: _pdfW(
+          label,
+          fontSize: 10,
+          color: PdfColors.grey900,
+        ),
       ),
-      pw.Text(
-        _pdfText(right),
-        style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: color),
+      _pdfW(
+        right,
+        bold: true,
+        fontSize: 9,
+        color: color,
       ),
     ],
   );
@@ -178,26 +187,29 @@ pw.Widget _discBar(Locale locale, String title, double wr, int n, PdfColor barCo
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Expanded(
-            child: pw.Text(
-              _pdfText(title),
-              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey900),
+            child: _pdfW(
+              title,
+              fontSize: 9,
+              color: PdfColors.grey900,
             ),
           ),
-          pw.Text(
+          _pdfW(
             _wrTradeStr(locale, wr, n),
-            style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: barColor),
+            bold: true,
+            fontSize: 9,
+            color: barColor,
           ),
         ],
       ),
-      pw.SizedBox(height: 4),
+      pw.SizedBox(height: 5),
       pw.Container(
-        height: 5,
+        height: 6,
         decoration: pw.BoxDecoration(
           color: PdfColors.grey200,
-          borderRadius: pw.BorderRadius.circular(2),
+          borderRadius: pw.BorderRadius.circular(3),
         ),
         child: n == 0
-            ? pw.SizedBox(height: 5)
+            ? pw.SizedBox(height: 6)
             : pw.Row(
                 children: [
                   pw.Expanded(
@@ -205,7 +217,7 @@ pw.Widget _discBar(Locale locale, String title, double wr, int n, PdfColor barCo
                     child: pw.Container(
                       decoration: pw.BoxDecoration(
                         color: barColor,
-                        borderRadius: pw.BorderRadius.circular(2),
+                        borderRadius: pw.BorderRadius.circular(3),
                       ),
                     ),
                   ),
@@ -238,33 +250,38 @@ pw.Widget _dailyJournalBucketRow(Locale locale, DailyJournalVolumeBucketStat s, 
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           children: [
             pw.Expanded(
-              child: pw.Text(
-                _pdfText(s.label),
-                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey900),
+              child: _pdfW(
+                s.label,
+                bold: true,
+                fontSize: 9,
+                color: PdfColors.grey900,
               ),
             ),
-            pw.Text(
+            _pdfW(
               n > 0 ? '${(s.winRate * 100).round()}% WR' : '—',
-              style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: barColor),
+              bold: true,
+              fontSize: 9,
+              color: barColor,
             ),
           ],
         ),
         pw.Padding(
           padding: const pw.EdgeInsets.only(top: 2),
-          child: pw.Text(
-            _pdfText(sub),
-            style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey600),
+          child: _pdfW(
+            sub,
+            fontSize: 7,
+            color: _kMuted,
           ),
         ),
-        pw.SizedBox(height: 4),
+        pw.SizedBox(height: 5),
         pw.Container(
-          height: 5,
+          height: 6,
           decoration: pw.BoxDecoration(
             color: PdfColors.grey200,
-            borderRadius: pw.BorderRadius.circular(2),
+            borderRadius: pw.BorderRadius.circular(3),
           ),
           child: n == 0
-              ? pw.SizedBox(height: 5)
+              ? pw.SizedBox(height: 6)
               : pw.Row(
                   children: [
                     pw.Expanded(
@@ -272,7 +289,7 @@ pw.Widget _dailyJournalBucketRow(Locale locale, DailyJournalVolumeBucketStat s, 
                       child: pw.Container(
                         decoration: pw.BoxDecoration(
                           color: barColor,
-                          borderRadius: pw.BorderRadius.circular(2),
+                          borderRadius: pw.BorderRadius.circular(3),
                         ),
                       ),
                     ),

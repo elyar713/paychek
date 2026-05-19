@@ -32,7 +32,12 @@ class _AdminConfigPageState extends State<AdminConfigPage>
       'https://europe-west1-paychek-trading.cloudfunctions.net/paychekStripeWebhook';
 
   bool _maintenance = false;
-  final _stripeCheckoutCtrl = TextEditingController();
+  final _stripePublishableKeyCtrl = TextEditingController();
+  final _stripeSecretKeyCtrl = TextEditingController();
+  bool _stripeSecretObscured = true;
+  final _stripeCheckoutMonthlyCtrl = TextEditingController();
+  final _stripeCheckoutQuarterlyCtrl = TextEditingController();
+  final _stripeCheckoutAnnualCtrl = TextEditingController();
   bool _stripeBillingEnabled = true;
   bool _stripeBillingLoading = false;
   bool _stripeBillingSaving = false;
@@ -58,8 +63,27 @@ class _AdminConfigPageState extends State<AdminConfigPage>
   @override
   void dispose() {
     _syncSpinCtrl.dispose();
-    _stripeCheckoutCtrl.dispose();
+    _stripePublishableKeyCtrl.dispose();
+    _stripeSecretKeyCtrl.dispose();
+    _stripeCheckoutMonthlyCtrl.dispose();
+    _stripeCheckoutQuarterlyCtrl.dispose();
+    _stripeCheckoutAnnualCtrl.dispose();
     super.dispose();
+  }
+
+  static bool _isHttpsCheckoutUrl(String raw) {
+    final t = raw.trim();
+    return t.isEmpty || t.startsWith('https://');
+  }
+
+  static bool _isStripePublishableKey(String raw) {
+    final t = raw.trim();
+    return t.isEmpty || RegExp(r'^pk_(test|live)_').hasMatch(t);
+  }
+
+  static bool _isStripeSecretKey(String raw) {
+    final t = raw.trim();
+    return t.isEmpty || RegExp(r'^sk_(test|live)_').hasMatch(t);
   }
 
   Future<void> _openStripeDashboard() async {
@@ -165,17 +189,36 @@ class _AdminConfigPageState extends State<AdminConfigPage>
   Future<void> _loadStripeBilling() async {
     setState(() => _stripeBillingLoading = true);
     try {
-      final snap = await FirebaseFirestore.instance
-          .collection(kPaychekAppConfigCollection)
-          .doc(kPaychekBillingDocId)
-          .get();
+      final col = FirebaseFirestore.instance.collection(
+        kPaychekAppConfigCollection,
+      );
+      final results = await Future.wait([
+        col.doc(kPaychekBillingDocId).get(),
+        col.doc(kPaychekStripeKeysDocId).get(),
+      ]);
       if (!mounted) return;
-      if (snap.exists) {
-        final d = snap.data() ?? {};
-        _stripeCheckoutCtrl.text =
-            '${d[kFieldStripeCheckoutUrl] ?? ''}'.trim();
+      final billingSnap = results[0];
+      final keysSnap = results[1];
+      if (billingSnap.exists) {
+        final d = billingSnap.data() ?? {};
+        _stripeCheckoutMonthlyCtrl.text =
+            '${d[kFieldStripeCheckoutUrlMonthly] ?? ''}'.trim();
+        _stripeCheckoutQuarterlyCtrl.text =
+            '${d[kFieldStripeCheckoutUrlQuarterly] ?? ''}'.trim();
+        var annual = '${d[kFieldStripeCheckoutUrlAnnual] ?? ''}'.trim();
+        if (annual.isEmpty) {
+          annual = '${d[kFieldStripeCheckoutUrl] ?? ''}'.trim();
+        }
+        _stripeCheckoutAnnualCtrl.text = annual;
         final en = d[kFieldStripeBillingEnabled];
         _stripeBillingEnabled = en is! bool || en == true;
+      }
+      if (keysSnap.exists) {
+        final k = keysSnap.data() ?? {};
+        _stripePublishableKeyCtrl.text =
+            '${k[kFieldStripePublishableKey] ?? ''}'.trim();
+        _stripeSecretKeyCtrl.text =
+            '${k[kFieldStripeSecretKey] ?? ''}'.trim();
       }
     } catch (e) {
       if (mounted) {
@@ -189,30 +232,92 @@ class _AdminConfigPageState extends State<AdminConfigPage>
   }
 
   Future<void> _saveStripeBilling() async {
-    final raw = _stripeCheckoutCtrl.text.trim();
+    final monthly = _stripeCheckoutMonthlyCtrl.text.trim();
+    final quarterly = _stripeCheckoutQuarterlyCtrl.text.trim();
+    final annual = _stripeCheckoutAnnualCtrl.text.trim();
+    final pk = _stripePublishableKeyCtrl.text.trim();
+    final sk = _stripeSecretKeyCtrl.text.trim();
+    for (final entry in [
+      ('Mensuel', monthly),
+      ('Trimestriel', quarterly),
+      ('Annuel', annual),
+    ]) {
+      if (!_isHttpsCheckoutUrl(entry.$2)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Lien ${entry.$1} : doit commencer par https://',
+              ),
+            ),
+          );
+        }
+        return;
+      }
+    }
     if (_stripeBillingEnabled &&
-        raw.isNotEmpty &&
-        !raw.startsWith('https://')) {
+        monthly.isEmpty &&
+        quarterly.isEmpty &&
+        annual.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('URL : doit commencer par https://')),
+          const SnackBar(
+            content: Text(
+              'Renseigne au moins un Payment Link Stripe (mensuel, '
+              'trimestriel ou annuel).',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+    if (!_isStripePublishableKey(pk)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Clé publique : format pk_test_… ou pk_live_…'),
+          ),
+        );
+      }
+      return;
+    }
+    if (!_isStripeSecretKey(sk)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Clé secrète : format sk_test_… ou sk_live_…'),
+          ),
         );
       }
       return;
     }
     setState(() => _stripeBillingSaving = true);
     try {
-      await FirebaseFirestore.instance
-          .collection(kPaychekAppConfigCollection)
-          .doc(kPaychekBillingDocId)
-          .set(
-            {
-              kFieldStripeCheckoutUrl: raw,
-              kFieldStripeBillingEnabled: _stripeBillingEnabled,
-              'updatedAt': Timestamp.now(),
-            },
-            SetOptions(merge: true),
-          );
+      final col = FirebaseFirestore.instance.collection(
+        kPaychekAppConfigCollection,
+      );
+      final now = Timestamp.now();
+      await Future.wait([
+        col.doc(kPaychekBillingDocId).set(
+          {
+            kFieldStripeCheckoutUrlMonthly: monthly,
+            kFieldStripeCheckoutUrlQuarterly: quarterly,
+            kFieldStripeCheckoutUrlAnnual: annual,
+            kFieldStripeCheckoutUrl: annual,
+            kFieldStripeBillingEnabled: _stripeBillingEnabled,
+            'updatedAt': now,
+          },
+          SetOptions(merge: true),
+        ),
+        col.doc(kPaychekStripeKeysDocId).set(
+          {
+            kFieldStripePublishableKey: pk,
+            kFieldStripeSecretKey: sk,
+            'updatedAt': now,
+          },
+          SetOptions(merge: true),
+        ),
+      ]);
       PaychekBillingRemote.invalidateCache();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -369,6 +474,22 @@ class _AdminConfigPageState extends State<AdminConfigPage>
     );
   }
 
+  Widget _stripePaymentLinkField({
+    required String title,
+    required String subtitle,
+    required TextEditingController controller,
+    required String hint,
+  }) {
+    return _StripePaymentLinkField(
+      title: title,
+      subtitle: subtitle,
+      controller: controller,
+      hint: hint,
+      enabled: !_stripeBillingSaving,
+      decoration: _monoFieldDecoration,
+    );
+  }
+
   Widget _billingCard({
     required DateFormat dfPay,
   }) {
@@ -435,14 +556,111 @@ class _AdminConfigPageState extends State<AdminConfigPage>
             Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
             const SizedBox(height: 22),
             Text(
-              'Paywall URL',
+              'Clé publique Stripe',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
+            Text(
+              'pk_test_… ou pk_live_… — stockée dans Firestore (accès admin).',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (_stripeBillingLoading)
+              const SizedBox(height: 48)
+            else
+              TextField(
+                controller: _stripePublishableKeyCtrl,
+                enabled: !_stripeBillingSaving,
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  color: const Color(0xFFCBD5E1),
+                ),
+                decoration: _monoFieldDecoration(
+                  hint: 'pk_live_xxxxxxxxxxxxxxxxxxxxxxxx',
+                ),
+              ),
+            const SizedBox(height: 18),
+            Text(
+              'Clé secrète Stripe',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'sk_test_… ou sk_live_… — document admin uniquement. '
+              'Pour les webhooks, copiez aussi dans le secret Firebase '
+              'PAYCHEK_STRIPE_SECRET_KEY.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (_stripeBillingLoading)
+              const SizedBox(height: 48)
+            else
+              TextField(
+                controller: _stripeSecretKeyCtrl,
+                enabled: !_stripeBillingSaving,
+                obscureText: _stripeSecretObscured,
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  color: const Color(0xFFCBD5E1),
+                ),
+                decoration: _monoFieldDecoration(
+                  hint: 'Coller la clé secrète Stripe (sk_test_… ou sk_live_…)',
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    tooltip: _stripeSecretObscured
+                        ? 'Afficher'
+                        : 'Masquer',
+                    onPressed: () => setState(
+                      () => _stripeSecretObscured = !_stripeSecretObscured,
+                    ),
+                    icon: Icon(
+                      _stripeSecretObscured
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.white.withValues(alpha: 0.45),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 22),
+            Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+            const SizedBox(height: 22),
+            Text(
+              'Payment Links Stripe',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Un lien buy.stripe.com par tarif (mensuel 8,99 \$ · '
+              'trimestriel 20,97 \$ · annuel 59,99 \$).',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 14),
             if (_stripeBillingLoading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -458,14 +676,25 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                 ),
               )
             else ...[
-              TextField(
-                controller: _stripeCheckoutCtrl,
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 12,
-                  color: const Color(0xFFCBD5E1),
-                ),
-                maxLines: 2,
-                decoration: _monoFieldDecoration(),
+              _stripePaymentLinkField(
+                title: 'Mensuel',
+                subtitle: '8,99 \$ / mois',
+                controller: _stripeCheckoutMonthlyCtrl,
+                hint: 'https://buy.stripe.com/…',
+              ),
+              const SizedBox(height: 14),
+              _stripePaymentLinkField(
+                title: 'Trimestriel',
+                subtitle: '20,97 \$ / 3 mois',
+                controller: _stripeCheckoutQuarterlyCtrl,
+                hint: 'https://buy.stripe.com/…',
+              ),
+              const SizedBox(height: 14),
+              _stripePaymentLinkField(
+                title: 'Annuel',
+                subtitle: '59,99 \$ / an',
+                controller: _stripeCheckoutAnnualCtrl,
+                hint: 'https://buy.stripe.com/…',
               ),
               const SizedBox(height: 18),
               Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
@@ -587,9 +816,16 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                 children: [
                   const SizedBox(height: 8),
                   _ConfigStripeRow(
-                    label: 'Clé secrète Stripe',
+                    label: 'Clés Firestore',
                     value:
-                        'Secret Firebase PAYCHEK_STRIPE_SECRET_KEY (sk_live_… / sk_test_…).',
+                        'paychek_app_config/stripe_keys (champs ci-dessus).',
+                  ),
+                  const SizedBox(height: 8),
+                  _ConfigStripeRow(
+                    label: 'Secret Functions',
+                    value:
+                        'firebase functions:secrets:set PAYCHEK_STRIPE_SECRET_KEY '
+                        '(même sk que ci-dessus pour les webhooks).',
                   ),
                   const SizedBox(height: 8),
                   _ConfigStripeRow(
@@ -601,7 +837,8 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                   _ConfigStripeRow(
                     label: 'URL checkout (priorités)',
                     value:
-                        '1) dart-define PAYCHEK_STRIPE_CHECKOUT_URL  2) Firestore (champ ci-dessus).',
+                        '1) dart-define PAYCHEK_STRIPE_CHECKOUT_URL_*  '
+                        '2) Firestore stripeCheckoutUrlMonthly|Quarterly|Annual.',
                   ),
                   const SizedBox(height: 8),
                   _ConfigStripeRow(
@@ -1205,6 +1442,64 @@ class _AdminConfigPageState extends State<AdminConfigPage>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StripePaymentLinkField extends StatelessWidget {
+  const _StripePaymentLinkField({
+    required this.title,
+    required this.subtitle,
+    required this.controller,
+    required this.hint,
+    required this.enabled,
+    required this.decoration,
+  });
+
+  final String title;
+  final String subtitle;
+  final TextEditingController controller;
+  final String hint;
+  final bool enabled;
+  final InputDecoration Function({String? hint}) decoration;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              subtitle,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                color: Colors.white.withValues(alpha: 0.45),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          enabled: enabled,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 12,
+            color: const Color(0xFFCBD5E1),
+          ),
+          maxLines: 2,
+          decoration: decoration(hint: hint),
+        ),
+      ],
     );
   }
 }

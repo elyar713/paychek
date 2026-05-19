@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../performance/performance_locale_copy.dart';
 import 'analyse_controller.dart';
 import 'analyse_models.dart';
 import 'analyse_phase_locale.dart';

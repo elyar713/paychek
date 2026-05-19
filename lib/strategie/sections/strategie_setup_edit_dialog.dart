@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../l10n/app_localizations.dart';
 import '../strategie_tokens.dart';
 import '../widgets/strategie_setup_card.dart';
+import '../widgets/strategie_setup_rule_styles.dart';
 import 'strategie_setup_edit_dialog_models.dart';
 import 'strategie_setup_edit_dialog_tag_field.dart';
 
@@ -60,6 +61,23 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
   late List<String> _cible;
   late List<String> _gestion;
 
+  final _timeframesFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _indicatorsFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _patternsFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _signalsFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _entreeFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _invalidationFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _cibleFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+  final _gestionFieldKey = GlobalKey<StrategieSetupTagFieldState>();
+
+  List<String> _tagsIncludingPending(
+    GlobalKey<StrategieSetupTagFieldState> key,
+    List<String> fallback,
+  ) {
+    return key.currentState?.tagsIncludingPending() ??
+        List<String>.from(fallback);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -111,18 +129,19 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
   void _submit() {
     final name = _nameC.text.trim();
     if (name.isEmpty) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     Navigator.of(context).pop(
       StrategieSetupEditDialogResult(
         modelName: name,
         dotColor: _dotColor,
-        timeframes: List<String>.from(_timeframes),
-        indicators: List<String>.from(_indicators),
-        patterns: List<String>.from(_patterns),
-        signals: List<String>.from(_signals),
-        entreePrecise: List<String>.from(_entree),
-        invalidation: List<String>.from(_invalidation),
-        cible: List<String>.from(_cible),
-        gestion: List<String>.from(_gestion),
+        timeframes: _tagsIncludingPending(_timeframesFieldKey, _timeframes),
+        indicators: _tagsIncludingPending(_indicatorsFieldKey, _indicators),
+        patterns: _tagsIncludingPending(_patternsFieldKey, _patterns),
+        signals: _tagsIncludingPending(_signalsFieldKey, _signals),
+        entreePrecise: _tagsIncludingPending(_entreeFieldKey, _entree),
+        invalidation: _tagsIncludingPending(_invalidationFieldKey, _invalidation),
+        cible: _tagsIncludingPending(_cibleFieldKey, _cible),
+        gestion: _tagsIncludingPending(_gestionFieldKey, _gestion),
       ),
     );
   }
@@ -271,6 +290,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                               Text(l.strategieTimeframes, style: _labelStyle),
                               const SizedBox(height: 8),
                               StrategieSetupTagField(
+                                key: _timeframesFieldKey,
                                 tags: _timeframes,
                                 hintText: l.strategieHintTimeframeTag,
                                 onChanged: (l) => setState(() => _timeframes = l),
@@ -286,6 +306,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                               Text(l.strategieIndicators, style: _labelStyle),
                               const SizedBox(height: 8),
                               StrategieSetupTagField(
+                                key: _indicatorsFieldKey,
                                 tags: _indicators,
                                 hintText: l.strategieHintIndicatorTag,
                                 onChanged: (l) => setState(() => _indicators = l),
@@ -299,6 +320,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     Text(l.strategiePatternFigure, style: _labelStyle),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _patternsFieldKey,
                       tags: _patterns,
                       hintText: l.strategieHintPattern,
                       onChanged: (l) => setState(() => _patterns = l),
@@ -307,6 +329,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     Text(l.strategieAlertSignal, style: _labelStyle),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _signalsFieldKey,
                       tags: _signals,
                       hintText: l.strategieHintSignal,
                       onChanged: (l) => setState(() => _signals = l),
@@ -315,10 +338,10 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     _iconSectionHeader(
                       LucideIcons.crosshair,
                       l.strategieRuleEntryPrecise,
-                      Colors.white,
                     ),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _entreeFieldKey,
                       tags: _entree,
                       hintText: l.strategieHintEntry,
                       onChanged: (l) => setState(() => _entree = l),
@@ -327,10 +350,10 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     _iconSectionHeader(
                       LucideIcons.shield,
                       l.strategieRuleInvalidation,
-                      StrategieTokens.riskRed,
                     ),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _invalidationFieldKey,
                       tags: _invalidation,
                       hintText: l.strategieHintInvalidation,
                       onChanged: (l) => setState(() => _invalidation = l),
@@ -339,10 +362,10 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     _iconSectionHeader(
                       LucideIcons.circleDot,
                       l.strategieRuleTarget,
-                      StrategieTokens.emerald,
                     ),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _cibleFieldKey,
                       tags: _cible,
                       hintText: l.strategieHintTarget,
                       onChanged: (l) => setState(() => _cible = l),
@@ -351,10 +374,10 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                     _iconSectionHeader(
                       LucideIcons.lock,
                       l.strategieRuleManagement,
-                      StrategieTokens.labelMuted,
                     ),
                     const SizedBox(height: 8),
                     StrategieSetupTagField(
+                      key: _gestionFieldKey,
                       tags: _gestion,
                       hintText: l.strategieHintManagement,
                       onChanged: (l) => setState(() => _gestion = l),
@@ -429,19 +452,25 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
     );
   }
 
-  Widget _iconSectionHeader(IconData icon, String title, Color color) {
+  Widget _iconSectionHeader(IconData icon, String title) {
+    final headingColor = StrategieSetupRuleStyles.headingColorForIcon(icon);
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: color),
-        const SizedBox(width: 8),
+        Icon(
+          icon,
+          size: StrategieSetupRuleStyles.iconSize,
+          color: StrategieSetupRuleStyles.iconColorForIcon(icon),
+        ),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             title,
             style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.6,
-              color: color,
+              letterSpacing: 0.5,
+              color: headingColor,
             ),
           ),
         ),

@@ -7,6 +7,7 @@ import 'dart:async' show unawaited;
 
 import '../l10n/app_localizations.dart';
 import '../reglage/paychek_password_reset_sent_dialog.dart';
+import '../shared/paychek_frame_callbacks.dart';
 
 const _kCardBlack = Color(0xFF0A0A0A);
 const _kAuthDialogRadius = 40.0;
@@ -140,13 +141,15 @@ class _WebLandingPasswordResetDialogState
     super.dispose();
   }
 
-  void _showSentConfirmation() {
+  bool _showSentConfirmation() {
+    if (!mounted) return false;
+    final caller = widget.callerContext;
     _popDialog(widget.dialogCtx);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.callerContext.mounted) {
-        unawaited(showPaychekPasswordResetSentDialog(widget.callerContext));
-      }
-    });
+    PaychekFrameCallbacks.runPostFrame(
+      () => unawaited(showPaychekPasswordResetSentDialog(caller)),
+      context: caller,
+    );
+    return true;
   }
 
   Future<void> _send() async {
@@ -157,16 +160,17 @@ class _WebLandingPasswordResetDialogState
       return;
     }
     setState(() => _busy = true);
+    var closedDialog = false;
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       if (!mounted) return;
-      _showSentConfirmation();
+      closedDialog = _showSentConfirmation();
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       final l10nAfter = AppLocalizations.of(context)!;
       final code = e.code.trim().toLowerCase();
       if (code == 'user-not-found') {
-        _showSentConfirmation();
+        closedDialog = _showSentConfirmation();
         return;
       }
       if (code == 'too-many-requests') {
@@ -187,7 +191,7 @@ class _WebLandingPasswordResetDialogState
       final l10nAfter = AppLocalizations.of(context)!;
       widget.snackAuthFailure(e, l10nAfter);
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted && !closedDialog) setState(() => _busy = false);
     }
   }
 

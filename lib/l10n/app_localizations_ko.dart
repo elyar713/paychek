@@ -2233,6 +2233,37 @@ class AppLocalizationsKo extends AppLocalizations {
   String get profileEditInvalidEmailSnack => '올바른 이메일 주소를 입력하세요';
 
   @override
+  String get accountChangePasswordButton => '비밀번호 변경';
+
+  @override
+  String get accountChangePasswordDialogTitle => '비밀번호 변경';
+
+  @override
+  String get accountChangePasswordCurrentLabel => '현재 비밀번호';
+
+  @override
+  String get accountChangePasswordNewLabel => '새 비밀번호';
+
+  @override
+  String get accountChangePasswordConfirmLabel => '새 비밀번호 확인';
+
+  @override
+  String get accountChangePasswordCta => '저장';
+
+  @override
+  String get accountChangePasswordSuccessSnack => '비밀번호가 업데이트되었습니다';
+
+  @override
+  String get accountChangePasswordCurrentMissing => '현재 비밀번호를 입력하세요';
+
+  @override
+  String get accountChangePasswordRequiresRecentLogin =>
+      '보안을 위해 다시 로그인한 후 다시 시도하세요.';
+
+  @override
+  String get accountChangePasswordForgotLink => '비밀번호를 잊으셨나요?';
+
+  @override
   String get accountAuthSectionTitle => '로그인';
 
   @override

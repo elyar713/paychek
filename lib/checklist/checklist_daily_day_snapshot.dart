@@ -2,19 +2,25 @@
 class ChecklistDailyDaySnapshot {
   const ChecklistDailyDaySnapshot({
     required this.percent,
-    this.uncheckedItemIds = const [],
+    this.uncheckedEntries = const [],
   });
 
   final int percent;
-  final List<String> uncheckedItemIds;
+
+  /// Libellés figés au moment de la clôture (ou avant suppression).
+  final List<ChecklistUncheckedDayEntry> uncheckedEntries;
+
+  List<String> get uncheckedItemIds => [
+        for (final e in uncheckedEntries) e.itemId,
+      ];
 
   ChecklistDailyDaySnapshot copyWith({
     int? percent,
-    List<String>? uncheckedItemIds,
+    List<ChecklistUncheckedDayEntry>? uncheckedEntries,
   }) {
     return ChecklistDailyDaySnapshot(
       percent: percent ?? this.percent,
-      uncheckedItemIds: uncheckedItemIds ?? this.uncheckedItemIds,
+      uncheckedEntries: uncheckedEntries ?? this.uncheckedEntries,
     );
   }
 }

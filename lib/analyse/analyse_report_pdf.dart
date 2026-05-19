@@ -5,8 +5,43 @@ import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import '../l10n/app_localizations.dart';
+import '../shared/paychek_pdf_fonts.dart';
+import '../shared/paychek_pdf_text.dart';
+import 'analyse_report_label_locale.dart';
+import 'analyse_report_pdf_copy.dart';
 import 'analyse_report_pdf_platform.dart' as pdf_platform;
 import 'analyse_report_snapshot.dart';
+
+bool _pdfKo = false;
+
+bool _koFor(String text) => _pdfKo || paychekPdfTextHasHangul(text);
+
+String _norm(String? v) => paychekPdfNormalize(v);
+
+pw.Widget _w(
+  String? text, {
+  bool bold = false,
+  double fontSize = 9,
+  PdfColor? color,
+  double? height,
+  double? letterSpacing,
+  pw.FontStyle fontStyle = pw.FontStyle.normal,
+  pw.TextAlign? textAlign,
+}) {
+  final t = _norm(text);
+  return PaychekPdfFonts.text(
+    t,
+    preferHangulPrimary: _koFor(t),
+    fontSize: fontSize,
+    bold: bold,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+    fontStyle: fontStyle,
+    textAlign: textAlign,
+  );
+}
 
 String _safePdfFileName(AnalyseReportSnapshot s) {
   final raw = '${s.actif}_${s.sousTitre}'.trim();
@@ -15,102 +50,75 @@ String _safePdfFileName(AnalyseReportSnapshot s) {
   return '${base.isEmpty ? 'analyse' : base}_rapport.pdf';
 }
 
-/// Texte lisible avec la police PDF standard (Helvetica).
-String _ascii(String? v) {
-  var x = (v ?? '').trim();
-  x = x.replaceAll(RegExp(r'[\u00A0\u2007\u202F]'), ' ');
-  x = x.replaceAll('×', 'x');
-  x = x.replaceAll(RegExp(r'[«»]'), '"');
-  x = x.replaceAll(RegExp(r'[\u2018\u2019\u201A\u201B]'), "'");
-  x = x.replaceAll(RegExp(r'[\u201C\u201D\u201E\u201F]'), '"');
-  x = x.replaceAll(RegExp(r'[\u2013\u2014\u2212]'), '-');
-  x = x.replaceAll('…', '...');
-  x = x.replaceAll('•', '-');
-  const map = <String, String>{
-    'é': 'e',
-    'è': 'e',
-    'ê': 'e',
-    'ë': 'e',
-    'É': 'E',
-    'à': 'a',
-    'â': 'a',
-    'À': 'A',
-    'ù': 'u',
-    'û': 'u',
-    'Ù': 'U',
-    'î': 'i',
-    'ï': 'i',
-    'Î': 'I',
-    'ô': 'o',
-    'ö': 'o',
-    'Ô': 'O',
-    'ç': 'c',
-    'Ç': 'C',
-    'œ': 'oe',
-    'Œ': 'OE',
-  };
-  map.forEach((k, v2) => x = x.replaceAll(k, v2));
-  final out = StringBuffer();
-  for (final r in x.runes) {
-    if (r <= 0x7F) {
-      out.writeCharCode(r);
-    } else {
-      out.write('?');
-    }
-  }
-  final t = out.toString().trim();
-  return t.isEmpty ? '-' : t;
-}
-
 PdfColor _kGold() => PdfColor.fromInt(0xFFC9A227);
 PdfColor _kGoldMuted() => PdfColor.fromInt(0xFF8B6914);
-PdfColor _badgeBg(AnalyseReportSnapshot s) {
-  final b = s.biasLabel.toLowerCase();
-  if (b.contains('achat') || b.contains('long') || b.contains('buy')) {
+
+PdfColor _badgeBg(String biasLabel) {
+  final b = biasLabel.toLowerCase();
+  if (b.contains('achat') ||
+      b.contains('long') ||
+      b.contains('buy') ||
+      b.contains('compra') ||
+      b.contains('kauf') ||
+      b.contains('매수')) {
     return PdfColor.fromInt(0xFF15803D);
   }
-  if (b.contains('vente') || b.contains('short') || b.contains('sell')) {
+  if (b.contains('vente') ||
+      b.contains('short') ||
+      b.contains('sell') ||
+      b.contains('venda') ||
+      b.contains('verkauf') ||
+      b.contains('매도')) {
     return PdfColor.fromInt(0xFFDC2626);
   }
   return PdfColors.grey700;
 }
 
 String _dashOr(String? v) {
-  final a = _ascii(v);
-  return a == '-' ? '-' : a;
+  final a = _norm(v);
+  return a.isEmpty ? '—' : a;
 }
 
-String _executiveParagraph(AnalyseReportSnapshot s) {
+String _executiveParagraph(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
+) {
   if (s.noteContexte.trim().isNotEmpty) {
     return s.noteContexte.trim();
   }
   final parts = <String>[];
   if (s.gaugeContextEnabled) {
     parts.add(
-      'Analyse ${_ascii(s.contexteTfLine)} : tendance ${_ascii(s.trendLabel)}, phase ${_ascii(s.phaseLabel)}.',
+      copy.executiveContextLine(
+        _dashOr(s.contexteTfLine),
+        labels.trend(s.trendLabel),
+        labels.phase(s.phaseLabel),
+      ),
     );
   }
   if (s.gaugeStructureEnabled) {
     parts.add(
-      'Structure ${_ascii(s.structureTf)} - ${_ascii(s.chartisme)}. Supports / resistances : ${_ascii(s.support)} / ${_ascii(s.resistance)}.',
+      copy.executiveStructureLine(
+        _dashOr(s.structureTf),
+        _dashOr(s.chartisme),
+        _dashOr(s.support),
+        _dashOr(s.resistance),
+      ),
     );
   }
   if (parts.isEmpty) {
-    return 'Rapport Mon Analyse - confiance globale ${s.globalConfidencePercent} %.';
+    return copy.executiveFallback(s.globalConfidencePercent);
   }
   return parts.join(' ');
 }
 
-String _footerNote(AnalyseReportSnapshot s) {
+String _footerNote(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
   final lowS = s.gaugeStructure < 55;
   final lowSmc = s.gaugeSmc < 55;
-  if (lowS && lowSmc) {
-    return 'Note : la confiance structurelle et SMC reste moderee en attente d\'un retest confirme du scenario.';
-  }
-  if (lowS || lowSmc) {
-    return 'Note : une ou plusieurs sections affichent une confiance moderee - croiser avec le prix avant engagement.';
-  }
-  return 'Note : confiance par section avec impact pondere (${s.gaugeImpactFeuille} % / section active typique).';
+  if (lowS && lowSmc) return copy.footerNoteLowBoth();
+  if (lowS || lowSmc) return copy.footerNoteLowOne();
+  return copy.footerNoteDefault(s.gaugeImpactFeuille);
 }
 
 pw.Widget _templateCard({required List<pw.Widget> children}) {
@@ -129,7 +137,12 @@ pw.Widget _templateCard({required List<pw.Widget> children}) {
   );
 }
 
-pw.Widget _pdfHeader(AnalyseReportSnapshot s) {
+pw.Widget _pdfHeader(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
+) {
+  final bias = labels.bias(s.biasLabel);
   return pw.Container(
     margin: const pw.EdgeInsets.only(bottom: 14),
     child: pw.Row(
@@ -139,27 +152,14 @@ pw.Widget _pdfHeader(AnalyseReportSnapshot s) {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                _ascii(s.actif).toUpperCase(),
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.grey900,
-                ),
-              ),
+              _w(s.actif, fontSize: 20, bold: true, color: PdfColors.grey900),
               pw.SizedBox(height: 4),
-              pw.Text(
-                _ascii(s.sousTitre),
-                style: pw.TextStyle(
-                  fontSize: 11,
-                  fontWeight: pw.FontWeight.bold,
-                  color: _kGoldMuted(),
-                ),
-              ),
+              _w(s.sousTitre, fontSize: 11, bold: true, color: _kGoldMuted()),
               pw.SizedBox(height: 6),
-              pw.Text(
-                _ascii('Date de l\'analyse : ${_dashOr(s.contexteDateLabel)}'),
-                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+              _w(
+                copy.analysisDateLabel(_dashOr(s.contexteDateLabel)),
+                fontSize: 9,
+                color: PdfColors.grey600,
               ),
             ],
           ),
@@ -167,17 +167,15 @@ pw.Widget _pdfHeader(AnalyseReportSnapshot s) {
         pw.Container(
           padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: pw.BoxDecoration(
-            color: _badgeBg(s),
+            color: _badgeBg(bias),
             borderRadius: pw.BorderRadius.circular(20),
           ),
-          child: pw.Text(
-            _ascii('DIRECTION : ${s.biasLabel}'),
-            style: pw.TextStyle(
-              fontSize: 9,
-              fontWeight: pw.FontWeight.bold,
-              color: PdfColors.white,
-              letterSpacing: 0.3,
-            ),
+          child: _w(
+            '${copy.directionPrefix} : $bias',
+            fontSize: 9,
+            bold: true,
+            color: PdfColors.white,
+            letterSpacing: 0.3,
           ),
         ),
       ],
@@ -185,7 +183,7 @@ pw.Widget _pdfHeader(AnalyseReportSnapshot s) {
   );
 }
 
-pw.Widget _confidenceDonut(AnalyseReportSnapshot s) {
+pw.Widget _confidenceDonut(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
   final p = s.globalConfidencePercent.clamp(0, 100);
   final rest = (100 - p).clamp(0, 100);
   final v1 = p <= 0 ? 0.001 : p.toDouble();
@@ -218,22 +216,13 @@ pw.Widget _confidenceDonut(AnalyseReportSnapshot s) {
         child: pw.Column(
           mainAxisAlignment: pw.MainAxisAlignment.center,
           children: [
-            pw.Text(
-              '$p%',
-              style: pw.TextStyle(
-                fontSize: 16,
-                fontWeight: pw.FontWeight.bold,
-                color: _kGold(),
-              ),
-            ),
-            pw.Text(
-              'CONFIANCE',
-              style: pw.TextStyle(
-                fontSize: 7,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.grey700,
-                letterSpacing: 0.6,
-              ),
+            _w('$p%', fontSize: 16, bold: true, color: _kGold()),
+            _w(
+              copy.confidenceDonutLabel,
+              fontSize: 7,
+              bold: true,
+              color: PdfColors.grey700,
+              letterSpacing: 0.6,
             ),
           ],
         ),
@@ -242,35 +231,35 @@ pw.Widget _confidenceDonut(AnalyseReportSnapshot s) {
   );
 }
 
-pw.Widget _executiveSummaryBlock(AnalyseReportSnapshot s) {
+pw.Widget _executiveSummaryBlock(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
+) {
   return _templateCard(
     children: [
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _confidenceDonut(s),
+          _confidenceDonut(s, copy),
           pw.SizedBox(width: 16),
           pw.Expanded(
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'RESUME EXECUTIF',
-                  style: pw.TextStyle(
-                    fontSize: 11,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.grey900,
-                    letterSpacing: 0.8,
-                  ),
+                _w(
+                  copy.executiveSummaryTitle,
+                  fontSize: 11,
+                  bold: true,
+                  color: PdfColors.grey900,
+                  letterSpacing: 0.8,
                 ),
                 pw.SizedBox(height: 8),
-                pw.Text(
-                  _ascii(_executiveParagraph(s)),
-                  style: const pw.TextStyle(
-                    fontSize: 9,
-                    color: PdfColors.grey800,
-                    height: 1.4,
-                  ),
+                _w(
+                  _executiveParagraph(s, copy, labels),
+                  fontSize: 9,
+                  color: PdfColors.grey800,
+                  height: 1.4,
                 ),
               ],
             ),
@@ -281,98 +270,98 @@ pw.Widget _executiveSummaryBlock(AnalyseReportSnapshot s) {
   );
 }
 
-pw.Widget _twoColumnTrendStructure(AnalyseReportSnapshot s) {
+pw.Widget _twoColumnTrendStructure(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
+) {
   final left = <pw.Widget>[
-    pw.Text(
-      'FEUILLE & TENDANCE',
-      style: pw.TextStyle(
-        fontSize: 10,
-        fontWeight: pw.FontWeight.bold,
-        color: PdfColors.grey900,
-        letterSpacing: 0.5,
-      ),
+    _w(
+      copy.feuilleTendanceSection,
+      fontSize: 10,
+      bold: true,
+      color: PdfColors.grey900,
+      letterSpacing: 0.5,
     ),
     pw.SizedBox(height: 8),
     if (s.gaugeContextEnabled) ...[
-      _kvPdf('Timeframe', _dashOr(s.contexteTfLine)),
-      _kvPdf('Tendance', _dashOr(s.trendLabel), valueColor: PdfColors.green700),
-      _kvPdf('Phase', _dashOr(s.phaseLabel)),
+      _kvPdf(copy.l.analyseTimeframeLabelShort, _dashOr(s.contexteTfLine)),
+      _kvPdf(
+        copy.l.analyseTrend,
+        labels.trend(s.trendLabel),
+        valueColor: PdfColors.green700,
+      ),
+      _kvPdf(copy.l.analysePhase, labels.phase(s.phaseLabel)),
       if (s.noteContexte.isNotEmpty) _italicNote(s.noteContexte),
     ] else
-      pw.Text(
-        _ascii('Section desactivee.'),
-        style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-      ),
+      _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
   ];
 
   final right = <pw.Widget>[
-    pw.Text(
-      'STRUCTURE ${_ascii(s.structureTf).toUpperCase()}',
-      style: pw.TextStyle(
-        fontSize: 10,
-        fontWeight: pw.FontWeight.bold,
-        color: PdfColors.grey900,
-        letterSpacing: 0.5,
-      ),
+    _w(
+      copy.structureTitle(s.structureTf),
+      fontSize: 10,
+      bold: true,
+      color: PdfColors.grey900,
+      letterSpacing: 0.5,
     ),
     pw.SizedBox(height: 8),
     if (s.gaugeStructureEnabled) ...[
-      _kvPdf('Signal / dernier point', _dashOr(s.chartisme)),
+      _kvPdf(copy.signalLastPoint, _dashOr(s.chartisme)),
       _kvPdf(
-        'Support',
-        '${_dashOr(s.support)}${_structureTestedSuffix(s.structureSupportTested)}',
+        copy.l.analyseSupport,
+        '${_dashOr(s.support)}${_structureTestedSuffix(s.structureSupportTested, copy)}',
       ),
       _kvPdf(
-        'Resistance',
-        '${_dashOr(s.resistance)}${_structureTestedSuffix(s.structureResistanceTested)}',
+        copy.l.analyseResistShort,
+        '${_dashOr(s.resistance)}${_structureTestedSuffix(s.structureResistanceTested, copy)}',
       ),
       if (s.noteStructure.isNotEmpty) _italicNote(s.noteStructure),
     ] else
-      pw.Text(
-        _ascii('Section desactivee.'),
-        style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-      ),
+      _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
   ];
 
   return pw.Row(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
-      pw.Expanded(
-        child: _templateCard(children: left),
-      ),
+      pw.Expanded(child: _templateCard(children: left)),
       pw.SizedBox(width: 10),
-      pw.Expanded(
-        child: _templateCard(children: right),
-      ),
+      pw.Expanded(child: _templateCard(children: right)),
     ],
   );
 }
 
-String _structureTestedSuffix(bool? tested) {
-  if (tested == null) return '';
-  return tested ? ' (Teste x2)' : '';
+String _structureTestedSuffix(bool? tested, AnalyseReportPdfCopy copy) {
+  if (tested != true) return '';
+  return copy.testedSuffix();
 }
 
 pw.Widget _kvPdf(String k, String v, {PdfColor? valueColor}) {
+  final key = _norm(k);
+  final val = _norm(v);
   return pw.Padding(
     padding: const pw.EdgeInsets.only(bottom: 5),
     child: pw.RichText(
       text: pw.TextSpan(
         children: [
           pw.TextSpan(
-            text: '${_ascii(k)} : ',
-            style: pw.TextStyle(
+            text: '$key : ',
+            style: PaychekPdfFonts.style(
+              text: '$key : ',
+              preferHangulPrimary: _koFor(key),
               fontSize: 9,
-              fontWeight: pw.FontWeight.bold,
+              bold: true,
               color: PdfColors.grey800,
             ),
           ),
           pw.TextSpan(
-            text: _ascii(v),
-            style: pw.TextStyle(
+            text: val,
+            style: PaychekPdfFonts.style(
+              text: val,
+              preferHangulPrimary: _koFor(val),
               fontSize: 9,
+              bold: true,
               color: valueColor ?? PdfColors.grey900,
-              fontWeight: pw.FontWeight.bold,
             ),
           ),
         ],
@@ -384,29 +373,28 @@ pw.Widget _kvPdf(String k, String v, {PdfColor? valueColor}) {
 pw.Widget _italicNote(String text) {
   return pw.Padding(
     padding: const pw.EdgeInsets.only(top: 6),
-    child: pw.Text(
-      _ascii(text),
-      style: pw.TextStyle(
-        fontSize: 8,
-        color: PdfColors.grey600,
-        fontStyle: pw.FontStyle.italic,
-        height: 1.35,
-      ),
+    child: _w(
+      text,
+      fontSize: 8,
+      color: PdfColors.grey600,
+      fontStyle: pw.FontStyle.italic,
+      height: 1.35,
     ),
   );
 }
 
-pw.Widget _toolsAndSmcWide(AnalyseReportSnapshot s) {
+pw.Widget _toolsAndSmcWide(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+) {
   return _templateCard(
     children: [
-      pw.Text(
-        'OUTILS TECHNIQUE & SMC',
-        style: pw.TextStyle(
-          fontSize: 10,
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.grey900,
-          letterSpacing: 0.6,
-        ),
+      _w(
+        copy.toolsSmcTitle,
+        fontSize: 10,
+        bold: true,
+        color: PdfColors.grey900,
+        letterSpacing: 0.6,
       ),
       pw.SizedBox(height: 10),
       pw.Row(
@@ -416,25 +404,17 @@ pw.Widget _toolsAndSmcWide(AnalyseReportSnapshot s) {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Indicateurs ${_ascii(s.indicatorsTf)}',
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.grey800,
-                  ),
+                _w(
+                  copy.indicatorsTitle(s.indicatorsTf),
+                  fontSize: 9,
+                  bold: true,
+                  color: PdfColors.grey800,
                 ),
                 pw.SizedBox(height: 4),
                 if (s.gaugeIndicatorsEnabled)
-                  pw.Text(
-                    _ascii(s.indicateursOutils),
-                    style: const pw.TextStyle(fontSize: 9, height: 1.35),
-                  )
+                  _w(s.indicateursOutils, fontSize: 9, height: 1.35)
                 else
-                  pw.Text(
-                    _ascii('Section desactivee.'),
-                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                  ),
+                  _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
                 if (s.noteIndicators.isNotEmpty) _italicNote(s.noteIndicators),
               ],
             ),
@@ -444,26 +424,21 @@ pw.Widget _toolsAndSmcWide(AnalyseReportSnapshot s) {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Analyse SMC / Flux',
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.grey800,
-                  ),
+                _w(
+                  copy.smcFluxTitle,
+                  fontSize: 9,
+                  bold: true,
+                  color: PdfColors.grey800,
                 ),
                 pw.SizedBox(height: 4),
                 if (s.gaugeSmcEnabled) ...[
-                  _kvPdf('Order block / zone', _dashOr(s.smcOb)),
-                  _kvPdf('FVG', _dashOr(s.smcFvg)),
-                  _kvPdf('Liquidite', _dashOr(s.smcLiq)),
+                  _kvPdf(copy.l.analyseReportCellOrderBlock, _dashOr(s.smcOb)),
+                  _kvPdf(copy.l.analyseReportCellFvg, _dashOr(s.smcFvg)),
+                  _kvPdf(copy.l.analyseReportCellLiqPools, _dashOr(s.smcLiq)),
                   _kvPdf('Fib / OTE', _dashOr(s.smcFibOteLabel)),
-                  _kvPdf('Prix Fib', _dashOr(s.smcFibPrice)),
+                  _kvPdf(copy.fibPriceLabel, _dashOr(s.smcFibPrice)),
                 ] else
-                  pw.Text(
-                    _ascii('Section desactivee.'),
-                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                  ),
+                  _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
                 if (s.noteSmc.isNotEmpty) _italicNote(s.noteSmc),
               ],
             ),
@@ -521,36 +496,35 @@ pw.Widget _goldBar(int percent) {
   );
 }
 
-pw.Widget _confidenceSectionBlock(AnalyseReportSnapshot s) {
+pw.Widget _confidenceSectionBlock(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+) {
   final impF = s.gaugeImpactFeuille;
   return _templateCard(
     children: [
-      pw.Text(
-        _ascii('CONFIANCE PAR SECTION (IMPACT $impF% CHACUNE)'),
-        style: pw.TextStyle(
-          fontSize: 10,
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.grey900,
-          letterSpacing: 0.4,
-        ),
+      _w(
+        copy.confidenceBySection(impF),
+        fontSize: 10,
+        bold: true,
+        color: PdfColors.grey900,
+        letterSpacing: 0.4,
       ),
       pw.SizedBox(height: 12),
-      _confidenceRowPdf('Feuille & Tendance', s.gaugeFeuille),
+      _confidenceRowPdf(copy.feuilleGaugeRow, s.gaugeFeuille),
       pw.SizedBox(height: 10),
-      _confidenceRowPdf('Structure', s.gaugeStructure),
+      _confidenceRowPdf(copy.structureGaugeRow, s.gaugeStructure),
       pw.SizedBox(height: 10),
-      _confidenceRowPdf('Indicateurs', s.gaugeIndicators),
+      _confidenceRowPdf(copy.indicatorsGaugeRow, s.gaugeIndicators),
       pw.SizedBox(height: 10),
-      _confidenceRowPdf('SMC', s.gaugeSmc),
+      _confidenceRowPdf(copy.smcGaugeRow, s.gaugeSmc),
       pw.SizedBox(height: 10),
-      pw.Text(
-        '* ${_ascii(_footerNote(s))}',
-        style: pw.TextStyle(
-          fontSize: 8,
-          color: PdfColors.grey600,
-          fontStyle: pw.FontStyle.italic,
-          height: 1.35,
-        ),
+      _w(
+        '* ${_footerNote(s, copy)}',
+        fontSize: 8,
+        color: PdfColors.grey600,
+        fontStyle: pw.FontStyle.italic,
+        height: 1.35,
       ),
     ],
   );
@@ -563,20 +537,8 @@ pw.Widget _confidenceRowPdf(String label, int pct) {
       pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          pw.Expanded(
-            child: pw.Text(
-              _ascii(label),
-              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800),
-            ),
-          ),
-          pw.Text(
-            '$pct%',
-            style: pw.TextStyle(
-              fontSize: 9,
-              fontWeight: pw.FontWeight.bold,
-              color: _kGold(),
-            ),
-          ),
+          pw.Expanded(child: _w(label, fontSize: 9, color: PdfColors.grey800)),
+          _w('$pct%', fontSize: 9, bold: true, color: _kGold()),
         ],
       ),
       pw.SizedBox(height: 4),
@@ -585,28 +547,32 @@ pw.Widget _confidenceRowPdf(String label, int pct) {
   );
 }
 
-pw.Widget _volumeCard(AnalyseReportSnapshot s) {
+pw.Widget _volumeCard(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
   if (!s.gaugeVolumeProfileEnabled) return pw.SizedBox();
   return _templateCard(
     children: [
-      pw.Text(
-        'PROFIL DE VOLUME',
-        style: pw.TextStyle(
-          fontSize: 10,
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.grey900,
-        ),
+      _w(
+        copy.l.analyseVolumeProfile,
+        fontSize: 10,
+        bold: true,
+        color: PdfColors.grey900,
       ),
       pw.SizedBox(height: 8),
       if ((s.volumeProfileTf ?? '').trim().isNotEmpty)
-        _kvPdf('TF', _dashOr(s.volumeProfileTf)),
+        _kvPdf(copy.l.analyseTimeframeLabelShort, _dashOr(s.volumeProfileTf)),
       if (s.volumeProfileZoneActive == true) ...[
-        _kvPdf('Zone (de)', _dashOr(s.volumeProfileZoneFrom)),
-        _kvPdf('Zone (a)', _dashOr(s.volumeProfileZoneTo)),
+        _kvPdf(
+          '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneFrom})',
+          _dashOr(s.volumeProfileZoneFrom),
+        ),
+        _kvPdf(
+          '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneTo})',
+          _dashOr(s.volumeProfileZoneTo),
+        ),
       ],
-      _kvPdf('POC', _dashOr(s.poc)),
-      _kvPdf('VAH', _dashOr(s.vah)),
-      _kvPdf('VAL', _dashOr(s.val)),
+      _kvPdf(copy.l.analyseVolumePoc, _dashOr(s.poc)),
+      _kvPdf(copy.l.analyseVolumeVah, _dashOr(s.vah)),
+      _kvPdf(copy.l.analyseVolumeVal, _dashOr(s.val)),
       if (s.noteVolume.isNotEmpty) _italicNote(s.noteVolume),
     ],
   );
@@ -614,52 +580,31 @@ pw.Widget _volumeCard(AnalyseReportSnapshot s) {
 
 pw.Widget _pdfSectionTitle(String t) => pw.Padding(
       padding: const pw.EdgeInsets.only(top: 8, bottom: 6),
-      child: pw.Text(
-        _ascii(t),
-        style: pw.TextStyle(
-          fontSize: 11,
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.blueGrey800,
-        ),
-      ),
+      child: _w(t, fontSize: 11, bold: true, color: PdfColors.blueGrey800),
     );
 
 pw.Widget _pdfLine(String label, String value) => pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 3),
-      child: pw.RichText(
-        text: pw.TextSpan(
-          children: [
-            pw.TextSpan(
-              text: '${_ascii(label)} : ',
-              style: pw.TextStyle(
-                fontSize: 9,
-                fontWeight: pw.FontWeight.bold,
-              ),
-            ),
-            pw.TextSpan(
-              text: _ascii(value),
-              style: const pw.TextStyle(fontSize: 9),
-            ),
-          ],
-        ),
-      ),
+      child: _kvPdf(label, value),
     );
 
-/// Blocs supplementaires (copies) - annexe.
-List<pw.Widget> _annexeBlocks(AnalyseReportSnapshot s) {
+List<pw.Widget> _annexeBlocks(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
+) {
   final out = <pw.Widget>[];
 
   if (s.contexteCopies != null && s.contexteCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle('Annexe - copies Feuille & tendance'));
-    for (var i = 0; i < s.contexteCopies!.length; i++) {
-      final c = s.contexteCopies![i];
+    out.add(_pdfSectionTitle(copy.annexeContexte()));
+    for (final c in s.contexteCopies!) {
       out.add(
         _templateCard(
           children: [
-            _pdfLine('Direction', c.biasLabel),
-            _pdfLine('Timeframe', _dashOr(c.contexteTfLine)),
-            _pdfLine('Tendance', _dashOr(c.trendLabel)),
-            _pdfLine('Phase', _dashOr(c.phaseLabel)),
+            _pdfLine(copy.directionPrefix, labels.bias(c.biasLabel)),
+            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.contexteTfLine)),
+            _pdfLine(copy.l.analyseTrend, labels.trend(c.trendLabel)),
+            _pdfLine(copy.l.analysePhase, labels.phase(c.phaseLabel)),
           ],
         ),
       );
@@ -667,16 +612,15 @@ List<pw.Widget> _annexeBlocks(AnalyseReportSnapshot s) {
   }
 
   if (s.structureCopies != null && s.structureCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle('Annexe - copies Structure'));
-    for (var i = 0; i < s.structureCopies!.length; i++) {
-      final c = s.structureCopies![i];
+    out.add(_pdfSectionTitle(copy.annexeStructure()));
+    for (final c in s.structureCopies!) {
       out.add(
         _templateCard(
           children: [
-            _pdfLine('Timeframe', _dashOr(c.structureTf)),
-            _pdfLine('Dernier point', _dashOr(c.chartisme)),
-            _pdfLine('Support', _dashOr(c.support)),
-            _pdfLine('Resistance', _dashOr(c.resistance)),
+            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.structureTf)),
+            _pdfLine(copy.lastPointLabel, _dashOr(c.chartisme)),
+            _pdfLine(copy.l.analyseSupport, _dashOr(c.support)),
+            _pdfLine(copy.l.analyseResistShort, _dashOr(c.resistance)),
           ],
         ),
       );
@@ -684,13 +628,13 @@ List<pw.Widget> _annexeBlocks(AnalyseReportSnapshot s) {
   }
 
   if (s.indicatorsCopies != null && s.indicatorsCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle('Annexe - copies Indicateurs'));
+    out.add(_pdfSectionTitle(copy.annexeIndicators()));
     for (final c in s.indicatorsCopies!) {
       out.add(
         _templateCard(
           children: [
-            _pdfLine('Timeframe', _dashOr(c.indicatorsTf)),
-            _pdfLine('Outils', _dashOr(c.indicateursOutils)),
+            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.indicatorsTf)),
+            _pdfLine(copy.toolsLabel, _dashOr(c.indicateursOutils)),
             if (c.noteIndicators.isNotEmpty) _italicNote(c.noteIndicators),
           ],
         ),
@@ -699,16 +643,16 @@ List<pw.Widget> _annexeBlocks(AnalyseReportSnapshot s) {
   }
 
   if (s.smcCopies != null && s.smcCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle('Annexe - copies SMC'));
+    out.add(_pdfSectionTitle(copy.annexeSmc()));
     for (final c in s.smcCopies!) {
       out.add(
         _templateCard(
           children: [
-            _pdfLine('Order block / zone', _dashOr(c.smcOb)),
-            _pdfLine('FVG', _dashOr(c.smcFvg)),
-            _pdfLine('Liquidite', _dashOr(c.smcLiq)),
+            _pdfLine(copy.l.analyseReportCellOrderBlock, _dashOr(c.smcOb)),
+            _pdfLine(copy.l.analyseReportCellFvg, _dashOr(c.smcFvg)),
+            _pdfLine(copy.l.analyseReportCellLiqPools, _dashOr(c.smcLiq)),
             _pdfLine('Fib / OTE', _dashOr(c.smcFibOteLabel)),
-            _pdfLine('Prix Fib', _dashOr(c.smcFibPrice)),
+            _pdfLine(copy.fibPriceLabel, _dashOr(c.smcFibPrice)),
             if (c.noteSmc.isNotEmpty) _italicNote(c.noteSmc),
           ],
         ),
@@ -722,10 +666,19 @@ List<pw.Widget> _annexeBlocks(AnalyseReportSnapshot s) {
 Future<Uint8List> buildAnalyseReportPdf(
   AnalyseReportSnapshot s, {
   Uint8List? imageBytes,
+  required Locale locale,
+  required AppLocalizations l,
 }) async {
+  await PaychekPdfFonts.ensureLoaded();
+  _pdfKo = locale.languageCode == 'ko';
+  final pdfTheme = PaychekPdfFonts.theme();
+  final copy = AnalyseReportPdfCopy(locale, l);
+  final labels = AnalyseReportSnapshotLabels(locale);
+
   final doc = pw.Document(
-    title: _ascii(s.actif),
-    author: 'Mon Analyse',
+    title: _norm(s.actif),
+    author: 'Paychek',
+    theme: pdfTheme,
   );
 
   final body = <pw.Widget>[
@@ -735,22 +688,22 @@ Future<Uint8List> buildAnalyseReportPdf(
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.stretch,
         children: [
-          _pdfHeader(s),
-          _executiveSummaryBlock(s),
-          _twoColumnTrendStructure(s),
-          _toolsAndSmcWide(s),
-          _confidenceSectionBlock(s),
-          _volumeCard(s),
+          _pdfHeader(s, copy, labels),
+          _executiveSummaryBlock(s, copy, labels),
+          _twoColumnTrendStructure(s, copy, labels),
+          _toolsAndSmcWide(s, copy),
+          _confidenceSectionBlock(s, copy),
+          _volumeCard(s, copy),
         ],
       ),
     ),
-    ..._annexeBlocks(s),
+    ..._annexeBlocks(s, copy, labels),
   ];
 
   if (imageBytes != null && imageBytes.isNotEmpty) {
     body.addAll([
       pw.SizedBox(height: 12),
-      _pdfSectionTitle('Capture'),
+      _pdfSectionTitle(copy.captureSection),
       pw.SizedBox(height: 6),
       pw.Image(
         pw.MemoryImage(imageBytes),
@@ -765,6 +718,7 @@ Future<Uint8List> buildAnalyseReportPdf(
       pageTheme: pw.PageTheme(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.fromLTRB(36, 42, 36, 36),
+        theme: pdfTheme,
         buildBackground: (ctx) => pw.Container(color: PdfColors.grey50),
       ),
       build: (ctx) => body,
@@ -774,16 +728,19 @@ Future<Uint8List> buildAnalyseReportPdf(
   return doc.save();
 }
 
-/// Export PDF : web (telechargement), bureau (Enregistrer sous), mobile (partage fichier).
 Future<void> exportAnalyseReportPdf(
   BuildContext context, {
   required AnalyseReportSnapshot snapshot,
   Uint8List? imageBytes,
 }) async {
   try {
+    final l = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
     final bytes = await buildAnalyseReportPdf(
       snapshot,
       imageBytes: imageBytes,
+      locale: locale,
+      l: l,
     );
     if (!context.mounted) return;
     final name = _safePdfFileName(snapshot);
@@ -802,7 +759,7 @@ Future<void> exportAnalyseReportPdf(
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Impossible de creer le PDF : $e',
+            AppLocalizations.of(context)!.exportPdfFailedWithError('$e'),
             style: const TextStyle(fontSize: 13),
           ),
           behavior: SnackBarBehavior.floating,

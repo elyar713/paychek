@@ -16,8 +16,9 @@ Future<Uint8List> buildPerformancePdf({
   required Locale uiLocale,
 }) async {
   final locale = uiLocale;
-  _pdfHangulMode = false;
-  final pdfTheme = pw.ThemeData();
+  await PaychekPdfFonts.ensureLoaded();
+  _perfPdfKo = locale.languageCode == 'ko';
+  final pdfTheme = PaychekPdfFonts.theme();
 
   final t = disciplineTrades;
   final tm = visibleTradesForAssets;
@@ -195,48 +196,84 @@ Future<Uint8List> buildPerformancePdf({
     'Diário de performance',
     '퍼포먼스 저널',
   );
-  final doc = pw.Document(title: docTitle, author: 'PAYCHEK');
+  final doc = pw.Document(
+    title: paychekPdfNormalize(docTitle),
+    author: 'PAYCHEK',
+    theme: pdfTheme,
+  );
 
   doc.addPage(
     pw.MultiPage(
-      theme: pdfTheme,
-      pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+      pageTheme: pw.PageTheme(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.fromLTRB(32, 40, 32, 36),
+        theme: pdfTheme,
+        buildBackground: (ctx) => pw.Container(color: _kCardBg),
+      ),
       build: (context) => [
-        pw.Text(
-          _pdfText(
+        pw.Center(
+          child: _pdfW(
+            docTitle.toUpperCase(),
+            bold: true,
+            fontSize: 18,
+            color: _kPrimary,
+            letterSpacing: 1.2,
+            textAlign: pw.TextAlign.center,
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Center(
+          child: pw.Container(
+            width: 48,
+            height: 3,
+            decoration: pw.BoxDecoration(
+              color: _kAccent,
+              borderRadius: pw.BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Center(
+          child: _pdfW(
             _p(
               locale,
-              'Journal de performance - Export $exportDate',
+              'Export $exportDate',
               'Performance journal - Export $exportDate',
               'Diario de rendimiento - Exportación $exportDate',
               'Performance-Journal - Export $exportDate',
               'Diário de performance - Exportação $exportDate',
               '퍼포먼스 저널 - 내보내기 $exportDate',
             ),
-          ),
-          style: pw.TextStyle(
-            fontSize: 14,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.grey900,
+            fontSize: 9,
+            color: _kMuted,
+            textAlign: pw.TextAlign.center,
           ),
         ),
-        pw.SizedBox(height: 4),
-        pw.Text(
-          _pdfText('${l.tradePdfPeriode}: $period'),
-          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+        pw.SizedBox(height: 6),
+        pw.Center(
+          child: _pdfW(
+            '${l.tradePdfPeriode}: $period',
+            fontSize: 9,
+            color: PdfColors.grey700,
+            textAlign: pw.TextAlign.center,
+          ),
         ),
-        pw.SizedBox(height: 12),
+        pw.SizedBox(height: 14),
+        pw.Container(height: 1, color: _kBorder),
+        pw.SizedBox(height: 14),
         _headerWinrateRow(locale, l, wrPct, agg, sourceLine),
         pw.SizedBox(height: 12),
         _capitalEvolutionChartSection(locale, l, tm, capitalAmount),
         pw.SizedBox(height: 12),
         _sectionTitle('PAYCHEK LENS'),
         _card(
+          bg: _kCardBg,
           children: [
-            pw.Text(
-              _pdfText(lensIntro.toString()),
-              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey900, height: 1.35),
+            _pdfW(
+              lensIntro.toString(),
+              fontSize: 10,
+              color: PdfColors.grey900,
+              height: 1.4,
             ),
             if (chips.isNotEmpty) ...[
               pw.SizedBox(height: 10),
@@ -247,24 +284,20 @@ Future<Uint8List> buildPerformancePdf({
               pw.Container(
                 width: double.infinity,
                 padding: const pw.EdgeInsets.only(bottom: 6),
-                child: pw.Text(
-                  _pdfText(
-                    _p(
-                      locale,
-                      'AVERTISSEMENTS - SEUILS STRATÉGIE',
-                      'WARNINGS — STRATEGY THRESHOLDS',
-                      'ADVERTENCIAS - UMBRALES DE ESTRATEGIA',
-                      'WARNHINWEISE – STRATEGIESCHWELLEN',
-                      'AVISOS - LIMITES DA ESTRATÉGIA',
-                      '경고 - 전략 기준선',
-                    ),
+                child: _pdfW(
+                  _p(
+                    locale,
+                    'AVERTISSEMENTS - SEUILS STRATÉGIE',
+                    'WARNINGS — STRATEGY THRESHOLDS',
+                    'ADVERTENCIAS - UMBRALES DE ESTRATEGIA',
+                    'WARNHINWEISE – STRATEGIESCHWELLEN',
+                    'AVISOS - LIMITES DA ESTRATÉGIA',
+                    '경고 - 전략 기준선',
                   ),
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: _cRedDark(),
-                    letterSpacing: 0.4,
-                  ),
+                  bold: true,
+                  fontSize: 9,
+                  color: _cRedDark(),
+                  letterSpacing: 0.4,
                 ),
               ),
               for (final w in warnings.take(8)) _pdfBulletLine(w, warningStyle: true),
@@ -291,25 +324,26 @@ Future<Uint8List> buildPerformancePdf({
           ),
         ),
         _card(
+          bg: _kCardBg,
           children: [
-            pw.Text(
-              _pdfText(
-                _p(
-                  locale,
-                  'Winrate selon le nombre de trades pris le même jour (période filtrée). '
-                      'Tranches : 1 à 5, 6 à 10, plus de 10 trades / journée.',
-                  'Win rate by number of trades taken the same calendar day (filtered period). '
-                      'Buckets: 1–5, 6–10, over 10 trades / day.',
-                  'Win rate según trades el mismo día (periodo filtrado). '
-                      'Tramos: 1–5, 6–10, más de 10 trades / día.',
-                  'Gewinnrate nach Anzahl der Trades am selben Tag (gefiltert). '
-                      'Stufen: 1–5, 6–10, über 10 Trades / Tag.',
-                  'Win rate por trades no mesmo dia (período filtrado). '
-                      'Faixas: 1–5, 6–10, mais de 10 trades / dia.',
-                  '동일 거래일 기준 거래 수(필터 기간)별 승률. 구간: 1–5, 6–10, 하루 10건 초과.',
-                ),
+            _pdfW(
+              _p(
+                locale,
+                'Winrate selon le nombre de trades pris le même jour (période filtrée). '
+                    'Tranches : 1 à 5, 6 à 10, plus de 10 trades / journée.',
+                'Win rate by number of trades taken the same calendar day (filtered period). '
+                    'Buckets: 1–5, 6–10, over 10 trades / day.',
+                'Win rate según trades el mismo día (periodo filtrado). '
+                    'Tramos: 1–5, 6–10, más de 10 trades / día.',
+                'Gewinnrate nach Anzahl der Trades am selben Tag (gefiltert). '
+                    'Stufen: 1–5, 6–10, über 10 Trades / Tag.',
+                'Win rate por trades no mesmo dia (período filtrado). '
+                    'Faixas: 1–5, 6–10, mais de 10 trades / dia.',
+                '동일 거래일 기준 거래 수(필터 기간)별 승률. 구간: 1–5, 6–10, 하루 10건 초과.',
               ),
-              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600, height: 1.35),
+              fontSize: 8,
+              color: _kMuted,
+              height: 1.4,
             ),
             pw.SizedBox(height: 10),
             for (var i = 0; i < dailyJournalBuckets.length; i++)
@@ -335,19 +369,18 @@ Future<Uint8List> buildPerformancePdf({
                       '시간대별 성과',
                     ),
                   ),
-                  pw.Text(
-                    _pdfText(
-                      _p(
-                        locale,
-                        'Winrate par plage horaire.',
-                        'Win rate by time window.',
-                        'Win rate por franja horaria.',
-                        'Gewinnrate nach Zeitfenster.',
-                        'Win rate por janela de horário.',
-                        '시간대별 승률.',
-                      ),
+                  _pdfW(
+                    _p(
+                      locale,
+                      'Winrate par plage horaire.',
+                      'Win rate by time window.',
+                      'Win rate por franja horaria.',
+                      'Gewinnrate nach Zeitfenster.',
+                      'Win rate por janela de horário.',
+                      '시간대별 승률.',
                     ),
-                    style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                    fontSize: 8,
+                    color: _kMuted,
                   ),
                   pw.SizedBox(height: 8),
                   for (final s in slots)
@@ -367,16 +400,12 @@ Future<Uint8List> buildPerformancePdf({
                         border: pw.Border.all(color: _cRedDark()),
                         borderRadius: pw.BorderRadius.circular(4),
                       ),
-                      child: pw.Text(
-                        _pdfText(
-                          '${hv.pendantFenetreNoTrade} ${performanceTradeWordPlural(locale.languageCode, hv.pendantFenetreNoTrade)} '
-                          '${_p(locale, 'en session No Trade.', 'during a No Trade session.', 'en sesión No Trade.', 'in einer No-Trade-Session.', 'em sessão No Trade.', '노트레이드 세션에서.')}',
-                        ),
-                        style: pw.TextStyle(
-                          fontSize: 9,
-                          color: _cRedDark(),
-                          fontWeight: pw.FontWeight.bold,
-                        ),
+                      child: _pdfW(
+                        '${hv.pendantFenetreNoTrade} ${performanceTradeWordPlural(locale.languageCode, hv.pendantFenetreNoTrade)} '
+                        '${_p(locale, 'en session No Trade.', 'during a No Trade session.', 'en sesión No Trade.', 'in einer No-Trade-Session.', 'em sessão No Trade.', '노트레이드 세션에서.')}',
+                        bold: true,
+                        fontSize: 9,
+                        color: _cRedDark(),
                       ),
                     ),
                   ],
@@ -421,20 +450,21 @@ Future<Uint8List> buildPerformancePdf({
           ),
         ),
         _card(
+          bg: _kCardBg,
           children: [
-            pw.Text(
-              _pdfText(
-                _p(
-                  locale,
-                  'Détails - tranche respectée 80-100 % (winrate sur la période filtrée).',
-                  'Detail — 80–100% band (win rate on the filtered period).',
-                  'Detalle — banda 80–100 % (win rate en el período filtrado).',
-                  'Details – Band 80–100 % (Gewinnrate, gefilterter Zeitraum).',
-                  'Detalhe — faixa 80–100 % (win rate no período filtrado).',
-                  '상세 — 80~100% 구간 (필터 기간 승률).',
-                ),
+            _pdfW(
+              _p(
+                locale,
+                'Détails - tranche respectée 80-100 % (winrate sur la période filtrée).',
+                'Detail — 80–100% band (win rate on the filtered period).',
+                'Detalle — banda 80–100 % (win rate en el período filtrado).',
+                'Details – Band 80–100 % (Gewinnrate, gefilterter Zeitraum).',
+                'Detalhe — faixa 80–100 % (win rate no período filtrado).',
+                '상세 — 80~100% 구간 (필터 기간 승률).',
               ),
-              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+              fontSize: 8,
+              color: _kMuted,
+              height: 1.35,
             ),
             pw.SizedBox(height: 10),
             _discBar(
@@ -472,19 +502,18 @@ Future<Uint8List> buildPerformancePdf({
             ],
             if (nStratOk + nStratNo > 0) ...[
               pw.SizedBox(height: 10),
-              pw.Text(
-                _pdfText(
-                  _p(
-                    locale,
-                    'Stratégie respectée (slider Ajouter trade)',
-                    'Strategy respected (Add trade slider)',
-                    'Estrategia respetada (slider Añadir trade)',
-                    'Strategie eingehalten (Slider Trade hinzufügen)',
-                    'Estratégia respeitada (slider Adicionar trade)',
-                    '전략 준수(트레이드 추가 슬라이더)',
-                  ),
+              _pdfW(
+                _p(
+                  locale,
+                  'Stratégie respectée (slider Ajouter trade)',
+                  'Strategy respected (Add trade slider)',
+                  'Estrategia respetada (slider Añadir trade)',
+                  'Strategie eingehalten (Slider Trade hinzufügen)',
+                  'Estratégia respeitada (slider Adicionar trade)',
+                  '전략 준수(트레이드 추가 슬라이더)',
                 ),
-                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                fontSize: 8,
+                color: _kMuted,
               ),
               pw.SizedBox(height: 6),
               _discBar(
@@ -521,23 +550,19 @@ Future<Uint8List> buildPerformancePdf({
             ],
             if (violations.isNotEmpty) ...[
               pw.SizedBox(height: 12),
-              pw.Text(
-                _pdfText(
-                  _p(
-                    locale,
-                    'POINTS NON RESPECTÉS',
-                    'MISSED RULES',
-                    'PUNTOS NO CUMPLIDOS',
-                    'NICHT BEACHTETE PUNKTE',
-                    'REGRAS NÃO RESPEITADAS',
-                    '미준수 항목',
-                  ),
+              _pdfW(
+                _p(
+                  locale,
+                  'POINTS NON RESPECTÉS',
+                  'MISSED RULES',
+                  'PUNTOS NO CUMPLIDOS',
+                  'NICHT BEACHTETE PUNKTE',
+                  'REGRAS NÃO RESPEITADAS',
+                  '미준수 항목',
                 ),
-                style: pw.TextStyle(
-                  fontSize: 9,
-                  fontWeight: pw.FontWeight.bold,
-                  color: _cRedDark(),
-                ),
+                bold: true,
+                fontSize: 9,
+                color: _cRedDark(),
               ),
               pw.SizedBox(height: 6),
               for (final v in violations.take(12))
@@ -547,11 +572,11 @@ Future<Uint8List> buildPerformancePdf({
                 ),
             ],
             pw.SizedBox(height: 10),
-            pw.Text(
-              _pdfText(
-                '${_p(locale, 'Observation :', 'Observation:', 'Observación:', 'Beobachtung:', 'Observação:', '관찰:')} $obs',
-              ),
-              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800, height: 1.35),
+            _pdfW(
+              '${_p(locale, 'Observation :', 'Observation:', 'Observación:', 'Beobachtung:', 'Observação:', '관찰:')} $obs',
+              fontSize: 9,
+              color: PdfColors.grey800,
+              height: 1.35,
             ),
           ],
         ),
@@ -577,36 +602,31 @@ Future<Uint8List> buildPerformancePdf({
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text(
-                          _pdfText(
-                            '${_p(locale, 'Meilleur : ', 'Best: ', 'Mejor: ', 'Beste: ', 'Melhor: ', '최고: ')}${bestDur.label}',
-                          ),
-                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800),
+                        _pdfW(
+                          '${_p(locale, 'Meilleur : ', 'Best: ', 'Mejor: ', 'Beste: ', 'Melhor: ', '최고: ')}${bestDur.label}',
+                          fontSize: 9,
+                          color: PdfColors.grey800,
                         ),
-                        pw.Text(
+                        _pdfW(
                           '${(bestDur.winRate * 100).round()}% · ${bestDur.count} ${performanceTradeWordPlural(locale.languageCode, bestDur.count)}',
-                          style: pw.TextStyle(
-                            fontSize: 10,
-                            fontWeight: pw.FontWeight.bold,
-                            color: _cGreen(),
-                          ),
+                          bold: true,
+                          fontSize: 10,
+                          color: _cGreen(),
                         ),
                       ],
                     )
                   else
-                    pw.Text(
-                      _pdfText(
-                        _p(
-                          locale,
-                          'Pas assez de données.',
-                          'Not enough data.',
-                          'Datos insuficientes.',
-                          'Zu wenig Daten.',
-                          'Dados insuficientes.',
-                          '데이터가 부족합니다.',
-                        ),
+                    _pdfW(
+                      _p(
+                        locale,
+                        'Pas assez de données.',
+                        'Not enough data.',
+                        'Datos insuficientes.',
+                        'Zu wenig Daten.',
+                        'Dados insuficientes.',
+                        '데이터가 부족합니다.',
                       ),
-                      style: const pw.TextStyle(fontSize: 9),
+                      fontSize: 9,
                     ),
                   pw.SizedBox(height: 8),
                   for (final b in buckets.take(5))
@@ -615,12 +635,13 @@ Future<Uint8List> buildPerformancePdf({
                       child: pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
-                          pw.Text(_pdfText(b.label), style: const pw.TextStyle(fontSize: 8)),
-                          pw.Text(
+                          _pdfW(b.label, fontSize: 8),
+                          _pdfW(
                             b.count > 0
                                 ? '${(b.winRate * 100).round()}% (${b.count} ${performanceTradeWordPlural(locale.languageCode, b.count)})'
                                 : '— (0 ${performanceTradeWordPlural(locale.languageCode, 0)})',
-                            style: pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                            fontSize: 8,
+                            color: PdfColors.grey700,
                           ),
                         ],
                       ),
@@ -634,19 +655,17 @@ Future<Uint8List> buildPerformancePdf({
                 children: [
                   _sectionTitle(l.tradeMostTradedHeading.toUpperCase()),
                   if (assets.isEmpty)
-                    pw.Text(
-                      _pdfText(
-                        _p(
-                          locale,
-                          'Aucun symbole renseigné sur la période.',
-                          'No symbol entered for this period.',
-                          'Sin símbolo en este período.',
-                          'Kein Symbol in diesem Zeitraum.',
-                          'Nenhum símbolo neste período.',
-                          '이 기간에 입력된 심볼이 없습니다.',
-                        ),
+                    _pdfW(
+                      _p(
+                        locale,
+                        'Aucun symbole renseigné sur la période.',
+                        'No symbol entered for this period.',
+                        'Sin símbolo en este período.',
+                        'Kein Symbol in diesem Zeitraum.',
+                        'Nenhum símbolo neste período.',
+                        '이 기간에 입력된 심볼이 없습니다.',
                       ),
-                      style: const pw.TextStyle(fontSize: 9),
+                      fontSize: 9,
                     )
                   else
                     for (final a in assets)
@@ -656,22 +675,18 @@ Future<Uint8List> buildPerformancePdf({
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Expanded(
-                              child: pw.Text(
-                                _pdfText(a.symbol),
-                                style: pw.TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: pw.FontWeight.bold,
-                                  color: PdfColors.grey900,
-                                ),
+                              child: _pdfW(
+                                a.symbol,
+                                bold: true,
+                                fontSize: 10,
+                                color: PdfColors.grey900,
                               ),
                             ),
-                            pw.Text(
+                            _pdfW(
                               '${a.count} ${performanceTradeWordPlural(locale.languageCode, a.count)} · ${(a.winRate * 100).round()}% WR',
-                              style: pw.TextStyle(
-                                fontSize: 9,
-                                fontWeight: pw.FontWeight.bold,
-                                color: a.winRate >= 0.5 ? _cGreen() : _cRed(),
-                              ),
+                              bold: true,
+                              fontSize: 9,
+                              color: a.winRate >= 0.5 ? _cGreen() : _cRed(),
                             ),
                           ],
                         ),
@@ -683,19 +698,20 @@ Future<Uint8List> buildPerformancePdf({
         ),
         pw.SizedBox(height: 16),
         pw.Center(
-          child: pw.Text(
-            _pdfText(
-              _p(
-                locale,
-                'PAYCHEK - données journal, filtre Performance aligné sur l\'écran.',
-                'PAYCHEK — journal data; Performance filter matches the screen.',
-                'PAYCHEK - datos del diario; filtro Rendimiento alineado con la pantalla.',
-                'PAYCHEK – Journaldaten; Performance-Filter wie im Bildschirm.',
-                'PAYCHEK - dados do diário; filtro Performance como na tela.',
-                'PAYCHEK - 일지 데이터, 화면과 동일한 퍼포먼스 필터.',
-              ),
+          child: _pdfW(
+            _p(
+              locale,
+              'PAYCHEK - données journal, filtre Performance aligné sur l\'écran.',
+              'PAYCHEK — journal data; Performance filter matches the screen.',
+              'PAYCHEK - datos del diario; filtro Rendimiento alineado con la pantalla.',
+              'PAYCHEK – Journaldaten; Performance-Filter wie im Bildschirm.',
+              'PAYCHEK - dados do diário; filtro Performance como na tela.',
+              'PAYCHEK - 일지 데이터, 화면과 동일한 퍼포먼스 필터.',
             ),
-            style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
+            fontSize: 8,
+            color: PdfColors.grey500,
+            fontStyle: pw.FontStyle.italic,
+            textAlign: pw.TextAlign.center,
           ),
         ),
       ],

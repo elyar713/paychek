@@ -104,15 +104,8 @@ class MentalStateDayBreakdown {
       );
     }
 
-    final emotions = _decodeEmotions(bundle['emotions']);
-    final selectedIds = _selectedEmotionIds(bundle);
-    if (emotions.isNotEmpty && selectedIds.isNotEmpty) {
-      final selected = [
-        for (final e in emotions)
-          if (selectedIds.contains(e.id)) e,
-      ];
-      if (selected.isNotEmpty) {
-        final emotionsShare100 = bundle['emotionsShare100'] as bool? ?? true;
+    final selected = _selectedEmotionsForDay(bundle);
+    if (selected.isNotEmpty) {
         final blockImpact = ((bundle['emotionBlockWeight'] as num?)?.toDouble() ?? 0)
             .round()
             .clamp(0, 100);
@@ -126,9 +119,6 @@ class MentalStateDayBreakdown {
                   label: mentalStateEmotionDisplayLabel(l, e.id, e.label),
                   percent: MentalStateShareLogic.emotionChipImpactPercent(
                     emotion: e,
-                    selectedIds: selectedIds,
-                    selected: selected,
-                    share100: emotionsShare100,
                   ),
                   percentColor: e.inverse
                       ? MentalStateTokens.matteRed
@@ -137,7 +127,6 @@ class MentalStateDayBreakdown {
             ],
           ),
         );
-      }
     }
 
     if (sections.isEmpty) return null;
@@ -165,6 +154,21 @@ class MentalStateDayBreakdown {
       if (x != null) out.add(x);
     }
     return out;
+  }
+
+  static List<MentalStateEmotion> _selectedEmotionsForDay(
+    Map<String, dynamic> bundle,
+  ) {
+    final frozen =
+        MentalStateStorage.decodeEmotionsList(bundle['selectedEmotionsSnapshot']);
+    if (frozen.isNotEmpty) return frozen;
+
+    final emotions = _decodeEmotions(bundle['emotions']);
+    final selectedIds = _selectedEmotionIds(bundle);
+    return [
+      for (final e in emotions)
+        if (selectedIds.contains(e.id)) e,
+    ];
   }
 
   static Set<String> _selectedEmotionIds(Map<String, dynamic> bundle) {

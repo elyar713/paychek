@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'checklist_daily_completion_storage.dart';
 import 'checklist_daily_day_snapshot.dart';
 import 'checklist_firestore_sync.dart';
+import 'checklist_item_period.dart';
 import 'checklist_item_schedule.dart';
 import 'checklist_item_schedule_sort.dart';
 import 'checklist_models.dart';
@@ -26,6 +27,7 @@ class ChecklistPageController extends ChangeNotifier {
                         id: i.id,
                         label: i.label,
                         checked: i.checked,
+                        checkedAt: i.checkedAt,
                         schedule: i.schedule,
                       ),
                     )
@@ -42,15 +44,41 @@ class ChecklistPageController extends ChangeNotifier {
   bool _hydrated = false;
   Map<int, ChecklistDailyDaySnapshot> _snapshotsByDay = {};
 
+  /// Dernier jour calendaire traité (clôture 23:59 → snapshot).
+  DateTime? _calendarAnchorDay;
+
+  static DateTime _dateOnly(DateTime d) =>
+      ChecklistItemPeriod.dateOnly(d);
+
+  bool _isHistoricalDay(DateTime day) {
+    final d = _dateOnly(day);
+    final today = _dateOnly(DateTime.now());
+    return d.isBefore(today);
+  }
+
+  bool _itemDoneOnDay(ChecklistItemData item, DateTime day) {
+    if (_isHistoricalDay(day)) {
+      if (item.isCompletedForCalendarDay(day)) return true;
+      // Anciennes coches sans checkedAt (avant clôture journalière).
+      if (item.checked && item.checkedAt == null && item.isDueOnDay(day)) {
+        return true;
+      }
+      return false;
+    }
+    return item.isCompletedForCurrentPeriod(day);
+  }
+
   /// Charge l’état persisté ; à appeler une fois au démarrage (ex. [DashboardPage]).
   Future<void> hydrateFromStorage() async {
     final data = await ChecklistSectionsStorage.load();
     if (data != null && data.isNotEmpty) {
       _sections = data;
-      notifyListeners();
     }
     _snapshotsByDay = await ChecklistDailyCompletionStorage.load();
     _hydrated = true;
+    _sealCompletionForPastDays();
+    _refreshCompletionPeriods(silent: true);
+    notifyListeners();
     _snapshotTodayCompletion();
   }
 
@@ -114,7 +142,8 @@ class ChecklistPageController extends ChangeNotifier {
 
   int get checkedItems => _sections.fold<int>(
         0,
-        (n, s) => n + s.items.where((i) => i.checked).length,
+        (n, s) =>
+            n + s.items.where((i) => i.isCompletedForCurrentPeriod()).length,
       );
 
   /// Lignes dont le rappel tombe sur [day] (défaut : aujourd’hui).
@@ -129,10 +158,11 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   int itemsDueOnDayCheckedCount([DateTime? day]) {
+    final on = day ?? DateTime.now();
     var n = 0;
     for (final s in _sections) {
       for (final i in s.items) {
-        if (i.isDueOnDay(day) && i.checked) n++;
+        if (i.isDueOnDay(on) && _itemDoneOnDay(i, on)) n++;
       }
     }
     return n;
@@ -173,14 +203,157 @@ class ChecklistPageController extends ChangeNotifier {
     return stored != null && stored.percent > 0;
   }
 
-  List<String> _uncheckedItemIdsForDay(DateTime day) {
-    final ids = <String>[];
+  List<ChecklistUncheckedDayEntry> _uncheckedEntriesForDay(DateTime day) {
+    final out = <ChecklistUncheckedDayEntry>[];
     for (final s in _sections) {
       for (final i in s.items) {
-        if (i.isDueOnDay(day) && !i.checked) ids.add(i.id);
+        if (i.isDueOnDay(day) && !_itemDoneOnDay(i, day)) {
+          out.add(
+            ChecklistUncheckedDayEntry(
+              sectionId: s.id,
+              sectionTitle: s.title,
+              itemId: i.id,
+              itemLabel: i.label,
+            ),
+          );
+        }
       }
     }
-    return ids;
+    return out;
+  }
+
+  /// Affiche les lignes historiques même si l’élément a été supprimé depuis.
+  List<ChecklistUncheckedDayEntry> _resolveStoredUncheckedEntries(
+    List<ChecklistUncheckedDayEntry> stored,
+  ) {
+    if (stored.isEmpty) return const [];
+
+    final liveByItemId = <String, ChecklistUncheckedDayEntry>{};
+    for (final s in _sections) {
+      for (final i in s.items) {
+        liveByItemId[i.id] = ChecklistUncheckedDayEntry(
+          sectionId: s.id,
+          sectionTitle: s.title,
+          itemId: i.id,
+          itemLabel: i.label,
+        );
+      }
+    }
+
+    final out = <ChecklistUncheckedDayEntry>[];
+    for (final e in stored) {
+      final live = liveByItemId[e.itemId];
+      if (live != null) {
+        out.add(
+          ChecklistUncheckedDayEntry(
+            sectionId: live.sectionId,
+            sectionTitle: live.sectionTitle,
+            itemId: e.itemId,
+            itemLabel: live.itemLabel.isNotEmpty ? live.itemLabel : e.itemLabel,
+          ),
+        );
+      } else if (e.itemLabel.isNotEmpty || e.sectionTitle.isNotEmpty) {
+        out.add(e);
+      }
+    }
+    return out;
+  }
+
+  void _freezeItemInPastSnapshots({
+    required String sectionId,
+    required String sectionTitle,
+    required String itemId,
+    required String itemLabel,
+  }) {
+    if (itemLabel.isEmpty && sectionTitle.isEmpty) return;
+
+    final frozen = ChecklistUncheckedDayEntry(
+      sectionId: sectionId,
+      sectionTitle: sectionTitle,
+      itemId: itemId,
+      itemLabel: itemLabel,
+    );
+
+    var anyChanged = false;
+    for (final k in _snapshotsByDay.keys.toList()) {
+      final snap = _snapshotsByDay[k]!;
+      if (!snap.uncheckedItemIds.contains(itemId)) continue;
+
+      final nextEntries = <ChecklistUncheckedDayEntry>[];
+      var snapChanged = false;
+      var found = false;
+      for (final e in snap.uncheckedEntries) {
+        if (e.itemId != itemId) {
+          nextEntries.add(e);
+          continue;
+        }
+        found = true;
+        if (e.itemLabel.isNotEmpty && e.sectionTitle.isNotEmpty) {
+          nextEntries.add(e);
+        } else {
+          nextEntries.add(frozen);
+          snapChanged = true;
+        }
+      }
+      if (!found) {
+        nextEntries.add(frozen);
+        snapChanged = true;
+      }
+      if (snapChanged) {
+        _snapshotsByDay[k] = snap.copyWith(uncheckedEntries: nextEntries);
+        anyChanged = true;
+      }
+    }
+    if (anyChanged) {
+      unawaited(ChecklistDailyCompletionStorage.save(_snapshotsByDay));
+    }
+  }
+
+  int _completionPercentForDay(DateTime day) {
+    final total = itemsDueOnDayCount(day);
+    if (total == 0) return 100;
+    return ((100 * itemsDueOnDayCheckedCount(day)) / total).round().clamp(0, 100);
+  }
+
+  void _writeDaySnapshot(DateTime day) {
+    final d = _dateOnly(day);
+    final due = itemsDueOnDayCount(d);
+    if (due == 0) return;
+    final k = ChecklistDailyCompletionStorage.dayKey(d);
+    final pct = _completionPercentForDay(d);
+    final uncheckedEntries = _uncheckedEntriesForDay(d);
+    _snapshotsByDay[k] = ChecklistDailyDaySnapshot(
+      percent: pct,
+      uncheckedEntries: uncheckedEntries,
+    );
+  }
+
+  void _sealDaySnapshotIfMissing(DateTime day) {
+    final d = _dateOnly(day);
+    final k = ChecklistDailyCompletionStorage.dayKey(d);
+    if (_snapshotsByDay.containsKey(k)) return;
+    _writeDaySnapshot(d);
+  }
+
+  /// Clôture les jours passés (23:59) avant de réinitialiser les coches du jour.
+  void _sealCompletionForPastDays() {
+    final today = _dateOnly(DateTime.now());
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (_calendarAnchorDay != null && _calendarAnchorDay != today) {
+      var d = _calendarAnchorDay!;
+      while (d.isBefore(today)) {
+        _writeDaySnapshot(d);
+        d = d.add(const Duration(days: 1));
+      }
+    } else {
+      _sealDaySnapshotIfMissing(yesterday);
+    }
+    _calendarAnchorDay = today;
+
+    if (_snapshotsByDay.isNotEmpty) {
+      unawaited(ChecklistDailyCompletionStorage.save(_snapshotsByDay));
+    }
   }
 
   List<ChecklistUncheckedDayEntry> uncheckedEntriesForDay(DateTime day) {
@@ -189,30 +362,13 @@ class ChecklistPageController extends ChangeNotifier {
     final today = DateTime(now.year, now.month, now.day);
     if (d.isAfter(today)) return const [];
 
-    final ids = d == today
-        ? _uncheckedItemIdsForDay(d)
-        : _snapshotsByDay[ChecklistDailyCompletionStorage.dayKey(d)]
-                ?.uncheckedItemIds ??
-            const [];
+    if (d == today) return _uncheckedEntriesForDay(d);
 
-    if (ids.isEmpty) return const [];
+    final stored =
+        _snapshotsByDay[ChecklistDailyCompletionStorage.dayKey(d)];
+    if (stored == null) return const [];
 
-    final idSet = ids.toSet();
-    final out = <ChecklistUncheckedDayEntry>[];
-    for (final s in _sections) {
-      for (final i in s.items) {
-        if (!idSet.contains(i.id)) continue;
-        out.add(
-          ChecklistUncheckedDayEntry(
-            sectionId: s.id,
-            sectionTitle: s.title,
-            itemId: i.id,
-            itemLabel: i.label,
-          ),
-        );
-      }
-    }
-    return out;
+    return _resolveStoredUncheckedEntries(stored.uncheckedEntries);
   }
 
   /// % affiché dans le mini-calendrier (historique + jour courant en direct).
@@ -234,8 +390,16 @@ class ChecklistPageController extends ChangeNotifier {
       return completionPercentOnDay(d);
     }
 
-    final stored = _snapshotsByDay[ChecklistDailyCompletionStorage.dayKey(d)];
-    if (stored != null) return stored.percent;
+    final k = ChecklistDailyCompletionStorage.dayKey(d);
+    final stored = _snapshotsByDay[k];
+    final retro = _completionPercentForDay(d);
+
+    if (stored != null) {
+      if (retro > stored.percent) return retro;
+      return stored.percent;
+    }
+
+    if (due > 0) return retro;
     if (hasTrades) return 0;
     return null;
   }
@@ -248,17 +412,17 @@ class ChecklistPageController extends ChangeNotifier {
     );
     final checked = itemsDueOnDayCheckedCount(now);
     final due = itemsDueOnDayCount(now);
-    final uncheckedIds = _uncheckedItemIdsForDay(now);
+    final uncheckedEntries = _uncheckedEntriesForDay(now);
     if (checked == 0) {
       if (due > 0) {
         final next = ChecklistDailyDaySnapshot(
           percent: 0,
-          uncheckedItemIds: uncheckedIds,
+          uncheckedEntries: uncheckedEntries,
         );
         final prev = _snapshotsByDay[k];
         if (prev != null &&
             prev.percent == 0 &&
-            _listEquals(prev.uncheckedItemIds, uncheckedIds)) {
+            _uncheckedEntriesEqual(prev.uncheckedEntries, uncheckedEntries)) {
           return;
         }
         _snapshotsByDay[k] = next;
@@ -273,27 +437,60 @@ class ChecklistPageController extends ChangeNotifier {
     final pct = completionPercentOnDay(now);
     final next = ChecklistDailyDaySnapshot(
       percent: pct,
-      uncheckedItemIds: uncheckedIds,
+      uncheckedEntries: uncheckedEntries,
     );
     final prev = _snapshotsByDay[k];
     if (prev != null &&
         prev.percent == next.percent &&
-        _listEquals(prev.uncheckedItemIds, next.uncheckedItemIds)) {
+        _uncheckedEntriesEqual(prev.uncheckedEntries, next.uncheckedEntries)) {
       return;
     }
     _snapshotsByDay[k] = next;
     unawaited(ChecklistDailyCompletionStorage.save(_snapshotsByDay));
   }
 
-  static bool _listEquals(List<String> a, List<String> b) {
+  static bool _uncheckedEntriesEqual(
+    List<ChecklistUncheckedDayEntry> a,
+    List<ChecklistUncheckedDayEntry> b,
+  ) {
     if (a.length != b.length) return false;
     for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
+      final x = a[i];
+      final y = b[i];
+      if (x.itemId != y.itemId ||
+          x.itemLabel != y.itemLabel ||
+          x.sectionId != y.sectionId ||
+          x.sectionTitle != y.sectionTitle) {
+        return false;
+      }
     }
     return true;
   }
 
+  void _refreshCompletionPeriods({bool silent = false}) {
+    final now = DateTime.now();
+    final today = _dateOnly(now);
+    if (_calendarAnchorDay != null && _calendarAnchorDay != today) {
+      _sealCompletionForPastDays();
+    }
+    _calendarAnchorDay ??= today;
+
+    var changed = false;
+    _sections = _sections.map((section) {
+      final nextItems = section.items.map((item) {
+        final normalized = ChecklistItemPeriod.normalizeCheckedState(item, now);
+        if (normalized != item) changed = true;
+        return normalized;
+      }).toList();
+      return section.copyWith(items: nextItems);
+    }).toList();
+    if (changed && !silent) {
+      _persistSoon();
+    }
+  }
+
   void _notifyChecklistChanged() {
+    _refreshCompletionPeriods(silent: true);
     notifyListeners();
     _snapshotTodayCompletion();
   }
@@ -338,6 +535,7 @@ class ChecklistPageController extends ChangeNotifier {
                       id: i.id,
                       label: i.label,
                       checked: i.checked,
+                      checkedAt: i.checkedAt,
                       schedule: i.schedule,
                     ),
                   )
@@ -346,6 +544,7 @@ class ChecklistPageController extends ChangeNotifier {
           )
           .toList();
     }
+    _refreshCompletionPeriods(silent: true);
     notifyListeners();
     _snapshotTodayCompletion();
   }
@@ -466,6 +665,7 @@ class ChecklistPageController extends ChangeNotifier {
               id: i.id,
               label: i.label,
               checked: i.checked,
+              checkedAt: i.checkedAt,
               schedule: i.schedule,
             ),
           )
@@ -504,11 +704,16 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void toggleItem(String sectionId, String itemId, bool value) {
+    final now = DateTime.now();
     _sections = _sections.map((section) {
       if (section.id != sectionId) return section;
       final nextItems = section.items.map((item) {
         if (item.id != itemId) return item;
-        return item.copyWith(checked: value);
+        if (value && item.isExpiredMissed(now)) return item;
+        if (!value) {
+          return item.copyWith(checked: false, clearCheckedAt: true);
+        }
+        return item.copyWith(checked: true, checkedAt: now);
       }).toList();
       return section.copyWith(items: nextItems);
     }).toList();
@@ -616,6 +821,20 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void removeItemFromSection(String sectionId, String itemId) {
+    for (final s in _sections) {
+      if (s.id != sectionId) continue;
+      for (final i in s.items) {
+        if (i.id != itemId) continue;
+        _freezeItemInPastSnapshots(
+          sectionId: sectionId,
+          sectionTitle: s.title,
+          itemId: itemId,
+          itemLabel: i.label,
+        );
+        break;
+      }
+      break;
+    }
     _pauseItemLabelBlurCommitForRebuild();
     if (editingItemId == itemId) {
       editingItemId = null;
@@ -674,6 +893,18 @@ class ChecklistPageController extends ChangeNotifier {
       builder: (ctx) => const ChecklistDeleteSectionDialog(),
     );
     if (ok == true && context.mounted) {
+      for (final s in _sections) {
+        if (s.id != sectionId) continue;
+        for (final i in s.items) {
+          _freezeItemInPastSnapshots(
+            sectionId: sectionId,
+            sectionTitle: s.title,
+            itemId: i.id,
+            itemLabel: i.label,
+          );
+        }
+        break;
+      }
       _sections = _sections.where((s) => s.id != sectionId).toList();
       _notifyChecklistChanged();
       _persistSoon();

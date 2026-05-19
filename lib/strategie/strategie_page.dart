@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_frame_callbacks.dart';
 import '../l10n/app_localizations.dart';
 import '../performance/performance_locale_copy.dart';
 import 'gestion_risque_edit_notifier.dart';
@@ -230,7 +231,7 @@ class _StrategiePageState extends State<StrategiePage> {
     void afterPopLegacy() {
       final cb = widget.onReturnToDashboard;
       if (cb == null) return;
-      WidgetsBinding.instance.addPostFrameCallback((_) => cb());
+      PaychekFrameCallbacks.runPostFrame(cb);
     }
 
     final embedded = widget.onCloseAsTab != null;

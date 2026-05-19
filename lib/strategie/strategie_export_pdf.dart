@@ -5,88 +5,79 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../analyse/analyse_report_pdf_platform.dart' as pdf_platform;
 import '../l10n/app_localizations.dart';
+import '../shared/paychek_pdf_fonts.dart';
+import '../shared/paychek_pdf_text.dart';
+import 'strategie_export_pdf_icons.dart';
 import 'strategie_feedback_reference.dart';
 import 'strategie_gestion_risque_storage.dart';
 import 'strategie_horaires_sessions_storage.dart';
 import 'strategie_setups_store.dart';
 import 'widgets/strategie_setup_card.dart';
+import 'widgets/strategie_setup_rule_styles.dart';
+import 'widgets/strategie_setup_tag_format.dart';
 
-String _ascii(String? v) {
-  var x = (v ?? '').trim();
-  x = x.replaceAll(RegExp(r'[\u00A0\u2007\u202F]'), ' ');
-  x = x.replaceAll('×', 'x');
-  x = x.replaceAll(RegExp(r'[«»]'), '"');
-  x = x.replaceAll(RegExp(r'[\u2018\u2019\u201A\u201B]'), "'");
-  x = x.replaceAll(RegExp(r'[\u201C\u201D\u201E\u201F]'), '"');
-  x = x.replaceAll(RegExp(r'[\u2013\u2014\u2212]'), '-');
-  x = x.replaceAll('…', '...');
-  x = x.replaceAll('•', '-');
-  const map = <String, String>{
-    'é': 'e',
-    'è': 'e',
-    'ê': 'e',
-    'ë': 'e',
-    'É': 'E',
-    'à': 'a',
-    'â': 'a',
-    'À': 'A',
-    'ù': 'u',
-    'û': 'u',
-    'Ù': 'U',
-    'î': 'i',
-    'ï': 'i',
-    'Î': 'I',
-    'ô': 'o',
-    'ö': 'o',
-    'Ô': 'O',
-    'ç': 'c',
-    'Ç': 'C',
-    'œ': 'oe',
-    'Œ': 'OE',
-  };
-  map.forEach((k, v2) => x = x.replaceAll(k, v2));
-  final out = StringBuffer();
-  for (final r in x.runes) {
-    if (r <= 0x7F) {
-      out.writeCharCode(r);
-    } else {
-      out.write('?');
-    }
-  }
-  final t = out.toString().trim();
-  return t.isEmpty ? '-' : t;
-}
+// Palette alignée checklist / app Paychek.
+final PdfColor _kPrimary = PdfColor.fromHex('0F172A');
+final PdfColor _kAccent = PdfColor.fromHex('0D9488');
+final PdfColor _kAccentSoft = PdfColor.fromHex('CCFBF1');
+final PdfColor _kCardBg = PdfColor.fromHex('F8FAFC');
+final PdfColor _kBorder = PdfColor.fromHex('E2E8F0');
+final PdfColor _kMuted = PdfColor.fromHex('64748B');
+final PdfColor _kGreen = PdfColor.fromHex('15803D');
+final PdfColor _kRed = PdfColor.fromHex('DC2626');
+final PdfColor _kSignalBg = PdfColor.fromHex('E8F5E9');
 
-PdfColor _kGreen() => PdfColor.fromInt(0xFF15803D);
-PdfColor _kRed() => PdfColor.fromInt(0xFFDC2626);
-PdfColor _kGreyBg() => PdfColor.fromInt(0xFFF3F4F6);
-
-pw.Widget _sectionTitle(String t) {
+pw.Widget _sectionTitle(String t, {required bool koPrimary}) {
   return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 8, top: 4),
-    child: pw.Text(
-      _ascii(t),
-      style: pw.TextStyle(
-        fontSize: 11,
-        fontWeight: pw.FontWeight.bold,
-        color: PdfColors.grey900,
-        letterSpacing: 0.6,
-      ),
+    padding: const pw.EdgeInsets.only(bottom: 10, top: 6),
+    child: pw.Row(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        pw.Container(
+          width: 4,
+          height: 16,
+          decoration: pw.BoxDecoration(
+            color: _kAccent,
+            borderRadius: pw.BorderRadius.circular(2),
+          ),
+        ),
+        pw.SizedBox(width: 8),
+        pw.Expanded(
+          child: PaychekPdfFonts.text(
+            t.toUpperCase(),
+            preferHangulPrimary: koPrimary,
+            fontSize: 10,
+            bold: true,
+            color: _kPrimary,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ],
     ),
   );
 }
 
-pw.Widget _bulletLine(String text) {
+pw.Widget _bulletLine(String text, {required bool koPrimary}) {
   return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 3),
+    padding: const pw.EdgeInsets.only(bottom: 4),
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('- ', style: pw.TextStyle(fontSize: 9, color: PdfColors.grey800)),
+        PaychekPdfFonts.text(
+          '•',
+          preferHangulPrimary: koPrimary,
+          fontSize: 9,
+          bold: true,
+          color: _kAccent,
+        ),
+        pw.SizedBox(width: 6),
         pw.Expanded(
-          child: pw.Text(
-            _ascii(text),
-            style: const pw.TextStyle(fontSize: 9, height: 1.3),
+          child: PaychekPdfFonts.text(
+            text,
+            preferHangulPrimary: koPrimary,
+            fontSize: 9,
+            color: PdfColors.grey800,
+            height: 1.35,
           ),
         ),
       ],
@@ -101,7 +92,7 @@ pw.Widget _card({required List<pw.Widget> children, PdfColor? bg}) {
     decoration: pw.BoxDecoration(
       color: bg ?? PdfColors.white,
       borderRadius: pw.BorderRadius.circular(10),
-      border: pw.Border.all(color: PdfColors.grey300),
+      border: pw.Border.all(color: _kBorder, width: 0.8),
     ),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
@@ -110,7 +101,124 @@ pw.Widget _card({required List<pw.Widget> children, PdfColor? bg}) {
   );
 }
 
+pw.Widget _tableHeaderCell(String label, {required bool koPrimary}) {
+  return PaychekPdfFonts.text(
+    label.toUpperCase(),
+    preferHangulPrimary: koPrimary,
+    fontSize: 7,
+    bold: true,
+    color: _kMuted,
+    letterSpacing: 0.6,
+  );
+}
+
+String _ruleHeadingForPdf(StrategieSetupRuleBlock r, AppLocalizations l) {
+  switch (StrategieSetupRuleStyles.iconKeyForIcon(r.icon)) {
+    case 'invalidation':
+      return l.strategieRuleInvalidation;
+    case 'target':
+      return l.strategieRuleTarget;
+    case 'management':
+      return l.strategieRuleManagement;
+    default:
+      return l.strategieRuleEntryPrecise;
+  }
+}
+
+pw.Widget _pdfRuleIcon(Uint8List? bytes) {
+  if (bytes != null && bytes.isNotEmpty) {
+    return pw.SizedBox(
+      width: 18,
+      height: 18,
+      child: pw.Image(
+        pw.MemoryImage(bytes),
+        width: 16,
+        height: 16,
+        fit: pw.BoxFit.contain,
+      ),
+    );
+  }
+  return pw.SizedBox(width: 18, height: 18);
+}
+
+pw.Widget _ruleBodyPdf(String body, {required bool koPrimary}) {
+  final normalized = paychekPdfNormalize(body);
+  if (normalized.isEmpty || normalized == '—') {
+    return PaychekPdfFonts.text(
+      '—',
+      preferHangulPrimary: koPrimary,
+      fontSize: 9,
+      color: PdfColors.grey800,
+      height: 1.4,
+    );
+  }
+  final tags = strategieSetupBodyToTags(normalized);
+  if (tags.length <= 1) {
+    return PaychekPdfFonts.text(
+      tags.isEmpty ? normalized : tags.first,
+      preferHangulPrimary: koPrimary,
+      fontSize: 9,
+      color: PdfColors.grey800,
+      height: 1.4,
+    );
+  }
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      for (var i = 0; i < tags.length; i++) ...[
+        if (i > 0) pw.SizedBox(height: 4),
+        _bulletLine('- ${tags[i]}', koPrimary: koPrimary),
+      ],
+    ],
+  );
+}
+
+pw.Widget _ruleBlockPdf(
+  StrategieSetupRuleBlock r,
+  AppLocalizations l, {
+  required bool koPrimary,
+  required StrategieExportPdfIcons icons,
+}) {
+  final heading = _ruleHeadingForPdf(r, l);
+  final iconBytes = icons.bytesForIcon(r.icon);
+  final headingColor = strategiePdfHeadingColor(r.icon);
+
+  return pw.Padding(
+    padding: const pw.EdgeInsets.only(bottom: 8),
+    child: pw.Row(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(top: 1),
+          child: _pdfRuleIcon(iconBytes),
+        ),
+        pw.SizedBox(width: 8),
+        pw.Expanded(
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              PaychekPdfFonts.text(
+                heading.toUpperCase(),
+                preferHangulPrimary: koPrimary,
+                fontSize: 7,
+                bold: true,
+                color: headingColor,
+                letterSpacing: 0.4,
+              ),
+              pw.SizedBox(height: 4),
+              _ruleBodyPdf(r.body, koPrimary: koPrimary),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Future<Uint8List> buildStrategiePdf(Locale locale) async {
+  await PaychekPdfFonts.ensureLoaded();
+  final ruleIcons = await StrategieExportPdfIcons.load();
+  final koPrimary = locale.languageCode == 'ko';
   final l = lookupAppLocalizations(locale);
   final gr = StrategieFeedbackReference.gestionRisque(locale);
   await StrategieSetupsStore.ensureLoaded();
@@ -121,30 +229,43 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
 
   final body = <pw.Widget>[
     pw.Center(
-      child: pw.Text(
-        _ascii(l.plusMyStrategy.toUpperCase()),
-        style: pw.TextStyle(
-          fontSize: 18,
-          fontWeight: pw.FontWeight.bold,
-          color: PdfColors.grey900,
-          letterSpacing: 1.2,
+      child: PaychekPdfFonts.text(
+        l.plusMyStrategy.toUpperCase(),
+        preferHangulPrimary: koPrimary,
+        fontSize: 20,
+        bold: true,
+        color: _kPrimary,
+        letterSpacing: 1.4,
+      ),
+    ),
+    pw.SizedBox(height: 8),
+    pw.Center(
+      child: pw.Container(
+        width: 48,
+        height: 3,
+        decoration: pw.BoxDecoration(
+          color: _kAccent,
+          borderRadius: pw.BorderRadius.circular(2),
         ),
       ),
     ),
-    pw.SizedBox(height: 6),
+    pw.SizedBox(height: 10),
     pw.Center(
-      child: pw.Text(
-        _ascii(l.strategiePdfPlaybookBlurbShort),
+      child: PaychekPdfFonts.text(
+        l.strategiePdfPlaybookBlurbShort,
+        preferHangulPrimary: koPrimary,
+        fontSize: 9,
+        color: _kMuted,
+        height: 1.4,
         textAlign: pw.TextAlign.center,
-        style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700, height: 1.35),
       ),
     ),
-    pw.SizedBox(height: 12),
-    pw.Container(height: 1, color: PdfColors.grey400),
     pw.SizedBox(height: 14),
-    _sectionTitle(l.ajouterTradeStrategieGoldRules),
+    pw.Container(height: 1, color: _kBorder),
+    pw.SizedBox(height: 16),
+    _sectionTitle(l.ajouterTradeStrategieGoldRules, koPrimary: koPrimary),
     _card(
-      bg: _kGreyBg(),
+      bg: _kCardBg,
       children: [
         for (var i = 0; i < rules.length; i++) ...[
           if (i > 0) pw.SizedBox(height: 8),
@@ -153,33 +274,35 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
             decoration: pw.BoxDecoration(
               color: PdfColors.white,
               borderRadius: pw.BorderRadius.circular(8),
-              border: pw.Border.all(color: PdfColors.grey300),
+              border: pw.Border.all(color: _kBorder, width: 0.6),
             ),
             child: pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Container(
-                  width: 22,
-                  height: 22,
+                  width: 24,
+                  height: 24,
                   alignment: pw.Alignment.center,
                   decoration: pw.BoxDecoration(
-                    color: PdfColors.grey700,
+                    color: _kAccent,
                     borderRadius: pw.BorderRadius.circular(6),
                   ),
-                  child: pw.Text(
+                  child: PaychekPdfFonts.text(
                     '${i + 1}',
-                    style: pw.TextStyle(
-                      fontSize: 10,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.white,
-                    ),
+                    preferHangulPrimary: koPrimary,
+                    fontSize: 10,
+                    bold: true,
+                    color: PdfColors.white,
                   ),
                 ),
                 pw.SizedBox(width: 10),
                 pw.Expanded(
-                  child: pw.Text(
-                    _ascii(rules[i]),
-                    style: const pw.TextStyle(fontSize: 9, height: 1.35),
+                  child: PaychekPdfFonts.text(
+                    rules[i],
+                    preferHangulPrimary: koPrimary,
+                    fontSize: 9,
+                    color: PdfColors.grey800,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -188,7 +311,7 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
         ],
       ],
     ),
-    _sectionTitle(l.ajouterTradeStrategieRiskManagement),
+    _sectionTitle(l.ajouterTradeStrategieRiskManagement, koPrimary: koPrimary),
     pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -197,6 +320,7 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
             gr[0].label,
             '${gestion.riskPct}%',
             false,
+            koPrimary: koPrimary,
           ),
         ),
         pw.SizedBox(width: 8),
@@ -205,6 +329,7 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
             gr[1].label,
             '${gestion.lossPct}%',
             true,
+            koPrimary: koPrimary,
           ),
         ),
         pw.SizedBox(width: 8),
@@ -213,6 +338,7 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
             gr[2].label,
             '${gestion.tradesPerDay} ${l.strategieGestionCaptionMaximum}',
             false,
+            koPrimary: koPrimary,
           ),
         ),
         pw.SizedBox(width: 8),
@@ -221,74 +347,83 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
             gr[3].label,
             '1:${gestion.rrRatio.round()} ${l.strategieGestionCaptionMinimum}',
             false,
+            koPrimary: koPrimary,
           ),
         ),
       ],
     ),
     pw.SizedBox(height: 14),
-    _sectionTitle(l.ajouterTradeStrategieHoursSessions),
+    _sectionTitle(l.ajouterTradeStrategieHoursSessions, koPrimary: koPrimary),
     _card(
-      bg: _kGreyBg(),
+      bg: _kCardBg,
       children: [
-        pw.Row(
-          children: [
-            pw.Expanded(
-              flex: 2,
-              child: pw.Text(
-                _ascii(l.strategiePdfTableSession),
-                style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600),
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: pw.BoxDecoration(
+            color: PdfColor.fromHex('E2E8F0'),
+            borderRadius: pw.BorderRadius.circular(6),
+          ),
+          child: pw.Row(
+            children: [
+              pw.Expanded(
+                flex: 2,
+                child: _tableHeaderCell(
+                  l.strategiePdfTableSession,
+                  koPrimary: koPrimary,
+                ),
               ),
-            ),
-            pw.Expanded(
-              flex: 2,
-              child: pw.Text(
-                _ascii(l.strategiePdfTableDescription),
-                style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600),
+              pw.Expanded(
+                flex: 2,
+                child: _tableHeaderCell(
+                  l.strategiePdfTableDescription,
+                  koPrimary: koPrimary,
+                ),
               ),
-            ),
-            pw.Expanded(
-              flex: 2,
-              child: pw.Text(
-                _ascii(l.strategiePdfTableSchedule),
-                style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.grey600),
+              pw.Expanded(
+                flex: 2,
+                child: _tableHeaderCell(
+                  l.strategiePdfTableSchedule,
+                  koPrimary: koPrimary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        pw.SizedBox(height: 8),
+        pw.SizedBox(height: 6),
         for (final s in sessions) ...[
-          pw.Divider(color: PdfColors.grey400, height: 1),
-          pw.SizedBox(height: 6),
+          pw.Divider(color: _kBorder, height: 1),
+          pw.SizedBox(height: 8),
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Expanded(
                 flex: 2,
-                child: pw.Text(
-                  _ascii(s.title),
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: s.isNoTradeZone ? _kRed() : PdfColors.grey900,
-                  ),
+                child: PaychekPdfFonts.text(
+                  s.title,
+                  preferHangulPrimary: koPrimary,
+                  fontSize: 9,
+                  bold: true,
+                  color: s.isNoTradeZone ? _kRed : _kPrimary,
                 ),
               ),
               pw.Expanded(
                 flex: 2,
-                child: pw.Text(
-                  _ascii(s.subtitle),
-                  style: const pw.TextStyle(fontSize: 8, height: 1.3),
+                child: PaychekPdfFonts.text(
+                  s.subtitle,
+                  preferHangulPrimary: koPrimary,
+                  fontSize: 8,
+                  color: PdfColors.grey700,
+                  height: 1.35,
                 ),
               ),
               pw.Expanded(
                 flex: 2,
-                child: pw.Text(
-                  _ascii(s.timeDisplay),
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: s.isNoTradeZone ? _kRed() : PdfColors.grey900,
-                  ),
+                child: PaychekPdfFonts.text(
+                  s.timeDisplay,
+                  preferHangulPrimary: koPrimary,
+                  fontSize: 9,
+                  bold: true,
+                  color: s.isNoTradeZone ? _kRed : _kPrimary,
                 ),
               ),
             ],
@@ -297,28 +432,34 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
         ],
       ],
     ),
-    _sectionTitle(l.strategieSectionSetupsAndModels),
+    _sectionTitle(l.strategieSectionSetupsAndModels, koPrimary: koPrimary),
     for (final setup in setups) ...[
       pw.SizedBox(height: 4),
-      _setupCardPdf(setup, l),
+      _setupCardPdf(setup, l, icons: ruleIcons, koPrimary: koPrimary),
     ],
-    pw.SizedBox(height: 8),
-    pw.Text(
-      _ascii(l.strategiePdfFooterNote),
-      style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500, height: 1.3),
+    pw.SizedBox(height: 10),
+    PaychekPdfFonts.text(
+      l.strategiePdfFooterNote,
+      preferHangulPrimary: koPrimary,
+      fontSize: 7,
+      color: PdfColors.grey500,
+      height: 1.35,
+      fontStyle: pw.FontStyle.italic,
     ),
   ];
 
   final doc = pw.Document(
-    title: l.plusMyStrategy,
+    title: paychekPdfNormalize(l.plusMyStrategy),
     author: 'PAYCHEK',
+    theme: PaychekPdfFonts.theme(),
   );
   doc.addPage(
     pw.MultiPage(
       pageTheme: pw.PageTheme(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.fromLTRB(32, 40, 32, 36),
-        buildBackground: (ctx) => pw.Container(color: PdfColors.grey50),
+        theme: PaychekPdfFonts.theme(),
+        buildBackground: (ctx) => pw.Container(color: _kCardBg),
       ),
       build: (ctx) => body,
     ),
@@ -326,52 +467,84 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
   return doc.save();
 }
 
-pw.Widget _riskCell(String label, String value, bool redValue) {
+pw.Widget _riskCell(
+  String label,
+  String value,
+  bool redValue, {
+  required bool koPrimary,
+}) {
   return pw.Container(
-    padding: const pw.EdgeInsets.all(10),
+    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 12),
     decoration: pw.BoxDecoration(
       color: PdfColors.white,
       borderRadius: pw.BorderRadius.circular(8),
-      border: pw.Border.all(color: PdfColors.grey300),
+      border: pw.Border.all(
+        color: redValue ? PdfColor.fromHex('FECACA') : _kBorder,
+        width: 0.8,
+      ),
     ),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.center,
       children: [
-        pw.Text(
-          _ascii(label),
+        PaychekPdfFonts.text(
+          label.toUpperCase(),
+          preferHangulPrimary: koPrimary,
+          fontSize: 6.5,
+          bold: true,
+          color: _kMuted,
+          letterSpacing: 0.5,
           textAlign: pw.TextAlign.center,
-          style: pw.TextStyle(
-            fontSize: 7,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.grey600,
-            letterSpacing: 0.4,
-          ),
         ),
-        pw.SizedBox(height: 6),
-        pw.Text(
-          _ascii(value),
+        pw.SizedBox(height: 8),
+        PaychekPdfFonts.text(
+          value,
+          preferHangulPrimary: koPrimary,
+          fontSize: 12,
+          bold: true,
+          color: redValue ? _kRed : _kPrimary,
           textAlign: pw.TextAlign.center,
-          style: pw.TextStyle(
-            fontSize: 11,
-            fontWeight: pw.FontWeight.bold,
-            color: redValue ? _kRed() : PdfColors.grey900,
-          ),
         ),
       ],
     ),
   );
 }
 
-pw.Widget _setupCardPdf(StrategieSetupCardData s, AppLocalizations l) {
+pw.Widget _setupCardPdf(
+  StrategieSetupCardData s,
+  AppLocalizations l, {
+  required StrategieExportPdfIcons icons,
+  required bool koPrimary,
+}) {
   final blocks = <pw.Widget>[
-    pw.Text(
-      'SETUP : ${_ascii(s.title).toUpperCase()}',
-      style: pw.TextStyle(
-        fontSize: 11,
-        fontWeight: pw.FontWeight.bold,
-        color: PdfColors.grey900,
-        letterSpacing: 0.4,
-      ),
+    pw.Row(
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: pw.BoxDecoration(
+            color: _kAccentSoft,
+            borderRadius: pw.BorderRadius.circular(4),
+          ),
+          child: PaychekPdfFonts.text(
+            'SETUP',
+            preferHangulPrimary: koPrimary,
+            fontSize: 7,
+            bold: true,
+            color: _kAccent,
+            letterSpacing: 0.8,
+          ),
+        ),
+        pw.SizedBox(width: 8),
+        pw.Expanded(
+          child: PaychekPdfFonts.text(
+            paychekPdfNormalize(s.title).toUpperCase(),
+            preferHangulPrimary: koPrimary,
+            fontSize: 11,
+            bold: true,
+            color: _kPrimary,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
     ),
     pw.SizedBox(height: 10),
     pw.Row(
@@ -381,14 +554,27 @@ pw.Widget _setupCardPdf(StrategieSetupCardData s, AppLocalizations l) {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                _ascii(l.strategiePdfTechnicalContext),
-                style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700),
+              PaychekPdfFonts.text(
+                l.strategiePdfTechnicalContext.toUpperCase(),
+                preferHangulPrimary: koPrimary,
+                fontSize: 7,
+                bold: true,
+                color: _kMuted,
+                letterSpacing: 0.5,
               ),
-              pw.SizedBox(height: 4),
-              _bulletLine(l.ajouterTradeStrategieSetupTimeframesRow(s.timeframes)),
-              _bulletLine(l.ajouterTradeStrategieSetupIndicatorsRow(s.indicateurs)),
-              _bulletLine(l.ajouterTradeStrategieSetupPatternRow(s.pattern)),
+              pw.SizedBox(height: 6),
+              _bulletLine(
+                l.ajouterTradeStrategieSetupTimeframesRow(s.timeframes),
+                koPrimary: koPrimary,
+              ),
+              _bulletLine(
+                l.ajouterTradeStrategieSetupIndicatorsRow(s.indicateurs),
+                koPrimary: koPrimary,
+              ),
+              _bulletLine(
+                l.ajouterTradeStrategieSetupPatternRow(s.pattern),
+                koPrimary: koPrimary,
+              ),
             ],
           ),
         ),
@@ -397,30 +583,29 @@ pw.Widget _setupCardPdf(StrategieSetupCardData s, AppLocalizations l) {
           child: pw.Container(
             padding: const pw.EdgeInsets.all(10),
             decoration: pw.BoxDecoration(
-              color: PdfColor.fromInt(0xFFE8F5E9),
+              color: _kSignalBg,
               borderRadius: pw.BorderRadius.circular(8),
-              border: pw.Border.all(color: _kGreen()),
+              border: pw.Border.all(color: _kGreen, width: 0.8),
             ),
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  _ascii(l.strategiePdfAlertSignal),
-                  style: pw.TextStyle(
-                    fontSize: 8,
-                    fontWeight: pw.FontWeight.bold,
-                    color: _kGreen(),
-                  ),
+                PaychekPdfFonts.text(
+                  l.strategiePdfAlertSignal.toUpperCase(),
+                  preferHangulPrimary: koPrimary,
+                  fontSize: 7,
+                  bold: true,
+                  color: _kGreen,
+                  letterSpacing: 0.4,
                 ),
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  _ascii(s.signalText),
-                  style: pw.TextStyle(
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                    color: _kGreen(),
-                    height: 1.3,
-                  ),
+                pw.SizedBox(height: 6),
+                PaychekPdfFonts.text(
+                  s.signalText,
+                  preferHangulPrimary: koPrimary,
+                  fontSize: 9,
+                  bold: true,
+                  color: _kGreen,
+                  height: 1.35,
                 ),
               ],
             ),
@@ -429,32 +614,29 @@ pw.Widget _setupCardPdf(StrategieSetupCardData s, AppLocalizations l) {
       ],
     ),
     pw.SizedBox(height: 10),
-    pw.Container(height: 1, color: PdfColors.grey300),
+    pw.Container(height: 1, color: _kBorder),
     pw.SizedBox(height: 10),
-    for (final r in s.ruleBlocks) ...[
-      pw.Padding(
-        padding: const pw.EdgeInsets.only(bottom: 8),
-        child: pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              _ascii(r.heading),
-              style: pw.TextStyle(
-                fontSize: 8,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.grey800,
-                letterSpacing: 0.3,
-              ),
-            ),
-            pw.SizedBox(height: 3),
-            pw.Text(
-              _ascii(r.body),
-              style: const pw.TextStyle(fontSize: 9, height: 1.35),
+    pw.Container(
+      padding: const pw.EdgeInsets.all(10),
+      decoration: pw.BoxDecoration(
+        color: PdfColor.fromHex('F1F5F9'),
+        borderRadius: pw.BorderRadius.circular(8),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < s.ruleBlocks.length; i++) ...[
+            if (i > 0) pw.SizedBox(height: 6),
+            _ruleBlockPdf(
+              s.ruleBlocks[i],
+              l,
+              koPrimary: koPrimary,
+              icons: icons,
             ),
           ],
-        ),
+        ],
       ),
-    ],
+    ),
   ];
 
   return _card(children: blocks);

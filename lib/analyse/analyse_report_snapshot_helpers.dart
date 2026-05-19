@@ -123,9 +123,9 @@ AnalyseReportStructureExtraLine _reportStructureExtraLine(
     priceLabel: _orDash(e.price),
     tenueLabel: switch (e.tenue) {
       AnalyseStructureTenue.tenu =>
-        _txt(locale, 'Tenu', 'Held', 'Mantenido', 'Gehalten', 'Mantido'),
+        _txt(locale, 'Tenu', 'Held', 'Mantenido', 'Gehalten', 'Mantido', '유지'),
       AnalyseStructureTenue.casse =>
-        _txt(locale, 'Cassé', 'Broken', 'Roto', 'Gebrochen', 'Rompido'),
+        _txt(locale, 'Cassé', 'Broken', 'Roto', 'Gebrochen', 'Rompido', '돌파'),
       null => null,
     },
   );
@@ -133,11 +133,19 @@ AnalyseReportStructureExtraLine _reportStructureExtraLine(
 
 String _biasLabel(AnalyseDirectionBias b, Locale locale) => switch (b) {
       AnalyseDirectionBias.achat =>
-        _txt(locale, 'ACHAT', 'BUY', 'COMPRA', 'KAUF', 'COMPRA'),
+        _txt(locale, 'ACHAT', 'BUY', 'COMPRA', 'KAUF', 'COMPRA', '매수'),
       AnalyseDirectionBias.vente =>
-        _txt(locale, 'VENTE', 'SELL', 'VENTA', 'VERKAUF', 'VENDA'),
+        _txt(locale, 'VENTE', 'SELL', 'VENTA', 'VERKAUF', 'VENDA', '매도'),
       AnalyseDirectionBias.surveiller =>
-        _txt(locale, 'À SURVEILLER', 'WATCH', 'VIGILAR', 'BEOBACHTEN', 'OBSERVAR'),
+        _txt(
+          locale,
+          'À SURVEILLER',
+          'WATCH',
+          'VIGILAR',
+          'BEOBACHTEN',
+          'OBSERVAR',
+          '관망',
+        ),
     };
 
 (Color, Color) _biasColors(AnalyseDirectionBias b) => switch (b) {
@@ -176,21 +184,23 @@ String _trendPickLabel(AnalyseController c, Locale locale) {
 
 String _trendEnumLabel(AnalyseLocalTrend t, Locale locale) => switch (t) {
       AnalyseLocalTrend.haussiere =>
-        _txt(locale, 'Haussière', 'Bullish', 'Alcista', 'Bullisch', 'Alta'),
+        _txt(locale, 'Haussière', 'Bullish', 'Alcista', 'Bullisch', 'Alta', '상승'),
       AnalyseLocalTrend.baissiere =>
-        _txt(locale, 'Baissière', 'Bearish', 'Bajista', 'Bärisch', 'Baixa'),
+        _txt(locale, 'Baissière', 'Bearish', 'Bajista', 'Bärisch', 'Baixa', '하락'),
       AnalyseLocalTrend.range =>
-        _txt(locale, 'Range', 'Ranging', 'Rango', 'Seitwärts', 'Lateral'),
+        _txt(locale, 'Range', 'Ranging', 'Rango', 'Seitwärts', 'Lateral', '횡보'),
     };
 
-String _txt(Locale locale, String fr, String en, String es, String de, String pt) {
-  final code = locale.languageCode.toLowerCase();
-  if (code == 'fr') return fr;
-  if (code == 'es') return es;
-  if (code == 'de') return de;
-  if (code == 'pt') return pt;
-  return en;
-}
+String _txt(
+  Locale locale,
+  String fr,
+  String en,
+  String es,
+  String de,
+  String pt, [
+  String? ko,
+]) =>
+    performancePickLocale(locale, fr, en, es, de, pt, ko);
 
 /// Aligné sur les puces « Phase actuelle » ([AnalyseTokens.chipPhaseSelected]).
 (Color, Color) _phasePillColors() => (

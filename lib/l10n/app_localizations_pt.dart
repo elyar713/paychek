@@ -2324,6 +2324,39 @@ class AppLocalizationsPt extends AppLocalizations {
   String get profileEditInvalidEmailSnack => 'Introduza um e-mail válido';
 
   @override
+  String get accountChangePasswordButton => 'Alterar palavra-passe';
+
+  @override
+  String get accountChangePasswordDialogTitle => 'Alterar palavra-passe';
+
+  @override
+  String get accountChangePasswordCurrentLabel => 'Palavra-passe atual';
+
+  @override
+  String get accountChangePasswordNewLabel => 'Nova palavra-passe';
+
+  @override
+  String get accountChangePasswordConfirmLabel =>
+      'Confirmar nova palavra-passe';
+
+  @override
+  String get accountChangePasswordCta => 'GUARDAR';
+
+  @override
+  String get accountChangePasswordSuccessSnack => 'Palavra-passe atualizada';
+
+  @override
+  String get accountChangePasswordCurrentMissing =>
+      'Introduz a tua palavra-passe atual';
+
+  @override
+  String get accountChangePasswordRequiresRecentLogin =>
+      'Por segurança, inicia sessão novamente e tenta outra vez.';
+
+  @override
+  String get accountChangePasswordForgotLink => 'Esqueceste a palavra-passe?';
+
+  @override
   String get accountAuthSectionTitle => 'Entrar';
 
   @override

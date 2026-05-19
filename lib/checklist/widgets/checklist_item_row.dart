@@ -26,10 +26,14 @@ class ChecklistItemRow extends StatelessWidget {
     this.onSectionEditInteract,
     this.schedule,
     this.onScheduleChanged,
+    this.expiredMissed = false,
   });
 
   final String label;
   final bool checked;
+
+  /// Échéance passée sans coche (hebdo / date) — ligne grisée, non cliquable.
+  final bool expiredMissed;
   final ValueChanged<bool> onChanged;
   final bool showDividerBelow;
 
@@ -57,16 +61,19 @@ class ChecklistItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final baseLabelStyle = expiredMissed
+        ? ChecklistTokens.itemLabelExpiredStyle
+        : ChecklistTokens.itemLabelOnCardStyle;
     final lineStyle = onLineDelete != null
-        ? ChecklistTokens.itemLabelOnCardStyle
+        ? baseLabelStyle
         : (checked
-            ? ChecklistTokens.itemLabelOnCardStyle.copyWith(
+            ? baseLabelStyle.copyWith(
                 decoration: TextDecoration.lineThrough,
-                decorationColor: ChecklistTokens.itemLabelOnCardStyle.color,
+                decorationColor: baseLabelStyle.color,
                 decorationThickness:
                     ChecklistTokens.itemLabelStrikethroughThickness,
               )
-            : ChecklistTokens.itemLabelOnCardStyle);
+            : baseLabelStyle);
 
     Widget mainTapTarget = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,7 +84,7 @@ class ChecklistItemRow extends StatelessWidget {
             onTapDown: onSectionEditInteract,
           )
         else
-          _SquareCheck(checked: checked),
+          _SquareCheck(checked: checked, muted: expiredMissed),
         const SizedBox(width: ChecklistTokens.itemRowCheckGap),
         Expanded(
           child: editingLabel &&
@@ -107,7 +114,7 @@ class ChecklistItemRow extends StatelessWidget {
       ],
     );
 
-    if (onLineDelete == null && !editingLabel) {
+    if (onLineDelete == null && !editingLabel && !expiredMissed) {
       mainTapTarget = Material(
         color: Colors.transparent,
         child: InkWell(
@@ -155,9 +162,7 @@ class ChecklistItemRow extends StatelessWidget {
     );
 
     final sched = schedule ?? const ChecklistItemSchedule();
-    final summary = onScheduleChanged != null
-        ? checklistItemScheduleSummaryLine(context, sched)
-        : null;
+    final summary = checklistItemScheduleSummaryLine(context, sched);
     final summaryColor = sched.isNonDailyDisplay
         ? ChecklistTokens.scheduleCustomSummary
         : DashboardTokens.accent.withValues(alpha: 0.92);
@@ -165,31 +170,29 @@ class ChecklistItemRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (summary != null) ...[
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 18 + ChecklistTokens.itemRowCheckGap,
-              right: 4,
-              top: ChecklistTokens.scheduleSummaryPaddingTop,
-              bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                summary,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: ChecklistTokens.scheduleSummaryFontSize,
-                  height: 1.15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.15,
-                  color: summaryColor,
-                ),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 18 + ChecklistTokens.itemRowCheckGap,
+            right: 4,
+            top: ChecklistTokens.scheduleSummaryPaddingTop,
+            bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              summary,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: ChecklistTokens.scheduleSummaryFontSize,
+                height: 1.15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.15,
+                color: summaryColor,
               ),
             ),
           ),
-        ],
+        ),
         row,
         if (showDividerBelow)
           Divider(height: 1, thickness: 1, color: ChecklistTokens.dividerOnCard),
@@ -254,12 +257,14 @@ class _LineDeleteButton extends StatelessWidget {
 }
 
 class _SquareCheck extends StatelessWidget {
-  const _SquareCheck({required this.checked});
+  const _SquareCheck({required this.checked, this.muted = false});
 
   final bool checked;
+  final bool muted;
 
   @override
   Widget build(BuildContext context) {
+    final borderIdle = muted ? const Color(0xFF2A2A2A) : const Color(0xFF3A3A3A);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       width: 18,
@@ -267,17 +272,17 @@ class _SquareCheck extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: checked
+        color: checked && !muted
             ? ChecklistTokens.checkboxCheckedFill
             : Colors.transparent,
         border: Border.all(
-          color: checked
+          color: checked && !muted
               ? ChecklistTokens.checkboxCheckedFill
-              : const Color(0xFF3A3A3A),
+              : borderIdle,
           width: 1.5,
         ),
       ),
-      child: checked
+      child: checked && !muted
           ? Icon(
               Icons.check,
               size: 12,

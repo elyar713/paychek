@@ -81,12 +81,12 @@ class ChecklistDailyUncheckedCard extends StatelessWidget {
           emptyMessage = l.checklistDailyUncheckedNoActivity;
         } else if (!isToday && hasTrades && !hasSnapshot) {
           emptyMessage = l.checklistDailyUncheckedNoHistory;
+        } else if (entries.isNotEmpty) {
+          emptyMessage = '';
         } else if (dueCount == 0) {
           emptyMessage = l.checklistDailyUncheckedNoDue;
-        } else if (entries.isEmpty) {
-          emptyMessage = l.checklistDailyUncheckedAllDone;
         } else {
-          emptyMessage = '';
+          emptyMessage = l.checklistDailyUncheckedAllDone;
         }
 
         final grouped = _groupBySection(entries);

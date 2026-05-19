@@ -2325,6 +2325,38 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte eine gültige E-Mail-Adresse eingeben';
 
   @override
+  String get accountChangePasswordButton => 'Passwort ändern';
+
+  @override
+  String get accountChangePasswordDialogTitle => 'Passwort ändern';
+
+  @override
+  String get accountChangePasswordCurrentLabel => 'Aktuelles Passwort';
+
+  @override
+  String get accountChangePasswordNewLabel => 'Neues Passwort';
+
+  @override
+  String get accountChangePasswordConfirmLabel => 'Neues Passwort bestätigen';
+
+  @override
+  String get accountChangePasswordCta => 'SPEICHERN';
+
+  @override
+  String get accountChangePasswordSuccessSnack => 'Passwort aktualisiert';
+
+  @override
+  String get accountChangePasswordCurrentMissing =>
+      'Gib dein aktuelles Passwort ein';
+
+  @override
+  String get accountChangePasswordRequiresRecentLogin =>
+      'Aus Sicherheitsgründen melde dich erneut an und versuche es noch einmal.';
+
+  @override
+  String get accountChangePasswordForgotLink => 'Passwort vergessen?';
+
+  @override
   String get accountAuthSectionTitle => 'Anmeldung';
 
   @override

@@ -13,7 +13,7 @@ import '../strategie_realtime_notifier.dart';
 import '../strategie_tokens.dart';
 import '../widgets/strategie_section_frame.dart';
 import '../widgets/strategie_setup_card.dart';
-import '../widgets/strategie_setup_cards_content.dart';
+import '../widgets/strategie_setup_rule_styles.dart';
 import 'strategie_setup_edit_dialog.dart';
 import 'strategie_setup_modeles_section_menu.dart';
 
@@ -147,28 +147,24 @@ class _StrategieSetupModelesSectionState
       signalText: '—',
       signalColor: Colors.white,
       ruleBlocks: [
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.crosshair,
           heading: l.strategieRuleEntryPrecise,
-          headingColor: strategieSetupRuleHeadingTan,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.shield,
           heading: l.strategieRuleInvalidation,
-          headingColor: StrategieTokens.riskRed,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.circleDot,
           heading: l.strategieRuleTarget,
-          headingColor: StrategieTokens.emerald,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.lock,
           heading: l.strategieRuleManagement,
-          headingColor: StrategieTokens.labelMuted,
           body: '—',
         ),
       ],
@@ -411,10 +407,13 @@ class _StrategieSetupModelesSectionState
                   selectedIndex: widget.visibleSetupIndex.value
                       .clamp(0, _cards.length - 1),
                   scrollController: _quickPickScrollController,
+                  editMode: _editMode,
                   onScrollBack: () => _nudgeQuickPickScroll(-220),
                   onScrollForward: () => _nudgeQuickPickScroll(220),
                   onSelect: (index) =>
                       widget.visibleSetupIndex.value = index,
+                  onEditAt: _openSetupEditor,
+                  onDeleteAt: _editMode ? _removeCardAt : null,
                 ),
                 const SizedBox(height: 12),
               ],
@@ -435,17 +434,23 @@ class _SetupQuickPickBar extends StatelessWidget {
     required this.cards,
     required this.selectedIndex,
     required this.scrollController,
+    required this.editMode,
     required this.onScrollBack,
     required this.onScrollForward,
     required this.onSelect,
+    required this.onEditAt,
+    this.onDeleteAt,
   });
 
   final List<StrategieSetupCardData> cards;
   final int selectedIndex;
   final ScrollController scrollController;
+  final bool editMode;
   final VoidCallback onScrollBack;
   final VoidCallback onScrollForward;
   final ValueChanged<int> onSelect;
+  final ValueChanged<int> onEditAt;
+  final ValueChanged<int>? onDeleteAt;
 
   static const _arrowHit = BoxConstraints(minWidth: 40, minHeight: 40);
 
@@ -478,6 +483,9 @@ class _SetupQuickPickBar extends StatelessWidget {
                     dotColor: cards[i].dotColor,
                     selected: i == selectedIndex,
                     onTap: () => onSelect(i),
+                    onEditTap: () => onEditAt(i),
+                    onDeleteTap:
+                        editMode && onDeleteAt != null ? () => onDeleteAt!(i) : null,
                   ),
                 ],
               ],
@@ -506,12 +514,16 @@ class _SetupQuickPickButton extends StatelessWidget {
     required this.dotColor,
     required this.selected,
     required this.onTap,
+    required this.onEditTap,
+    this.onDeleteTap,
   });
 
   final String label;
   final Color dotColor;
   final bool selected;
   final VoidCallback onTap;
+  final VoidCallback onEditTap;
+  final VoidCallback? onDeleteTap;
 
   @override
   Widget build(BuildContext context) {
@@ -521,7 +533,7 @@ class _SetupQuickPickButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(StrategieTokens.radiusSm),
         child: SizedBox(
-          width: 200,
+          width: onDeleteTap != null ? 248 : 228,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
@@ -563,6 +575,9 @@ class _SetupQuickPickButton extends StatelessWidget {
                     ),
                   ),
                 ),
+                StrategieSetupEditIconButton(onPressed: onEditTap),
+                if (onDeleteTap != null)
+                  StrategieSetupDeleteIconButton(onPressed: onDeleteTap!),
               ],
             ),
           ),

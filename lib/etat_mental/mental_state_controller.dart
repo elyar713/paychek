@@ -178,7 +178,7 @@ class MentalStateController extends ChangeNotifier {
     final k = _currentMentalDayKey();
     _touchedDays.add(k);
     _overallScoreByDay[k] = overallScore;
-    _snapshotByDay[k] = _currentDaySnapshot();
+    _snapshotByDay[k] = _daySnapshotForPersist(k);
   }
 
   /// Score global affiché dans le mini-calendrier : identique à l’anneau pour la **période en cours** ; historique sinon.
@@ -289,7 +289,7 @@ class MentalStateController extends ChangeNotifier {
     final k = _currentMentalDayKey();
     if (_touchedDays.contains(k)) {
       _overallScoreByDay[k] = overallScore;
-      _snapshotByDay[k] = _currentDaySnapshot();
+      _snapshotByDay[k] = _daySnapshotForPersist(k);
     }
   }
 
@@ -298,6 +298,87 @@ class MentalStateController extends ChangeNotifier {
     b.remove('calendarOverallByDay');
     b.remove('dailySnapshots');
     return b;
+  }
+
+  Map<String, dynamic> _daySnapshotForPersist(String dayKey) {
+    final snap = _currentDaySnapshot();
+    snap['selectedEmotionsSnapshot'] = [
+      for (final e in _mergedSelectedEmotionsForDay(dayKey))
+        MentalStateStorage.emotionToMap(e),
+    ];
+    return snap;
+  }
+
+  /// Émotions sélectionnées ce jour-là, y compris celles supprimées depuis.
+  List<MentalStateEmotion> _mergedSelectedEmotionsForDay(String dayKey) {
+    final byId = <String, MentalStateEmotion>{};
+    final prev = _snapshotByDay[dayKey];
+    for (final e in MentalStateStorage.decodeEmotionsList(
+      prev?['selectedEmotionsSnapshot'],
+    )) {
+      if (!emotions.any((x) => x.id == e.id)) {
+        byId[e.id] = e;
+      }
+    }
+    for (final e in emotions) {
+      if (selectedEmotionIds.contains(e.id)) {
+        byId[e.id] = e;
+      }
+    }
+    return byId.values.toList();
+  }
+
+  Set<String> _selectedEmotionIdsInSnapshot(Map<String, dynamic> snap) {
+    final ids = <String>{};
+    final sel = snap['selectedEmotionIds'];
+    if (sel is List) {
+      for (final e in sel) {
+        final id = e.toString().trim();
+        if (id.isNotEmpty) ids.add(id);
+      }
+    }
+    final catalog = MentalStateStorage.decodeEmotionsList(snap['emotions']);
+    final sei = (snap['selectedEmotionIndex'] as num?)?.toInt();
+    if (ids.isEmpty && sei != null && sei >= 0 && sei < catalog.length) {
+      ids.add(catalog[sei].id);
+    }
+    for (final e in MentalStateStorage.decodeEmotionsList(
+      snap['selectedEmotionsSnapshot'],
+    )) {
+      ids.add(e.id);
+    }
+    return ids;
+  }
+
+  /// Conserve l’émotion supprimée dans les snapshots des jours où elle était sélectionnée.
+  void freezeDeletedEmotionInDailySnapshots(MentalStateEmotion emotion) {
+    var changed = false;
+    for (final k in _snapshotByDay.keys.toList()) {
+      final snap = Map<String, dynamic>.from(_snapshotByDay[k]!);
+      if (!_selectedEmotionIdsInSnapshot(snap).contains(emotion.id)) continue;
+
+      final byId = <String, MentalStateEmotion>{
+        for (final e in MentalStateStorage.decodeEmotionsList(
+          snap['selectedEmotionsSnapshot'],
+        ))
+          e.id: e,
+      };
+      if (!byId.containsKey(emotion.id)) {
+        for (final e in MentalStateStorage.decodeEmotionsList(snap['emotions'])) {
+          if (e.id == emotion.id) {
+            byId[e.id] = e;
+            break;
+          }
+        }
+      }
+      byId[emotion.id] = emotion;
+      snap['selectedEmotionsSnapshot'] = [
+        for (final e in byId.values) MentalStateStorage.emotionToMap(e),
+      ];
+      _snapshotByDay[k] = snap;
+      changed = true;
+    }
+    if (changed) _schedulePersistCalendar();
   }
 
   Map<String, dynamic>? snapshotForCalendarDay(DateTime day) {
@@ -428,7 +509,7 @@ class MentalStateController extends ChangeNotifier {
       final endedKey = sleepDayKey(ended);
       if (_touchedDays.contains(endedKey)) {
         _overallScoreByDay[endedKey] = overallScore;
-        _snapshotByDay[endedKey] = _currentDaySnapshot();
+        _snapshotByDay[endedKey] = _daySnapshotForPersist(endedKey);
       }
     }
     _snapshotTodayOverallForCalendar();
@@ -538,14 +619,9 @@ class MentalStateController extends ChangeNotifier {
           if (selectedEmotionIds.contains(e.id)) e,
       ];
 
-  /// Part affichée sur la puce : poids libre, ou part parmi les sélectionnées (mode 100 %).
+  /// Poids affiché sur la puce (réglage engrenage).
   int emotionChipImpactPercent(MentalStateEmotion e) =>
-      MentalStateShareLogic.emotionChipImpactPercent(
-        emotion: e,
-        selectedIds: selectedEmotionIds,
-        selected: selectedEmotions,
-        share100: emotionsShare100,
-      );
+      MentalStateShareLogic.emotionChipImpactPercent(emotion: e);
 
   Future<void> _loadFullBundleIfPresent() async {
     final m = await MentalStateStorage.loadBundleMap();
@@ -832,28 +908,11 @@ class MentalStateController extends ChangeNotifier {
   }
 
   void equalizeEmotionWeights() {
-    if (emotionsShare100 && selectedEmotionIds.isNotEmpty) {
-      MentalStateShareLogic.equalizeEmotionWeights(selectedEmotions);
-    } else {
-      MentalStateShareLogic.equalizeEmotionWeights(emotions);
-    }
+    MentalStateShareLogic.equalizeEmotionWeights(emotions);
     touch();
   }
 
   void setEmotionShare(int index, double targetPercent) {
-    if (emotionsShare100 &&
-        index >= 0 &&
-        index < emotions.length &&
-        selectedEmotionIds.contains(emotions[index].id) &&
-        selectedEmotionIds.isNotEmpty) {
-      final sel = selectedEmotions;
-      final idxInSel = sel.indexWhere((e) => e.id == emotions[index].id);
-      if (idxInSel >= 0) {
-        MentalStateShareLogic.setEmotionShareSingle(sel, idxInSel, targetPercent);
-        touch();
-        return;
-      }
-    }
     MentalStateShareLogic.setEmotionShareSingle(emotions, index, targetPercent);
     touch();
   }
@@ -950,15 +1009,12 @@ class MentalStateController extends ChangeNotifier {
     }
 
     if (emotions.isNotEmpty && selectedEmotionIds.isNotEmpty) {
-      final selected = emotions.where((e) => selectedEmotionIds.contains(e.id)).toList();
-      if (selected.isNotEmpty) {
-        final sumW = selected.fold<double>(0, (s, e) => s + e.weight.clamp(0, 100));
-        for (final em in selected) {
-          final w = em.weight.clamp(0, 100);
-          final ew = sumW > 0 ? (emotionBlockWeight * (w / sumW)) : 0;
-          num += em.normalizedForScore() * ew;
-          den += ew;
-        }
+      for (final em in emotions) {
+        if (!selectedEmotionIds.contains(em.id)) continue;
+        final w = em.weight.clamp(0, 100) / 100.0;
+        final ew = emotionBlockWeight * w;
+        num += em.normalizedForScore() * ew;
+        den += ew;
       }
     }
     if (den <= 0) return 0;

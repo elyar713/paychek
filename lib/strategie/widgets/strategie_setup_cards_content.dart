@@ -4,9 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../strategie_tokens.dart';
 import '../strategie_setups_store.dart';
 import 'strategie_setup_card.dart';
-
-/// Couleur titres blocs règles (maquette).
-const Color strategieSetupRuleHeadingTan = Color(0xFFD4A574);
+import 'strategie_setup_rule_styles.dart';
 
 /// Cartes par défaut « Setups & modèles » (SMC : corps « — » si non figé).
 List<StrategieSetupCardData> strategieSetupDefaultCardDataList() {
@@ -20,29 +18,25 @@ List<StrategieSetupCardData> strategieSetupDefaultCardDataList() {
       signalText: 'Resistance breakout with volume spike',
       signalColor: StrategieTokens.emerald,
       ruleBlocks: [
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.crosshair,
           heading: 'PRECISE ENTRY',
-          headingColor: strategieSetupRuleHeadingTan,
           body:
               'M15 candle close above the key level with above-average volume.',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.shield,
           heading: 'INVALIDATION (STOP LOSS)',
-          headingColor: StrategieTokens.riskRed,
           body: 'Placed just below the breakout candle wick.',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.circleDot,
           heading: 'CIBLE (TAKE PROFIT)',
-          headingColor: StrategieTokens.emerald,
           body: 'Next liquidity zone or major resistance (min RR 1:2).',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.lock,
           heading: 'GESTION (BREAKEVEN / PARTIELS)',
-          headingColor: StrategieTokens.labelMuted,
           body: 'Once price reaches +1R profit, move SL to entry.',
         ),
       ],
@@ -56,28 +50,24 @@ List<StrategieSetupCardData> strategieSetupDefaultCardDataList() {
       signalText: 'Price taps the H4 OB + M15 rejection',
       signalColor: const Color(0xFF42A5F5),
       ruleBlocks: [
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.crosshair,
           heading: 'PRECISE ENTRY',
-          headingColor: strategieSetupRuleHeadingTan,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.shield,
           heading: 'INVALIDATION (STOP LOSS)',
-          headingColor: StrategieTokens.riskRed,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.circleDot,
           heading: 'CIBLE (TAKE PROFIT)',
-          headingColor: StrategieTokens.emerald,
           body: '—',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.lock,
           heading: 'GESTION (BREAKEVEN / PARTIELS)',
-          headingColor: StrategieTokens.labelMuted,
           body: '—',
         ),
       ],
@@ -91,28 +81,24 @@ List<StrategieSetupCardData> strategieSetupDefaultCardDataList() {
       signalText: 'Neckline breakout with volume',
       signalColor: const Color(0xFFFFB74D),
       ruleBlocks: [
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.crosshair,
           heading: 'PRECISE ENTRY',
-          headingColor: strategieSetupRuleHeadingTan,
           body: 'Buy/Sell on the neckline retest (pullback).',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.shield,
           heading: 'INVALIDATION (STOP LOSS)',
-          headingColor: StrategieTokens.riskRed,
           body: 'Above/below the last (right) shoulder.',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.circleDot,
           heading: 'CIBLE (TAKE PROFIT)',
-          headingColor: StrategieTokens.emerald,
           body: 'Head-to-neck distance projected from the breakout point.',
         ),
-        StrategieSetupRuleBlock(
+        StrategieSetupRuleStyles.block(
           icon: LucideIcons.lock,
           heading: 'GESTION (BREAKEVEN / PARTIELS)',
-          headingColor: StrategieTokens.labelMuted,
           body: 'Take 50% partial at midpoint and move SL to breakeven.',
         ),
       ],

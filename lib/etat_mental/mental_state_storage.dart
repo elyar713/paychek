@@ -41,13 +41,7 @@ abstract final class MentalStateStorage {
           'barColor': m.barColor.toARGB32(),
           'isMainSlider': m.isMainSlider,
         };
-    Map<String, dynamic> emotion(MentalStateEmotion e) => <String, dynamic>{
-          'id': e.id,
-          'label': e.label,
-          'value': e.value,
-          'weight': e.weight,
-          'inverse': e.inverse,
-        };
+    Map<String, dynamic> emotion(MentalStateEmotion e) => emotionToMap(e);
     return <String, dynamic>{
       'v': 1,
       'sleepValue': sleepValue,
@@ -86,6 +80,25 @@ abstract final class MentalStateStorage {
       barColor: Color(colorV ?? Colors.white.toARGB32()),
       isMainSlider: isMain,
     );
+  }
+
+  static Map<String, dynamic> emotionToMap(MentalStateEmotion e) =>
+      <String, dynamic>{
+        'id': e.id,
+        'label': e.label,
+        'value': e.value,
+        'weight': e.weight,
+        'inverse': e.inverse,
+      };
+
+  static List<MentalStateEmotion> decodeEmotionsList(Object? raw) {
+    if (raw is! List) return const [];
+    final out = <MentalStateEmotion>[];
+    for (final e in raw) {
+      final x = decodeEmotion(e);
+      if (x != null) out.add(x);
+    }
+    return out;
   }
 
   static MentalStateEmotion? decodeEmotion(Object? raw) {

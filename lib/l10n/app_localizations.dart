@@ -4282,6 +4282,66 @@ abstract class AppLocalizations {
   /// **'Saisissez une adresse e-mail valide'**
   String get profileEditInvalidEmailSnack;
 
+  /// No description provided for @accountChangePasswordButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le mot de passe'**
+  String get accountChangePasswordButton;
+
+  /// No description provided for @accountChangePasswordDialogTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le mot de passe'**
+  String get accountChangePasswordDialogTitle;
+
+  /// No description provided for @accountChangePasswordCurrentLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe actuel'**
+  String get accountChangePasswordCurrentLabel;
+
+  /// No description provided for @accountChangePasswordNewLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau mot de passe'**
+  String get accountChangePasswordNewLabel;
+
+  /// No description provided for @accountChangePasswordConfirmLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer le nouveau mot de passe'**
+  String get accountChangePasswordConfirmLabel;
+
+  /// No description provided for @accountChangePasswordCta.
+  ///
+  /// In fr, this message translates to:
+  /// **'ENREGISTRER'**
+  String get accountChangePasswordCta;
+
+  /// No description provided for @accountChangePasswordSuccessSnack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe mis à jour'**
+  String get accountChangePasswordSuccessSnack;
+
+  /// No description provided for @accountChangePasswordCurrentMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisis ton mot de passe actuel'**
+  String get accountChangePasswordCurrentMissing;
+
+  /// No description provided for @accountChangePasswordRequiresRecentLogin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour des raisons de sécurité, reconnecte-toi puis réessaie.'**
+  String get accountChangePasswordRequiresRecentLogin;
+
+  /// No description provided for @accountChangePasswordForgotLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe oublié ?'**
+  String get accountChangePasswordForgotLink;
+
   /// No description provided for @accountAuthSectionTitle.
   ///
   /// In fr, this message translates to:
