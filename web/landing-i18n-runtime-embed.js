@@ -64,7 +64,7 @@ function applyFAQ(s) { if (!s || !s.faq || !s.faq.items) return; var flagged = A
 
 function applyPricingFeatures(strings) { if (!strings || !strings.pricing) return; document.querySelectorAll("[data-paychek-pricing=\"lite\"] li,#pricing-lite-features li").forEach(function (li, ix) { var path = li.getAttribute("data-i18n"); var lx = li.getAttribute("data-pricing-lite-index"); if (lx != null) ix = parseInt(lx, 10); var lbl = path ? getAtPath(strings, path) : null; if (lbl == null && strings.pricing.featuresLite && strings.pricing.featuresLite[ix] != null) lbl = strings.pricing.featuresLite[ix]; if (lbl != null) setPricingLiText(li, lbl); }); document.querySelectorAll("[data-paychek-pricing=\"pro\"] li,#pricing-pro-features li").forEach(function (li, ix) { var path = li.getAttribute("data-i18n"); var lx = li.getAttribute("data-pricing-pro-index"); if (lx != null) ix = parseInt(lx, 10); var lbl = path ? getAtPath(strings, path) : null; if (lbl == null && strings.pricing.featuresPro && strings.pricing.featuresPro[ix] != null) lbl = strings.pricing.featuresPro[ix]; if (lbl != null) setPricingLiText(li, lbl); }); if (document.querySelector("[data-paychek-pricing=lite],[data-paychek-pricing=pro],#pricing-lite-features,#pricing-pro-features")) return; var cards = Array.prototype.slice.call(document.querySelectorAll("#pricing .pricing-card")); if (cards.length < 2) return; var liteRows = cards[0].querySelectorAll("ul li"); var proRows = cards[1].querySelectorAll("ul li"); var fl = strings.pricing.featuresLite; var fp = strings.pricing.featuresPro; var i; if (fl) { for (i = 0; i < liteRows.length && i < fl.length; i++) { if (liteRows[i].querySelector("i")) setPricingLiText(liteRows[i], fl[i]); } } if (fp) { for (i = 0; i < proRows.length && i < fp.length; i++) { if (proRows[i].querySelector("i")) setPricingLiText(proRows[i], fp[i]); } } }
 
-function bindDataAttrs(s){ if(!s) return; Array.prototype.slice.call(document.querySelectorAll("[data-i18n]")).forEach(function(el){var p=el.getAttribute("data-i18n"); if(!p) return; if(el.closest&&el.closest("#pricing"))return; var v=getAtPath(s,p); if(typeof v==="string") el.textContent=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-html]")).forEach(function(el){var p=el.getAttribute("data-i18n-html");var v=getAtPath(s,p); if(typeof v==="string") el.innerHTML=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-aria]")).forEach(function(el){var p=el.getAttribute("data-i18n-aria");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("aria-label",v); }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-title]")).forEach(function(el){var p=el.getAttribute("data-i18n-title");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("title",v); }); }
+function bindDataAttrs(s){ if(!s) return; Array.prototype.slice.call(document.querySelectorAll("[data-i18n]")).forEach(function(el){var p=el.getAttribute("data-i18n"); if(!p) return; if(el.closest&&el.closest("#pricing ul"))return; var v=getAtPath(s,p); if(typeof v==="string") el.textContent=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-html]")).forEach(function(el){var p=el.getAttribute("data-i18n-html");var v=getAtPath(s,p); if(typeof v==="string") el.innerHTML=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-aria]")).forEach(function(el){var p=el.getAttribute("data-i18n-aria");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("aria-label",v); }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-title]")).forEach(function(el){var p=el.getAttribute("data-i18n-title");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("title",v); }); }
 
 function refreshExplorerTabs(s){ if(!s||!s.tabs) return; Object.keys(s.tabs).forEach(function(k){ var tb=document.getElementById("tab-"+k); var lab=s.tabs[k]; if(tb!=null&&lab!=null) tb.textContent=lab; }); }
 
@@ -177,81 +177,7 @@ function applyProcess(proc) {
   }
 } 
 
-function applyPricingTexts(s) {
-  if (!s || !s.pricing) return;
-  var p = s.pricing;
-  var pc = document.getElementById("pricing");
-  if (!pc) return;
-  var compare = document.getElementById("pricing-compare");
-  if (!compare) return;
-
-  var head = pc.querySelector("[data-pricing-head]");
-  if (head) {
-    var title = head.querySelector("[data-pricing-title]");
-    if (title && p.titleHtml != null) title.innerHTML = p.titleHtml;
-    var sub = head.querySelector("[data-pricing-subtitle]");
-    if (sub && p.subtitle != null) sub.textContent = p.subtitle;
-  }
-
-  var periodMap = { "1m": p.period1m, "3m": p.period3m, "1y": p.period1y };
-  Object.keys(periodMap).forEach(function (code) {
-    var btn = document.getElementById("btn-pricing-" + code);
-    var lbl = btn && btn.querySelector("[data-pricing-period-label]");
-    if (lbl && periodMap[code] != null) lbl.textContent = periodMap[code];
-  });
-  var b22 = pc.querySelector("[data-pricing-badge-22]");
-  if (b22 && p.badgeSave22 != null) b22.textContent = p.badgeSave22;
-  var b44 = pc.querySelector("[data-pricing-badge-44]");
-  if (b44 && p.badgeSave44 != null) b44.textContent = p.badgeSave44;
-
-  function setText(sel, val) {
-    if (val == null) return;
-    var el = compare.querySelector(sel);
-    if (el) el.textContent = val;
-  }
-  setText("[data-pricing-lite-standard]", p.liteStandard);
-  setText("[data-pricing-lite-label]", p.liteLabel);
-  setText("[data-pricing-lite-free]", p.liteFree);
-  setText("[data-pricing-lite-basic]", p.liteFeaturesBasic);
-  setText("[data-pricing-pro-unlimited]", p.proUnlimited);
-  setText("[data-pricing-pro-label]", p.proLabel);
-  setText("[data-pricing-pro-badge]", p.proBadge);
-  setText("[data-pricing-cta-current]", p.ctaCurrent);
-
-  var rowSpecs = [
-    { id: "trades", row: "rowTrades", lite: "liteTrades", pro: "proTrades" },
-    { id: "entry", row: "rowEntry", lite: "liteEntry", pro: "proEntry" },
-    { id: "calendar", row: "rowCalendar", lite: "liteCalendar", pro: "proCalendar" },
-    { id: "checklist", row: "rowChecklist", lite: "liteAbsent", pro: "proChecklist" },
-    { id: "analysis", row: "rowAnalysis", lite: "liteAbsent", pro: "proAnalysis" },
-    { id: "strategy", row: "rowStrategy", lite: "liteAbsent", pro: "proStrategy" },
-    { id: "performance", row: "rowPerformance", lite: "liteAbsent", pro: "proPerformance" },
-    { id: "psychology", row: "rowPsychology", lite: "liteAbsent", pro: "proPsychology" },
-    { id: "reports", row: "rowReports", lite: "liteAbsent", pro: "proReports" },
-  ];
-  rowSpecs.forEach(function (spec) {
-    var row = compare.querySelector('[data-pricing-row="' + spec.id + '"]');
-    if (!row) return;
-    var liteLbl = row.querySelector("[data-pricing-lite-label-row]");
-    var proLbl = row.querySelector("[data-pricing-pro-label-row]");
-    var liteVal = row.querySelector("[data-pricing-lite-value]");
-    var proVal = row.querySelector("[data-pricing-pro-value]");
-    if (liteLbl && p[spec.row] != null) liteLbl.textContent = p[spec.row];
-    if (proLbl && p[spec.row] != null) proLbl.textContent = p[spec.row];
-    if (liteVal && p[spec.lite] != null) liteVal.textContent = p[spec.lite];
-    if (proVal && p[spec.pro] != null) proVal.textContent = p[spec.pro];
-  });
-
-  var trialMain = pc.querySelector("[data-pricing-trial-main]");
-  var trialSub = pc.querySelector("[data-pricing-trial-sub]");
-  if (trialMain && p.trialMain != null) trialMain.textContent = p.trialMain;
-  if (trialSub && p.trialSub != null) trialSub.textContent = p.trialSub;
-
-  window.PAYCHEK_LANDING_PRICING_PERIODS = p.periods || {};
-  if (typeof window.paychekSelectPricingPeriod === "function") {
-    window.paychekSelectPricingPeriod(window.paychekPricingPeriod || "1y");
-  }
-} 
+function applyPricingTexts(s){ if(!s||!s.pricing)return; var pc=document.getElementById("pricing"); if(!pc)return; var head=pc.querySelector(".text-center"); if(head){ var hz=head.querySelector("h3"); if(hz&&s.pricing.title!=null) hz.textContent=s.pricing.title;var ps=head.querySelectorAll("p"); if(ps[0]&&s.pricing.subtitle!=null) ps[0].textContent=s.pricing.subtitle;} var cards=pc.querySelectorAll(".pricing-card"); if(cards[0]){ var rl=cards[0].querySelector(".mb-8 .flex.items-center span.text-\[10px\]"); if(rl&&s.pricing.liteLabel!=null) rl.textContent=s.pricing.liteLabel;var sfxL=cards[0].querySelectorAll("span.text-gray-600"); if(sfxL[0]&&s.pricing.perLife!=null) sfxL[0].textContent=s.pricing.perLife; var bt0=cards[0].querySelector("button.btn-secondary"); if(bt0&&s.pricing.ctaLite!=null) bt0.textContent=s.pricing.ctaLite;} if(cards[1]){ var po=document.querySelector("#pricing .pricing-card.featured .absolute.bg-blue-600"); if(po&&s.pricing.popular!=null) po.textContent=s.pricing.popular; var rp=cards[1].querySelector(".mb-8 .flex.items-center span.text-\[10px\]"); if(rp&&s.pricing.proLabel!=null) rp.textContent=s.pricing.proLabel;var sfxP=cards[1].querySelectorAll("span.text-gray-600"); if(sfxP[0]&&s.pricing.perYear!=null) sfxP[0].textContent=s.pricing.perYear; var nm=cards[1].querySelector("span.text-\[9px\]"); if(nm&&s.pricing.noCommitment!=null) nm.textContent=s.pricing.noCommitment; var bp=cards[1].querySelector("button.btn-primary"); if(bp&&s.pricing.ctaPro!=null) bp.textContent=s.pricing.ctaPro;} var trial=document.querySelector("#pricing .btn-trial"); if(trial){ var q=trial.querySelectorAll("p"); if(q[0]&&s.pricing.trialMain!=null) q[0].textContent=s.pricing.trialMain;if(q[1]&&s.pricing.trialSub!=null) q[1].textContent=s.pricing.trialSub;} } 
 
 function applyFooter(f){ if(!f)return;var slog=document.querySelector("footer > div.max-w-7xl > div > div.flex.flex-col.gap-6 > p"); if(!slog) slog=document.querySelector("footer > div.max-w-7xl > div p.text-gray-500"); if(!slog) slog=document.querySelector("footer p.text-\[10px\].font-bold.uppercase"); if(slog&&f.slogan!=null) slog.textContent=f.slogan;var hn=document.querySelectorAll("footer ul.flex.flex-col.gap-4"); var tn=document.querySelectorAll("footer h6.uppercase"); if(tn.length>=4){ if(f.columnProduct!=null) tn[0].textContent=f.columnProduct; if(f.columnCompany!=null) tn[1].textContent=f.columnCompany;if(f.columnResources!=null) tn[2].textContent=f.columnResources;if(f.columnLegal!=null) tn[3].textContent=f.columnLegal;} if(hn.length>=4){ var a=hn[0].querySelectorAll("a"); var o=[f.feat,f.pricing,f.faq,f.updates];for(var i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[1].querySelectorAll("a"); o=[f.about,f.careers,f.affiliate,f.contact];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[2].querySelectorAll("a"); o=[f.blog,f.guideTrading,f.webinars,f.documentation];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[3].querySelectorAll("a"); o=[f.privacy,f.terms,f.security,f.cookies];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; } var crs=document.querySelectorAll("footer > div.flex.flex-col > div.mt-32 p"); if(crs.length<2) crs=document.querySelectorAll("footer .border-white\/5 p"); if(crs[0]&&f.copyright!=null) crs[0].textContent=f.copyright;if(crs[1]&&f.designedFor!=null) crs[1].textContent=f.designedFor;} 
 
