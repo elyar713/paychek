@@ -68,6 +68,7 @@ import 'ajouter_trade_plan_analyse_feedback_items.dart';
 import 'ajouter_trade_plan_analyse_menu.dart';
 import 'ajouter_trade_plan_analyse_section.dart';
 import 'ajouter_trade_strategie_feedback_panel.dart';
+import 'ajouter_trade_strategie_picker_mobile.dart';
 import 'ajouter_trade_shell_scope.dart';
 import 'ajouter_trade_side.dart';
 import 'ajouter_trade_widgets.dart';

@@ -289,6 +289,19 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                               titres.contains(_strategieChoisie)
                                               ? _strategieChoisie
                                               : titres.first;
+
+                                          if (ajouterTradeUseMobileStrategiePicker(
+                                            ctx,
+                                          )) {
+                                            return AjouterTradeStrategiePickerField(
+                                              setups: setups,
+                                              value: value,
+                                              onChanged: (t) => setState(
+                                                () => _strategieChoisie = t,
+                                              ),
+                                            );
+                                          }
+
                                           final selected = setups
                                               .where((e) => e.title == value)
                                               .toList();

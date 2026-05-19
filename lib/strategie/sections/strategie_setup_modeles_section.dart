@@ -13,6 +13,7 @@ import '../strategie_realtime_notifier.dart';
 import '../strategie_tokens.dart';
 import '../widgets/strategie_section_frame.dart';
 import '../widgets/strategie_setup_card.dart';
+import '../widgets/strategie_setup_mobile_picker.dart';
 import '../widgets/strategie_setup_rule_styles.dart';
 import 'strategie_setup_edit_dialog.dart';
 import 'strategie_setup_modeles_section_menu.dart';
@@ -402,19 +403,28 @@ class _StrategieSetupModelesSectionState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_cards.length > 1) ...[
-                _SetupQuickPickBar(
-                  cards: _cards,
-                  selectedIndex: widget.visibleSetupIndex.value
-                      .clamp(0, _cards.length - 1),
-                  scrollController: _quickPickScrollController,
-                  editMode: _editMode,
-                  onScrollBack: () => _nudgeQuickPickScroll(-220),
-                  onScrollForward: () => _nudgeQuickPickScroll(220),
-                  onSelect: (index) =>
-                      widget.visibleSetupIndex.value = index,
-                  onEditAt: _openSetupEditor,
-                  onDeleteAt: _editMode ? _removeCardAt : null,
-                ),
+                if (strategieUseMobileSetupPicker(context))
+                  StrategieSetupMobilePickerList(
+                    setups: _cards,
+                    selectedIndex: widget.visibleSetupIndex.value
+                        .clamp(0, _cards.length - 1),
+                    onSelected: (index) =>
+                        widget.visibleSetupIndex.value = index,
+                    onDeleteAt: _editMode ? _removeCardAt : null,
+                  )
+                else
+                  _SetupQuickPickBar(
+                    cards: _cards,
+                    selectedIndex: widget.visibleSetupIndex.value
+                        .clamp(0, _cards.length - 1),
+                    scrollController: _quickPickScrollController,
+                    editMode: _editMode,
+                    onScrollBack: () => _nudgeQuickPickScroll(-220),
+                    onScrollForward: () => _nudgeQuickPickScroll(220),
+                    onSelect: (index) =>
+                        widget.visibleSetupIndex.value = index,
+                    onDeleteAt: _editMode ? _removeCardAt : null,
+                  ),
                 const SizedBox(height: 12),
               ],
               cardsArea(constraints),
@@ -438,7 +448,6 @@ class _SetupQuickPickBar extends StatelessWidget {
     required this.onScrollBack,
     required this.onScrollForward,
     required this.onSelect,
-    required this.onEditAt,
     this.onDeleteAt,
   });
 
@@ -449,7 +458,6 @@ class _SetupQuickPickBar extends StatelessWidget {
   final VoidCallback onScrollBack;
   final VoidCallback onScrollForward;
   final ValueChanged<int> onSelect;
-  final ValueChanged<int> onEditAt;
   final ValueChanged<int>? onDeleteAt;
 
   static const _arrowHit = BoxConstraints(minWidth: 40, minHeight: 40);
@@ -463,13 +471,14 @@ class _SetupQuickPickBar extends StatelessWidget {
           padding: EdgeInsets.zero,
           constraints: _arrowHit,
           tooltip: MaterialLocalizations.of(context).previousPageTooltip,
-          icon: Icon(
+          icon: const Icon(
             LucideIcons.chevronLeft,
             size: 22,
             color: StrategieTokens.labelMuted,
           ),
           onPressed: onScrollBack,
         ),
+        const SizedBox(width: 6),
         Expanded(
           child: SingleChildScrollView(
             controller: scrollController,
@@ -483,7 +492,6 @@ class _SetupQuickPickBar extends StatelessWidget {
                     dotColor: cards[i].dotColor,
                     selected: i == selectedIndex,
                     onTap: () => onSelect(i),
-                    onEditTap: () => onEditAt(i),
                     onDeleteTap:
                         editMode && onDeleteAt != null ? () => onDeleteAt!(i) : null,
                   ),
@@ -492,11 +500,12 @@ class _SetupQuickPickBar extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 6),
         IconButton(
           padding: EdgeInsets.zero,
           constraints: _arrowHit,
           tooltip: MaterialLocalizations.of(context).nextPageTooltip,
-          icon: Icon(
+          icon: const Icon(
             LucideIcons.chevronRight,
             size: 22,
             color: StrategieTokens.emerald,
@@ -514,7 +523,6 @@ class _SetupQuickPickButton extends StatelessWidget {
     required this.dotColor,
     required this.selected,
     required this.onTap,
-    required this.onEditTap,
     this.onDeleteTap,
   });
 
@@ -522,7 +530,6 @@ class _SetupQuickPickButton extends StatelessWidget {
   final Color dotColor;
   final bool selected;
   final VoidCallback onTap;
-  final VoidCallback onEditTap;
   final VoidCallback? onDeleteTap;
 
   @override
@@ -532,54 +539,52 @@ class _SetupQuickPickButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(StrategieTokens.radiusSm),
-        child: SizedBox(
-          width: onDeleteTap != null ? 248 : 228,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected
+                ? StrategieTokens.emerald.withValues(alpha: 0.12)
+                : StrategieTokens.innerCardBg,
+            borderRadius: BorderRadius.circular(StrategieTokens.radiusSm),
+            border: Border.all(
               color: selected
-                  ? StrategieTokens.emerald.withValues(alpha: 0.12)
-                  : StrategieTokens.innerCardBg,
-              borderRadius: BorderRadius.circular(StrategieTokens.radiusSm),
-              border: Border.all(
-                color: selected
-                    ? StrategieTokens.emerald.withValues(alpha: 0.85)
-                    : StrategieTokens.cardBorder.withValues(alpha: 0.55),
-                width: selected ? 1.5 : 1,
+                  ? StrategieTokens.emerald.withValues(alpha: 0.85)
+                  : StrategieTokens.cardBorder.withValues(alpha: 0.55),
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: dotColor,
-                    shape: BoxShape.circle,
+              const SizedBox(width: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: selected
+                        ? StrategieTokens.emerald
+                        : Colors.white.withValues(alpha: 0.88),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: selected
-                          ? StrategieTokens.emerald
-                          : Colors.white.withValues(alpha: 0.88),
-                    ),
-                  ),
-                ),
-                StrategieSetupEditIconButton(onPressed: onEditTap),
-                if (onDeleteTap != null)
-                  StrategieSetupDeleteIconButton(onPressed: onDeleteTap!),
-              ],
-            ),
+              ),
+              if (onDeleteTap != null)
+                StrategieSetupDeleteIconButton(onPressed: onDeleteTap!),
+            ],
           ),
         ),
       ),
