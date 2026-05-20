@@ -77,9 +77,11 @@ class OnboardingLanguagePage extends StatelessWidget {
                               kAppLanguageCodesDisplayOrder[i],
                             ),
                             selected: code == kAppLanguageCodesDisplayOrder[i],
-                            onTap: () => localeController.selectCode(
-                              kAppLanguageCodesDisplayOrder[i],
-                            ),
+                            onTap: () async {
+                              await localeController.selectCode(
+                                kAppLanguageCodesDisplayOrder[i],
+                              );
+                            },
                           ),
                         ],
                       ],
@@ -87,7 +89,9 @@ class OnboardingLanguagePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await localeController.selectCode(code);
+                      if (!context.mounted) return;
                       if (onContinueWithoutNavigator != null) {
                         onContinueWithoutNavigator!();
                       } else {

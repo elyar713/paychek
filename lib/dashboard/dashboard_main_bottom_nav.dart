@@ -5,9 +5,9 @@ import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
 import 'dashboard_tokens.dart';
 
-/// Barre de navigation principale â€” **fixe** sous toutes les pages du [DashboardPage].
+/// Barre de navigation principale — **fixe** sous toutes les pages du [DashboardPage].
 ///
-/// Index alignÃ©s sur [IndexedStack] : 0 Dashboard, 1 Trade, 2 Ajouter, 3 Calendrier, 4 Plus.
+/// Index alignés sur [IndexedStack] : 0 Dashboard, 1 Trade, 2 Ajouter, 3 Calendrier, 4 Plus.
 class DashboardMainBottomNav extends StatelessWidget {
   const DashboardMainBottomNav({
     super.key,
@@ -16,8 +16,14 @@ class DashboardMainBottomNav extends StatelessWidget {
     this.showPlusTab = true,
   });
 
-  /// Hauteur du bandeau (hors [SafeArea] / encoche basse).
-  static const double barHeight = 80;
+  /// Hauteur du fond sous les onglets latéraux (sans la protrusion du bouton +).
+  static const double sideNavBgHeight = 46;
+
+  /// Hauteur totale des icônes (bouton + compris).
+  static const double barHeight = 66;
+
+  /// Espace réservé sous le contenu dans [DashboardPage] — identique sur tous les onglets.
+  static double totalHeight(double bottomInset) => barHeight + bottomInset;
 
   final int currentIndex;
   final ValueChanged<int> onDestination;
@@ -28,64 +34,80 @@ class DashboardMainBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Pas de [BottomAppBar] ici : la barre est placÃ©e hors du [Scaffold] ([Stack] dans
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final bgColor =
+        kIsWeb ? PaychekWebTokens.scaffoldBg : DashboardTokens.scaffoldMatte;
+    final fondHeight = sideNavBgHeight + bottomInset;
+    // Pas de [BottomAppBar] ici : la barre est placée hors du [Scaffold] ([Stack] dans
     // [DashboardPage]) pour rester cliquable quand le tiroir Plus est ouvert.
-    // [BottomAppBar] appelle [Scaffold.geometryOf] et exige un ancÃªtre [Scaffold].
-    return Material(
-      color: kIsWeb ? PaychekWebTokens.scaffoldBg : DashboardTokens.scaffoldMatte,
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      child: SizedBox(
-        height: barHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.dashboard_outlined,
-              label: l10n.navDashboard,
-              active: currentIndex == 0,
-              onTap: () => onDestination(0),
-            ),
+    // [BottomAppBar] appelle [Scaffold.geometryOf] et exige un ancêtre [Scaffold].
+    return SizedBox(
+      height: totalHeight(bottomInset),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.bottomCenter,
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: fondHeight,
+            child: ColoredBox(color: bgColor),
           ),
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.candlestick_chart_outlined,
-              label: l10n.navTrade,
-              active: currentIndex == 1,
-              onTap: () => onDestination(1),
-            ),
-          ),
-          Expanded(
-            child: _CenterAddNavBtn(
-              label: l10n.navAdd,
-              active: currentIndex == 2,
-              onTap: () => onDestination(2),
-            ),
-          ),
-          Expanded(
-            child: _NavBtn(
-              icon: Icons.calendar_today_outlined,
-              label: l10n.navCalendar,
-              active: currentIndex == 3,
-              onTap: () => onDestination(3),
-            ),
-          ),
-          if (showPlusTab)
-            Expanded(
-              child: _NavBtn(
-                icon: Icons.menu_rounded,
-                label: l10n.navMore,
-                active: currentIndex == 4,
-                onTap: () => onDestination(4),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: bottomInset,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: _NavBtn(
+                      icon: Icons.dashboard_outlined,
+                      label: l10n.navDashboard,
+                      active: currentIndex == 0,
+                      onTap: () => onDestination(0),
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavBtn(
+                      icon: Icons.candlestick_chart_outlined,
+                      label: l10n.navTrade,
+                      active: currentIndex == 1,
+                      onTap: () => onDestination(1),
+                    ),
+                  ),
+                  Expanded(
+                    child: _CenterAddNavBtn(
+                      label: l10n.navAdd,
+                      active: currentIndex == 2,
+                      onTap: () => onDestination(2),
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavBtn(
+                      icon: Icons.calendar_today_outlined,
+                      label: l10n.navCalendar,
+                      active: currentIndex == 3,
+                      onTap: () => onDestination(3),
+                    ),
+                  ),
+                  if (showPlusTab)
+                    Expanded(
+                      child: _NavBtn(
+                        icon: Icons.menu_rounded,
+                        label: l10n.navMore,
+                        active: currentIndex == 4,
+                        onTap: () => onDestination(4),
+                      ),
+                    ),
+                ],
               ),
             ),
-            ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -218,6 +240,3 @@ class _CenterAddNavBtn extends StatelessWidget {
     );
   }
 }
-
-
-

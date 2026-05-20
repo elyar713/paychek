@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import '../questionnaire/questionnaire_completion_prefs.dart';
 import 'paychek_client_platform.dart';
 import 'reglage_language_prefs.dart';
 import 'reglage_profile_prefs.dart';
@@ -211,6 +212,7 @@ Future<void> syncPaychekUserDocument(
       payload['accessWebEnabled'] = true;
       payload['accessMobileEnabled'] = true;
       payload[kPaychekUserFieldQuestionnaireComplete] = false;
+      await QuestionnaireCompletionPrefs.markIncomplete(user.uid);
     }
 
     if (firstName != null) {
@@ -342,6 +344,7 @@ Future<void> paychekMergeProfileFromFirestore(User user) async {
 
 /// Après fin du questionnaire (web + mobile). Ne bloque pas l’UI en cas d’échec réseau / règles.
 Future<void> setPaychekQuestionnaireCompleted(User user) async {
+  await QuestionnaireCompletionPrefs.markCompleted(user.uid);
   try {
     await FirebaseFirestore.instance
         .collection(kPaychekUsersCollection)

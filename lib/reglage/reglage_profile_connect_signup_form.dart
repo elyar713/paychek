@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async' show unawaited;
 
 import '../l10n/app_localizations.dart';
+import '../questionnaire/questionnaire_completion_prefs.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_connect_terminal_chrome.dart';
 import 'reglage_profile_prefs.dart';
@@ -139,6 +140,7 @@ class ReglageProfileSignupForm extends StatelessWidget {
         }
         await syncedUser.updateDisplayName('$prenom $nom'.trim());
         await syncedUser.reload();
+        await QuestionnaireCompletionPrefs.markIncomplete(syncedUser.uid);
         if (closeImmediatelyOnSuccess) {
           await ReglageProfilePrefs.save(
             inscrit: true,

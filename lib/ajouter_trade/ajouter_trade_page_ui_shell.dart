@@ -354,6 +354,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
     return ColoredBox(
       color: DashboardTokens.scaffoldMatte,
       child: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -373,7 +374,12 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  16,
+                  20,
+                  32 + MediaQuery.viewInsetsOf(context).bottom,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

@@ -567,6 +567,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     final profileStore = UserProfileScope.of(context);
     final web = WebDashboardConfig.useLeftRail;
     return SafeArea(
+      bottom: false,
       child: SingleChildScrollView(
         padding: web
             ? const EdgeInsets.fromLTRB(32, 32, 32, 32)

@@ -399,33 +399,12 @@ class _DashboardSparklinePainter extends CustomPainter {
 
     final zeroY = size.height - ((0 - minY) / yRange * size.height);
 
-    _drawZeroLine(canvas, size, zeroY);
     _drawGradients(canvas, size, zeroY, yRange);
     _drawPerformanceLine(canvas, size, zeroY, yRange);
   }
 
   double _spotX(double spotX, double width) =>
       _sparkScreenXFromSpotValue(spotX, _pointCount, width);
-
-  void _drawZeroLine(Canvas canvas, Size size, double zeroY) {
-    final paint = Paint()
-      ..color = kWeekdayColor.withValues(alpha: 0.3)
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    const dashWidth = 5.0;
-    const dashSpace = 5.0;
-    var startX = 0.0;
-
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, zeroY),
-        Offset(startX + dashWidth, zeroY),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-  }
 
   /// Même cubiques que [_drawPerformanceLine] : courbe continue pour le nuage.
   void _appendContinuousSmoothCurve(

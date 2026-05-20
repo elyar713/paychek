@@ -654,6 +654,37 @@ async function paychekLoadEmailTemplateOverrides(db) {
   return snap.data() ?? {};
 }
 
+/**
+ * HTML personnalisé Firestore (`welcomeSignupHtml` = FR) ou variante par locale
+ * (`welcomeSignupHtml_de`, `welcomeSignupHtml_en`, …).
+ * @param {Record<string, unknown>} tplData
+ * @param {string} locale
+ */
+function paychekWelcomeSignupHtmlOverride(tplData, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const perLocale = `${tplData[`welcomeSignupHtml_${loc}`] ?? ""}`.trim();
+  if (perLocale) return perLocale;
+  if (loc === "fr") {
+    return `${tplData.welcomeSignupHtml ?? ""}`.trim();
+  }
+  return "";
+}
+
+/**
+ * Idem pour l’e-mail Pro (`proAccessConfirmedHtml` = FR).
+ * @param {Record<string, unknown>} tplData
+ * @param {string} locale
+ */
+function paychekProAccessHtmlOverride(tplData, locale) {
+  const loc = emailI18n.normalizePaychekEmailLocale(locale);
+  const perLocale = `${tplData[`proAccessConfirmedHtml_${loc}`] ?? ""}`.trim();
+  if (perLocale) return perLocale;
+  if (loc === "fr") {
+    return `${tplData.proAccessConfirmedHtml ?? ""}`.trim();
+  }
+  return "";
+}
+
 function paychekApplyEmailPlaceholders(template, vars) {
   let out = `${template}`;
   for (const [key, val] of Object.entries(vars)) {
@@ -2161,7 +2192,7 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
   let customHtml = "";
   try {
     const tplData = await paychekLoadEmailTemplateOverrides(db);
-    customHtml = `${tplData.proAccessConfirmedHtml ?? ""}`.trim();
+    customHtml = paychekProAccessHtmlOverride(tplData, locale);
   } catch (e) {
     console.warn("paychekProWelcomeEmail: lecture template Firestore", e);
   }
@@ -2479,7 +2510,7 @@ async function resolveWelcomeSignupHtml(db, varsRaw, locale) {
   let customHtml = "";
   try {
     const tplData = await paychekLoadEmailTemplateOverrides(db);
-    customHtml = `${tplData.welcomeSignupHtml ?? ""}`.trim();
+    customHtml = paychekWelcomeSignupHtmlOverride(tplData, loc);
   } catch (e) {
     console.warn("welcomeSignupEmail: lecture template Firestore", e);
   }

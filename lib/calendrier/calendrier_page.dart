@@ -299,6 +299,7 @@ class _CalendrierPageState extends State<CalendrierPage> {
         return ColoredBox(
           color: bg,
           child: SafeArea(
+            bottom: false,
             minimum: EdgeInsets.zero,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

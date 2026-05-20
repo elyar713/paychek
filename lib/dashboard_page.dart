@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async' show Timer, StreamSubscription, unawaited;
 
@@ -184,6 +186,7 @@ class _DashboardPageState extends State<DashboardPage>
   @override
   void initState() {
     super.initState();
+    _applyMobileSystemChrome();
     WidgetsBinding.instance.addObserver(this);
     AnalyseRealtimeNotifier.tick.addListener(_reloadAnalyseHomePreview);
     AnalyseRealtimeNotifier.reportsTick.addListener(_reloadAnalyseHomePreview);
@@ -209,6 +212,17 @@ class _DashboardPageState extends State<DashboardPage>
       });
     });
     _bindSubscriberEntitlementListener();
+  }
+
+  void _applyMobileSystemChrome() {
+    if (kIsWeb) return;
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: DashboardTokens.scaffoldMatte,
+        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarContrastEnforced: false,
+      ),
+    );
   }
 
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
@@ -609,7 +623,7 @@ class _DashboardPageState extends State<DashboardPage>
           // Mobile : barre du bas fixe. Web : navigation uniquement dans le rail gauche — pas de doublon en bas.
           final navTotal = useWebRail
               ? bottomInset
-              : DashboardMainBottomNav.barHeight + bottomInset;
+              : DashboardMainBottomNav.totalHeight(bottomInset);
           final overlayLeftInset = WebDashboardConfig.overlayLeftInsetPx;
 
           void closePlus() => _closePlusMenu();
@@ -632,6 +646,7 @@ class _DashboardPageState extends State<DashboardPage>
               Scaffold(
                 backgroundColor: DashboardTokens.scaffoldMatte,
                 extendBody: true,
+                resizeToAvoidBottomInset: !useWebRail ? false : true,
                 body: WebDashboardBody(
                   useWebRail: useWebRail,
                   navTotal: navTotal,
@@ -913,14 +928,11 @@ class _DashboardPageState extends State<DashboardPage>
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: SafeArea(
-                    top: false,
-                    child: DashboardMainBottomNav(
-                      currentIndex:
-                          _plusMenuOpen ? 4 : _bodyIndex,
-                      onDestination: (i) => _onBottomNavTap(i),
-                      showPlusTab: true,
-                    ),
+                  child: DashboardMainBottomNav(
+                    currentIndex:
+                        _plusMenuOpen ? 4 : _bodyIndex,
+                    onDestination: (i) => _onBottomNavTap(i),
+                    showPlusTab: true,
                   ),
                 ),
             ],

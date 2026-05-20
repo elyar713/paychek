@@ -23,23 +23,17 @@ class AppLocaleController extends ChangeNotifier {
   }
 }
 
-/// Fournit [AppLocaleController] sous [MaterialApp].
-class AppLocaleScope extends InheritedWidget {
+/// Fournit [AppLocaleController] sous [MaterialApp] et notifie les descendants au changement de langue.
+class AppLocaleScope extends InheritedNotifier<AppLocaleController> {
   const AppLocaleScope({
     super.key,
-    required this.controller,
+    required AppLocaleController controller,
     required super.child,
-  });
-
-  final AppLocaleController controller;
+  }) : super(notifier: controller);
 
   static AppLocaleController of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<AppLocaleScope>();
     assert(scope != null, 'AppLocaleScope introuvable');
-    return scope!.controller;
+    return scope!.notifier!;
   }
-
-  @override
-  bool updateShouldNotify(AppLocaleScope oldWidget) =>
-      controller != oldWidget.controller;
 }

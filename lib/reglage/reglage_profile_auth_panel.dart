@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import '../questionnaire/questionnaire_completion_prefs.dart';
 import '../paychek_brand_links.dart';
 import '../web/web_landing_password_reset_dialog.dart';
 import 'paychek_user_firestore.dart';
@@ -347,6 +348,12 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
 
   void _afterAuthOk() => widget.onAuthSuccess();
 
+  Future<void> _markQuestionnaireIfNewUser(UserCredential cred) async {
+    if (cred.additionalUserInfo?.isNewUser == true && cred.user != null) {
+      await QuestionnaireCompletionPrefs.markIncomplete(cred.user!.uid);
+    }
+  }
+
   Future<void> _signInWithGoogle(AppLocalizations l10n) async {
     if (!isGoogleSignInAvailableOnThisPlatform()) {
       _snack(l10n.accountSocialGoogleUnavailableDesktop);
@@ -355,6 +362,7 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     try {
       final cred = await signInWithGoogle();
       if (cred == null || cred.user == null) return;
+      await _markQuestionnaireIfNewUser(cred);
       if (widget.closeImmediatelyOnSuccess) {
         _afterAuthOk();
         unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));
@@ -396,6 +404,7 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     try {
       final cred = await signInWithFacebook();
       if (cred == null || cred.user == null) return;
+      await _markQuestionnaireIfNewUser(cred);
       if (widget.closeImmediatelyOnSuccess) {
         _afterAuthOk();
         unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));
@@ -418,6 +427,7 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     try {
       final cred = await signInWithApple();
       if (cred == null || cred.user == null) return;
+      await _markQuestionnaireIfNewUser(cred);
       if (widget.closeImmediatelyOnSuccess) {
         _afterAuthOk();
         unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));

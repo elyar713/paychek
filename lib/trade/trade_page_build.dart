@@ -47,6 +47,7 @@ extension _TradePageBuild on _TradePageState {
         return ColoredBox(
           color: TradeTokens.bg,
           child: SafeArea(
+            bottom: false,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final hPad = PaychekPageHeader.horizontalPad(constraints.maxWidth);

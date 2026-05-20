@@ -707,6 +707,8 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
                       ),
                   ],
                   locale: localeCtrl.locale,
+                  localeResolutionCallback: (deviceLocale, supportedLocales) =>
+                      localeCtrl.locale,
                   supportedLocales: AppLocalizations.supportedLocales,
                   localizationsDelegates: AppLocalizations.localizationsDelegates,
                   theme: ThemeData(
