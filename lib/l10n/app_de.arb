@@ -9,6 +9,47 @@
   "ajouterTradeFillSuggestedLot": "Füllen Sie das Los",
   "ajouterTradeSizingEstimationFootnote": "* Schätzungen basieren auf dem gespeicherten Kapital; Kontrakt-/CFD-Werte sind annähernd.",
   "ajouterTradeScreenshotHelp": "Fügen Sie ein Diagramm oder einen Setup-Screenshot hinzu (optional).",
+  "ajouterTradeAnalyseCardTitle": "ANALYSE",
+  "ajouterTradeAnalyseCardHelp": "Wählen Sie einen Bericht aus Meine Analyse — das PDF wird beim Speichern an diesen Trade angehängt.",
+  "ajouterTradeAnalyseChooseReport": "Analyse auswählen",
+  "ajouterTradeAnalysePdfGenerating": "PDF wird erstellt…",
+  "ajouterTradeAnalysePdfAttached": "PDF angehängt: {fileName}",
+  "@ajouterTradeAnalysePdfAttached": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "ajouterTradeAnalyseClear": "Entfernen",
+  "ajouterTradeAnalysePdfError": "Analyse-PDF konnte nicht erstellt werden.",
+  "ajouterTradeAnalysePdfNotReady": "Warten Sie, bis das PDF fertig ist, oder heben Sie die Auswahl auf.",
+  "ajouterTradeNoteCardTitle": "NOTIZ",
+  "ajouterTradeNoteCardHelp": "Persönliche Notizen zu diesem Trade (optional).",
+  "ajouterTradeNoteHint": "Kontext, Erkenntnisse, Emotionen…",
+  "ajouterTradeSessionAutoTagTitle": "Tages-Session",
+  "ajouterTradeSessionAutoTagSubtitle": "Auto-Tag Prinzip / Feeling nach Einstiegsreihenfolge. CSV inkl.",
+  "ajouterTradeSessionPlannedCountLabel": "Trades « nach Plan » pro Tag: {count}",
+  "@ajouterTradeSessionPlannedCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSessionAutoTagHint": "Z. B. 2 → Trade 1–2 Prinzip, ab Trade 3 Feeling.",
+  "ajouterTradeSessionHint": "Trade Nr. {rank} heute → Auto: {tag}",
+  "@ajouterTradeSessionHint": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeNoteSectionTitle": "Notiz",
   "ajouterTradePageTitle": "Handel hinzufügen",
   "ajouterTradeErrorQtyPositive": "Geben Sie eine Positionsgröße größer als 0 ein.",
   "ajouterTradeErrorEntryPrice": "Geben Sie einen gültigen Eintrittspreis ein (größer als 0).",
@@ -538,6 +579,8 @@
   "checklistItemRisque2": "Das Risiko überschreitet nicht 1 % meines Kapitals.",
   "checklistItemRisque3": "Das Risiko-Ertrags-Verhältnis beträgt mindestens 1:2.",
   "checklistMenuEdit": "Bearbeiten",
+  "checklistSectionToggleOn": "Abschnitt aktivieren",
+  "checklistSectionToggleOff": "Abschnitt deaktivieren",
   "checklistPageTitle": "Checkliste",
   "checklistProgressCl": "CL",
   "checklistSectionNews": "NEWS · WIRTSCHAFTSKALENDER",
@@ -1176,6 +1219,7 @@
   "tradeDurationHoursMinutes": "{hours}h {minutes}",
   "tradeDurationMinutes": "{minutes} min",
   "tradeEditMenu": "Bearbeiten",
+  "tradeLinkedAnalyseOpenPdf": "Analyse-PDF öffnen",
   "tradeExportPdfTooltip": "PDF exportieren",
   "tradeFilterAll": "Alle",
   "tradeFilterBreakeven": "Die Gewinnzone erreichen",
@@ -1197,6 +1241,7 @@
   "tradeLabelNews": "News",
   "tradeMindsetFeeling": "Gefühl",
   "tradeMindsetPrinciple": "Prinzip",
+  "tradeMindsetTalent": "Talent",
   "tradeMonthTitle": "Monat",
   "tradeMostTradedHeading": "Die am häufigsten gehandelten Vermögenswerte",
   "tradeNotRespected": "Nicht befolgt",

@@ -211,6 +211,9 @@ class _CalendrierPageState extends State<CalendrierPage> {
           allTrades: trades,
           capSymbol: capSymbol,
           onTradeSelected: widget.onNavigateToTrade,
+          onExpandHeaderLockedTap: widget.liteFreemiumRestricted
+              ? widget.onLiteFreemiumRestrictedTap
+              : null,
         );
 
         final performancePanel = CalendrierPerformancePanel(

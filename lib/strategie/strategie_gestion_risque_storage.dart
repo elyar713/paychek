@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import 'strategie_realtime_notifier.dart';
 
 /// Paramètres « Gestion du risque » (page Stratégie) — alignés sur [StrategieGestionRisqueSection].
 class StrategieGestionRisqueParams {
@@ -66,5 +67,6 @@ abstract final class StrategieGestionRisqueStorage {
     await p.setDouble(_kLoss, params.lossPct);
     await p.setInt(_kTrades, params.tradesPerDay);
     await p.setDouble(_kRr, params.rrRatio);
+    StrategieRealtimeNotifier.bump();
   }
 }

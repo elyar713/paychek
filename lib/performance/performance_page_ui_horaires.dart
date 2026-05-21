@@ -46,21 +46,24 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
     final code = Localizations.localeOf(context).languageCode;
     String t(String fr, String en, String es, String de, String pt, String ko) =>
         perf6(code, fr, en, es, de, pt, ko);
-    final s = slots.length >= 3
-        ? slots
-        : [
+    final s = slots.isEmpty
+        ? [
             const TimeSlotStat(label: '-', sub: '', winRate: 0, count: 0),
-            const TimeSlotStat(label: '-', sub: '', winRate: 0, count: 0),
-            const TimeSlotStat(label: '-', sub: '', winRate: 0, count: 0),
-          ];
-    Color cFor(int i) {
-      if (i == 0) return _kGreen;
-      if (i == 2) return _kRed;
+          ]
+        : slots;
+
+    Color cFor(TimeSlotStat slot) {
+      if (slot.isNoTradeZone) return _kRed;
+      if (slot.winRate >= 0.55) return _kGreen;
+      if (slot.winRate <= 0.35 && slot.count > 0) return _kRed;
       return Colors.white;
     }
 
-    IconData iconFor(int i) =>
-        i == 0 ? LucideIcons.sunrise : (i == 1 ? LucideIcons.sun : LucideIcons.moon);
+    IconData iconFor(TimeSlotStat slot, int index) {
+      if (slot.isNoTradeZone) return LucideIcons.moon;
+      if (index == 0) return LucideIcons.sunrise;
+      return LucideIcons.sun;
+    }
 
     final hasHoraireViolation = hv.sessionsConfigurees &&
         (hv.horsCreaneauxAutorises > 0 ||
@@ -99,12 +102,12 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
           const SizedBox(height: 6),
           Text(
             t(
-              'Créneaux matin, journée et soir.',
-              'Morning, daytime and evening windows.',
-              'Franjas de mañana, día y noche.',
-              'Morgens, tagsüber und abends.',
-              'Janelas de manhã, dia e noite.',
-              '아침·낮·저녁 구간.',
+              'Sessions Stratégie (y compris zones No Trade).',
+              'Strategy sessions (including No Trade zones).',
+              'Sesiones de Estrategia (incl. zonas No Trade).',
+              'Strategie-Sessions (inkl. No-Trade-Zonen).',
+              'Sessões de Estratégia (incl. zonas No Trade).',
+              '전략 세션(노 트레이드 구간 포함).',
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
@@ -113,16 +116,17 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
             ),
           ),
           const SizedBox(height: 12),
-          for (var i = 0; i < 3; i++) ...[
+          for (var i = 0; i < s.length; i++) ...[
             _timeSlotRow(
-              iconFor(i),
+              iconFor(s[i], i),
               s[i].label,
               s[i].sub,
               '${(s[i].winRate * 100).round()}% WR',
               s[i].winRate,
-              cFor(i),
+              cFor(s[i]),
+              dim: s[i].isNoTradeZone,
             ),
-            if (i < 2) const SizedBox(height: 14),
+            if (i < s.length - 1) const SizedBox(height: 14),
           ],
           if (!hv.sessionsConfigurees) ...[
             const SizedBox(height: 20),
@@ -205,8 +209,15 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
     );
   }
 
-  Widget _timeSlotRow(IconData icon, String title, String sub, String wr, double w, Color c) {
-    final dim = title.startsWith('19');
+  Widget _timeSlotRow(
+    IconData icon,
+    String title,
+    String sub,
+    String wr,
+    double w,
+    Color c, {
+    bool dim = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

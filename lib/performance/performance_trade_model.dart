@@ -18,7 +18,7 @@ class Trade {
     this.planPct,
     this.strategiePct,
     this.etatPct,
-    /// `true` = Principe, `false` = Feeling ; `null` traité comme Principe dans les stats.
+    /// `true` = Principe, `false` = Feeling, `null` = Talent (sans notation).
     this.mindsetPrincipe,
     /// Lot parsé depuis la quantité (journal) ; `null` si absent.
     this.lotSize,

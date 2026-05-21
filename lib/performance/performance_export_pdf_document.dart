@@ -33,12 +33,18 @@ Future<Uint8List> buildPerformancePdf({
   final roll = computeDisciplineRollups(t);
   final worst = t.isEmpty ? 0.0 : worstSingleLoss(t);
   final avgDur = averageDurationMinutes(t);
-  final slots = timeSlotWinRates(t, locale: locale);
+  final slots = timeSlotWinRatesForStrategieSessions(
+    t,
+    locale: locale,
+    sessions: sessions,
+  );
   final wm = winRatesMindsetPrincipeFeeling(tm);
   final wrP = wm.$1;
   final nP = wm.$2;
   final wrF = wm.$3;
   final nF = wm.$4;
+  final wrT = wm.$5;
+  final nT = wm.$6;
   final hv = computeHoraireTradingViolationStats(trades: t, sessions: sessions);
   final warnings = paychekStrategieWarnings(
     trades: t,
@@ -430,6 +436,8 @@ Future<Uint8List> buildPerformancePdf({
                   _statPdfRow(locale, l.tradeMindsetPrinciple, wrP, nP, _cGreen()),
                   pw.SizedBox(height: 6),
                   _statPdfRow(locale, l.tradeMindsetFeeling, wrF, nF, _cOrange()),
+                  pw.SizedBox(height: 6),
+                  _statPdfRow(locale, l.tradeMindsetTalent, wrT, nT, _cGrey()),
                   pw.SizedBox(height: 8),
                   _mindsetFooter(locale, wrP, nP, wrF, nF),
                 ],

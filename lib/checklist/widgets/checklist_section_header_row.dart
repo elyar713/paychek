@@ -3,6 +3,7 @@
 import '../../l10n/app_localizations.dart';
 import '../checklist_prompts.dart';
 import '../checklist_tokens.dart';
+import 'checklist_section_enable_toggle.dart';
 
 /// IcÃ´ne + titre + menu â‹¯ (Ã‰diter / Supprimer).
 class ChecklistSectionHeaderRow extends StatelessWidget {
@@ -10,6 +11,9 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
     super.key,
     required this.title,
     this.onMenuSelected,
+    this.sectionEnabled = true,
+    this.onSectionEnabledChanged,
+    this.allowDelete = true,
     this.editingTitle = false,
     this.titleEditController,
     this.titleFocusNode,
@@ -19,6 +23,9 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
 
   final String title;
   final ValueChanged<String>? onMenuSelected;
+  final bool sectionEnabled;
+  final ValueChanged<bool>? onSectionEnabledChanged;
+  final bool allowDelete;
 
   /// Ã‰dition inline du titre (sans dialog).
   final bool editingTitle;
@@ -71,6 +78,16 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                   style: ChecklistTokens.sectionTitleOnCardStyle,
                 ),
         ),
+        if (onSectionEnabledChanged != null)
+          ChecklistSectionEnableToggle(
+            value: sectionEnabled,
+            onChanged: onSectionEnabledChanged!,
+            tooltip: sectionEnabled
+                ? l.checklistSectionToggleOff
+                : l.checklistSectionToggleOn,
+          ),
+        if (onSectionEnabledChanged != null && onMenuSelected != null)
+          const SizedBox(width: 2),
         if (onMenuSelected != null)
           PopupMenuButton<String>(
             icon: const Icon(
@@ -116,6 +133,7 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                   ),
                 ),
               PopupMenuItem(
+                enabled: allowDelete,
                 padding: ChecklistTokens.sectionPopupMenuItemPadding,
                 value: ChecklistPrompts.menuActionDelete,
                 child: Row(
@@ -123,13 +141,17 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                     Icon(
                       Icons.delete_outline_rounded,
                       size: 18,
-                      color: const Color(0xFFE53935),
+                      color: allowDelete
+                          ? const Color(0xFFE53935)
+                          : ChecklistTokens.sectionPopupMenuItemStyle.color,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       l.delete,
                       style: ChecklistTokens.sectionPopupMenuItemStyle.copyWith(
-                        color: const Color(0xFFE57373),
+                        color: allowDelete
+                            ? const Color(0xFFE57373)
+                            : const Color(0xFF5A5A5A),
                       ),
                     ),
                   ],

@@ -3,6 +3,8 @@ import 'dart:ui' show Locale;
 import 'package:intl/intl.dart' as intl;
 
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
+import '../strategie/strategie_horaires_sessions_storage.dart';
+import '../strategie/strategie_session_locale_format.dart';
 import 'performance_locale_copy.dart';
 import 'performance_trade_model.dart';
 
@@ -192,12 +194,74 @@ DurationBucketStat? pickBestDurationBucketByWinrate(List<DurationBucketStat> buc
 }
 
 class TimeSlotStat {
-  const TimeSlotStat({required this.label, required this.sub, required this.winRate, required this.count});
+  const TimeSlotStat({
+    required this.label,
+    required this.sub,
+    required this.winRate,
+    required this.count,
+    this.isNoTradeZone = false,
+  });
 
   final String label;
   final String sub;
   final double winRate;
   final int count;
+  final bool isNoTradeZone;
+}
+
+int? _tradeEntryMinutes(Trade t) {
+  final tod = t.timeOfDay;
+  if (tod == null || tod.isEmpty) return null;
+  final p = tod.split(':');
+  if (p.length < 2) return null;
+  final h = int.tryParse(p[0].trim()) ?? 0;
+  final m = int.tryParse(p[1].trim()) ?? 0;
+  return h * 60 + m;
+}
+
+bool _minutesInStrategieSessionWindow(int mins, StrategieSessionPersisted s) {
+  final start = s.startHour * 60 + s.startMinute;
+  if (s.endHour == null || s.endMinute == null) {
+    return mins >= start;
+  }
+  final end = s.endHour! * 60 + s.endMinute!;
+  if (end >= start) {
+    return mins >= start && mins <= end;
+  }
+  return mins >= start || mins <= end;
+}
+
+/// Winrate par session Stratégie (trading autorisé **et** zones No Trade).
+List<TimeSlotStat> timeSlotWinRatesForStrategieSessions(
+  List<Trade> trades, {
+  required Locale locale,
+  required List<StrategieSessionPersisted> sessions,
+}) {
+  if (sessions.isEmpty) {
+    return timeSlotWinRates(trades, locale: locale);
+  }
+
+  TimeSlotStat slotFor(StrategieSessionPersisted s) {
+    var wins = 0;
+    var c = 0;
+    for (final t in trades) {
+      final mins = _tradeEntryMinutes(t);
+      if (mins == null) continue;
+      if (_minutesInStrategieSessionWindow(mins, s)) {
+        c++;
+        if (t.win) wins++;
+      }
+    }
+    return TimeSlotStat(
+      label: formatStrategieSessionWindow(s, locale),
+      sub: strategieSessionTitleForLocale(s, locale),
+      winRate: c == 0 ? 0.0 : wins / c,
+      count: c,
+      isNoTradeZone: s.isNoTradeZone,
+    );
+  }
+
+  return [for (final s in sessions) slotFor(s)];
 }
 
 List<TimeSlotStat> timeSlotWinRates(

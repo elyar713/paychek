@@ -58,6 +58,7 @@ class DashboardCumulativeSparkline extends StatefulWidget {
     this.height,
     this.currencySymbol = r'$',
     this.onOpenTradeById,
+    this.onInteractionLockedTap,
   });
 
   final List<EvolutionSpot> spots;
@@ -73,6 +74,9 @@ class DashboardCumulativeSparkline extends StatefulWidget {
 
   final ValueChanged<String>? onOpenTradeById;
 
+  /// Mode freemium : pas d’ouverture trade, mais rappel paywall au tap.
+  final VoidCallback? onInteractionLockedTap;
+
   static const double _defaultHeight = 120;
 
   @override
@@ -83,6 +87,9 @@ class DashboardCumulativeSparkline extends StatefulWidget {
 class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkline> {
   int? _hoverIndex;
 
+  /// Sur tactile : garder le point actif après le relâchement (bulle lisible).
+  bool _touchPointerActive = false;
+
   double _chartHeightPx() =>
       widget.height ?? DashboardCumulativeSparkline._defaultHeight;
 
@@ -91,6 +98,7 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     assert(widget.spots.length == widget.spotContexts.length);
     final idx =
         nearestSparkSpotIndex(local.dx, width, widget.spots.length);
+    if (_hoverIndex == idx) return;
     setState(() => _hoverIndex = idx);
   }
 
@@ -99,26 +107,115 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     _setHoverFromLocal(local, chartSize.width, chartSize.height);
   }
 
-  void _clearHover() {
+  void _clearHover({bool force = false}) {
+    if (!force && _touchPointerActive) return;
     if (_hoverIndex == null) return;
     setState(() => _hoverIndex = null);
   }
 
-  void _maybeOpenTrade(int? idx) {
-    if (idx == null ||
-        widget.onOpenTradeById == null ||
-        widget.spots.isEmpty) {
+  void _handleTap(Size chartSize) {
+    final idx = _hoverIndex;
+    if (idx == null || widget.spots.isEmpty) return;
+
+    if (widget.onOpenTradeById == null) {
+      widget.onInteractionLockedTap?.call();
       return;
     }
+
     final trades = widget.spotContexts[idx].tradesOnSlice;
     if (trades.isEmpty) return;
     widget.onOpenTradeById!(trades.first.id);
-    _clearHover();
+    _clearHover(force: true);
+  }
+
+  bool _isTouchPointer(PointerDeviceKind kind) {
+    return kind == PointerDeviceKind.touch ||
+        kind == PointerDeviceKind.stylus;
+  }
+
+  Widget _buildChartStack(Size chartSize) {
+    return Stack(
+      clipBehavior: Clip.hardEdge,
+      fit: StackFit.expand,
+      children: [
+        CustomPaint(
+          painter: _DashboardSparklinePainter(
+            spots: widget.spots,
+            minY: widget.minY,
+            maxY: widget.maxY,
+          ),
+        ),
+        if (_hoverIndex != null &&
+            _hoverIndex! < widget.spots.length &&
+            chartSize.width > 0)
+          CustomPaint(
+            painter: _SparkHoverMarkerPainter(
+              center: sparkPointScreen(
+                widget.spots[_hoverIndex!],
+                chartSize,
+                widget.minY,
+                widget.maxY,
+                widget.spots.length,
+              ),
+              cumulativeY: widget.spots[_hoverIndex!].y,
+            ),
+          ),
+        Positioned.fill(
+          child: MouseRegion(
+            onExit: (_) => _clearHover(),
+            onHover: (e) => _hoverAtLocalPosition(e.localPosition, chartSize),
+            child: Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: (e) {
+                if (_isTouchPointer(e.kind)) {
+                  _touchPointerActive = true;
+                }
+                _hoverAtLocalPosition(e.localPosition, chartSize);
+              },
+              onPointerMove: (e) =>
+                  _hoverAtLocalPosition(e.localPosition, chartSize),
+              onPointerUp: (e) {
+                if (_isTouchPointer(e.kind)) {
+                  _touchPointerActive = false;
+                }
+              },
+              onPointerCancel: (e) {
+                if (_isTouchPointer(e.kind)) {
+                  _touchPointerActive = false;
+                }
+                _clearHover(force: true);
+              },
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (d) =>
+                    _hoverAtLocalPosition(d.localPosition, chartSize),
+                onTapCancel: () => _clearHover(force: true),
+                onTap: () => _handleTap(chartSize),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+        ),
+        if (_hoverIndex != null &&
+            _hoverIndex! < widget.spots.length &&
+            chartSize.width > 0)
+          _HoverReadout(
+            spots: widget.spots,
+            index: _hoverIndex!,
+            spotContexts: widget.spotContexts,
+            currencySymbol: widget.currencySymbol,
+            minY: widget.minY,
+            maxY: widget.maxY,
+            showOpenHint: widget.onOpenTradeById != null,
+            l: AppLocalizations.of(context)!,
+            chartSize: chartSize,
+          ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
     assert(widget.spots.length == widget.spotContexts.length);
 
     final hPx = _chartHeightPx();
@@ -133,79 +230,7 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
           child: LayoutBuilder(
             builder: (context, constraints) {
               final chartSize = Size(constraints.maxWidth, hPx);
-
-              return Stack(
-                clipBehavior: Clip.hardEdge,
-                fit: StackFit.expand,
-                children: [
-                  CustomPaint(
-                    painter: _DashboardSparklinePainter(
-                      spots: widget.spots,
-                      minY: widget.minY,
-                      maxY: widget.maxY,
-                    ),
-                  ),
-                  if (_hoverIndex != null &&
-                      _hoverIndex! < widget.spots.length &&
-                      chartSize.width > 0)
-                    CustomPaint(
-                      painter: _SparkHoverMarkerPainter(
-                        center: sparkPointScreen(
-                          widget.spots[_hoverIndex!],
-                          chartSize,
-                          widget.minY,
-                          widget.maxY,
-                          widget.spots.length,
-                        ),
-                        cumulativeY: widget.spots[_hoverIndex!].y,
-                      ),
-                    ),
-                  Positioned.fill(
-                    child: MouseRegion(
-                      onExit: (_) => _clearHover(),
-                      onHover: (e) =>
-                          _hoverAtLocalPosition(e.localPosition, chartSize),
-                      child: Listener(
-                        behavior: HitTestBehavior.translucent,
-                        onPointerDown: (e) =>
-                            _hoverAtLocalPosition(e.localPosition, chartSize),
-                        onPointerMove: (e) =>
-                            _hoverAtLocalPosition(e.localPosition, chartSize),
-                        onPointerUp: (e) {
-                          if (e.kind == PointerDeviceKind.touch ||
-                              e.kind == PointerDeviceKind.stylus) {
-                            // Après [onTap] éventuel (même frame).
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (mounted) _clearHover();
-                            });
-                          }
-                        },
-                        onPointerCancel: (_) => _clearHover(),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTapCancel: () => _clearHover(),
-                          onTap: () => _maybeOpenTrade(_hoverIndex),
-                          child: const SizedBox.expand(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (_hoverIndex != null &&
-                      _hoverIndex! < widget.spots.length &&
-                      chartSize.width > 0)
-                    _HoverReadout(
-                      spots: widget.spots,
-                      index: _hoverIndex!,
-                      spotContexts: widget.spotContexts,
-                      currencySymbol: widget.currencySymbol,
-                      minY: widget.minY,
-                      maxY: widget.maxY,
-                      showOpenHint: widget.onOpenTradeById != null,
-                      l: l,
-                      chartSize: chartSize,
-                    ),
-                ],
-              );
+              return _buildChartStack(chartSize);
             },
           ),
         ),
@@ -301,6 +326,8 @@ class _HoverReadout extends StatelessWidget {
     const maxW = 220.0;
     const pad = 8.0;
     const estH = 80.0;
+    const gap = 8.0;
+    const minTop = 4.0;
     final n = spots.length;
     final anchor = sparkPointScreen(
       spots[index],
@@ -310,10 +337,22 @@ class _HoverReadout extends StatelessWidget {
       n,
     );
 
-    final left =
-        (anchor.dx - maxW * 0.5).clamp(pad, chartSize.width - maxW - pad);
-    final top =
-        (anchor.dy - estH - 8).clamp(4.0, chartSize.height - estH - 4);
+    final leftMax = chartSize.width - maxW - pad;
+    final left = leftMax <= pad
+        ? pad
+        : (anchor.dx - maxW * 0.5).clamp(pad, leftMax);
+
+    final maxTop = chartSize.height - estH - minTop;
+    final double top;
+    if (maxTop < minTop) {
+      // Graphique calendrier (~86 px) : pas assez de place pour clamp classique.
+      top = ((chartSize.height - estH) * 0.5).clamp(0.0, chartSize.height);
+    } else {
+      final roomAbove = anchor.dy - estH - gap;
+      top = roomAbove >= minTop
+          ? roomAbove
+          : (anchor.dy + gap).clamp(minTop, maxTop);
+    }
 
     return Positioned(
       left: left,

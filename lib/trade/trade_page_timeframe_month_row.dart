@@ -44,12 +44,6 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
     }
     final maxCount = counts.values.fold<int>(0, (a, b) => a > b ? a : b);
 
-    String hm(DateTime d) {
-      String p2(int v) => v.toString().padLeft(2, '0');
-      final l = d.toLocal();
-      return '${p2(l.hour)}:${p2(l.minute)}';
-    }
-
     final loc = AppLocalizations.of(context)!;
 
     Widget rowTrade(TradeListItem t) {
@@ -134,7 +128,15 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${hm(t.entreeAt)} • ${tradeSessionLabel(rowL, tradeSessionBucketId(t.entreeAt))}',
+                        _formatTradeRowWhenLine(
+                          context,
+                          t.entreeAt,
+                          sessionLabel: tradeSessionLabel(
+                            rowL,
+                            tradeSessionBucketId(t.entreeAt),
+                          ),
+                          withDate: true,
+                        ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: TradeTokens.textDate,
                               fontWeight: FontWeight.w700,

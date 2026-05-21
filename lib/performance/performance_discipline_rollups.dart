@@ -188,12 +188,15 @@ List<StrategieSetupWinStat> winRatesByStrategieSetupTitles(
   return out;
 }
 
-/// Feeling seul compte comme Feeling ; tout le reste (dont `null`) = Principe.
-(double wrP, int nP, double wrF, int nF) winRatesMindsetPrincipeFeeling(
-    List<Trade> trades) {
-  var wP = 0, tP = 0, wF = 0, tF = 0;
+/// `null` = Talent (trade sans notation Principe/Feeling, saisie lite).
+(double wrP, int nP, double wrF, int nF, double wrT, int nT)
+    winRatesMindsetPrincipeFeeling(List<Trade> trades) {
+  var wP = 0, tP = 0, wF = 0, tF = 0, wT = 0, tT = 0;
   for (final t in trades) {
-    if (t.mindsetPrincipe == false) {
+    if (t.mindsetPrincipe == null) {
+      tT++;
+      if (t.win) wT++;
+    } else if (t.mindsetPrincipe == false) {
       tF++;
       if (t.win) wF++;
     } else {
@@ -201,7 +204,7 @@ List<StrategieSetupWinStat> winRatesByStrategieSetupTitles(
       if (t.win) wP++;
     }
   }
-  return (_rate(wP, tP), tP, _rate(wF, tF), tF);
+  return (_rate(wP, tP), tP, _rate(wF, tF), tF, _rate(wT, tT), tT);
 }
 
 double worstSingleLoss(List<Trade> trades) {

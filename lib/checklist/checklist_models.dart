@@ -61,20 +61,26 @@ class ChecklistSectionData {
     required this.id,
     required this.title,
     required this.items,
+    this.enabled = true,
   });
 
   final String id;
   final String title;
   final List<ChecklistItemData> items;
 
+  /// Section active dans la checklist (anneau, calendrier, lignes cochables).
+  final bool enabled;
+
   ChecklistSectionData copyWith({
     String? title,
     List<ChecklistItemData>? items,
+    bool? enabled,
   }) {
     return ChecklistSectionData(
       id: id,
       title: title ?? this.title,
       items: items ?? this.items,
+      enabled: enabled ?? this.enabled,
     );
   }
 }
@@ -159,4 +165,30 @@ List<ChecklistSectionData> defaultNouveauTradeSections() {
       ],
     ),
   ];
+}
+
+/// Section « stock » : non supprimable (ex. NEWS).
+bool checklistSectionIsProtected(String sectionId) =>
+    sectionId == ChecklistPrompts.sectionIdNews;
+
+/// Seule la section NEWS a l’interrupteur on/off.
+bool checklistSectionHasEnableToggle(String sectionId) =>
+    sectionId == ChecklistPrompts.sectionIdNews;
+
+/// Comptage checklist / lignes actives (off = uniquement pour NEWS).
+bool checklistSectionIsActive(ChecklistSectionData section) =>
+    !checklistSectionHasEnableToggle(section.id) || section.enabled;
+
+ChecklistSectionData _defaultNewsSection() => defaultNouveauTradeSections().firstWhere(
+      (s) => s.id == ChecklistPrompts.sectionIdNews,
+    );
+
+/// Garantit la section NEWS (réinjectée si absente des prefs / cloud).
+List<ChecklistSectionData> checklistEnsureProtectedSections(
+  List<ChecklistSectionData> sections,
+) {
+  if (sections.any((s) => s.id == ChecklistPrompts.sectionIdNews)) {
+    return sections;
+  }
+  return [_defaultNewsSection(), ...sections];
 }

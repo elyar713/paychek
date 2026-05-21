@@ -6,7 +6,7 @@ import '../reglage/user_portfolio_models.dart';
 
 enum TradeSide { vente, achat }
 
-enum TradeMindset { principe, feeling }
+enum TradeMindset { principe, feeling, none }
 
 @immutable
 class TradeListItem {
@@ -35,8 +35,14 @@ class TradeListItem {
     required this.strategiePct,
     required this.etatPct,
     required this.mindset,
+
+    /// `true` si l'utilisateur (ou la session auto-tag) a choisi Principe ou Feeling.
+    this.mindsetExplicit = false,
     required this.strategieTitle,
     this.planReport,
+    this.linkedAnalyseReport,
+    this.linkedAnalysePdfBytes,
+    this.linkedAnalysePdfFileName,
     this.strategieNonRespectIds = const <String>{},
     this.planNonRespectIds = const <String>{},
     this.checklistNonRespectIds = const <String>{},
@@ -50,6 +56,9 @@ class TradeListItem {
 
     /// Tags psychologiques (FOMO, TILT, …) depuis la section TAG d’Ajouter trade.
     this.psychTags = const <String>[],
+
+    /// Note libre saisie sur Ajouter trade (journal / export).
+    this.userNote,
 
     /// Horodatage client pour fusion multi-appareils (web / mobile) ; incrémenté à chaque enregistrement.
     this.syncRev = 0,
@@ -77,12 +86,18 @@ class TradeListItem {
   final double strategiePct;
   final double etatPct;
   final TradeMindset mindset;
+  final bool mindsetExplicit;
 
   /// Stratégie choisie (pour résoudre les libellés non respectés).
   final String strategieTitle;
 
   /// Snapshot de plan d'analyse (pour résoudre les ids).
   final AnalyseReportSnapshot? planReport;
+
+  /// Rapport Mon Analyse joint au trade (carte sous CSV) + PDF généré.
+  final AnalyseReportSnapshot? linkedAnalyseReport;
+  final Uint8List? linkedAnalysePdfBytes;
+  final String? linkedAnalysePdfFileName;
 
   /// Ids non respectés (selon les menus Ajouter trade).
   final Set<String> strategieNonRespectIds;
@@ -102,6 +117,9 @@ class TradeListItem {
   /// Libellés des tags cochés (ordre d’insertion approximatif).
   final List<String> psychTags;
 
+  /// Commentaire utilisateur (vide = non enregistré).
+  final String? userNote;
+
   /// Fusion Firestore / prefs : plus récent gagne (à égalité, priorité au cloud).
   final int syncRev;
 
@@ -119,8 +137,12 @@ class TradeListItem {
 
   TradeListItem copyWith({
     int? syncRev,
+    TradeMindset? mindset,
+    bool? mindsetExplicit,
     Uint8List? screenshotBytes,
     String? screenshotPath,
+    Uint8List? linkedAnalysePdfBytes,
+    String? linkedAnalysePdfFileName,
   }) {
     return TradeListItem(
       id: id,
@@ -144,9 +166,15 @@ class TradeListItem {
       planPct: planPct,
       strategiePct: strategiePct,
       etatPct: etatPct,
-      mindset: mindset,
+      mindset: mindset ?? this.mindset,
+      mindsetExplicit: mindsetExplicit ?? this.mindsetExplicit,
       strategieTitle: strategieTitle,
       planReport: planReport,
+      linkedAnalyseReport: linkedAnalyseReport,
+      linkedAnalysePdfBytes:
+          linkedAnalysePdfBytes ?? this.linkedAnalysePdfBytes,
+      linkedAnalysePdfFileName:
+          linkedAnalysePdfFileName ?? this.linkedAnalysePdfFileName,
       strategieNonRespectIds: strategieNonRespectIds,
       planNonRespectIds: planNonRespectIds,
       checklistNonRespectIds: checklistNonRespectIds,
@@ -156,6 +184,7 @@ class TradeListItem {
       performanceLite: performanceLite,
       portfolioId: portfolioId,
       psychTags: psychTags,
+      userNote: userNote,
       syncRev: syncRev ?? this.syncRev,
     );
   }

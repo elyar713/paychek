@@ -124,11 +124,6 @@ extension _TradePageTimeframeDayRow on _TradePageState {
       },
     );
 
-    String hm(DateTime d) {
-      String p2(int v) => v.toString().padLeft(2, '0');
-      final l = d.toLocal();
-      return '${p2(l.hour)}:${p2(l.minute)}';
-    }
 
     Widget dayTradeRow(
       TradeListItem t, {
@@ -206,7 +201,14 @@ extension _TradePageTimeframeDayRow on _TradePageState {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${hm(t.entreeAt)} • ${tradeSessionLabel(rowL, tradeSessionBucketId(t.entreeAt))}',
+                        _formatTradeRowWhenLine(
+                          context,
+                          t.entreeAt,
+                          sessionLabel: tradeSessionLabel(
+                            rowL,
+                            tradeSessionBucketId(t.entreeAt),
+                          ),
+                        ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: TradeTokens.textDate,
                               fontWeight: FontWeight.w700,

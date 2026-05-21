@@ -266,21 +266,26 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     );
   }
 
-  /// Bloc Mindset : en-tête, barres verticales, synthèse par nombre de trades Principe / Feeling.
+  /// Bloc Mindset : en-tête, barres verticales, synthèse Principe / Feeling / Talent.
   Widget _mindsetPerformanceBlock({
     required String Function(String fr, String en, String es, String de, String pt, String ko) txt,
     required String Function(int n) tradesWord,
     required String principleLabel,
     required String feelingLabel,
+    required String talentLabel,
     required double wrP,
     required double wrF,
+    required double wrT,
     required int nP,
     required int nF,
+    required int nT,
     required String wrTextP,
     required String wrTextF,
+    required String wrTextT,
   }) {
     const trackH = 158.0;
-    const gap = 14.0;
+    const gap = 10.0;
+    const talentGrey = Color(0xFF888888);
 
     Widget columnFor({
       required IconData rowIcon,
@@ -325,7 +330,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             height: trackH,
             child: LayoutBuilder(
               builder: (context, c) {
-                final w = math.min(104.0, c.maxWidth * 0.88);
+                final w = math.min(72.0, c.maxWidth * 0.88);
                 final radius = 18.0;
                 return Align(
                   alignment: Alignment.bottomCenter,
@@ -497,7 +502,14 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    txt('PRINCIPAL / FEELING', 'PRINCIPLE / FEELING', 'PRINCIPAL / FEELING', 'PRINZIP / FEELING', 'PRINCÍPIO / FEELING', '원칙 / 느낌'),
+                    txt(
+                      'PRINCIPAL / FEELING / TALENT',
+                      'PRINCIPLE / FEELING / TALENT',
+                      'PRINCIPAL / FEELING / TALENTO',
+                      'PRINZIP / FEELING / TALENT',
+                      'PRINCÍPIO / FEELING / TALENTO',
+                      '원칙 / 느낌 / 탤런트',
+                    ),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -510,12 +522,12 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             ),
             Tooltip(
               message: txt(
-                'Hauteur des barres = win rate sur les trades classés Principe ou Feeling (période filtrée). Les deux cases en bas rappellent le volume de trades par mindset.',
-                'Bar height = win rate on trades tagged Principle or Feeling (filtered period). The two tiles below show trade counts per mindset.',
-                'Altura = win rate en trades Principio/Feeling (período). Las dos cajas abajo muestran el volumen por mindset.',
-                'Balkenhöhe = Gewinnrate je Prinzip/Feeling (Zeitraum). Die Kästen unten zeigen die Trade-Anzahl pro Mindset.',
-                'Altura = win rate em Princípio/Feeling (período). Os blocos abaixo mostram a contagem por mindset.',
-                '막대 높이 = 원칙/느낌 태그 트레이드 승률(필터 기간). 아래 두 칸은 마인드셋별 트레이드 수입니다.',
+                'Hauteur des barres = win rate par mindset (période filtrée). Talent = trades sans mention Principe ni Feeling. Les cases en bas indiquent le volume par catégorie.',
+                'Bar height = win rate per mindset (filtered period). Talent = trades with neither Principle nor Feeling selected. Tiles below show volume per category.',
+                'Altura = win rate por mindset (período). Talento = trades sin Principio ni Feeling indicados. Los bloques abajo muestran el volumen.',
+                'Balkenhöhe = Gewinnrate je Mindset (Zeitraum). Talent = Trades ohne Prinzip- oder Feeling-Angabe. Kästen unten = Anzahl.',
+                'Altura = win rate por mindset (período). Talento = trades sem menção a Princípio ou Feeling. Blocos abaixo = volume.',
+                '막대 높이 = 마인드셋별 승률(필터 기간). 탤런트 = 원칙·느낌 모두 미선택 트레이드. 아래 칸은 건수입니다.',
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 2),
@@ -550,6 +562,18 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 hideFillIfEmpty: true,
               ),
             ),
+            SizedBox(width: gap),
+            Expanded(
+              child: columnFor(
+                rowIcon: LucideIcons.star,
+                name: talentLabel,
+                wrText: wrTextT,
+                wr: wrT,
+                n: nT,
+                fillColor: talentGrey,
+                hideFillIfEmpty: true,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 18),
@@ -578,6 +602,17 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 iconColor: _kRed,
               ),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: mindsetStatTile(
+                kicker: talentLabel.toUpperCase(),
+                value: '$nT ${tradesWord(nT)}',
+                kickerColor: talentGrey,
+                valueColor: talentGrey,
+                icon: LucideIcons.star,
+                iconColor: talentGrey,
+              ),
+            ),
           ],
         ),
       ],
@@ -602,7 +637,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     final (fullEt, nFullEt) = winRateEtatBand(t, (p) => p >= 80);
     final (partEt, nPartEt) = winRateEtatBand(t, (p) => p >= 50 && p < 80);
     final (ignEt, nIgnEt) = winRateEtatBand(t, (p) => p < 50);
-    final (wrP, nP, wrF, nF) = winRatesMindsetPrincipeFeeling(tm);
+    final (wrP, nP, wrF, nF, wrT, nT) = winRatesMindsetPrincipeFeeling(tm);
     final strategieViolations = aggregateStrategieNonRespect(t);
               final (wrHighStrat, nHighStrat, wrLowStrat, nLowStrat) =
                   winRatesStrategieHighVsForced(t);
@@ -1037,14 +1072,18 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                     tradesWord: trades,
                     principleLabel: txt('Principal', 'Principle', 'Principio', 'Prinzip', 'Princípio', '원칙'),
                     feelingLabel: l.tradeMindsetFeeling,
+                    talentLabel: l.tradeMindsetTalent,
                     wrP: wrP,
                     wrF: wrF,
+                    wrT: wrT,
                     nP: nP,
                     nF: nF,
+                    nT: nT,
                     wrTextP: wrLabel(wrP, nP),
                     wrTextF: nF > 0
                         ? wrLabel(wrF, nF)
                         : txt('0 % WR', '0% WR', '0 % WR', '0 % WR', '0 % WR', '0% WR'),
+                    wrTextT: wrLabel(wrT, nT),
                   ),
                 ],
               );

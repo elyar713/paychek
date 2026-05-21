@@ -67,7 +67,13 @@ Trade tradeListItemToPerformanceTrade(
     planPct: discipline?.planPct ?? t.planPct,
     strategiePct: discipline?.strategiePct ?? t.strategiePct,
     etatPct: discipline?.etatPct ?? t.etatPct,
-    mindsetPrincipe: t.mindset != TradeMindset.feeling,
+    mindsetPrincipe: !t.mindsetExplicit
+        ? null
+        : switch (t.mindset) {
+            TradeMindset.principe => true,
+            TradeMindset.feeling => false,
+            TradeMindset.none => null,
+          },
     lotSize: parseLotSizeFromQuantiteLabel(t.quantiteLabel),
     strategieTitle: t.strategieTitle,
     strategieNonRespectIds: Set<String>.from(t.strategieNonRespectIds),

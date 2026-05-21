@@ -12,11 +12,11 @@ import '../reglage/paychek_csv_import_log.dart';
 import '../reglage/paychek_support_ticket_submit.dart';
 import '../reglage/paychek_user_firestore.dart';
 import '../reglage/trial_access_prefs.dart';
-import 'admin_demo_data.dart';
 import 'admin_firestore_users.dart';
 import 'admin_models.dart';
 import 'admin_stripe_entitlement_sync.dart';
 import 'admin_stripe_refund.dart';
+import 'admin_user_billing_summary.dart';
 import 'admin_support_ticket_detail_page.dart';
 import 'admin_theme.dart';
 import 'admin_user_engagement.dart';
@@ -2111,11 +2111,6 @@ class _UserExpandedDashboard extends StatelessWidget {
     const mpPanel = Color(0xFF1A1A1A);
     const mpBorder = Color(0xFF1E293B);
 
-    final payments = AdminDemoData.payments()
-        .where((p) => p.userHandle == u.email)
-        .toList();
-    payments.sort((a, b) => b.date.compareTo(a.date));
-
     Widget miniLabel(String t) => Text(
           t.toUpperCase(),
           style: GoogleFonts.plusJakartaSans(
@@ -2469,7 +2464,7 @@ class _UserExpandedDashboard extends StatelessWidget {
               fontSize: 11, fontWeight: FontWeight.w800),
         ),
       ),
-      child: _BillingStripePanel(df: df, payments: payments, targetUserId: u.id),
+      child: _BillingStripePanel(df: df, user: u),
     );
 
     final usageSection = _MaquetteCollapsibleCard(
@@ -3012,13 +3007,11 @@ String? _csvImportDetail(Map<String, dynamic> d, int skipped) {
 class _BillingStripePanel extends StatefulWidget {
   const _BillingStripePanel({
     required this.df,
-    required this.payments,
-    required this.targetUserId,
+    required this.user,
   });
 
   final DateFormat df;
-  final List<PaymentRow> payments;
-  final String targetUserId;
+  final AdminUserRow user;
 
   @override
   State<_BillingStripePanel> createState() => _BillingStripePanelState();
@@ -3026,7 +3019,46 @@ class _BillingStripePanel extends StatefulWidget {
 
 class _BillingStripePanelState extends State<_BillingStripePanel> {
   bool _refundBusy = false;
+  bool _summaryLoading = true;
+  AdminUserBillingSummary _summary = AdminUserBillingSummary.empty;
   final _amountCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadSummary());
+  }
+
+  @override
+  void didUpdateWidget(covariant _BillingStripePanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user.id != widget.user.id ||
+        oldWidget.user.subscriptionTier != widget.user.subscriptionTier ||
+        oldWidget.user.subscriptionProSinceUtc !=
+            widget.user.subscriptionProSinceUtc ||
+        oldWidget.user.subscriptionCurrentPeriodEnd !=
+            widget.user.subscriptionCurrentPeriodEnd) {
+      unawaited(_loadSummary());
+    }
+  }
+
+  Future<void> _loadSummary() async {
+    setState(() => _summaryLoading = true);
+    try {
+      final s = await resolveAdminUserBillingSummary(
+        user: widget.user,
+        dateFormat: widget.df,
+      );
+      if (!mounted) return;
+      setState(() {
+        _summary = s;
+        _summaryLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _summaryLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -3088,7 +3120,7 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     try {
       final r = await paychekAdminNotifyUserRefundEmail(
-        targetUserId: widget.targetUserId,
+        targetUserId: widget.user.id,
         amountLabel: amount,
       );
       if (!context.mounted) return;
@@ -3115,47 +3147,111 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
     }
   }
 
+  Widget _billingPair(
+    String label,
+    String value, {
+    bool monospace = false,
+    double valueSize = 15,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF64748B),
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 6),
+        SelectableText(
+          value,
+          maxLines: 2,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: valueSize,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            height: 1.2,
+            fontFeatures: monospace
+                ? const [FontFeature.tabularFigures()]
+                : null,
+          ).copyWith(
+            fontFamily: monospace ? 'monospace' : null,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final latest = widget.payments.isNotEmpty ? widget.payments.first : null;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Icon(Icons.credit_card, size: 22, color: AdminTheme.textMuted),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Visa terminant par 4242',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  Text(
-                    'Expire le 12/28',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AdminTheme.textMuted,
-                        ),
-                  ),
-                ],
+        if (_summaryLoading)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            OutlinedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Dashboard Stripe (stub).')),
-                );
-              },
-              child: const Text('Détails Stripe'),
+          )
+        else
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A0A0A),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF1E293B)),
             ),
-          ],
-        ),
-        const SizedBox(height: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _billingPair('Montant payé', _summary.amountLabel),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child:
+                          _billingPair('Date de paiement', _summary.paidAtLabel),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _billingPair(
+                        'Type d\'abonnement',
+                        _summary.cycleLabel,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _billingPair(
+                  'N° de transaction',
+                  _summary.transactionIdLabel,
+                  monospace: true,
+                  valueSize: 12,
+                ),
+              ],
+            ),
+          ),
+        if (!widget.user.hasPaidPlan && !_summaryLoading) ...[
+          const SizedBox(height: 10),
+          Text(
+            'Aucun abonnement payant actif pour ce compte.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AdminTheme.textMuted,
+                ),
+          ),
+        ],
+        const SizedBox(height: 16),
         Text(
           'Montant (e-mail client uniquement — Stripe manuel)',
           style: GoogleFonts.plusJakartaSans(
@@ -3208,64 +3304,6 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        if (latest == null)
-          Text(
-            'Aucune facture démo pour ce profil (Stripe à brancher).',
-            style: Theme.of(context).textTheme.bodySmall,
-          )
-        else
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AdminTheme.bg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AdminTheme.border),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Facture #${latest.id}',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Payée le ${widget.df.format(latest.date)}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AdminTheme.textMuted,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  '${latest.amountUsd.toStringAsFixed(2)} \$',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: AdminTheme.accent,
-                      ),
-                ),
-                IconButton(
-                  tooltip: 'PDF',
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Téléchargement PDF (stub).')),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.picture_as_pdf_outlined,
-                    color: AdminTheme.accent,
-                  ),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }

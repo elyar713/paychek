@@ -10,6 +10,47 @@
   "ajouterTradeSizingEstimationFootnote": "* Estimation selon le capital enregistré ; valeurs contrat / CFD approximatives.",
   "ajouterTradeScreenshotHelp": "Ajoute une capture du graphique ou du setup (optionnel).",
   "ajouterTradeCsvChooseSoftware": "Choisir un logiciel",
+  "ajouterTradeAnalyseCardTitle": "ANALYSE",
+  "ajouterTradeAnalyseCardHelp": "Choisissez un rapport depuis Mon analyse — son PDF sera joint à ce trade à l’enregistrement.",
+  "ajouterTradeAnalyseChooseReport": "Choisir une analyse",
+  "ajouterTradeAnalysePdfGenerating": "Génération du PDF…",
+  "ajouterTradeAnalysePdfAttached": "PDF joint : {fileName}",
+  "@ajouterTradeAnalysePdfAttached": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "ajouterTradeAnalyseClear": "Retirer",
+  "ajouterTradeAnalysePdfError": "Impossible de générer le PDF d’analyse.",
+  "ajouterTradeAnalysePdfNotReady": "Attendez la fin de la génération du PDF, ou retirez la sélection.",
+  "ajouterTradeNoteCardTitle": "NOTE",
+  "ajouterTradeNoteCardHelp": "Vos notes personnelles sur ce trade (facultatif).",
+  "ajouterTradeNoteHint": "Contexte, leçons, émotions…",
+  "ajouterTradeSessionAutoTagTitle": "Session du jour",
+  "ajouterTradeSessionAutoTagSubtitle": "Classe Principe / Feeling selon l’ordre d’entrée. Import CSV inclus.",
+  "ajouterTradeSessionPlannedCountLabel": "Trades encore « selon le plan » par jour : {count}",
+  "@ajouterTradeSessionPlannedCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSessionAutoTagHint": "Ex. : 2 → trades 1–2 en Principe, à partir du 3ᵉ en Feeling (tilt / revenge).",
+  "ajouterTradeSessionHint": "Trade n°{rank} aujourd’hui → auto : {tag}",
+  "@ajouterTradeSessionHint": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeNoteSectionTitle": "Note",
   "ajouterTradePageTitle": "Ajouter un trade",
   "ajouterTradeErrorQtyPositive": "Indique une quantité (lot) supérieure à 0.",
   "ajouterTradeErrorEntryPrice": "Indique un prix d’entrée valide (supérieur à 0).",
@@ -539,6 +580,8 @@
   "checklistItemRisque2": "Le risque ne dépasse pas 1% de mon capital.",
   "checklistItemRisque3": "Le Ratio Risk/Reward est d'au moins 1:2.",
   "checklistMenuEdit": "Éditer",
+  "checklistSectionToggleOn": "Activer la section",
+  "checklistSectionToggleOff": "Désactiver la section",
   "checklistPageTitle": "Checklist",
   "checklistProgressCl": "CL",
   "checklistSectionNews": "NEWS · CALENDRIER ÉCONOMIQUE",
@@ -1265,6 +1308,7 @@
   "tradeDurationHoursMinutes": "{hours}h {minutes}",
   "tradeDurationMinutes": "{minutes} min",
   "tradeEditMenu": "Modifier",
+  "tradeLinkedAnalyseOpenPdf": "Ouvrir le PDF d’analyse",
   "tradeExportPdfTooltip": "Exporter PDF",
   "tradeFilterAll": "Tous",
   "tradeFilterBreakeven": "Breakeven",
@@ -1315,6 +1359,7 @@
   "tradeLabelNews": "News",
   "tradeMindsetFeeling": "Feeling",
   "tradeMindsetPrinciple": "Principe",
+  "tradeMindsetTalent": "Talent",
   "tradeMonthTitle": "Mois",
   "tradeMostTradedHeading": "Actifs les plus tradés",
   "tradeNotRespected": "Non respecté",

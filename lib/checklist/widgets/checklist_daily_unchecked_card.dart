@@ -151,35 +151,30 @@ class ChecklistDailyUncheckedCard extends StatelessWidget {
                 else
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 220),
-                    child: Scrollbar(
-                      thumbVisibility: grouped.length > 3,
-                      radius: const Radius.circular(4),
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            for (var s = 0; s < grouped.length; s++) ...[
-                              if (s > 0) const SizedBox(height: 12),
-                              _UncheckedSectionBlock(
-                                sectionTitle: checklistSectionTitle(
-                                  l,
-                                  grouped[s].sectionId,
-                                  grouped[s].sectionTitle,
-                                ),
-                                itemLabels: [
-                                  for (final item in grouped[s].items)
-                                    checklistItemLabel(
-                                      l,
-                                      item.itemId,
-                                      item.itemLabel,
-                                    ),
-                                ],
+                    child: _ChecklistUncheckedScrollArea(
+                      showScrollbar: grouped.length > 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var s = 0; s < grouped.length; s++) ...[
+                            if (s > 0) const SizedBox(height: 12),
+                            _UncheckedSectionBlock(
+                              sectionTitle: checklistSectionTitle(
+                                l,
+                                grouped[s].sectionId,
+                                grouped[s].sectionTitle,
                               ),
-                            ],
+                              itemLabels: [
+                                for (final item in grouped[s].items)
+                                  checklistItemLabel(
+                                    l,
+                                    item.itemId,
+                                    item.itemLabel,
+                                  ),
+                              ],
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
@@ -188,6 +183,50 @@ class ChecklistDailyUncheckedCard extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Scroll + barre : contrôleur explicite (web n’attache pas le PrimaryScrollController).
+class _ChecklistUncheckedScrollArea extends StatefulWidget {
+  const _ChecklistUncheckedScrollArea({
+    required this.showScrollbar,
+    required this.child,
+  });
+
+  final bool showScrollbar;
+  final Widget child;
+
+  @override
+  State<_ChecklistUncheckedScrollArea> createState() =>
+      _ChecklistUncheckedScrollAreaState();
+}
+
+class _ChecklistUncheckedScrollAreaState
+    extends State<_ChecklistUncheckedScrollArea> {
+  late final ScrollController _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scrollView = SingleChildScrollView(
+      controller: _scroll,
+      primary: false,
+      physics: const ClampingScrollPhysics(),
+      padding: const EdgeInsets.only(right: 4),
+      child: widget.child,
+    );
+    if (!widget.showScrollbar) return scrollView;
+    return Scrollbar(
+      controller: _scroll,
+      thumbVisibility: true,
+      radius: const Radius.circular(4),
+      child: scrollView,
     );
   }
 }

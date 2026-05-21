@@ -273,6 +273,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         'ATAS' => 'as',
         _ => 'mt',
       };
+      final pendingImports = <TradeListItem>[];
       for (final row in parsedRows) {
         final baseId =
             '${dealPrefix}_${row.ticket}_${row.closeTime.millisecondsSinceEpoch}';
@@ -281,7 +282,10 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           continue;
         }
         if (capImports &&
-            !TradeLiteMonthlyLimit.canAddNonPro(store.items, delta: 1)) {
+            !TradeLiteMonthlyLimit.canAddNonPro(
+              store.items,
+              delta: pendingImports.length + 1,
+            )) {
           skippedLiteMonthlyCap++;
           continue;
         }
@@ -295,38 +299,51 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           storedReports: storedAnalyseReports,
           importedPair: pair,
         );
-        final item = TradeListItem(
-          id: baseId,
-          syncRev: DateTime.now().millisecondsSinceEpoch,
-          pair: pair,
-          side: row.side,
-          amountLabel: amountLabel,
-          gainAmount: net,
-          dateLine: _formatTradeDateLine(row.openTime),
+        final newsFlags = resolveTradeNewsTimingFlagsFromController(
           entreeAt: row.openTime,
-          sortieAt: row.closeTime,
-          breakeven: net == 0,
-          avantNews: false,
-          apresNews: false,
-          quantiteLabel: row.size.toStringAsFixed(2),
-          prixEntreeLabel: row.openPrice.toStringAsFixed(5),
-          prixSortieLabel: row.closePrice.toStringAsFixed(5),
-          checklistPct: discipline.checklistPct,
-          planPct: discipline.planPct,
-          strategiePct: 50,
-          etatPct: discipline.etatPct,
-          mindset: TradeMindset.principe,
-          planReport: discipline.planReport,
-          // Strategy execution must reflect user-defined strategy, not import source.
-          strategieTitle: _strategieChoisie,
-          isProfit: net >= 0,
-          assetClass: _assetClassForImportedRow(source, row),
-          // Discipline renseignée (anneaux jour) → visible dans Performance / Lens.
-          performanceLite: false,
-          portfolioId: portfolioId,
+          checklist: widget.checklistController,
         );
-        store.add(item);
+        pendingImports.add(
+          TradeListItem(
+            id: baseId,
+            syncRev: DateTime.now().millisecondsSinceEpoch,
+            pair: pair,
+            side: row.side,
+            amountLabel: amountLabel,
+            gainAmount: net,
+            dateLine: _formatTradeDateLine(row.openTime),
+            entreeAt: row.openTime,
+            sortieAt: row.closeTime,
+            breakeven: net == 0,
+            avantNews: newsFlags.avantNews,
+            apresNews: newsFlags.apresNews,
+            quantiteLabel: row.size.toStringAsFixed(2),
+            prixEntreeLabel: row.openPrice.toStringAsFixed(5),
+            prixSortieLabel: row.closePrice.toStringAsFixed(5),
+            checklistPct: discipline.checklistPct,
+            planPct: discipline.planPct,
+            strategiePct: 50,
+            etatPct: discipline.etatPct,
+            mindset: TradeMindset.none,
+            planReport: discipline.planReport,
+            strategieTitle: _strategieChoisie,
+            isProfit: net >= 0,
+            assetClass: _assetClassForImportedRow(source, row),
+            performanceLite: false,
+            portfolioId: portfolioId,
+          ),
+        );
         existingIds.add(baseId);
+      }
+
+      final taggedImports = applySessionMindsetToIncomingTrades(
+        existing: store.items,
+        incoming: pendingImports,
+        rules: _sessionMindsetRules,
+        portfolioId: portfolioId,
+      );
+      for (final item in taggedImports) {
+        store.add(item);
         importedCount++;
       }
       if (!context.mounted) return;

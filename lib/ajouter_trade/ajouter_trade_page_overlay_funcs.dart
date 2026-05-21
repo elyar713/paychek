@@ -423,6 +423,10 @@ void _ajouterTradeToggleTradeDateTimeOverlay(
                               s._sortieDateTime = dt;
                             }
                           });
+                          if (entree) {
+                            s._applyNewsFlagsFromChecklist();
+                            s._applySessionMindsetToFormIfEnabled();
+                          }
                         },
                       ),
                     ),

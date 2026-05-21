@@ -120,6 +120,10 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                       planAnalyse: _sectionPlanEnabled,
                                       checklist: _sectionChecklistEnabled,
                                       etatMoment: _sectionEtatEnabled,
+                                      sessionAutoTagEnabled:
+                                          _sessionAutoTagEnabled,
+                                      plannedTradesPerDay:
+                                          _plannedTradesPerDay,
                                     ),
                                     onChanged: (p) {
                                       setState(() {
@@ -129,7 +133,12 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                         _sectionPlanEnabled = p.planAnalyse;
                                         _sectionChecklistEnabled = p.checklist;
                                         _sectionEtatEnabled = p.etatMoment;
+                                        _sessionAutoTagEnabled =
+                                            p.sessionAutoTagEnabled;
+                                        _plannedTradesPerDay =
+                                            p.plannedTradesPerDay;
                                       });
+                                      _applySessionMindsetToFormIfEnabled();
                                     },
                                   );
                                 },
@@ -234,6 +243,18 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                             ),
                           ],
                         ),
+                        if (_sessionMindsetHintText(l) != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            _sessionMindsetHintText(l)!,
+                            style: TextStyle(
+                              color: DashboardTokens.muted,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
                         ListenableBuilder(
                           listenable: Listenable.merge([
                             widget.checklistController,

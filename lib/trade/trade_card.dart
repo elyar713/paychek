@@ -13,6 +13,7 @@ import '../etat_mental/mental_state_controller.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
 import 'trade_date_format.dart';
+import 'trade_linked_analyse_pdf.dart';
 import 'trade_models.dart';
 import 'trade_session.dart';
 import 'trade_tokens.dart';
@@ -73,6 +74,12 @@ class TradeCard extends StatelessWidget {
           icon: Icons.psychology_alt_rounded,
           label: l10n.tradeMindsetFeeling,
           color: TradeTokens.lossNeon,
+        );
+      case TradeMindset.none:
+        return (
+          icon: Icons.star_rounded,
+          label: l10n.tradeMindsetTalent,
+          color: const Color(0xFF888888),
         );
     }
   }

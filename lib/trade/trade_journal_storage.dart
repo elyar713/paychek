@@ -8,6 +8,7 @@ import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_report_snapshot_codec.dart';
 import '../reglage/paychek_prefs_scope.dart';
 import '../reglage/user_portfolio_models.dart';
+import 'trade_journal_mindset_migration.dart';
 import 'trade_models.dart';
 
 const _kBase = 'trade_journal_items_v1';
@@ -45,11 +46,23 @@ Map<String, dynamic> _encodeTrade(TradeListItem t) {
     'planPct': t.planPct,
     'strategiePct': t.strategiePct,
     'etatPct': t.etatPct,
-    'mindset': t.mindset == TradeMindset.feeling ? 'feeling' : 'principe',
+    'mindset': switch (t.mindset) {
+      TradeMindset.feeling => 'feeling',
+      TradeMindset.none => 'none',
+      TradeMindset.principe => 'principe',
+    },
+    'mindsetExplicit': t.mindsetExplicit,
     'strategieTitle': t.strategieTitle,
     'planReport': t.planReport == null
         ? null
         : encodeAnalyseReportSnapshot(t.planReport!),
+    'linkedAnalyseReport': t.linkedAnalyseReport == null
+        ? null
+        : encodeAnalyseReportSnapshot(t.linkedAnalyseReport!),
+    'linkedAnalysePdfBytesB64': t.linkedAnalysePdfBytes != null
+        ? base64Encode(t.linkedAnalysePdfBytes!)
+        : null,
+    'linkedAnalysePdfFileName': t.linkedAnalysePdfFileName,
     'strategieNonRespectIds': t.strategieNonRespectIds.toList(),
     'planNonRespectIds': t.planNonRespectIds.toList(),
     'checklistNonRespectIds': t.checklistNonRespectIds.toList(),
@@ -59,6 +72,8 @@ Map<String, dynamic> _encodeTrade(TradeListItem t) {
     'performanceLite': t.performanceLite,
     'portfolioId': t.portfolioId,
     'psychTags': t.psychTags,
+    if (t.userNote != null && t.userNote!.trim().isNotEmpty)
+      'userNote': t.userNote!.trim(),
     'syncRev': t.syncRev,
   };
 }
@@ -87,13 +102,43 @@ TradeListItem? _decodeTrade(Map<String, dynamic> m) {
         sortieRaw != null && sortieRaw.isNotEmpty ? DateTime.tryParse(sortieRaw) : null;
 
     final mindsetRaw = m['mindset'] as String?;
-    final mindset =
-        mindsetRaw == 'feeling' ? TradeMindset.feeling : TradeMindset.principe;
+    final performanceLite = m['performanceLite'] as bool? ?? false;
+    final mindsetExplicit = m['mindsetExplicit'] as bool? ??
+        legacyMindsetExplicitFromMap(
+          mindsetRaw: mindsetRaw,
+          performanceLite: performanceLite,
+        );
+    final TradeMindset mindset;
+    if (performanceLite) {
+      mindset = TradeMindset.none;
+    } else {
+      mindset = switch (mindsetRaw) {
+        'feeling' => TradeMindset.feeling,
+        'none' => TradeMindset.none,
+        'principe' => TradeMindset.principe,
+        _ => TradeMindset.principe,
+      };
+    }
 
     AnalyseReportSnapshot? planReport;
     final pr = m['planReport'];
     if (pr is Map) {
       planReport = decodeAnalyseReportSnapshot(Map<String, dynamic>.from(pr));
+    }
+
+    AnalyseReportSnapshot? linkedAnalyseReport;
+    final lar = m['linkedAnalyseReport'];
+    if (lar is Map) {
+      linkedAnalyseReport =
+          decodeAnalyseReportSnapshot(Map<String, dynamic>.from(lar));
+    }
+
+    Uint8List? linkedAnalysePdfBytes;
+    final lapb = m['linkedAnalysePdfBytesB64'] as String?;
+    if (lapb != null && lapb.isNotEmpty) {
+      try {
+        linkedAnalysePdfBytes = Uint8List.fromList(base64Decode(lapb));
+      } catch (_) {}
     }
 
     Uint8List? screenshotBytes;
@@ -135,17 +180,27 @@ TradeListItem? _decodeTrade(Map<String, dynamic> m) {
       strategiePct: (m['strategiePct'] as num?)?.toDouble() ?? 0,
       etatPct: (m['etatPct'] as num?)?.toDouble() ?? 0,
       mindset: mindset,
+      mindsetExplicit: mindsetExplicit,
       strategieTitle: m['strategieTitle'] as String? ?? '',
       planReport: planReport,
+      linkedAnalyseReport: linkedAnalyseReport,
+      linkedAnalysePdfBytes: linkedAnalysePdfBytes,
+      linkedAnalysePdfFileName: m['linkedAnalysePdfFileName'] as String?,
       strategieNonRespectIds: stringSet('strategieNonRespectIds'),
       planNonRespectIds: stringSet('planNonRespectIds'),
       checklistNonRespectIds: stringSet('checklistNonRespectIds'),
       etatNonRespectIds: stringSet('etatNonRespectIds'),
       isProfit: m['isProfit'] as bool? ?? true,
       assetClass: _decodeAssetClass(m['assetClass'] as String?),
-      performanceLite: m['performanceLite'] as bool? ?? false,
+      performanceLite: performanceLite,
       portfolioId: m['portfolioId'] as String? ?? kDefaultPortfolioId,
       psychTags: stringList('psychTags'),
+      userNote: () {
+        final raw = m['userNote'] as String?;
+        if (raw == null) return null;
+        final t = raw.trim();
+        return t.isEmpty ? null : t;
+      }(),
       syncRev: (m['syncRev'] as num?)?.round() ?? 0,
     );
   } catch (_) {
@@ -160,6 +215,7 @@ TradeListItem? tradeJournalTradeFromMap(Map<String, dynamic> m) => _decodeTrade(
 Map<String, dynamic> tradeJournalTradeToMapForFirestore(TradeListItem t) {
   final m = Map<String, dynamic>.from(_encodeTrade(t));
   m.remove('screenshotBytesB64');
+  m.remove('linkedAnalysePdfBytesB64');
   return m;
 }
 
@@ -196,7 +252,11 @@ abstract final class TradeJournalStorage {
         final t = _decodeTrade(Map<String, dynamic>.from(e));
         if (t != null) out.add(t);
       }
-      return out;
+      final migrated = applyJournalMindsetTalentMigration(out);
+      if (journalMindsetMigrationWouldChange(out)) {
+        await save(migrated, firebaseUidOverride: firebaseUidOverride);
+      }
+      return migrated;
     } catch (_) {
       return null;
     }

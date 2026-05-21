@@ -230,6 +230,60 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
       cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
       sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
     );
+    final analyseCard = AjouterTradeAnalyseAttachmentCard(
+      labelStyle: labelStyle,
+      mutedStyle: mutedStyle,
+      selectedReport: _tradeLinkedAnalyseReport,
+      pdfFileName: _tradeLinkedAnalysePdfFileName,
+      pdfGenerating: _tradeLinkedAnalysePdfGenerating,
+      onReportSelected: _onTradeLinkedAnalyseSelected,
+      onClear: _clearTradeLinkedAnalyse,
+      compact: true,
+      cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
+      sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
+    );
+
+    final noteCard = AjouterTradeNoteCard(
+      controller: _tradeNoteController,
+      labelStyle: labelStyle,
+      mutedStyle: mutedStyle,
+      cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
+      sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
+    );
+
+    Widget screenshotCsvAnalyseRow({double columnGap = 12}) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: liteLockDisciplineExtras(screenshotCard)),
+          SizedBox(width: columnGap),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                liteLockDisciplineExtras(csvCard),
+                SizedBox(height: columnGap >= 16 ? 10 : 8),
+                liteLockDisciplineExtras(analyseCard),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget extrasBelowInstrument({double gap = 20}) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          screenshotCsvAnalyseRow(
+            columnGap: gap >= 20 ? 16 : 12,
+          ),
+          SizedBox(height: gap >= 20 ? 16 : 12),
+          liteLockDisciplineExtras(noteCard),
+        ],
+      );
+    }
 
     if (kIsWeb) {
       return ColoredBox(
@@ -284,9 +338,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                               const SizedBox(height: 20),
                               liteLockDisciplineExtras(psychCard),
                               const SizedBox(height: 20),
-                              liteLockDisciplineExtras(screenshotCard),
-                              const SizedBox(height: 20),
-                              liteLockDisciplineExtras(csvCard),
+                              extrasBelowInstrument(),
                             ],
                           ),
                         ),
@@ -307,17 +359,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                             const SizedBox(height: 24),
                             buildInstrumentCard(),
                             const SizedBox(height: 24),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                    child: liteLockDisciplineExtras(
-                                        screenshotCard)),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                    child: liteLockDisciplineExtras(csvCard)),
-                              ],
-                            ),
+                            extrasBelowInstrument(gap: 24),
                           ],
                         ),
                         rightColumn: Column(
@@ -407,17 +449,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                           const SizedBox(height: 20),
                           liteLockDisciplineExtras(psychCard),
                           const SizedBox(height: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                  child:
-                                      liteLockDisciplineExtras(screenshotCard)),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                  child: liteLockDisciplineExtras(csvCard)),
-                            ],
-                          ),
+                          extrasBelowInstrument(),
                         ],
                       ),
                     ),

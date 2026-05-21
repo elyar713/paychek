@@ -44,6 +44,69 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ajouterTradeCsvChooseSoftware => 'Choisir un logiciel';
 
   @override
+  String get ajouterTradeAnalyseCardTitle => 'ANALYSE';
+
+  @override
+  String get ajouterTradeAnalyseCardHelp =>
+      'Wählen Sie einen Bericht aus Meine Analyse — das PDF wird beim Speichern an diesen Trade angehängt.';
+
+  @override
+  String get ajouterTradeAnalyseChooseReport => 'Analyse auswählen';
+
+  @override
+  String get ajouterTradeAnalysePdfGenerating => 'PDF wird erstellt…';
+
+  @override
+  String ajouterTradeAnalysePdfAttached(String fileName) {
+    return 'PDF angehängt: $fileName';
+  }
+
+  @override
+  String get ajouterTradeAnalyseClear => 'Entfernen';
+
+  @override
+  String get ajouterTradeAnalysePdfError =>
+      'Analyse-PDF konnte nicht erstellt werden.';
+
+  @override
+  String get ajouterTradeAnalysePdfNotReady =>
+      'Warten Sie, bis das PDF fertig ist, oder heben Sie die Auswahl auf.';
+
+  @override
+  String get ajouterTradeNoteCardTitle => 'NOTIZ';
+
+  @override
+  String get ajouterTradeNoteCardHelp =>
+      'Persönliche Notizen zu diesem Trade (optional).';
+
+  @override
+  String get ajouterTradeNoteHint => 'Kontext, Erkenntnisse, Emotionen…';
+
+  @override
+  String get ajouterTradeSessionAutoTagTitle => 'Tages-Session';
+
+  @override
+  String get ajouterTradeSessionAutoTagSubtitle =>
+      'Auto-Tag Prinzip / Feeling nach Einstiegsreihenfolge. CSV inkl.';
+
+  @override
+  String ajouterTradeSessionPlannedCountLabel(int count) {
+    return 'Trades « nach Plan » pro Tag: $count';
+  }
+
+  @override
+  String get ajouterTradeSessionAutoTagHint =>
+      'Z. B. 2 → Trade 1–2 Prinzip, ab Trade 3 Feeling.';
+
+  @override
+  String ajouterTradeSessionHint(int rank, String tag) {
+    return 'Trade Nr. $rank heute → Auto: $tag';
+  }
+
+  @override
+  String get tradeNoteSectionTitle => 'Notiz';
+
+  @override
   String get ajouterTradePageTitle => 'Handel hinzufügen';
 
   @override
@@ -1303,6 +1366,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get checklistMenuEdit => 'Bearbeiten';
+
+  @override
+  String get checklistSectionToggleOn => 'Abschnitt aktivieren';
+
+  @override
+  String get checklistSectionToggleOff => 'Abschnitt deaktivieren';
 
   @override
   String get checklistPageTitle => 'Checkliste';
@@ -3323,6 +3392,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tradeEditMenu => 'Bearbeiten';
 
   @override
+  String get tradeLinkedAnalyseOpenPdf => 'Analyse-PDF öffnen';
+
+  @override
   String get tradeExportPdfTooltip => 'PDF exportieren';
 
   @override
@@ -3388,6 +3460,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tradeMindsetPrinciple => 'Prinzip';
+
+  @override
+  String get tradeMindsetTalent => 'Talent';
 
   @override
   String get tradeMonthTitle => 'Monat';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
+import 'ajouter_trade_discipline_prefs_storage.dart';
 import 'ajouter_trade_discipline_settings_sheet_widgets.dart';
 
 /// Préférences affichées dans la feuille « discipline » (Ajouter trade).
@@ -13,7 +14,19 @@ class AjouterTradeDisciplinePrefs {
     required this.planAnalyse,
     required this.checklist,
     required this.etatMoment,
+    required this.sessionAutoTagEnabled,
+    required this.plannedTradesPerDay,
   });
+
+  static const defaults = AjouterTradeDisciplinePrefs(
+    authorizeWhenFeeling: false,
+    strategie: true,
+    planAnalyse: true,
+    checklist: true,
+    etatMoment: true,
+    sessionAutoTagEnabled: false,
+    plannedTradesPerDay: 2,
+  );
 
   final bool authorizeWhenFeeling;
   final bool strategie;
@@ -21,12 +34,18 @@ class AjouterTradeDisciplinePrefs {
   final bool checklist;
   final bool etatMoment;
 
+  /// Test : classe Principe / Feeling selon l’ordre des trades du jour (CSV inclus).
+  final bool sessionAutoTagEnabled;
+  final int plannedTradesPerDay;
+
   AjouterTradeDisciplinePrefs copyWith({
     bool? authorizeWhenFeeling,
     bool? strategie,
     bool? planAnalyse,
     bool? checklist,
     bool? etatMoment,
+    bool? sessionAutoTagEnabled,
+    int? plannedTradesPerDay,
   }) {
     return AjouterTradeDisciplinePrefs(
       authorizeWhenFeeling:
@@ -35,6 +54,32 @@ class AjouterTradeDisciplinePrefs {
       planAnalyse: planAnalyse ?? this.planAnalyse,
       checklist: checklist ?? this.checklist,
       etatMoment: etatMoment ?? this.etatMoment,
+      sessionAutoTagEnabled:
+          sessionAutoTagEnabled ?? this.sessionAutoTagEnabled,
+      plannedTradesPerDay:
+          plannedTradesPerDay ?? this.plannedTradesPerDay,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'authorizeWhenFeeling': authorizeWhenFeeling,
+        'strategie': strategie,
+        'planAnalyse': planAnalyse,
+        'checklist': checklist,
+        'etatMoment': etatMoment,
+        'sessionAutoTagEnabled': sessionAutoTagEnabled,
+        'plannedTradesPerDay': plannedTradesPerDay.clamp(1, 10),
+      };
+
+  static AjouterTradeDisciplinePrefs fromJson(Map<String, dynamic> m) {
+    return AjouterTradeDisciplinePrefs(
+      authorizeWhenFeeling: m['authorizeWhenFeeling'] as bool? ?? false,
+      strategie: m['strategie'] as bool? ?? true,
+      planAnalyse: m['planAnalyse'] as bool? ?? true,
+      checklist: m['checklist'] as bool? ?? true,
+      etatMoment: m['etatMoment'] as bool? ?? true,
+      sessionAutoTagEnabled: m['sessionAutoTagEnabled'] as bool? ?? false,
+      plannedTradesPerDay: (m['plannedTradesPerDay'] as num?)?.round() ?? 2,
     );
   }
 }
@@ -83,8 +128,12 @@ class _AjouterTradeDisciplineSheetBodyState
   }
 
   void _emit(AjouterTradeDisciplinePrefs next) {
-    setState(() => _p = next);
-    widget.onChanged(next);
+    final normalized = next.copyWith(
+      plannedTradesPerDay: next.plannedTradesPerDay.clamp(1, 10),
+    );
+    setState(() => _p = normalized);
+    widget.onChanged(normalized);
+    AjouterTradeDisciplinePrefsStorage.save(normalized);
   }
 
   @override
@@ -169,6 +218,17 @@ class _AjouterTradeDisciplineSheetBodyState
                           value: _p.authorizeWhenFeeling,
                           onChanged: (v) => _emit(
                             _p.copyWith(authorizeWhenFeeling: v),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        AjouterTradeSessionMindsetTestCard(
+                          autoTagEnabled: _p.sessionAutoTagEnabled,
+                          plannedTradesPerDay: _p.plannedTradesPerDay,
+                          onAutoTagChanged: (v) => _emit(
+                            _p.copyWith(sessionAutoTagEnabled: v),
+                          ),
+                          onPlannedChanged: (n) => _emit(
+                            _p.copyWith(plannedTradesPerDay: n),
                           ),
                         ),
                         const SizedBox(height: 16),

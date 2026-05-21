@@ -4,9 +4,9 @@
 /// dans `ajouter_trade_page_*.dart` (cible ≈ 300 lignes par fichier ; discipline ~680).
 library;
 
+import 'dart:async' show unawaited;
 import 'dart:convert';
 import 'dart:math' as math;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
+import '../checklist/checklist_news_trade_classifier.dart';
 import '../checklist/checklist_page_controller.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../questionnaire/user_capital_scope.dart';
@@ -25,6 +26,7 @@ import '../reglage/paychek_csv_import_log.dart';
 import '../reglage/paychek_user_firestore.dart';
 import '../analyse/analyse_default_demo_seed.dart';
 import '../analyse/analyse_realtime_notifier.dart';
+import '../analyse/analyse_report_pdf.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_reports_storage.dart';
 import '../etat_mental/mental_state_controller.dart';
@@ -34,6 +36,8 @@ import '../strategie/widgets/strategie_setup_cards_content.dart';
 import '../reglage/trial_access_prefs.dart' show AccountEntitlementSnapshot;
 import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_journal_scope.dart';
+import '../trade/trade_session_mindset.dart';
+import 'ajouter_trade_discipline_prefs_storage.dart';
 import '../trade/trade_journal_store.dart';
 import '../trade/trade_lite_monthly_limit.dart';
 import '../trade/trade_models.dart';
@@ -55,7 +59,9 @@ import 'ajouter_trade_non_respect_generic_list.dart';
 import 'ajouter_trade_page_strategie_section.dart';
 import 'ajouter_trade_psych_tags_card.dart';
 import 'ajouter_trade_screenshot_section.dart';
+import 'ajouter_trade_analyse_attachment_card.dart';
 import 'ajouter_trade_csv_section.dart';
+import 'ajouter_trade_note_card.dart';
 import 'ajouter_trade_discipline_mindset_summary.dart';
 import 'ajouter_trade_discipline_sections_separators.dart';
 import 'ajouter_trade_discipline_settings_sheet.dart';
@@ -83,6 +89,9 @@ part 'ajouter_trade_page_state_edit.dart';
 part 'ajouter_trade_page_state_save.dart';
 part 'ajouter_trade_page_state_dialogs.dart';
 part 'ajouter_trade_page_discipline_pct.dart';
+part 'ajouter_trade_page_news_sync.dart';
+part 'ajouter_trade_page_state_analyse_attachment.dart';
+part 'ajouter_trade_page_session_mindset.dart';
 part 'ajouter_trade_page_state.dart';
 
 /// Onglet central **Ajouter** : saisie d’un trade (structure prête à être branchée).

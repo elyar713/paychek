@@ -541,6 +541,10 @@ Future<Uint8List> buildTradePdf(
               pw.SizedBox(height: 10),
               _line(_t(l.tradePdfTags), _t(t.psychTags.join(', '))),
             ],
+            if (t.userNote != null && t.userNote!.trim().isNotEmpty) ...[
+              pw.SizedBox(height: 10),
+              _line(_t(l.tradeNoteSectionTitle), _t(t.userNote!.trim())),
+            ],
             pw.SizedBox(height: 14),
             _sectionTitle(_t(l.tradePdfAnalysePostTrade)),
             pw.SizedBox(height: 6),

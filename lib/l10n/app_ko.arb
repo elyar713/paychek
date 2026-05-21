@@ -9,6 +9,47 @@
   "ajouterTradeFillSuggestedLot": "로트 채우기",
   "ajouterTradeSizingEstimationFootnote": "* 추정은 저장된 자본을 사용합니다. 계약/CFD 수치는 대략적입니다.",
   "ajouterTradeScreenshotHelp": "차트 또는 셋업 스크린샷 추가(선택).",
+  "ajouterTradeAnalyseCardTitle": "분석",
+  "ajouterTradeAnalyseCardHelp": "내 분석에서 리포트를 선택하면 저장 시 PDF가 이 트레이드에 첨부됩니다.",
+  "ajouterTradeAnalyseChooseReport": "분석 선택",
+  "ajouterTradeAnalysePdfGenerating": "PDF 생성 중…",
+  "ajouterTradeAnalysePdfAttached": "PDF 첨부: {fileName}",
+  "@ajouterTradeAnalysePdfAttached": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "ajouterTradeAnalyseClear": "제거",
+  "ajouterTradeAnalysePdfError": "분석 PDF를 생성할 수 없습니다.",
+  "ajouterTradeAnalysePdfNotReady": "PDF 생성이 끝날 때까지 기다리거나 선택을 해제하세요.",
+  "ajouterTradeNoteCardTitle": "메모",
+  "ajouterTradeNoteCardHelp": "이 트레이드에 대한 개인 메모(선택).",
+  "ajouterTradeNoteHint": "맥락, 배운 점, 감정…",
+  "ajouterTradeSessionAutoTagTitle": "오늘 세션",
+  "ajouterTradeSessionAutoTagSubtitle": "진입 순서로 원칙/감정 자동 태그. CSV 포함.",
+  "ajouterTradeSessionPlannedCountLabel": "하루 «계획» 트레이드 수: {count}",
+  "@ajouterTradeSessionPlannedCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSessionAutoTagHint": "예: 2 → 1–2번 원칙, 3번째부터 감정.",
+  "ajouterTradeSessionHint": "오늘 {rank}번째 트레이드 → 자동: {tag}",
+  "@ajouterTradeSessionHint": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeNoteSectionTitle": "메모",
   "ajouterTradePageTitle": "거래 추가",
   "ajouterTradeErrorQtyPositive": "0보다 큰 포지션 크기를 입력하세요.",
   "ajouterTradeErrorEntryPrice": "유효한 진입가(0보다 큼)를 입력하세요.",
@@ -538,6 +579,8 @@
   "checklistItemRisque2": "리스크는 자본의 1%를 넘지 않습니다.",
   "checklistItemRisque3": "손익비는 최소 1:2입니다.",
   "checklistMenuEdit": "편집",
+  "checklistSectionToggleOn": "섹션 켜기",
+  "checklistSectionToggleOff": "섹션 끄기",
   "checklistPageTitle": "체크리스트",
   "checklistProgressCl": "CL",
   "checklistSectionNews": "NEWS · 경제 캘린더",
@@ -1197,6 +1240,7 @@
   "tradeLabelNews": "뉴스",
   "tradeMindsetFeeling": "느낌",
   "tradeMindsetPrinciple": "원칙",
+  "tradeMindsetTalent": "탤런트",
   "tradeMonthTitle": "월",
   "tradeMostTradedHeading": "가장 많이 거래한 종목",
   "tradeNotRespected": "미준수",

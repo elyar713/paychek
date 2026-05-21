@@ -9,6 +9,47 @@
   "ajouterTradeFillSuggestedLot": "Llenar lote",
   "ajouterTradeSizingEstimationFootnote": "* Las estimaciones utilizan capital ahorrado; Las cifras del contrato/CFD son aproximadas.",
   "ajouterTradeScreenshotHelp": "Agregue un gráfico o una captura de pantalla de configuración (opcional).",
+  "ajouterTradeAnalyseCardTitle": "ANÁLISIS",
+  "ajouterTradeAnalyseCardHelp": "Elija un informe de Mi análisis — su PDF se adjuntará a este trade al guardar.",
+  "ajouterTradeAnalyseChooseReport": "Elegir un análisis",
+  "ajouterTradeAnalysePdfGenerating": "Generando PDF…",
+  "ajouterTradeAnalysePdfAttached": "PDF adjunto: {fileName}",
+  "@ajouterTradeAnalysePdfAttached": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "ajouterTradeAnalyseClear": "Quitar",
+  "ajouterTradeAnalysePdfError": "No se pudo generar el PDF del análisis.",
+  "ajouterTradeAnalysePdfNotReady": "Espere a que termine el PDF o retire la selección.",
+  "ajouterTradeNoteCardTitle": "NOTA",
+  "ajouterTradeNoteCardHelp": "Notas personales sobre este trade (opcional).",
+  "ajouterTradeNoteHint": "Contexto, lecciones, emociones…",
+  "ajouterTradeSessionAutoTagTitle": "Sesión del día",
+  "ajouterTradeSessionAutoTagSubtitle": "Etiqueta automática Principio / Feeling por orden de entrada. Incluye CSV.",
+  "ajouterTradeSessionPlannedCountLabel": "Trades « según el plan » por día: {count}",
+  "@ajouterTradeSessionPlannedCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ajouterTradeSessionAutoTagHint": "Ej.: 2 → trades 1–2 Principio, desde el 3 Feeling.",
+  "ajouterTradeSessionHint": "Trade n°{rank} hoy → auto: {tag}",
+  "@ajouterTradeSessionHint": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeNoteSectionTitle": "Nota",
   "ajouterTradePageTitle": "Agregar comercio",
   "ajouterTradeErrorQtyPositive": "Introduzca un tamaño de posición mayor que 0.",
   "ajouterTradeErrorEntryPrice": "Introduzca un precio de entrada válido (mayor que 0).",
@@ -538,6 +579,8 @@
   "checklistItemRisque2": "El riesgo no supera el 1% de mi capital.",
   "checklistItemRisque3": "La relación riesgo/recompensa es al menos 1:2.",
   "checklistMenuEdit": "Editar",
+  "checklistSectionToggleOn": "Activar sección",
+  "checklistSectionToggleOff": "Desactivar sección",
   "checklistPageTitle": "Lista de verificación",
   "checklistProgressCl": "CL",
   "checklistSectionNews": "NEWS · CALENDARIO ECONÓMICO",
@@ -1176,6 +1219,7 @@
   "tradeDurationHoursMinutes": "{hours}h {minutes}",
   "tradeDurationMinutes": "{minutes} min",
   "tradeEditMenu": "Editar",
+  "tradeLinkedAnalyseOpenPdf": "Abrir PDF de análisis",
   "tradeExportPdfTooltip": "Exportar PDF",
   "tradeFilterAll": "Todo",
   "tradeFilterBreakeven": "Punto de equilibrio",
@@ -1197,6 +1241,7 @@
   "tradeLabelNews": "Noticias",
   "tradeMindsetFeeling": "Sentimiento",
   "tradeMindsetPrinciple": "Principio",
+  "tradeMindsetTalent": "Talento",
   "tradeMonthTitle": "Mes",
   "tradeMostTradedHeading": "Activos más negociados",
   "tradeNotRespected": "No seguido",

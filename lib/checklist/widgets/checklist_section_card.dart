@@ -14,6 +14,9 @@ class ChecklistSectionCard extends StatelessWidget {
     /// (incompatible avec [IntrinsicHeight]).
     this.inlineRowLayout = false,
     this.onMenuSelected,
+    this.sectionEnabled = true,
+    this.onSectionEnabledChanged,
+    this.allowSectionDelete = true,
     this.titleEditing = false,
     this.titleEditController,
     this.titleFocusNode,
@@ -25,6 +28,9 @@ class ChecklistSectionCard extends StatelessWidget {
   final List<Widget> children;
   final bool inlineRowLayout;
   final ValueChanged<String>? onMenuSelected;
+  final bool sectionEnabled;
+  final ValueChanged<bool>? onSectionEnabledChanged;
+  final bool allowSectionDelete;
 
   final bool titleEditing;
   final TextEditingController? titleEditController;
@@ -36,6 +42,9 @@ class ChecklistSectionCard extends StatelessWidget {
     final header = ChecklistSectionHeaderRow(
       title: sectionTitle,
       onMenuSelected: onMenuSelected,
+      sectionEnabled: sectionEnabled,
+      onSectionEnabledChanged: onSectionEnabledChanged,
+      allowDelete: allowSectionDelete,
       editingTitle: titleEditing,
       titleEditController: titleEditController,
       titleFocusNode: titleFocusNode,
@@ -43,18 +52,21 @@ class ChecklistSectionCard extends StatelessWidget {
       onTitleInteraction: onTitleInteraction,
     );
     const gap = SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap);
-    final body = Column(
+    Widget itemsBlock = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: children,
     );
+    if (!sectionEnabled) {
+      itemsBlock = Opacity(opacity: 0.42, child: itemsBlock);
+    }
     if (!inlineRowLayout) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           header,
           gap,
-          body,
+          itemsBlock,
         ],
       );
     }
@@ -66,7 +78,7 @@ class ChecklistSectionCard extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
-            child: body,
+            child: itemsBlock,
           ),
         ),
       ],

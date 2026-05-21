@@ -41,6 +41,66 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ajouterTradeCsvChooseSoftware => 'Choisir un logiciel';
 
   @override
+  String get ajouterTradeAnalyseCardTitle => '분석';
+
+  @override
+  String get ajouterTradeAnalyseCardHelp =>
+      '내 분석에서 리포트를 선택하면 저장 시 PDF가 이 트레이드에 첨부됩니다.';
+
+  @override
+  String get ajouterTradeAnalyseChooseReport => '분석 선택';
+
+  @override
+  String get ajouterTradeAnalysePdfGenerating => 'PDF 생성 중…';
+
+  @override
+  String ajouterTradeAnalysePdfAttached(String fileName) {
+    return 'PDF 첨부: $fileName';
+  }
+
+  @override
+  String get ajouterTradeAnalyseClear => '제거';
+
+  @override
+  String get ajouterTradeAnalysePdfError => '분석 PDF를 생성할 수 없습니다.';
+
+  @override
+  String get ajouterTradeAnalysePdfNotReady =>
+      'PDF 생성이 끝날 때까지 기다리거나 선택을 해제하세요.';
+
+  @override
+  String get ajouterTradeNoteCardTitle => '메모';
+
+  @override
+  String get ajouterTradeNoteCardHelp => '이 트레이드에 대한 개인 메모(선택).';
+
+  @override
+  String get ajouterTradeNoteHint => '맥락, 배운 점, 감정…';
+
+  @override
+  String get ajouterTradeSessionAutoTagTitle => '오늘 세션';
+
+  @override
+  String get ajouterTradeSessionAutoTagSubtitle =>
+      '진입 순서로 원칙/감정 자동 태그. CSV 포함.';
+
+  @override
+  String ajouterTradeSessionPlannedCountLabel(int count) {
+    return '하루 «계획» 트레이드 수: $count';
+  }
+
+  @override
+  String get ajouterTradeSessionAutoTagHint => '예: 2 → 1–2번 원칙, 3번째부터 감정.';
+
+  @override
+  String ajouterTradeSessionHint(int rank, String tag) {
+    return '오늘 $rank번째 트레이드 → 자동: $tag';
+  }
+
+  @override
+  String get tradeNoteSectionTitle => '메모';
+
+  @override
   String get ajouterTradePageTitle => '거래 추가';
 
   @override
@@ -1245,6 +1305,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get checklistMenuEdit => '편집';
+
+  @override
+  String get checklistSectionToggleOn => '섹션 켜기';
+
+  @override
+  String get checklistSectionToggleOff => '섹션 끄기';
 
   @override
   String get checklistPageTitle => '체크리스트';
@@ -3207,6 +3273,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tradeEditMenu => '편집';
 
   @override
+  String get tradeLinkedAnalyseOpenPdf => 'Ouvrir le PDF d’analyse';
+
+  @override
   String get tradeExportPdfTooltip => 'PDF 내보내기';
 
   @override
@@ -3272,6 +3341,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tradeMindsetPrinciple => '원칙';
+
+  @override
+  String get tradeMindsetTalent => '탤런트';
 
   @override
   String get tradeMonthTitle => '월';

@@ -8,6 +8,7 @@ import '../l10n/checklist_localizations.dart';
 import '../widgets/paychek_page_header.dart';
 import 'checklist_export_pdf.dart';
 import 'checklist_item_schedule.dart';
+import 'checklist_models.dart';
 import 'checklist_page_controller.dart';
 import 'checklist_tokens.dart';
 import 'widgets/checklist_add_section_button.dart';
@@ -49,6 +50,9 @@ class ChecklistPageView extends StatelessWidget {
 
     Widget sectionCard(int i, {required bool inlineRowLayout}) {
       final section = displaySections[i];
+      final sectionProtected = checklistSectionIsProtected(section.id);
+      final sectionHasToggle = checklistSectionHasEnableToggle(section.id);
+      final sectionActive = checklistSectionIsActive(section);
       final sectionDisplayTitle =
           checklistSectionTitle(l, section.id, section.title);
 
@@ -60,7 +64,10 @@ class ChecklistPageView extends StatelessWidget {
           label: checklistItemLabel(l, item.id, item.label),
           checked: rowChecked,
           expiredMissed: expired,
-          onChanged: (v) => c.toggleItem(section.id, item.id, v),
+          inactive: !sectionActive,
+          onChanged: sectionActive
+              ? (v) => c.toggleItem(section.id, item.id, v)
+              : null,
           schedule: item.schedule ?? const ChecklistItemSchedule(),
           onScheduleChanged: editing
               ? (sched) => c.updateItemSchedule(section.id, item.id, sched)
@@ -86,6 +93,11 @@ class ChecklistPageView extends StatelessWidget {
                 key: c.sectionEditCardKey,
                 inlineRowLayout: inlineRowLayout,
                 sectionTitle: sectionDisplayTitle,
+                allowSectionDelete: !sectionProtected,
+                sectionEnabled: sectionActive,
+                onSectionEnabledChanged: sectionHasToggle
+                    ? (v) => c.setSectionEnabled(section.id, v)
+                    : null,
                 titleEditing: true,
                 titleEditController: c.sectionTitleEditController,
                 titleFocusNode: c.sectionTitleFocusNode,
@@ -105,6 +117,11 @@ class ChecklistPageView extends StatelessWidget {
           : ChecklistSectionCard(
               inlineRowLayout: inlineRowLayout,
               sectionTitle: sectionDisplayTitle,
+              allowSectionDelete: !sectionProtected,
+              sectionEnabled: sectionActive,
+              onSectionEnabledChanged: sectionHasToggle
+                  ? (v) => c.setSectionEnabled(section.id, v)
+                  : null,
               titleEditing: false,
               titleEditController: c.sectionTitleEditController,
               titleFocusNode: c.sectionTitleFocusNode,

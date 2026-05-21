@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import 'strategie_realtime_notifier.dart';
 import 'strategie_tokens.dart';
 
 /// Session « Horaires » (page Stratégie) — sérialisable pour persistance + règles Paychek Lens.
@@ -129,6 +130,7 @@ abstract final class StrategieHorairesSessionsStorage {
     final p = await SharedPreferences.getInstance();
     final raw = jsonEncode(sessions.map((s) => s.toJson()).toList());
     await p.setString(_k, raw);
+    StrategieRealtimeNotifier.bump();
   }
 }
 

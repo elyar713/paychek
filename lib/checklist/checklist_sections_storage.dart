@@ -34,6 +34,7 @@ abstract final class ChecklistSectionsStorage {
             (s) => {
               'id': s.id,
               'title': s.title,
+              'enabled': s.enabled,
               'items': s.items.map(encodeItem).toList(),
             },
           )
@@ -88,7 +89,15 @@ abstract final class ChecklistSectionsStorage {
           );
         }
       }
-      out.add(ChecklistSectionData(id: id, title: title, items: items));
+      final enabled = e['enabled'];
+      out.add(
+        ChecklistSectionData(
+          id: id,
+          title: title,
+          items: items,
+          enabled: enabled is bool ? enabled : true,
+        ),
+      );
     }
     return out.isEmpty ? null : out;
   }

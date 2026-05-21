@@ -253,6 +253,11 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
 
       _tradeScreenshot = null;
       _tradeScreenshotBytes = null;
+      _tradeLinkedAnalyseReport = null;
+      _tradeLinkedAnalysePdfBytes = null;
+      _tradeLinkedAnalysePdfFileName = null;
+      _tradeLinkedAnalysePdfGenerating = false;
+      _tradeNoteController.clear();
       _selectedCsvSoftware = null;
       _lastImportedFileName = null;
       _clearPerfLitePreserve();

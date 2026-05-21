@@ -21,6 +21,7 @@ class ChecklistPageController extends ChangeNotifier {
               (s) => ChecklistSectionData(
                 id: s.id,
                 title: s.title,
+                enabled: s.enabled,
                 items: s.items
                     .map(
                       (i) => ChecklistItemData(
@@ -72,7 +73,7 @@ class ChecklistPageController extends ChangeNotifier {
   Future<void> hydrateFromStorage() async {
     final data = await ChecklistSectionsStorage.load();
     if (data != null && data.isNotEmpty) {
-      _sections = data;
+      _sections = checklistEnsureProtectedSections(data);
     }
     _snapshotsByDay = await ChecklistDailyCompletionStorage.load();
     _hydrated = true;
@@ -91,6 +92,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   Future<void> _persistToDiskAndCloud() async {
+    _sections = checklistEnsureProtectedSections(_sections);
     await ChecklistSectionsStorage.save(_sections);
     await ChecklistFirestoreSync.pushIfSignedIn();
   }
@@ -137,19 +139,25 @@ class ChecklistPageController extends ChangeNotifier {
   List<ChecklistSectionData> get sectionsSortedBySchedule =>
       checklistSectionsSortedBySchedule(_sections);
 
-  int get totalItems =>
-      _sections.fold<int>(0, (n, s) => n + s.items.length);
+  int get totalItems => _sections.fold<int>(
+        0,
+        (n, s) =>
+            checklistSectionIsActive(s) ? n + s.items.length : n,
+      );
 
   int get checkedItems => _sections.fold<int>(
         0,
-        (n, s) =>
-            n + s.items.where((i) => i.isCompletedForCurrentPeriod()).length,
+        (n, s) => checklistSectionIsActive(s)
+            ? n +
+                s.items.where((i) => i.isCompletedForCurrentPeriod()).length
+            : n,
       );
 
   /// Lignes dont le rappel tombe sur [day] (défaut : aujourd’hui).
   int itemsDueOnDayCount([DateTime? day]) {
     var n = 0;
     for (final s in _sections) {
+      if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
         if (i.isDueOnDay(day)) n++;
       }
@@ -161,6 +169,7 @@ class ChecklistPageController extends ChangeNotifier {
     final on = day ?? DateTime.now();
     var n = 0;
     for (final s in _sections) {
+      if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
         if (i.isDueOnDay(on) && _itemDoneOnDay(i, on)) n++;
       }
@@ -206,6 +215,7 @@ class ChecklistPageController extends ChangeNotifier {
   List<ChecklistUncheckedDayEntry> _uncheckedEntriesForDay(DateTime day) {
     final out = <ChecklistUncheckedDayEntry>[];
     for (final s in _sections) {
+      if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
         if (i.isDueOnDay(day) && !_itemDoneOnDay(i, day)) {
           out.add(
@@ -521,7 +531,7 @@ class ChecklistPageController extends ChangeNotifier {
     sectionTitleEditController.clear();
     itemLabelEditController.clear();
     if (data != null && data.isNotEmpty) {
-      _sections = data;
+      _sections = checklistEnsureProtectedSections(data);
     } else {
       // Même logique que l’init + [ChecklistFirestoreSync._pushFull] : prefs vides → défauts.
       _sections = defaultNouveauTradeSections()
@@ -529,6 +539,7 @@ class ChecklistPageController extends ChangeNotifier {
             (s) => ChecklistSectionData(
               id: s.id,
               title: s.title,
+              enabled: s.enabled,
               items: s.items
                   .map(
                     (i) => ChecklistItemData(
@@ -659,6 +670,7 @@ class ChecklistPageController extends ChangeNotifier {
     return ChecklistSectionData(
       id: s.id,
       title: s.title,
+      enabled: s.enabled,
       items: s.items
           .map(
             (i) => ChecklistItemData(
@@ -704,6 +716,8 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void toggleItem(String sectionId, String itemId, bool value) {
+    final section = _sections.where((s) => s.id == sectionId).toList();
+    if (section.isEmpty || !checklistSectionIsActive(section.first)) return;
     final now = DateTime.now();
     _sections = _sections.map((section) {
       if (section.id != sectionId) return section;
@@ -721,10 +735,23 @@ class ChecklistPageController extends ChangeNotifier {
     _persistSoon();
   }
 
+  void setSectionEnabled(String sectionId, bool enabled) {
+    if (!checklistSectionHasEnableToggle(sectionId)) return;
+    _sections = _sections
+        .map(
+          (s) => s.id == sectionId ? s.copyWith(enabled: enabled) : s,
+        )
+        .toList();
+    _notifyChecklistChanged();
+    _persistSoon();
+    notifyListeners();
+  }
+
   void onSectionMenu(String sectionId, String action, BuildContext context) {
     if (action == ChecklistPrompts.menuActionEdit) {
       startSectionTitleEdit(sectionId);
     } else if (action == ChecklistPrompts.menuActionDelete) {
+      if (checklistSectionIsProtected(sectionId)) return;
       confirmDeleteSection(sectionId, context);
     }
   }
@@ -887,6 +914,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   Future<void> confirmDeleteSection(String sectionId, BuildContext context) async {
+    if (checklistSectionIsProtected(sectionId)) return;
     final ok = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black54,

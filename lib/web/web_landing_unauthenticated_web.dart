@@ -77,22 +77,19 @@ class _WebLandingUnauthenticatedWebState
       },
     );
     _sub = html.window.onMessage.listen(_onWindowMessage);
+    _iframeVisible = true;
     final bootGen = _uiGeneration;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_isUiAlive(bootGen)) return;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!_isUiAlive(bootGen)) return;
-        setState(() => _iframeVisible = true);
-        _acceptMessages = true;
-        final pending =
-            List<({Map<String, dynamic> map, String? origin})>.from(
-          _pendingMessages,
-        );
-        _pendingMessages.clear();
-        for (final item in pending) {
-          _handleMessageMap(item.map, eventOrigin: item.origin);
-        }
-      });
+      _acceptMessages = true;
+      final pending =
+          List<({Map<String, dynamic> map, String? origin})>.from(
+        _pendingMessages,
+      );
+      _pendingMessages.clear();
+      for (final item in pending) {
+        _handleMessageMap(item.map, eventOrigin: item.origin);
+      }
     });
   }
 

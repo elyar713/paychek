@@ -40,6 +40,10 @@ class _TradeSaveCapture {
     required this.etatNonRespectIds,
     required this.psychTags,
     required this.accountEntitlement,
+    this.linkedAnalyseReport,
+    this.linkedAnalysePdfBytes,
+    this.linkedAnalysePdfFileName,
+    this.userNote,
   });
 
   final TradeJournalStore store;
@@ -77,6 +81,15 @@ class _TradeSaveCapture {
   final Set<String> etatNonRespectIds;
   final List<String> psychTags;
   final AccountEntitlementSnapshot? accountEntitlement;
+  final AnalyseReportSnapshot? linkedAnalyseReport;
+  final Uint8List? linkedAnalysePdfBytes;
+  final String? linkedAnalysePdfFileName;
+  final String? userNote;
+}
+
+String? _normalizeTradeUserNote(String raw) {
+  final t = raw.trim();
+  return t.isEmpty ? null : t;
 }
 
 extension _AjouterTradePageStateSave on _AjouterTradePageState {
@@ -94,6 +107,12 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       if (sortie == null || sortie <= 0) {
         return l.ajouterTradeErrorExitOrFlags;
       }
+    }
+    if (_tradeLinkedAnalyseReport != null &&
+        (_tradeLinkedAnalysePdfGenerating ||
+            _tradeLinkedAnalysePdfBytes == null ||
+            _tradeLinkedAnalysePdfBytes!.isEmpty)) {
+      return l.ajouterTradeAnalysePdfNotReady;
     }
     return null;
   }
@@ -123,6 +142,29 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
     );
     final mentalC = MentalStateController.instance;
     final mentalHistorical = mentalC.overallScoreForCalendarDay(entryDay);
+    final newsFlags = resolveTradeNewsTimingFlagsFromController(
+      entreeAt: _entreeDateTime,
+      checklist: widget.checklistController,
+      manualFallback: TradeNewsTimingFlags(
+        avantNews: _avantNews,
+        apresNews: _apresNews,
+      ),
+    );
+
+    var tradeMindset = _tradeMindset;
+    if (_sessionAutoTagEnabled) {
+      final store = TradeJournalScope.of(context);
+      final portfolioId = _editingPortfolioId ??
+          UserPortfolioScope.of(context).activePortfolioId;
+      final m = resolveTradeSessionMindset(
+        entreeAt: _entreeDateTime,
+        existing: store.items,
+        rules: _sessionMindsetRules,
+        portfolioId: portfolioId,
+        excludeTradeId: _editingTradeId,
+      );
+      tradeMindset = tradeMindsetToAjouterTradeKey(m);
+    }
 
     return _TradeSaveCapture(
       store: TradeJournalScope.of(context),
@@ -139,8 +181,8 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       sortieAt: _positionEnCours ? null : _sortieDateTime,
       breakeven: _breakeven,
       positionEnCours: _positionEnCours,
-      avantNews: _avantNews,
-      apresNews: _apresNews,
+      avantNews: newsFlags.avantNews,
+      apresNews: newsFlags.apresNews,
       quantiteLabel: _quantiteController.text.trim().isEmpty
           ? null
           : _quantiteController.text.trim(),
@@ -157,7 +199,7 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       net: net,
       fee: fee,
       performanceLite: performanceLite,
-      tradeMindset: _tradeMindset,
+      tradeMindset: tradeMindset,
       strategieTitle: _strategieChoisie,
       planSelected: _planAnalyseSelectedReport,
       planStoredReports: List<AnalyseReportSnapshot>.from(
@@ -173,12 +215,19 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       etatNonRespectIds: Set<String>.from(_etatMomentNonRespectIds),
       psychTags: List<String>.from(_psychTagSelected),
       accountEntitlement: widget.accountEntitlement,
+      linkedAnalyseReport: _tradeLinkedAnalyseReport,
+      linkedAnalysePdfBytes: _tradeLinkedAnalysePdfBytes,
+      linkedAnalysePdfFileName: _tradeLinkedAnalysePdfFileName,
+      userNote: _normalizeTradeUserNote(_tradeNoteController.text),
     );
   }
 
   TradeMindset _mapMindsetFromCapture(String tradeMindset) {
-    if (tradeMindset == 'feeling') return TradeMindset.feeling;
-    return TradeMindset.principe;
+    return switch (tradeMindset) {
+      'feeling' => TradeMindset.feeling,
+      'principe' => TradeMindset.principe,
+      _ => TradeMindset.none,
+    };
   }
 
   TradeSide _mapSideFromCapture(AjouterTradeSide side) {
@@ -227,8 +276,15 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       strategiePct: discipline.strategiePct,
       etatPct: discipline.etatPct,
       mindset: _mapMindsetFromCapture(c.tradeMindset),
+      mindsetExplicit: c.tradeMindset != 'none',
       strategieTitle: c.strategieTitle,
       planReport: planReport,
+      linkedAnalyseReport:
+          (c.linkedAnalysePdfBytes != null && c.linkedAnalysePdfBytes!.isNotEmpty)
+          ? c.linkedAnalyseReport
+          : null,
+      linkedAnalysePdfBytes: c.linkedAnalysePdfBytes,
+      linkedAnalysePdfFileName: c.linkedAnalysePdfFileName,
       strategieNonRespectIds: Set<String>.from(c.strategieNonRespectIds),
       planNonRespectIds: Set<String>.from(c.planNonRespectIds),
       checklistNonRespectIds: Set<String>.from(c.checklistNonRespectIds),
@@ -238,6 +294,7 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       performanceLite: c.performanceLite,
       portfolioId: c.portfolioId,
       psychTags: List<String>.from(c.psychTags),
+      userNote: c.userNote,
       syncRev: DateTime.now().millisecondsSinceEpoch,
     );
   }

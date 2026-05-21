@@ -6,6 +6,7 @@ import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_reports_storage.dart';
 import '../analyse/analyse_tokens.dart';
 import '../dashboard/dashboard_tokens.dart';
+import '../l10n/app_localizations.dart';
 import 'ajouter_trade_shell_scope.dart';
 
 /// Rapports démo (GOLD, EUR/USD) — défaut brouillon Ajouter trade si le stockage est vide.
@@ -33,9 +34,15 @@ class AjouterTradePlanAnalyseMenu extends StatefulWidget {
     this.selectedSnapshot,
     this.onSelectedSnapshotChanged,
     this.onReportsLoaded,
+    this.compact = false,
+    this.explicitSelectionOnly = false,
   });
 
   final bool showDemoReports;
+  final bool compact;
+
+  /// Pas de rapport affiché tant que l’utilisateur n’a pas choisi (carte Analyse trade).
+  final bool explicitSelectionOnly;
   final AnalyseReportSnapshot? selectedSnapshot;
   final ValueChanged<AnalyseReportSnapshot?>? onSelectedSnapshotChanged;
 
@@ -123,12 +130,37 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
   AnalyseReportSnapshot? get _currentSnapshot {
     final sel = widget.selectedSnapshot;
     if (sel != null) return sel;
+    if (widget.explicitSelectionOnly) return null;
     if (!widget.showDemoReports || _reports.isEmpty) return null;
     return _reports[_selectedIdx.clamp(0, _reports.length - 1)];
   }
 
-  String get _fieldLabel {
+  bool get _showChoosePlaceholder =>
+      widget.showDemoReports &&
+      widget.explicitSelectionOnly &&
+      widget.selectedSnapshot == null;
+
+  int? _indexForSnapshot(AnalyseReportSnapshot? snap) {
+    if (snap == null || _reports.isEmpty) return null;
+    final idx = _reports.indexWhere(
+      (r) => r.actif == snap.actif && r.sousTitre == snap.sousTitre,
+    );
+    return idx >= 0 ? idx : null;
+  }
+
+  int? get _highlightedListIndex {
+    if (widget.explicitSelectionOnly) {
+      return _indexForSnapshot(widget.selectedSnapshot);
+    }
+    if (_reports.isEmpty) return null;
+    return _selectedIdx.clamp(0, _reports.length - 1);
+  }
+
+  String _fieldLabel(BuildContext context) {
     if (!widget.showDemoReports) return '—';
+    if (_showChoosePlaceholder) {
+      return AppLocalizations.of(context)!.ajouterTradeAnalyseChooseReport;
+    }
     return _currentSnapshot?.actif ?? '—';
   }
 
@@ -247,7 +279,7 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    color: i == _selectedIdx
+                                                    color: i == _highlightedListIndex
                                                         ? DashboardTokens
                                                             .onMatteEmphasis
                                                         : DashboardTokens
@@ -325,8 +357,8 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
           borderRadius: BorderRadius.circular(10),
           child: Container(
             key: _fieldKey,
-            height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            height: widget.compact ? 30 : 36,
+            padding: EdgeInsets.symmetric(horizontal: widget.compact ? 8 : 10),
             decoration: BoxDecoration(
               color: DashboardTokens.scaffoldMatte,
               borderRadius: BorderRadius.circular(10),
@@ -338,13 +370,17 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
               children: [
                 Expanded(
                   child: Text(
-                    _fieldLabel,
+                    _fieldLabel(context),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: DashboardTokens.onMatteEmphasis,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
+                    style: TextStyle(
+                      color: _showChoosePlaceholder
+                          ? DashboardTokens.muted
+                          : DashboardTokens.onMatteEmphasis,
+                      fontWeight: _showChoosePlaceholder
+                          ? FontWeight.w600
+                          : FontWeight.w700,
+                      fontSize: widget.compact ? 11 : 12,
                     ),
                   ),
                 ),
@@ -357,14 +393,14 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
                         _currentSnapshot!.globalConfidencePercent,
                       ),
                       fontWeight: FontWeight.w800,
-                      fontSize: 12,
+                      fontSize: widget.compact ? 11 : 12,
                     ),
                   ),
                 ],
-                const SizedBox(width: 4),
-                const Icon(
+                SizedBox(width: widget.compact ? 2 : 4),
+                Icon(
                   Icons.expand_more,
-                  size: 20,
+                  size: widget.compact ? 18 : 20,
                   color: DashboardTokens.labelGrey,
                 ),
               ],

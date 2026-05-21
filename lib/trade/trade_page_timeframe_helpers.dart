@@ -154,6 +154,26 @@ String _formatDayLabel(BuildContext context, DateTime d) {
   return '${local.day} ${l.monthName(local.month)}';
 }
 
+String _formatHm(DateTime d) {
+  String p2(int v) => v.toString().padLeft(2, '0');
+  final l = d.toLocal();
+  return '${p2(l.hour)}:${p2(l.minute)}';
+}
+
+/// Ligne sous le symbole dans les listes 1J / 1S / 1M (heure + session ; date si [withDate]).
+String _formatTradeRowWhenLine(
+  BuildContext context,
+  DateTime entreeAt, {
+  required String sessionLabel,
+  bool withDate = false,
+}) {
+  final hm = _formatHm(entreeAt);
+  if (!withDate) {
+    return '$hm • $sessionLabel';
+  }
+  return '${_formatDayLabel(context, entreeAt)} • $hm • $sessionLabel';
+}
+
 String _formatMonthLabel(BuildContext context, DateTime d) {
   final l = AppLocalizations.of(context)!;
   return l.monthName(d.toLocal().month);

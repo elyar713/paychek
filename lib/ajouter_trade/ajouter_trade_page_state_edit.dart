@@ -49,7 +49,9 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
       _checklistNonRespectIds = Set<String>.from(t.checklistNonRespectIds);
       _etatMomentNonRespectIds = Set<String>.from(t.etatNonRespectIds);
 
-      if (t.performanceLite) {
+      if (t.mindset == TradeMindset.none ||
+          t.performanceLite ||
+          !t.mindsetExplicit) {
         _tradeMindset = 'none';
       } else {
         _tradeMindset = t.mindset == TradeMindset.feeling
@@ -67,6 +69,13 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
           ? null
           : XFile(t.screenshotPath!);
       _tradeScreenshotBytes = t.screenshotBytes;
+
+      _tradeLinkedAnalyseReport = t.linkedAnalyseReport;
+      _tradeLinkedAnalysePdfBytes = t.linkedAnalysePdfBytes;
+      _tradeLinkedAnalysePdfFileName = t.linkedAnalysePdfFileName;
+      _tradeLinkedAnalysePdfGenerating = false;
+
+      _tradeNoteController.text = t.userNote ?? '';
 
       final blind = AppLocalizations.of(context)!.ajouterTradePsychTagBlind;
       final basePreset = ['FOMO', 'TILT', 'Revenge', blind];
@@ -97,6 +106,11 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
         _clearPerfLitePreserve();
       }
     });
+    _applyNewsFlagsFromChecklist();
+    if (t.linkedAnalyseReport != null &&
+        (t.linkedAnalysePdfBytes == null || t.linkedAnalysePdfBytes!.isEmpty)) {
+      unawaited(_ensureTradeLinkedAnalysePdf());
+    }
     _requestGainRecalc();
   }
 }

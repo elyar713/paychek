@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../reglage/paychek_user_firestore.dart';
+import 'trade_journal_mindset_migration.dart';
 import 'trade_journal_storage.dart';
 import 'trade_journal_store.dart';
 import 'trade_models.dart';
@@ -87,8 +88,12 @@ abstract final class TradeJournalFirestoreSync {
       if (t != null) cloud.add(t);
     }
     final local = List<TradeListItem>.from(store.items);
-    final merged = _mergeBySyncRev(local, cloud);
-    final changed = !_sameTradeIdsAndRevs(local, merged);
+    final union = _mergeBySyncRev(local, cloud);
+    final mindsetMigrate = journalMindsetMigrationWouldChange(union);
+    final merged = mindsetMigrate
+        ? applyJournalMindsetTalentMigration(union)
+        : union;
+    final changed = !_sameTradeIdsAndRevs(local, merged) || mindsetMigrate;
     if (changed) {
       store.replaceAll(merged);
       await TradeJournalStorage.save(merged);
@@ -96,7 +101,8 @@ abstract final class TradeJournalFirestoreSync {
     // Hydratation : pousser seulement si l’union diffère du contenu cloud (ex. trades locaux
     // absents du cloud). Si le merge n’a fait qu’importer le cloud, un `set` serait inutile
     // et redéclencherait des snapshots / GC.
-    if (echoPushToCloud && !_sameTradeIdsAndRevs(cloud, merged)) {
+    if (echoPushToCloud &&
+        (!_sameTradeIdsAndRevs(cloud, merged) || mindsetMigrate)) {
       await pushFullJournal(u, List<TradeListItem>.from(store.items));
     }
   }
@@ -148,6 +154,13 @@ abstract final class TradeJournalFirestoreSync {
         final bytes = t.screenshotBytes ?? c.screenshotBytes;
         if (bytes != null && bytes.isNotEmpty) {
           winner = winner.copyWith(screenshotBytes: bytes);
+        }
+      }
+      if (winner.linkedAnalysePdfBytes == null ||
+          winner.linkedAnalysePdfBytes!.isEmpty) {
+        final pdf = t.linkedAnalysePdfBytes ?? c.linkedAnalysePdfBytes;
+        if (pdf != null && pdf.isNotEmpty) {
+          winner = winner.copyWith(linkedAnalysePdfBytes: pdf);
         }
       }
       byId[t.id] = winner;

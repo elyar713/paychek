@@ -43,7 +43,8 @@ pw.Widget _w(
   );
 }
 
-String _safePdfFileName(AnalyseReportSnapshot s) {
+/// Nom de fichier suggéré pour l’export / pièce jointe trade.
+String analyseReportPdfFileName(AnalyseReportSnapshot s) {
   final raw = '${s.actif}_${s.sousTitre}'.trim();
   final cleaned = raw.replaceAll(RegExp(r'[<>:"/\\|?*\n\r]'), '_');
   final base = cleaned.length > 72 ? cleaned.substring(0, 72) : cleaned;
@@ -743,7 +744,7 @@ Future<void> exportAnalyseReportPdf(
       l: l,
     );
     if (!context.mounted) return;
-    final name = _safePdfFileName(snapshot);
+    final name = analyseReportPdfFileName(snapshot);
 
     final ok = await pdf_platform.trySaveReportPdfOnPlatform(
       bytes,

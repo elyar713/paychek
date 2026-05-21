@@ -312,6 +312,31 @@ extension _TradeCardBuild on TradeCard {
                                     ),
                                   ],
                                 ),
+                                if (item.userNote != null &&
+                                    item.userNote!.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      l.tradeNoteSectionTitle,
+                                      style: t.labelSmall?.copyWith(
+                                        color: TradeTokens.textSecondary,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    item.userNote!.trim(),
+                                    style: t.bodySmall?.copyWith(
+                                      color: Colors.white.withValues(alpha: 0.92),
+                                      fontSize: 11,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                ],
                                 if (item.psychTags.isNotEmpty) ...[
                                   const SizedBox(height: 10),
                                   Align(
@@ -543,6 +568,43 @@ extension _TradeCardBuild on TradeCard {
                                                       );
                                                     },
                                                   ),
+                                      ),
+                                    ),
+                                  ];
+                                }(),
+                                ...() {
+                                  final pdf = item.linkedAnalysePdfBytes;
+                                  if (pdf == null || pdf.isEmpty) {
+                                    return const <Widget>[];
+                                  }
+                                  final actif =
+                                      item.linkedAnalyseReport?.actif.trim();
+                                  final hint = (actif != null && actif.isNotEmpty)
+                                      ? '$actif · ${l.tradeLinkedAnalyseOpenPdf}'
+                                      : l.tradeLinkedAnalyseOpenPdf;
+                                  return <Widget>[
+                                    const SizedBox(height: 10),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: TextButton.icon(
+                                        onPressed: () =>
+                                            openTradeLinkedAnalysePdf(
+                                          context,
+                                          item,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.picture_as_pdf_outlined,
+                                          size: 18,
+                                          color: DashboardTokens.titleGold,
+                                        ),
+                                        label: Text(
+                                          hint,
+                                          style: t.labelSmall?.copyWith(
+                                            color: DashboardTokens.titleGold,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 11,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ];

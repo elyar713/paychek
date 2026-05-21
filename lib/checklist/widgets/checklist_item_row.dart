@@ -14,7 +14,8 @@ class ChecklistItemRow extends StatelessWidget {
     super.key,
     required this.label,
     required this.checked,
-    required this.onChanged,
+    this.onChanged,
+    this.inactive = false,
     this.showDividerBelow = true,
     this.onLineDelete,
     this.editingLabel = false,
@@ -34,7 +35,10 @@ class ChecklistItemRow extends StatelessWidget {
 
   /// Échéance passée sans coche (hebdo / date) — ligne grisée, non cliquable.
   final bool expiredMissed;
-  final ValueChanged<bool> onChanged;
+
+  /// Section désactivée (interrupteur off) — même rendu que [expiredMissed].
+  final bool inactive;
+  final ValueChanged<bool>? onChanged;
   final bool showDividerBelow;
 
   /// Si dÃ©fini : mode Â« Modifier Â» â€” carrÃ© remplacÃ© par supprimer la ligne.
@@ -61,7 +65,8 @@ class ChecklistItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final baseLabelStyle = expiredMissed
+    final muted = expiredMissed || inactive;
+    final baseLabelStyle = muted
         ? ChecklistTokens.itemLabelExpiredStyle
         : ChecklistTokens.itemLabelOnCardStyle;
     final lineStyle = onLineDelete != null
@@ -84,7 +89,7 @@ class ChecklistItemRow extends StatelessWidget {
             onTapDown: onSectionEditInteract,
           )
         else
-          _SquareCheck(checked: checked, muted: expiredMissed),
+          _SquareCheck(checked: checked, muted: muted),
         const SizedBox(width: ChecklistTokens.itemRowCheckGap),
         Expanded(
           child: editingLabel &&
@@ -114,11 +119,14 @@ class ChecklistItemRow extends StatelessWidget {
       ],
     );
 
-    if (onLineDelete == null && !editingLabel && !expiredMissed) {
+    if (onLineDelete == null &&
+        !editingLabel &&
+        !muted &&
+        onChanged != null) {
       mainTapTarget = Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => onChanged(!checked),
+          onTap: () => onChanged!(!checked),
           child: mainTapTarget,
         ),
       );

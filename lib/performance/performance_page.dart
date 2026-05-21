@@ -14,6 +14,7 @@ import '../reglage/user_portfolio_store.dart';
 import '../reglage/user_portfolio_models.dart';
 import '../strategie/strategie_gestion_risque_storage.dart';
 import '../strategie/strategie_horaires_sessions_storage.dart';
+import '../strategie/strategie_realtime_notifier.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_sections_storage.dart';
 import 'performance_custom_lens_storage.dart';

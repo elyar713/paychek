@@ -166,6 +166,108 @@ abstract class AppLocalizations {
   /// **'Choisir un logiciel'**
   String get ajouterTradeCsvChooseSoftware;
 
+  /// No description provided for @ajouterTradeAnalyseCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ANALYSE'**
+  String get ajouterTradeAnalyseCardTitle;
+
+  /// No description provided for @ajouterTradeAnalyseCardHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un rapport depuis Mon analyse — son PDF sera joint à ce trade à l’enregistrement.'**
+  String get ajouterTradeAnalyseCardHelp;
+
+  /// No description provided for @ajouterTradeAnalyseChooseReport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une analyse'**
+  String get ajouterTradeAnalyseChooseReport;
+
+  /// No description provided for @ajouterTradeAnalysePdfGenerating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Génération du PDF…'**
+  String get ajouterTradeAnalysePdfGenerating;
+
+  /// No description provided for @ajouterTradeAnalysePdfAttached.
+  ///
+  /// In fr, this message translates to:
+  /// **'PDF joint : {fileName}'**
+  String ajouterTradeAnalysePdfAttached(String fileName);
+
+  /// No description provided for @ajouterTradeAnalyseClear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer'**
+  String get ajouterTradeAnalyseClear;
+
+  /// No description provided for @ajouterTradeAnalysePdfError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de générer le PDF d’analyse.'**
+  String get ajouterTradeAnalysePdfError;
+
+  /// No description provided for @ajouterTradeAnalysePdfNotReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attendez la fin de la génération du PDF, ou retirez la sélection.'**
+  String get ajouterTradeAnalysePdfNotReady;
+
+  /// No description provided for @ajouterTradeNoteCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'NOTE'**
+  String get ajouterTradeNoteCardTitle;
+
+  /// No description provided for @ajouterTradeNoteCardHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos notes personnelles sur ce trade (facultatif).'**
+  String get ajouterTradeNoteCardHelp;
+
+  /// No description provided for @ajouterTradeNoteHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contexte, leçons, émotions…'**
+  String get ajouterTradeNoteHint;
+
+  /// No description provided for @ajouterTradeSessionAutoTagTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session du jour'**
+  String get ajouterTradeSessionAutoTagTitle;
+
+  /// No description provided for @ajouterTradeSessionAutoTagSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Classe Principe / Feeling selon l’ordre d’entrée. Import CSV inclus.'**
+  String get ajouterTradeSessionAutoTagSubtitle;
+
+  /// No description provided for @ajouterTradeSessionPlannedCountLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trades encore « selon le plan » par jour : {count}'**
+  String ajouterTradeSessionPlannedCountLabel(int count);
+
+  /// No description provided for @ajouterTradeSessionAutoTagHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. : 2 → trades 1–2 en Principe, à partir du 3ᵉ en Feeling (tilt / revenge).'**
+  String get ajouterTradeSessionAutoTagHint;
+
+  /// No description provided for @ajouterTradeSessionHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trade n°{rank} aujourd’hui → auto : {tag}'**
+  String ajouterTradeSessionHint(int rank, String tag);
+
+  /// No description provided for @tradeNoteSectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note'**
+  String get tradeNoteSectionTitle;
+
   /// No description provided for @ajouterTradePageTitle.
   ///
   /// In fr, this message translates to:
@@ -2415,6 +2517,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Éditer'**
   String get checklistMenuEdit;
+
+  /// No description provided for @checklistSectionToggleOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer la section'**
+  String get checklistSectionToggleOn;
+
+  /// No description provided for @checklistSectionToggleOff.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactiver la section'**
+  String get checklistSectionToggleOff;
 
   /// No description provided for @checklistPageTitle.
   ///
@@ -6106,6 +6220,12 @@ abstract class AppLocalizations {
   /// **'Modifier'**
   String get tradeEditMenu;
 
+  /// No description provided for @tradeLinkedAnalyseOpenPdf.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir le PDF d’analyse'**
+  String get tradeLinkedAnalyseOpenPdf;
+
   /// No description provided for @tradeExportPdfTooltip.
   ///
   /// In fr, this message translates to:
@@ -6231,6 +6351,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Principe'**
   String get tradeMindsetPrinciple;
+
+  /// No description provided for @tradeMindsetTalent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Talent'**
+  String get tradeMindsetTalent;
 
   /// No description provided for @tradeMonthTitle.
   ///

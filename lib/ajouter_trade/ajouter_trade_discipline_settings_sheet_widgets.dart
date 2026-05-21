@@ -152,3 +152,125 @@ class AjouterTradeDisciplineSectionSwitchTile extends StatelessWidget {
     );
   }
 }
+
+/// Réglage test : auto Principe / Feeling selon le n° de trade du jour.
+class AjouterTradeSessionMindsetTestCard extends StatelessWidget {
+  const AjouterTradeSessionMindsetTestCard({
+    super.key,
+    required this.autoTagEnabled,
+    required this.plannedTradesPerDay,
+    required this.onAutoTagChanged,
+    required this.onPlannedChanged,
+  });
+
+  final bool autoTagEnabled;
+  final int plannedTradesPerDay;
+  final ValueChanged<bool> onAutoTagChanged;
+  final ValueChanged<int> onPlannedChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
+    final planned = plannedTradesPerDay.clamp(1, 10);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      decoration: BoxDecoration(
+        color: DashboardTokens.scaffoldMatte,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: autoTagEnabled
+              ? DashboardTokens.accent.withValues(alpha: 0.45)
+              : DashboardTokens.cardBoxBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: DashboardTokens.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.auto_awesome_motion_rounded,
+                  size: 20,
+                  color: autoTagEnabled
+                      ? DashboardTokens.accent
+                      : DashboardTokens.muted,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.ajouterTradeSessionAutoTagTitle,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: DashboardTokens.onMatteEmphasis,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l.ajouterTradeSessionAutoTagSubtitle,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: DashboardTokens.muted,
+                        fontSize: 11,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: autoTagEnabled,
+                onChanged: onAutoTagChanged,
+                activeThumbColor: DashboardTokens.onMatteEmphasis,
+                activeTrackColor:
+                    DashboardTokens.accent.withValues(alpha: 0.55),
+              ),
+            ],
+          ),
+          if (autoTagEnabled) ...[
+            const SizedBox(height: 12),
+            Text(
+              l.ajouterTradeSessionPlannedCountLabel(planned),
+              style: textTheme.labelSmall?.copyWith(
+                color: DashboardTokens.titleGold,
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+                letterSpacing: 0.3,
+              ),
+            ),
+            Slider(
+              value: planned.toDouble(),
+              min: 1,
+              max: 5,
+              divisions: 4,
+              label: '$planned',
+              onChanged: (v) => onPlannedChanged(v.round()),
+              activeColor: DashboardTokens.accent,
+              inactiveColor: DashboardTokens.cardBoxBorder,
+            ),
+            Text(
+              l.ajouterTradeSessionAutoTagHint,
+              style: textTheme.bodySmall?.copyWith(
+                color: DashboardTokens.muted,
+                fontSize: 10,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

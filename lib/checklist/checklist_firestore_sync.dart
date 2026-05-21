@@ -64,7 +64,9 @@ abstract final class ChecklistFirestoreSync {
       if (cloudRev > localRev) {
         final sections = _sectionsFromData(data);
         if (sections != null) {
-          await ChecklistSectionsStorage.save(sections);
+          await ChecklistSectionsStorage.save(
+            checklistEnsureProtectedSections(sections),
+          );
           await _writeLocalRev(cloudRev);
           ChecklistRealtimeNotifier.bump();
         }
@@ -78,7 +80,9 @@ abstract final class ChecklistFirestoreSync {
           applyCloud: () async {
             final sections = _sectionsFromData(data);
             if (sections != null) {
-              await ChecklistSectionsStorage.save(sections);
+              await ChecklistSectionsStorage.save(
+                checklistEnsureProtectedSections(sections),
+              );
             }
           },
           writeLocalRev: _writeLocalRev,
@@ -102,7 +106,9 @@ abstract final class ChecklistFirestoreSync {
       if (cloudRev <= localRev) return;
       final sections = _sectionsFromData(data);
       if (sections == null) return;
-      await ChecklistSectionsStorage.save(sections);
+      await ChecklistSectionsStorage.save(
+        checklistEnsureProtectedSections(sections),
+      );
       await _writeLocalRev(cloudRev);
       ChecklistRealtimeNotifier.bump();
     } catch (e, st) {
@@ -132,6 +138,9 @@ abstract final class ChecklistFirestoreSync {
         : 0;
 
     var sections = await ChecklistSectionsStorage.load();
+    if (sections != null && sections.isNotEmpty) {
+      sections = checklistEnsureProtectedSections(sections);
+    }
     if (sections == null || sections.isEmpty) {
       final cloudSections =
           cloudData != null ? _sectionsFromData(cloudData) : null;
@@ -156,6 +165,7 @@ abstract final class ChecklistFirestoreSync {
         <String, dynamic>{
           'id': s.id,
           'title': s.title,
+          'enabled': s.enabled,
           'items': [
             for (final i in s.items) ChecklistSectionsStorage.encodeItem(i),
           ],

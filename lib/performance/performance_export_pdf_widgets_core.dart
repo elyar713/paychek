@@ -12,7 +12,7 @@ PdfColor _cRed() => PdfColor.fromHex('DC2626');
 PdfColor _cRedDark() => PdfColor.fromHex('991B1B');
 PdfColor _cRedBg() => PdfColor.fromHex('FFF1F2');
 PdfColor _cOrange() => PdfColor.fromHex('D97706');
-PdfColor _cGrey() => PdfColor.fromHex('6B7280');
+PdfColor _cGrey() => PdfColor.fromHex('888888');
 
 pw.Widget _sectionTitle(String t) {
   return pw.Padding(

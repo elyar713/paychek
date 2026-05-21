@@ -55,12 +55,18 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   final TextEditingController _prixPositionController = TextEditingController();
   final TextEditingController _entreeController = TextEditingController();
   final TextEditingController _sortieController = TextEditingController();
+  final TextEditingController _tradeNoteController = TextEditingController();
   DateTime _entreeDateTime = DateTime.now();
   DateTime _sortieDateTime = DateTime.now();
   bool _breakeven = false;
   bool _positionEnCours = false;
   bool _avantNews = false;
   bool _apresNews = false;
+
+  AnalyseReportSnapshot? _tradeLinkedAnalyseReport;
+  Uint8List? _tradeLinkedAnalysePdfBytes;
+  String? _tradeLinkedAnalysePdfFileName;
+  bool _tradeLinkedAnalysePdfGenerating = false;
 
   /// Import CSV minimal ([TradeListItem.performanceLite]) : conserve le P&L journal (net)
   /// tant que l'utilisateur ne modifie pas entrée/sortie/qty/instrument — l'estimation du
@@ -104,6 +110,10 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   bool _sectionPlanEnabled = true;
   bool _sectionChecklistEnabled = true;
   bool _sectionEtatEnabled = true;
+
+  /// Test engrenage : auto-tag Principe / Feeling selon l’ordre du jour.
+  bool _sessionAutoTagEnabled = false;
+  int _plannedTradesPerDay = 2;
 
   bool _disciplineFeelingAllowsInput() =>
       _tradeMindset != 'feeling' || _authorizeDisciplineWhenFeeling;
@@ -319,7 +329,10 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
       });
     });
     widget.editTrade?.addListener(_onEditTradeChanged);
+    widget.checklistController.addListener(_onChecklistSectionsChanged);
     widget.shellBodyIndex.addListener(_onShellBodyIndexChanged);
+    _loadDisciplinePrefsFromStorage();
+    _applyNewsFlagsFromChecklist();
     _sortieController.addListener(_onSortieTextChanged);
     StrategieSetupsStore.ensureLoaded().then((_) {
       if (!mounted) return;
@@ -457,6 +470,7 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     AnalyseRealtimeNotifier.reportsTick
         .removeListener(_onAnalyseReportsStorageTick);
     widget.editTrade?.removeListener(_onEditTradeChanged);
+    widget.checklistController.removeListener(_onChecklistSectionsChanged);
     widget.shellBodyIndex.removeListener(_onShellBodyIndexChanged);
     _sortieController.removeListener(_onSortieTextChanged);
     _ajouterTradeCloseStrategieMenu(this);
@@ -468,6 +482,7 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     _prixPositionController.dispose();
     _entreeController.dispose();
     _sortieController.dispose();
+    _tradeNoteController.dispose();
     _psychTagNewController.dispose();
     _psychTagNewFocus.dispose();
     super.dispose();

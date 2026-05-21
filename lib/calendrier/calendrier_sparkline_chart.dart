@@ -107,6 +107,9 @@ class CalendrierPerformancePanel extends StatelessWidget {
                 height: 86,
                 currencySymbol: capSymbol,
                 onOpenTradeById: onOpen,
+                onInteractionLockedTap: liteInteractionLocked
+                    ? onLiteInteractionLockedTap
+                    : null,
               ),
               const SizedBox(height: 8),
               Row(

@@ -58,9 +58,12 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
     super.initState();
     StrategieSetupsStore.ensureLoaded();
     _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    StrategieRealtimeNotifier.tick.addListener(_onStrategieChanged);
     _loadSavedWidget();
     _loadLensContext();
   }
+
+  void _onStrategieChanged() => _loadLensContext();
 
   Future<void> _loadLensContext() async {
     final g = await StrategieGestionRisqueStorage.load();
@@ -118,6 +121,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   @override
   void dispose() {
+    StrategieRealtimeNotifier.tick.removeListener(_onStrategieChanged);
     _journalStore?.removeListener(_onJournalChanged);
     _portfolioStore?.removeListener(_onJournalChanged);
     _pulseCtrl.dispose();
@@ -317,7 +321,11 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
       locale: locale,
     );
     final buckets = durationBucketWinRates(disc);
-    final slots = timeSlotWinRates(disc, locale: locale);
+    final slots = timeSlotWinRatesForStrategieSessions(
+      disc,
+      locale: locale,
+      sessions: _strategieSessions,
+    );
     final dailyJournalBuckets = dailyJournalVolumeBucketWinRatesLocalized(
       disc,
       locale: locale,
