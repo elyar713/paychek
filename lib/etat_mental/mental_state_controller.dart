@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -480,6 +481,13 @@ class MentalStateController extends ChangeNotifier {
       _persistOverallScoresByDay();
       MentalStateStorage.saveBundleMap(toCloudBundle());
     });
+  }
+
+  /// Annule le timer de frontière jour (tests widget sans attendre minuit).
+  @visibleForTesting
+  void cancelMidnightCalendarTimerForTests() {
+    _midnightCalendarTimer?.cancel();
+    _midnightCalendarTimer = null;
   }
 
   void _scheduleMidnightCalendarTimer() {
