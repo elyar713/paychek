@@ -41,16 +41,14 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
-    return AnalyseCard(
-      editorSection: AnalyseEditorSection.structure,
-      child: ListenableBuilder(
-        listenable: c,
-        builder: (context, _) {
-          final l = AppLocalizations.of(context)!;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AnalyseSectionTitleRow(
+    final body = ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        final l = AppLocalizations.of(context)!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnalyseSectionTitleRow(
                 title: l.analyseStructureSectionTitle,
                 icon: Icons.polyline,
                 iconColor: AnalyseEditorSection.structure.sectionAccent,
@@ -73,47 +71,47 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
                   ],
                 ),
               ),
-              AnalyseCollapsibleSectionBody(
-                expanded: c.structureEnabled,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 10),
-                    ListenableBuilder(
-            listenable: c,
-            builder: (context, _) {
-              return SizedBox(
-                height: AnalyseTextField.compactRowHeight,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      width: 88,
-                      child: AnalyseInlinePill(
-                        label: c.structureTf,
-                        icon: Icons.keyboard_arrow_down,
-                        compact: true,
-                        height: AnalyseTextField.compactRowHeight,
-                        onPressed: (ctx) =>
-                            showAnalyseStructureTfPicker(ctx, c),
-                      ),
+            AnalyseCollapsibleSectionBody(
+              expanded: c.structureEnabled,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  ListenableBuilder(
+                      listenable: c,
+                      builder: (context, _) {
+                        return SizedBox(
+                          height: AnalyseTextField.compactRowHeight,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                width: 88,
+                                child: AnalyseInlinePill(
+                                  label: c.structureTf,
+                                  icon: Icons.keyboard_arrow_down,
+                                  compact: true,
+                                  height: AnalyseTextField.compactRowHeight,
+                                  onPressed: (ctx) =>
+                                      showAnalyseStructureTfPicker(ctx, c),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: AnalyseTextField(
+                                  hintText: l.analyseLastPointHint,
+                                  value: c.structureDernierPoint,
+                                  onChanged: (v) => c.structureDernierPoint = v,
+                                  compact: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: AnalyseTextField(
-                        hintText: l.analyseLastPointHint,
-                        value: c.structureDernierPoint,
-                        onChanged: (v) => c.structureDernierPoint = v,
-                        compact: true,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 14),
+                  const SizedBox(height: 14),
           ListenableBuilder(
             listenable: c,
             builder: (context, _) {
@@ -290,13 +288,16 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
               );
             },
           ),
-                  ],
-                ),
+                ],
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
+    );
+    return AnalyseCard(
+      editorSection: AnalyseEditorSection.structure,
+      child: body,
     );
   }
 }

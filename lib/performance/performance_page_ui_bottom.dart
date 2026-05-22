@@ -7,13 +7,37 @@ extension _PerformancePageUiBottom on _PerformancePageState {
       case AjouterTradeAssetClass.forex:
         return 'Forex';
       case AjouterTradeAssetClass.indice:
-        return performancePickLang(code, 'Indice', 'Index', 'Índice', 'Index', 'Índice', '지수');
+        return performancePickLang(
+          code,
+          'Indice',
+          'Index',
+          'Índice',
+          'Index',
+          'Índice',
+          '지수',
+        );
       case AjouterTradeAssetClass.future:
-        return performancePickLang(code, 'Future', 'Futures', 'Futuros', 'Futures', 'Futuros', '선물');
+        return performancePickLang(
+          code,
+          'Future',
+          'Futures',
+          'Futuros',
+          'Futures',
+          'Futuros',
+          '선물',
+        );
       case AjouterTradeAssetClass.crypto:
         return 'Crypto';
       case AjouterTradeAssetClass.stock:
-        return performancePickLang(code, 'Action', 'Stock', 'Acción', 'Aktie', 'Ação', '주식');
+        return performancePickLang(
+          code,
+          'Action',
+          'Stock',
+          'Acción',
+          'Aktie',
+          'Ação',
+          '주식',
+        );
       case AjouterTradeAssetClass.matieresPremieres:
         return performancePickLang(
           code,
@@ -58,9 +82,9 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF151515),
+                  color: PerformanceTokens.innerBgDeep,
                   borderRadius: BorderRadius.circular(r),
-                  border: Border.all(color: const Color(0xFF2E2E2E)),
+                  border: Border.all(color: PerformanceTokens.cardBorder),
                 ),
                 child: SizedBox(width: w, height: height),
               ),
@@ -90,9 +114,18 @@ extension _PerformancePageUiBottom on _PerformancePageState {
 
   Widget _cardVolume() {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
-    final vol = volumeBucketWinRatesForMarche(_visibleTrades, _volumeSectionMarche);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
+    final vol = volumeBucketWinRatesForMarche(
+      _visibleTrades,
+      _volumeSectionMarche,
+    );
 
     return _dashCard(
       child: Column(
@@ -100,7 +133,14 @@ extension _PerformancePageUiBottom on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.layers,
-            t('Volume & Taille de Lot', 'Volume & Lot Size', 'Volumen y tamaño de lote', 'Volumen & Lotgröße', 'Volume e tamanho do lote', '거래량·랏 크기'),
+            t(
+              'Volume & Taille de Lot',
+              'Volume & Lot Size',
+              'Volumen y tamaño de lote',
+              'Volumen & Lotgröße',
+              'Volume e tamanho do lote',
+              '거래량·랏 크기',
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -113,11 +153,18 @@ extension _PerformancePageUiBottom on _PerformancePageState {
           ),
           const SizedBox(height: 16),
           Text(
-            t('Winrate par tranche', 'Win rate by range', 'Win rate por rango', 'Gewinnrate nach Band', 'Win rate por faixa', '구간별 승률'),
+            t(
+              'Winrate par tranche',
+              'Win rate by range',
+              'Win rate por rango',
+              'Gewinnrate nach Band',
+              'Win rate por faixa',
+              '구간별 승률',
+            ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF7A7A7A),
+              color: PerformanceTokens.labelMuted,
               letterSpacing: 0.4,
             ),
           ),
@@ -133,16 +180,16 @@ extension _PerformancePageUiBottom on _PerformancePageState {
   }
 
   Widget _volumeMarcheChip(AjouterTradeAssetClass m) => _assetMarcheChip(
-        m: m,
-        selected: _volumeSectionMarche,
-        onSelected: () => _setVolumeSectionMarche(m),
-      );
+    m: m,
+    selected: _volumeSectionMarche,
+    onSelected: () => _setVolumeSectionMarche(m),
+  );
 
   Widget _mostTradedMarcheChip(AjouterTradeAssetClass m) => _assetMarcheChip(
-        m: m,
-        selected: _mostTradedSectionMarche,
-        onSelected: () => _setMostTradedSectionMarche(m),
-      );
+    m: m,
+    selected: _mostTradedSectionMarche,
+    onSelected: () => _setMostTradedSectionMarche(m),
+  );
 
   Widget _assetMarcheChip({
     required AjouterTradeAssetClass m,
@@ -159,10 +206,14 @@ extension _PerformancePageUiBottom on _PerformancePageState {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: sel ? const Color(0xFF2C3A48) : const Color(0xFF141414),
+            color: sel
+                ? PerformanceTokens.filterActive
+                : PerformanceTokens.innerBg,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: sel ? const Color(0xFF4A5A6A) : const Color(0xFF333333),
+              color: sel
+                  ? PerformanceTokens.chipBorderActive
+                  : PerformanceTokens.labelFaint,
             ),
           ),
           child: Text(
@@ -170,7 +221,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              color: sel ? Colors.white : const Color(0xFF9E9E9E),
+              color: sel ? Colors.white : PerformanceTokens.textSecondary,
             ),
           ),
         ),
@@ -180,22 +231,31 @@ extension _PerformancePageUiBottom on _PerformancePageState {
 
   Widget _volumeBucketRow(VolumeBucketStat v, Color fillColor) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String tradesWord(int n) => performanceTradeWordPlural(code, n);
 
     final has = v.count > 0;
     final right = has ? '${(v.winRate * 100).round()}% WR' : '-';
     final sub = has
         ? '${v.count} ${tradesWord(v.count)}'
-        : t('Aucun trade dans ce bucket', 'No trades in this bucket', 'Sin trades en este bloque', 'Kein Trade in diesem Bereich', 'Nenhum trade nesta faixa', '이 구간에 트레이드 없음');
+        : t(
+            'Aucun trade dans ce bucket',
+            'No trades in this bucket',
+            'Sin trades en este bloque',
+            'Kein Trade in diesem Bereich',
+            'Nenhum trade nesta faixa',
+            '이 구간에 트레이드 없음',
+          );
     final fill = v.winRate.clamp(0.0, 1.0);
     // Barre invisible à 0 % : on garde un minimum visible si au moins un trade.
-    final indicatorValue = !has
-        ? null
-        : (fill < 0.02
-            ? 0.06
-            : fill);
+    final indicatorValue = !has ? null : (fill < 0.02 ? 0.06 : fill);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -212,7 +272,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFFDDDDDD),
+                    color: PerformanceTokens.textPrimary,
                   ),
                 ),
               ),
@@ -224,7 +284,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: has ? fillColor : const Color(0xFF666666),
+                      color: has ? fillColor : PerformanceTokens.labelDim,
                     ),
                   ),
                   Text(
@@ -232,7 +292,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 8,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF777777),
+                      color: PerformanceTokens.labelMuted,
                     ),
                   ),
                 ],
@@ -245,9 +305,9 @@ extension _PerformancePageUiBottom on _PerformancePageState {
               height: 5,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFF252525),
+                color: PerformanceTokens.innerBgDeep,
                 borderRadius: BorderRadius.circular(2),
-                border: Border.all(color: const Color(0xFF333333)),
+                border: Border.all(color: PerformanceTokens.labelFaint),
               ),
             )
           else
@@ -256,7 +316,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
               child: LinearProgressIndicator(
                 value: indicatorValue,
                 minHeight: 5,
-                backgroundColor: const Color(0xFF111111),
+                backgroundColor: PerformanceTokens.innerBg,
                 color: fillColor,
               ),
             ),
@@ -267,9 +327,17 @@ extension _PerformancePageUiBottom on _PerformancePageState {
 
   Widget _cardMostTradedAssetBars(List<AssetTradeBarStat> stats) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
-    final maxCount = stats.isEmpty ? 1 : stats.map((e) => e.count).reduce((a, b) => a > b ? a : b);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
+    final maxCount = stats.isEmpty
+        ? 1
+        : stats.map((e) => e.count).reduce((a, b) => a > b ? a : b);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -279,14 +347,22 @@ extension _PerformancePageUiBottom on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.trendingUp,
-            t('Actif le plus tradé', 'Most traded asset', 'Activo más tradeado', 'Meist gehandeltes Instrument', 'Ativo mais negociado', '가장 많이 거래한 종목'),
+            t(
+              'Actif le plus tradé',
+              'Most traded asset',
+              'Activo más tradeado',
+              'Meist gehandeltes Instrument',
+              'Ativo mais negociado',
+              '가장 많이 거래한 종목',
+            ),
           ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final m in AjouterTradeAssetClass.values) _mostTradedMarcheChip(m),
+              for (final m in AjouterTradeAssetClass.values)
+                _mostTradedMarcheChip(m),
             ],
           ),
           const SizedBox(height: 12),
@@ -301,7 +377,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.45,
             ),
           ),
@@ -318,7 +394,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
-                color: const Color(0xFFAAAAAA),
+                color: PerformanceTokens.textSecondary,
                 height: 1.45,
               ),
             )
@@ -327,14 +403,18 @@ extension _PerformancePageUiBottom on _PerformancePageState {
               _mostTradedAssetBarRow(
                 stats[i],
                 maxCount,
-                i.isEven ? Colors.white : const Color(0xFF6B7A8A),
+                i.isEven ? Colors.white : PerformanceTokens.labelMuted,
               ),
         ],
       ),
     );
   }
 
-  Widget _mostTradedAssetBarRow(AssetTradeBarStat s, int maxCount, Color barColor) {
+  Widget _mostTradedAssetBarRow(
+    AssetTradeBarStat s,
+    int maxCount,
+    Color barColor,
+  ) {
     final code = Localizations.localeOf(context).languageCode;
     String tradesWord(int n) => performanceTradeWordPlural(code, n);
 
@@ -358,7 +438,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFFDDDDDD),
+                    color: PerformanceTokens.textPrimary,
                   ),
                 ),
               ),
@@ -370,7 +450,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF777777),
+                      color: PerformanceTokens.labelMuted,
                     ),
                   ),
                   Text(
@@ -404,7 +484,11 @@ extension _PerformancePageUiBottom on _PerformancePageState {
     );
   }
 
-  Widget _cardTitle(IconData icon, String title, {Color titleColor = const Color(0xFF9A9A9A)}) {
+  Widget _cardTitle(
+    IconData icon,
+    String title, {
+    Color titleColor = PerformanceTokens.textSecondary,
+  }) {
     return Row(
       children: [
         Icon(icon, size: 16, color: _kGreen.withValues(alpha: 0.9)),
@@ -431,13 +515,23 @@ extension _PerformancePageUiBottom on _PerformancePageState {
         const SizedBox(width: 8),
         Text(
           title,
-          style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
         ),
       ],
     );
   }
 
-  Widget _statBarRow(String left, String right, double fill, Color fillColor, {String? sub}) {
+  Widget _statBarRow(
+    String left,
+    String right,
+    double fill,
+    Color fillColor, {
+    String? sub,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
@@ -450,7 +544,11 @@ extension _PerformancePageUiBottom on _PerformancePageState {
               Expanded(
                 child: Text(
                   left,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w500, color: const Color(0xFFCCCCCC)),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: PerformanceTokens.textBright,
+                  ),
                 ),
               ),
               Column(
@@ -458,12 +556,20 @@ extension _PerformancePageUiBottom on _PerformancePageState {
                 children: [
                   Text(
                     right,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w700, color: fillColor),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: fillColor,
+                    ),
                   ),
                   if (sub != null)
                     Text(
                       sub,
-                      style: GoogleFonts.plusJakartaSans(fontSize: 8, fontWeight: FontWeight.w500, color: const Color(0xFF666666)),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                        color: PerformanceTokens.labelDim,
+                      ),
                     ),
                 ],
               ),
@@ -475,7 +581,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             child: LinearProgressIndicator(
               value: fill.clamp(0.0, 1.0),
               minHeight: 4,
-              backgroundColor: const Color(0xFF111111),
+              backgroundColor: PerformanceTokens.innerBg,
               color: fillColor,
             ),
           ),

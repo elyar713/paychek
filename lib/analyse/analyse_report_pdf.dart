@@ -43,7 +43,46 @@ pw.Widget _w(
   );
 }
 
-/// Nom de fichier suggéré pour l’export / pièce jointe trade.
+/// Palette rapport PDF (thème clair).
+abstract final class _OledPdf {
+  static final bg = PdfColor.fromInt(0xFFFFFFFF);
+  static final card = PdfColor.fromInt(0xFFFFFFFF);
+  static final cardBorder = PdfColor.fromInt(0xFFE4E4E7);
+  static final fieldBg = PdfColor.fromInt(0xFFF4F4F5);
+  static final smcPanel = PdfColor.fromInt(0xFFEEF2FF);
+  static final smcBorder = PdfColor.fromInt(0xFFC7D2FE);
+  static final track = PdfColor.fromInt(0xFFE4E4E7);
+  static final textPrimary = PdfColor.fromInt(0xFF18181B);
+  static final zinc100 = textPrimary;
+  static final zinc200 = PdfColor.fromInt(0xFF27272A);
+  static final zinc400 = PdfColor.fromInt(0xFF52525B);
+  static final zinc500 = PdfColor.fromInt(0xFF71717A);
+  static final zinc600 = PdfColor.fromInt(0xFFA1A1AA);
+  static final blue = PdfColor.fromInt(0xFF2563EB);
+  static final indigo = PdfColor.fromInt(0xFF4F46E5);
+  static final green = PdfColor.fromInt(0xFF059669);
+  static final red = PdfColor.fromInt(0xFFDC2626);
+  static final amber = PdfColor.fromInt(0xFFD97706);
+  static final badgeBuyBg = PdfColor.fromInt(0xFFD1FAE5);
+  static final badgeSellBg = PdfColor.fromInt(0xFFFEE2E2);
+  static final badgeNeutralBg = fieldBg;
+
+  static PdfColor confluence(int score) {
+    if (score > 70) return green;
+    if (score > 40) return amber;
+    return red;
+  }
+
+  static PdfColor confidencePercent(int pct) {
+    if (pct >= 70) return green;
+    if (pct >= 45) return amber;
+    return red;
+  }
+
+  static PdfColor fromFlutter(Color c) =>
+      PdfColor.fromInt(0xFF000000 | (c.toARGB32() & 0xFFFFFF));
+}
+
 String analyseReportPdfFileName(AnalyseReportSnapshot s) {
   final raw = '${s.actif}_${s.sousTitre}'.trim();
   final cleaned = raw.replaceAll(RegExp(r'[<>:"/\\|?*\n\r]'), '_');
@@ -51,10 +90,24 @@ String analyseReportPdfFileName(AnalyseReportSnapshot s) {
   return '${base.isEmpty ? 'analyse' : base}_rapport.pdf';
 }
 
-PdfColor _kGold() => PdfColor.fromInt(0xFFC9A227);
-PdfColor _kGoldMuted() => PdfColor.fromInt(0xFF8B6914);
+String _dashOr(String? v) {
+  final a = _norm(v);
+  return a.isEmpty ? '—' : a;
+}
 
-PdfColor _badgeBg(String biasLabel) {
+List<String> _lines(String main, List<String> extras) {
+  final out = <String>[];
+  final m = main.trim();
+  if (m.isNotEmpty && m != '—') out.add(m);
+  for (final e in extras) {
+    final t = e.trim();
+    if (t.isNotEmpty) out.add(t);
+  }
+  if (out.isEmpty) return const ['—'];
+  return out;
+}
+
+PdfColor _biasBadgeBg(String biasLabel) {
   final b = biasLabel.toLowerCase();
   if (b.contains('achat') ||
       b.contains('long') ||
@@ -62,7 +115,7 @@ PdfColor _badgeBg(String biasLabel) {
       b.contains('compra') ||
       b.contains('kauf') ||
       b.contains('매수')) {
-    return PdfColor.fromInt(0xFF15803D);
+    return _OledPdf.badgeBuyBg;
   }
   if (b.contains('vente') ||
       b.contains('short') ||
@@ -70,48 +123,30 @@ PdfColor _badgeBg(String biasLabel) {
       b.contains('venda') ||
       b.contains('verkauf') ||
       b.contains('매도')) {
-    return PdfColor.fromInt(0xFFDC2626);
+    return _OledPdf.badgeSellBg;
   }
-  return PdfColors.grey700;
+  return _OledPdf.badgeNeutralBg;
 }
 
-String _dashOr(String? v) {
-  final a = _norm(v);
-  return a.isEmpty ? '—' : a;
-}
-
-String _executiveParagraph(
-  AnalyseReportSnapshot s,
-  AnalyseReportPdfCopy copy,
-  AnalyseReportSnapshotLabels labels,
-) {
-  if (s.noteContexte.trim().isNotEmpty) {
-    return s.noteContexte.trim();
+PdfColor _biasBadgeFg(String biasLabel) {
+  final b = biasLabel.toLowerCase();
+  if (b.contains('achat') ||
+      b.contains('long') ||
+      b.contains('buy') ||
+      b.contains('compra') ||
+      b.contains('kauf') ||
+      b.contains('매수')) {
+    return _OledPdf.green;
   }
-  final parts = <String>[];
-  if (s.gaugeContextEnabled) {
-    parts.add(
-      copy.executiveContextLine(
-        _dashOr(s.contexteTfLine),
-        labels.trend(s.trendLabel),
-        labels.phase(s.phaseLabel),
-      ),
-    );
+  if (b.contains('vente') ||
+      b.contains('short') ||
+      b.contains('sell') ||
+      b.contains('venda') ||
+      b.contains('verkauf') ||
+      b.contains('매도')) {
+    return _OledPdf.red;
   }
-  if (s.gaugeStructureEnabled) {
-    parts.add(
-      copy.executiveStructureLine(
-        _dashOr(s.structureTf),
-        _dashOr(s.chartisme),
-        _dashOr(s.support),
-        _dashOr(s.resistance),
-      ),
-    );
-  }
-  if (parts.isEmpty) {
-    return copy.executiveFallback(s.globalConfidencePercent);
-  }
-  return parts.join(' ');
+  return _OledPdf.textPrimary;
 }
 
 String _footerNote(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
@@ -122,15 +157,27 @@ String _footerNote(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
   return copy.footerNoteDefault(s.gaugeImpactFeuille);
 }
 
-pw.Widget _templateCard({required List<pw.Widget> children}) {
+pw.Widget _oledDivider() => pw.Container(
+      height: 1,
+      margin: const pw.EdgeInsets.symmetric(vertical: 12),
+      color: _OledPdf.cardBorder,
+    );
+
+pw.Widget _oledCard({required List<pw.Widget> children}) {
   return pw.Container(
-    margin: const pw.EdgeInsets.only(bottom: 12),
-    padding: const pw.EdgeInsets.all(16),
     decoration: pw.BoxDecoration(
-      color: PdfColors.white,
-      borderRadius: pw.BorderRadius.circular(14),
-      border: pw.Border.all(color: PdfColors.grey300, width: 0.8),
+      color: _OledPdf.card,
+      borderRadius: pw.BorderRadius.circular(12),
+      border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.8),
+      boxShadow: const [
+        pw.BoxShadow(
+          color: PdfColor.fromInt(0x0F000000),
+          blurRadius: 10,
+          offset: PdfPoint(0, 2),
+        ),
+      ],
     ),
+    padding: const pw.EdgeInsets.all(14),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: children,
@@ -138,92 +185,158 @@ pw.Widget _templateCard({required List<pw.Widget> children}) {
   );
 }
 
-pw.Widget _pdfHeader(
-  AnalyseReportSnapshot s,
-  AnalyseReportPdfCopy copy,
-  AnalyseReportSnapshotLabels labels,
-) {
-  final bias = labels.bias(s.biasLabel);
-  return pw.Container(
-    margin: const pw.EdgeInsets.only(bottom: 14),
-    child: pw.Row(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Expanded(
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              _w(s.actif, fontSize: 20, bold: true, color: PdfColors.grey900),
-              pw.SizedBox(height: 4),
-              _w(s.sousTitre, fontSize: 11, bold: true, color: _kGoldMuted()),
-              pw.SizedBox(height: 6),
-              _w(
-                copy.analysisDateLabel(_dashOr(s.contexteDateLabel)),
-                fontSize: 9,
-                color: PdfColors.grey600,
-              ),
-            ],
-          ),
+pw.Widget _sectionHeader({
+  required String title,
+  required PdfColor accent,
+  int? confidencePct,
+}) {
+  return pw.Row(
+    children: [
+      pw.Container(
+        width: 2,
+        height: 14,
+        decoration: pw.BoxDecoration(
+          color: accent,
+          borderRadius: pw.BorderRadius.circular(1),
         ),
-        pw.Container(
-          padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: pw.BoxDecoration(
-            color: _badgeBg(bias),
-            borderRadius: pw.BorderRadius.circular(20),
-          ),
-          child: _w(
-            '${copy.directionPrefix} : $bias',
-            fontSize: 9,
-            bold: true,
-            color: PdfColors.white,
-            letterSpacing: 0.3,
-          ),
+      ),
+      pw.SizedBox(width: 8),
+      pw.Expanded(
+        child: _w(
+          title,
+          fontSize: 9,
+          bold: true,
+          color: accent,
+          letterSpacing: 1.2,
+        ),
+      ),
+      if (confidencePct != null)
+        _w(
+          '$confidencePct%',
+          fontSize: 9,
+          bold: true,
+          color: _OledPdf.confidencePercent(confidencePct),
+        ),
+    ],
+  );
+}
+
+pw.Widget _oledField({
+  required String label,
+  required String value,
+  bool multiline = false,
+}) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _w(
+        label,
+        fontSize: 7,
+        bold: true,
+        color: _OledPdf.zinc500,
+        letterSpacing: 0.8,
+      ),
+      pw.SizedBox(height: 3),
+      pw.Container(
+        padding: pw.EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: multiline ? 8 : 6,
+        ),
+        decoration: pw.BoxDecoration(
+          color: _OledPdf.fieldBg,
+          borderRadius: pw.BorderRadius.circular(6),
+          border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.5),
+        ),
+        child: _w(
+          _dashOr(value),
+          fontSize: multiline ? 8.5 : 9,
+          bold: true,
+          color: _OledPdf.zinc100,
+          height: multiline ? 1.35 : 1.2,
+        ),
+      ),
+    ],
+  );
+}
+
+pw.Widget _oledNote(String text) {
+  return pw.Padding(
+    padding: const pw.EdgeInsets.only(top: 6),
+    child: pw.Container(
+      padding: const pw.EdgeInsets.all(8),
+      decoration: pw.BoxDecoration(
+        color: _OledPdf.fieldBg,
+        borderRadius: pw.BorderRadius.circular(6),
+        border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.5),
+      ),
+      child: _w(text, fontSize: 8, color: _OledPdf.zinc400, height: 1.4),
+    ),
+  );
+}
+
+pw.Widget _srLevel({
+  required String prefix,
+  required String price,
+  required PdfColor accent,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+    decoration: pw.BoxDecoration(
+      color: _OledPdf.fieldBg,
+      borderRadius: pw.BorderRadius.circular(6),
+      border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.5),
+    ),
+    child: pw.Row(
+      children: [
+        _w(prefix, fontSize: 9, bold: true, color: accent),
+        pw.SizedBox(width: 6),
+        pw.Expanded(
+          child: _w(_dashOr(price), fontSize: 9, bold: true, color: _OledPdf.textPrimary),
         ),
       ],
     ),
   );
 }
 
-pw.Widget _confidenceDonut(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
-  final p = s.globalConfidencePercent.clamp(0, 100);
-  final rest = (100 - p).clamp(0, 100);
-  final v1 = p <= 0 ? 0.001 : p.toDouble();
+pw.Widget _confluenceRing(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
+  final score = s.confluenceScore.clamp(0, 100);
+  final color = _OledPdf.confluence(score);
+  final rest = (100 - score).clamp(0, 100);
+  final v1 = score <= 0 ? 0.001 : score.toDouble();
   final v2 = rest <= 0 ? 0.001 : rest.toDouble();
 
   return pw.SizedBox(
-    width: 108,
-    height: 108,
+    width: 72,
+    height: 72,
     child: pw.Chart(
       grid: pw.PieGrid(startAngle: -math.pi / 2),
       datasets: [
         pw.PieDataSet(
           value: v1,
-          color: _kGold(),
-          innerRadius: 30,
+          color: color,
+          innerRadius: 22,
           legendPosition: pw.PieLegendPosition.none,
           drawBorder: false,
-          borderColor: PdfColors.white,
         ),
         pw.PieDataSet(
           value: v2,
-          color: PdfColors.grey300,
-          innerRadius: 30,
+          color: _OledPdf.track,
+          innerRadius: 22,
           legendPosition: pw.PieLegendPosition.none,
           drawBorder: false,
-          borderColor: PdfColors.white,
         ),
       ],
       overlay: pw.Center(
         child: pw.Column(
           mainAxisAlignment: pw.MainAxisAlignment.center,
           children: [
-            _w('$p%', fontSize: 16, bold: true, color: _kGold()),
+            _w('$score%', fontSize: 14, bold: true, color: _OledPdf.textPrimary),
             _w(
-              copy.confidenceDonutLabel,
-              fontSize: 7,
+              copy.confluenceRingLabel,
+              fontSize: 6,
               bold: true,
-              color: PdfColors.grey700,
-              letterSpacing: 0.6,
+              color: _OledPdf.zinc500,
+              letterSpacing: 0.8,
             ),
           ],
         ),
@@ -232,216 +345,172 @@ pw.Widget _confidenceDonut(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
   );
 }
 
-pw.Widget _executiveSummaryBlock(
+pw.Widget _oledHero(
   AnalyseReportSnapshot s,
   AnalyseReportPdfCopy copy,
   AnalyseReportSnapshotLabels labels,
 ) {
-  return _templateCard(
-    children: [
-      pw.Row(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          _confidenceDonut(s, copy),
-          pw.SizedBox(width: 16),
-          pw.Expanded(
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                _w(
-                  copy.executiveSummaryTitle,
-                  fontSize: 11,
-                  bold: true,
-                  color: PdfColors.grey900,
-                  letterSpacing: 0.8,
-                ),
-                pw.SizedBox(height: 8),
-                _w(
-                  _executiveParagraph(s, copy, labels),
-                  fontSize: 9,
-                  color: PdfColors.grey800,
-                  height: 1.4,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-pw.Widget _twoColumnTrendStructure(
-  AnalyseReportSnapshot s,
-  AnalyseReportPdfCopy copy,
-  AnalyseReportSnapshotLabels labels,
-) {
-  final left = <pw.Widget>[
-    _w(
-      copy.feuilleTendanceSection,
-      fontSize: 10,
-      bold: true,
-      color: PdfColors.grey900,
-      letterSpacing: 0.5,
-    ),
-    pw.SizedBox(height: 8),
-    if (s.gaugeContextEnabled) ...[
-      _kvPdf(copy.l.analyseTimeframeLabelShort, _dashOr(s.contexteTfLine)),
-      _kvPdf(
-        copy.l.analyseTrend,
-        labels.trend(s.trendLabel),
-        valueColor: PdfColors.green700,
-      ),
-      _kvPdf(copy.l.analysePhase, labels.phase(s.phaseLabel)),
-      if (s.noteContexte.isNotEmpty) _italicNote(s.noteContexte),
-    ] else
-      _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
-  ];
-
-  final right = <pw.Widget>[
-    _w(
-      copy.structureTitle(s.structureTf),
-      fontSize: 10,
-      bold: true,
-      color: PdfColors.grey900,
-      letterSpacing: 0.5,
-    ),
-    pw.SizedBox(height: 8),
-    if (s.gaugeStructureEnabled) ...[
-      _kvPdf(copy.signalLastPoint, _dashOr(s.chartisme)),
-      _kvPdf(
-        copy.l.analyseSupport,
-        '${_dashOr(s.support)}${_structureTestedSuffix(s.structureSupportTested, copy)}',
-      ),
-      _kvPdf(
-        copy.l.analyseResistShort,
-        '${_dashOr(s.resistance)}${_structureTestedSuffix(s.structureResistanceTested, copy)}',
-      ),
-      if (s.noteStructure.isNotEmpty) _italicNote(s.noteStructure),
-    ] else
-      _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
-  ];
+  final bias = labels.bias(s.biasLabel);
 
   return pw.Row(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
-      pw.Expanded(child: _templateCard(children: left)),
-      pw.SizedBox(width: 10),
-      pw.Expanded(child: _templateCard(children: right)),
+      _confluenceRing(s, copy),
+      pw.SizedBox(width: 12),
+      pw.Expanded(
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            _w(s.actif, fontSize: 18, bold: true, color: _OledPdf.textPrimary),
+            pw.SizedBox(height: 3),
+            _w(s.sousTitre, fontSize: 10, bold: true, color: _OledPdf.zinc200),
+            pw.SizedBox(height: 4),
+            _w(
+              copy.analysisDateLabel(_dashOr(s.contexteDateLabel)),
+              fontSize: 8,
+              color: _OledPdf.zinc500,
+            ),
+            pw.SizedBox(height: 6),
+            _w(
+              copy.confluenceStatusLabel(s.confluenceScore),
+              fontSize: 8,
+              bold: true,
+              color: _OledPdf.confluence(s.confluenceScore),
+              letterSpacing: 0.4,
+            ),
+          ],
+        ),
+      ),
+      if (s.gaugeContextEnabled)
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: pw.BoxDecoration(
+            color: _biasBadgeBg(bias),
+            borderRadius: pw.BorderRadius.circular(16),
+          ),
+          child: _w(
+            '${copy.directionPrefix} · $bias',
+            fontSize: 8,
+            bold: true,
+            color: _biasBadgeFg(bias),
+            letterSpacing: 0.3,
+          ),
+        ),
     ],
   );
 }
 
-String _structureTestedSuffix(bool? tested, AnalyseReportPdfCopy copy) {
-  if (tested != true) return '';
-  return copy.testedSuffix();
-}
-
-pw.Widget _kvPdf(String k, String v, {PdfColor? valueColor}) {
-  final key = _norm(k);
-  final val = _norm(v);
-  return pw.Padding(
-    padding: const pw.EdgeInsets.only(bottom: 5),
-    child: pw.RichText(
-      text: pw.TextSpan(
-        children: [
-          pw.TextSpan(
-            text: '$key : ',
-            style: PaychekPdfFonts.style(
-              text: '$key : ',
-              preferHangulPrimary: _koFor(key),
-              fontSize: 9,
-              bold: true,
-              color: PdfColors.grey800,
-            ),
-          ),
-          pw.TextSpan(
-            text: val,
-            style: PaychekPdfFonts.style(
-              text: val,
-              preferHangulPrimary: _koFor(val),
-              fontSize: 9,
-              bold: true,
-              color: valueColor ?? PdfColors.grey900,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-pw.Widget _italicNote(String text) {
-  return pw.Padding(
-    padding: const pw.EdgeInsets.only(top: 6),
-    child: _w(
-      text,
-      fontSize: 8,
-      color: PdfColors.grey600,
-      fontStyle: pw.FontStyle.italic,
-      height: 1.35,
-    ),
-  );
-}
-
-pw.Widget _toolsAndSmcWide(
+pw.Widget _fundamentalSection(
   AnalyseReportSnapshot s,
   AnalyseReportPdfCopy copy,
+  AnalyseReportSnapshotLabels labels,
 ) {
-  return _templateCard(
+  if (!s.gaugeContextEnabled) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        _sectionHeader(title: copy.sectionFundamental, accent: _OledPdf.blue),
+        pw.SizedBox(height: 8),
+        _w(copy.sectionDisabled, fontSize: 9, color: _OledPdf.zinc500),
+      ],
+    );
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
     children: [
-      _w(
-        copy.toolsSmcTitle,
-        fontSize: 10,
-        bold: true,
-        color: PdfColors.grey900,
-        letterSpacing: 0.6,
+      _sectionHeader(
+        title: copy.sectionFundamental,
+        accent: _OledPdf.blue,
+        confidencePct: s.gaugeFeuille,
       ),
-      pw.SizedBox(height: 10),
+      pw.SizedBox(height: 8),
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Expanded(
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                _w(
-                  copy.indicatorsTitle(s.indicatorsTf),
-                  fontSize: 9,
-                  bold: true,
-                  color: PdfColors.grey800,
-                ),
-                pw.SizedBox(height: 4),
-                if (s.gaugeIndicatorsEnabled)
-                  _w(s.indicateursOutils, fontSize: 9, height: 1.35)
-                else
-                  _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
-                if (s.noteIndicators.isNotEmpty) _italicNote(s.noteIndicators),
-              ],
+            child: _oledField(
+              label: 'TIMEFRAME',
+              value: s.contexteTfLine,
             ),
           ),
-          pw.SizedBox(width: 14),
+          pw.SizedBox(width: 8),
           pw.Expanded(
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                _w(
-                  copy.smcFluxTitle,
-                  fontSize: 9,
-                  bold: true,
-                  color: PdfColors.grey800,
-                ),
-                pw.SizedBox(height: 4),
-                if (s.gaugeSmcEnabled) ...[
-                  _kvPdf(copy.l.analyseReportCellOrderBlock, _dashOr(s.smcOb)),
-                  _kvPdf(copy.l.analyseReportCellFvg, _dashOr(s.smcFvg)),
-                  _kvPdf(copy.l.analyseReportCellLiqPools, _dashOr(s.smcLiq)),
-                  _kvPdf('Fib / OTE', _dashOr(s.smcFibOteLabel)),
-                  _kvPdf(copy.fibPriceLabel, _dashOr(s.smcFibPrice)),
-                ] else
-                  _w(copy.sectionDisabled, fontSize: 9, color: PdfColors.grey600),
-                if (s.noteSmc.isNotEmpty) _italicNote(s.noteSmc),
-              ],
+            child: _oledField(
+              label: copy.l.analyseTrend.toUpperCase(),
+              value: labels.trend(s.trendLabel),
+            ),
+          ),
+          pw.SizedBox(width: 8),
+          pw.Expanded(
+            child: _oledField(
+              label: copy.l.analysePhase.toUpperCase(),
+              value: labels.phase(s.phaseLabel),
+            ),
+          ),
+        ],
+      ),
+      if (s.noteStructure.trim().isNotEmpty) ...[
+        pw.SizedBox(height: 8),
+        _oledField(label: 'STRUCTURE', value: s.noteStructure, multiline: true),
+      ],
+      if (s.noteContexte.trim().isNotEmpty) ...[
+        pw.SizedBox(height: 8),
+        _oledField(label: copy.notesMacroLabel, value: s.noteContexte, multiline: true),
+      ],
+    ],
+  );
+}
+
+pw.Widget _zoneCleSection(
+  AnalyseReportSnapshot s,
+  AnalyseReportPdfCopy copy,
+) {
+  if (!s.gaugeStructureEnabled) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        _sectionHeader(title: copy.sectionZoneCle, accent: _OledPdf.indigo),
+        pw.SizedBox(height: 8),
+        _w(copy.sectionDisabled, fontSize: 9, color: _OledPdf.zinc500),
+      ],
+    );
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _sectionHeader(
+        title: copy.sectionZoneCle,
+        accent: _OledPdf.indigo,
+        confidencePct: s.gaugeStructure,
+      ),
+      pw.SizedBox(height: 8),
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(child: _oledField(label: 'TIMEFRAME', value: s.structureTf)),
+          pw.SizedBox(width: 8),
+          pw.Expanded(child: _oledField(label: 'CHARTISME', value: s.chartisme)),
+        ],
+      ),
+      pw.SizedBox(height: 6),
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(
+            child: _srLevel(
+              prefix: 'S',
+              price: s.support,
+              accent: _OledPdf.green,
+            ),
+          ),
+          pw.SizedBox(width: 8),
+          pw.Expanded(
+            child: _srLevel(
+              prefix: 'R',
+              price: s.resistance,
+              accent: _OledPdf.red,
             ),
           ),
         ],
@@ -450,31 +519,214 @@ pw.Widget _toolsAndSmcWide(
   );
 }
 
-pw.Widget _goldBar(int percent) {
-  final p = (percent / 100.0).clamp(0.0, 1.0);
-  final f = (p * 100).round().clamp(0, 100);
+pw.Widget _entrySection(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
+  if (!s.gaugeIndicatorsEnabled) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        _sectionHeader(title: copy.sectionEntry, accent: _OledPdf.green),
+        pw.SizedBox(height: 8),
+        _w(copy.sectionDisabled, fontSize: 9, color: _OledPdf.zinc500),
+      ],
+    );
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _sectionHeader(
+        title: copy.sectionEntry,
+        accent: _OledPdf.green,
+        confidencePct: s.gaugeIndicators,
+      ),
+      pw.SizedBox(height: 8),
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Expanded(child: _oledField(label: 'TIMEFRAME', value: s.indicatorsTf)),
+          pw.SizedBox(width: 8),
+          pw.Expanded(
+            child: _oledField(label: copy.signauxLabel, value: s.indicateursOutils),
+          ),
+        ],
+      ),
+      if (s.noteIndicators.trim().isNotEmpty) ...[
+        pw.SizedBox(height: 8),
+        _oledField(
+          label: copy.actionPlanLabel,
+          value: s.noteIndicators,
+          multiline: true,
+        ),
+      ],
+    ],
+  );
+}
+
+pw.Widget _smcPanel(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
+  if (!s.gaugeSmcEnabled) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        _sectionHeader(title: copy.sectionSmc, accent: _OledPdf.indigo),
+        pw.SizedBox(height: 8),
+        _w(copy.sectionDisabled, fontSize: 9, color: _OledPdf.zinc500),
+      ],
+    );
+  }
+
+  final obLines = _lines(s.smcOb, s.smcObExtras);
+  final fvgLines = _lines(s.smcFvg, s.smcFvgExtras);
+  final liqLines = _lines(s.smcLiq, s.smcLiquidityExtras);
+
+  pw.Widget smcGroup(String label, List<String> lines) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        _w(label, fontSize: 7, bold: true, color: _OledPdf.indigo, letterSpacing: 0.5),
+        pw.SizedBox(height: 4),
+        for (var i = 0; i < lines.length; i++) ...[
+          if (i > 0) pw.SizedBox(height: 4),
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: pw.BoxDecoration(
+              color: _OledPdf.fieldBg,
+              borderRadius: pw.BorderRadius.circular(5),
+              border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.4),
+            ),
+            child: _w(lines[i], fontSize: 8.5, color: _OledPdf.zinc200),
+          ),
+        ],
+      ],
+    );
+  }
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _sectionHeader(
+        title: copy.sectionSmc,
+        accent: _OledPdf.indigo,
+        confidencePct: s.gaugeSmc,
+      ),
+      pw.SizedBox(height: 8),
+      pw.Container(
+        padding: const pw.EdgeInsets.all(10),
+        decoration: pw.BoxDecoration(
+          color: _OledPdf.smcPanel,
+          borderRadius: pw.BorderRadius.circular(8),
+          border: pw.Border.all(color: _OledPdf.smcBorder, width: 0.6),
+        ),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          children: [
+            smcGroup(copy.l.analyseReportCellOrderBlock, obLines),
+            pw.SizedBox(height: 8),
+            smcGroup(copy.l.analyseReportCellFvg, fvgLines),
+            pw.SizedBox(height: 8),
+            smcGroup(copy.l.analyseReportCellLiqPools, liqLines),
+            pw.SizedBox(height: 8),
+            pw.Row(
+              children: [
+                if (s.smcFibOteLabel.trim().isNotEmpty)
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: pw.BoxDecoration(
+                      color: _OledPdf.fieldBg,
+                      borderRadius: pw.BorderRadius.circular(12),
+                      border: pw.Border.all(color: _OledPdf.cardBorder),
+                    ),
+                    child: _w(s.smcFibOteLabel, fontSize: 8, bold: true, color: _OledPdf.zinc200),
+                  ),
+                if (s.smcFibOteLabel.trim().isNotEmpty) pw.SizedBox(width: 8),
+                pw.Expanded(
+                  child: _w(
+                    '${copy.fibPriceLabel} : ${_dashOr(s.smcFibPrice)}',
+                    fontSize: 8.5,
+                    color: _OledPdf.zinc200,
+                  ),
+                ),
+              ],
+            ),
+            if (s.noteSmc.trim().isNotEmpty) ...[
+              pw.SizedBox(height: 8),
+              _oledNote(s.noteSmc),
+            ],
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+pw.Widget _volumeSection(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
+  if (!s.gaugeVolumeProfileEnabled) return pw.SizedBox();
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _sectionHeader(title: copy.sectionVolume, accent: _OledPdf.zinc500),
+      pw.SizedBox(height: 8),
+      if ((s.volumeProfileTf ?? '').trim().isNotEmpty)
+        _oledField(label: 'TIMEFRAME', value: s.volumeProfileTf!),
+      if ((s.volumeProfileTf ?? '').trim().isNotEmpty) pw.SizedBox(height: 6),
+      if (s.volumeProfileZoneActive == true) ...[
+        pw.Row(
+          children: [
+            pw.Expanded(
+              child: _oledField(
+                label: '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneFrom})',
+                value: s.volumeProfileZoneFrom ?? '',
+              ),
+            ),
+            pw.SizedBox(width: 8),
+            pw.Expanded(
+              child: _oledField(
+                label: '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneTo})',
+                value: s.volumeProfileZoneTo ?? '',
+              ),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 6),
+      ],
+      pw.Row(
+        children: [
+          pw.Expanded(child: _oledField(label: copy.l.analyseVolumePoc, value: s.poc)),
+          pw.SizedBox(width: 6),
+          pw.Expanded(child: _oledField(label: copy.l.analyseVolumeVah, value: s.vah)),
+          pw.SizedBox(width: 6),
+          pw.Expanded(child: _oledField(label: copy.l.analyseVolumeVal, value: s.val)),
+        ],
+      ),
+      if (s.noteVolume.trim().isNotEmpty) _oledNote(s.noteVolume),
+    ],
+  );
+}
+
+pw.Widget _confidenceBar(int pct, PdfColor fill) {
+  final f = (pct.clamp(0, 100) / 100 * 100).round();
   if (f <= 0) {
     return pw.Container(
-      height: 6,
+      height: 5,
       decoration: pw.BoxDecoration(
-        color: PdfColors.grey200,
+        color: _OledPdf.track,
         borderRadius: pw.BorderRadius.circular(3),
       ),
     );
   }
   if (f >= 100) {
     return pw.Container(
-      height: 6,
+      height: 5,
       decoration: pw.BoxDecoration(
-        color: _kGold(),
+        color: fill,
         borderRadius: pw.BorderRadius.circular(3),
       ),
     );
   }
   return pw.Container(
-    height: 6,
+    height: 5,
     decoration: pw.BoxDecoration(
-      color: PdfColors.grey200,
+      color: _OledPdf.track,
       borderRadius: pw.BorderRadius.circular(3),
     ),
     child: pw.Row(
@@ -483,47 +735,83 @@ pw.Widget _goldBar(int percent) {
           flex: f,
           child: pw.Container(
             decoration: pw.BoxDecoration(
-              color: _kGold(),
+              color: fill,
               borderRadius: pw.BorderRadius.circular(3),
             ),
           ),
         ),
-        pw.Expanded(
-          flex: 100 - f,
-          child: pw.Container(color: PdfColors.grey200),
-        ),
+        pw.Expanded(flex: 100 - f, child: pw.SizedBox()),
       ],
     ),
   );
 }
 
-pw.Widget _confidenceSectionBlock(
-  AnalyseReportSnapshot s,
-  AnalyseReportPdfCopy copy,
-) {
-  final impF = s.gaugeImpactFeuille;
-  return _templateCard(
+pw.Widget _confidenceRow(String label, int pct, PdfColor accent) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
     children: [
-      _w(
-        copy.confidenceBySection(impF),
-        fontSize: 10,
-        bold: true,
-        color: PdfColors.grey900,
-        letterSpacing: 0.4,
+      pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Expanded(child: _w(label, fontSize: 8, color: _OledPdf.zinc400)),
+          _w(
+            '$pct%',
+            fontSize: 8,
+            bold: true,
+            color: _OledPdf.confidencePercent(pct),
+          ),
+        ],
       ),
-      pw.SizedBox(height: 12),
-      _confidenceRowPdf(copy.feuilleGaugeRow, s.gaugeFeuille),
+      pw.SizedBox(height: 4),
+      _confidenceBar(pct, accent),
+    ],
+  );
+}
+
+pw.Widget _confidencePanel(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
+  final impF = s.gaugeImpactFeuille;
+  final globalPct = s.globalConfidencePercent;
+  final globalColor = _OledPdf.fromFlutter(s.globalConfidenceColor);
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      _sectionHeader(
+        title: copy.confidencePanelTitle(impF),
+        accent: _OledPdf.zinc400,
+      ),
       pw.SizedBox(height: 10),
-      _confidenceRowPdf(copy.structureGaugeRow, s.gaugeStructure),
+      pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          _w(
+            copy.globalConfidenceLabel,
+            fontSize: 9,
+            bold: true,
+            color: _OledPdf.zinc400,
+            letterSpacing: 0.4,
+          ),
+          _w(
+            '$globalPct%',
+            fontSize: 14,
+            bold: true,
+            color: globalColor,
+          ),
+        ],
+      ),
       pw.SizedBox(height: 10),
-      _confidenceRowPdf(copy.indicatorsGaugeRow, s.gaugeIndicators),
-      pw.SizedBox(height: 10),
-      _confidenceRowPdf(copy.smcGaugeRow, s.gaugeSmc),
-      pw.SizedBox(height: 10),
+      _confidenceRow(copy.feuilleGaugeRow, s.gaugeFeuille, _OledPdf.blue),
+      pw.SizedBox(height: 8),
+      _confidenceRow(copy.structureGaugeRow, s.gaugeStructure, _OledPdf.indigo),
+      pw.SizedBox(height: 8),
+      _confidenceRow(copy.entryGaugeRow, s.gaugeIndicators, _OledPdf.green),
+      pw.SizedBox(height: 8),
+      _confidenceRow(copy.smcGaugeRow, s.gaugeSmc, _OledPdf.indigo),
+      pw.SizedBox(height: 8),
       _w(
         '* ${_footerNote(s, copy)}',
-        fontSize: 8,
-        color: PdfColors.grey600,
+        fontSize: 7,
+        color: _OledPdf.zinc600,
         fontStyle: pw.FontStyle.italic,
         height: 1.35,
       ),
@@ -531,62 +819,41 @@ pw.Widget _confidenceSectionBlock(
   );
 }
 
-pw.Widget _confidenceRowPdf(String label, int pct) {
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-    children: [
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Expanded(child: _w(label, fontSize: 9, color: PdfColors.grey800)),
-          _w('$pct%', fontSize: 9, bold: true, color: _kGold()),
-        ],
-      ),
-      pw.SizedBox(height: 4),
-      _goldBar(pct),
-    ],
-  );
-}
-
-pw.Widget _volumeCard(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
-  if (!s.gaugeVolumeProfileEnabled) return pw.SizedBox();
-  return _templateCard(
-    children: [
-      _w(
-        copy.l.analyseVolumeProfile,
-        fontSize: 10,
-        bold: true,
-        color: PdfColors.grey900,
-      ),
-      pw.SizedBox(height: 8),
-      if ((s.volumeProfileTf ?? '').trim().isNotEmpty)
-        _kvPdf(copy.l.analyseTimeframeLabelShort, _dashOr(s.volumeProfileTf)),
-      if (s.volumeProfileZoneActive == true) ...[
-        _kvPdf(
-          '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneFrom})',
-          _dashOr(s.volumeProfileZoneFrom),
-        ),
-        _kvPdf(
-          '${copy.l.analyseVolumeZoneLabel} (${copy.l.analyseVolumeZoneTo})',
-          _dashOr(s.volumeProfileZoneTo),
-        ),
-      ],
-      _kvPdf(copy.l.analyseVolumePoc, _dashOr(s.poc)),
-      _kvPdf(copy.l.analyseVolumeVah, _dashOr(s.vah)),
-      _kvPdf(copy.l.analyseVolumeVal, _dashOr(s.val)),
-      if (s.noteVolume.isNotEmpty) _italicNote(s.noteVolume),
-    ],
-  );
-}
-
-pw.Widget _pdfSectionTitle(String t) => pw.Padding(
-      padding: const pw.EdgeInsets.only(top: 8, bottom: 6),
-      child: _w(t, fontSize: 11, bold: true, color: PdfColors.blueGrey800),
+pw.Widget _annexeTitle(String t) => pw.Padding(
+      padding: const pw.EdgeInsets.only(top: 14, bottom: 8),
+      child: _w(t, fontSize: 9, bold: true, color: _OledPdf.zinc400, letterSpacing: 0.6),
     );
 
-pw.Widget _pdfLine(String label, String value) => pw.Padding(
-      padding: const pw.EdgeInsets.only(bottom: 3),
-      child: _kvPdf(label, value),
+pw.Widget _annexeCard(List<pw.Widget> rows) {
+  return pw.Container(
+    margin: const pw.EdgeInsets.only(bottom: 8),
+    padding: const pw.EdgeInsets.all(10),
+    decoration: pw.BoxDecoration(
+      color: _OledPdf.fieldBg,
+      borderRadius: pw.BorderRadius.circular(8),
+      border: pw.Border.all(color: _OledPdf.cardBorder, width: 0.5),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: rows,
+    ),
+  );
+}
+
+pw.Widget _annexeKv(String k, String v) => pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 4),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.SizedBox(
+            width: 110,
+            child: _w(k, fontSize: 8, bold: true, color: _OledPdf.zinc500),
+          ),
+          pw.Expanded(
+            child: _w(v, fontSize: 8, bold: true, color: _OledPdf.zinc200),
+          ),
+        ],
+      ),
     );
 
 List<pw.Widget> _annexeBlocks(
@@ -596,72 +863,79 @@ List<pw.Widget> _annexeBlocks(
 ) {
   final out = <pw.Widget>[];
 
-  if (s.contexteCopies != null && s.contexteCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle(copy.annexeContexte()));
-    for (final c in s.contexteCopies!) {
-      out.add(
-        _templateCard(
-          children: [
-            _pdfLine(copy.directionPrefix, labels.bias(c.biasLabel)),
-            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.contexteTfLine)),
-            _pdfLine(copy.l.analyseTrend, labels.trend(c.trendLabel)),
-            _pdfLine(copy.l.analysePhase, labels.phase(c.phaseLabel)),
-          ],
-        ),
-      );
+  void addCopies<T>({
+    required String title,
+    required List<T>? copies,
+    required List<pw.Widget> Function(T c) build,
+  }) {
+    final list = copies;
+    if (list == null || list.isEmpty) return;
+    out.add(_annexeTitle(title));
+    for (final c in list) {
+      out.add(_annexeCard(build(c)));
     }
   }
 
-  if (s.structureCopies != null && s.structureCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle(copy.annexeStructure()));
-    for (final c in s.structureCopies!) {
-      out.add(
-        _templateCard(
-          children: [
-            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.structureTf)),
-            _pdfLine(copy.lastPointLabel, _dashOr(c.chartisme)),
-            _pdfLine(copy.l.analyseSupport, _dashOr(c.support)),
-            _pdfLine(copy.l.analyseResistShort, _dashOr(c.resistance)),
-          ],
-        ),
-      );
-    }
-  }
+  addCopies<AnalyseReportContexteCopy>(
+    title: copy.annexeContexte(),
+    copies: s.contexteCopies,
+    build: (c) => [
+      _annexeKv(copy.directionPrefix, labels.bias(c.biasLabel)),
+      _annexeKv(copy.l.analyseTimeframeLabelShort, _dashOr(c.contexteTfLine)),
+      _annexeKv(copy.l.analyseTrend, labels.trend(c.trendLabel)),
+      _annexeKv(copy.l.analysePhase, labels.phase(c.phaseLabel)),
+    ],
+  );
 
-  if (s.indicatorsCopies != null && s.indicatorsCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle(copy.annexeIndicators()));
-    for (final c in s.indicatorsCopies!) {
-      out.add(
-        _templateCard(
-          children: [
-            _pdfLine(copy.l.analyseTimeframeLabelShort, _dashOr(c.indicatorsTf)),
-            _pdfLine(copy.toolsLabel, _dashOr(c.indicateursOutils)),
-            if (c.noteIndicators.isNotEmpty) _italicNote(c.noteIndicators),
-          ],
-        ),
-      );
-    }
-  }
+  addCopies<AnalyseReportStructureCopy>(
+    title: copy.annexeStructure(),
+    copies: s.structureCopies,
+    build: (c) => [
+      _annexeKv(copy.l.analyseTimeframeLabelShort, _dashOr(c.structureTf)),
+      _annexeKv(copy.lastPointLabel, _dashOr(c.chartisme)),
+      _annexeKv(copy.l.analyseSupport, _dashOr(c.support)),
+      _annexeKv(copy.l.analyseResistShort, _dashOr(c.resistance)),
+    ],
+  );
 
-  if (s.smcCopies != null && s.smcCopies!.isNotEmpty) {
-    out.add(_pdfSectionTitle(copy.annexeSmc()));
-    for (final c in s.smcCopies!) {
-      out.add(
-        _templateCard(
-          children: [
-            _pdfLine(copy.l.analyseReportCellOrderBlock, _dashOr(c.smcOb)),
-            _pdfLine(copy.l.analyseReportCellFvg, _dashOr(c.smcFvg)),
-            _pdfLine(copy.l.analyseReportCellLiqPools, _dashOr(c.smcLiq)),
-            _pdfLine('Fib / OTE', _dashOr(c.smcFibOteLabel)),
-            _pdfLine(copy.fibPriceLabel, _dashOr(c.smcFibPrice)),
-            if (c.noteSmc.isNotEmpty) _italicNote(c.noteSmc),
-          ],
-        ),
-      );
-    }
-  }
+  addCopies<AnalyseReportIndicatorsCopy>(
+    title: copy.annexeIndicators(),
+    copies: s.indicatorsCopies,
+    build: (c) => [
+      _annexeKv(copy.l.analyseTimeframeLabelShort, _dashOr(c.indicatorsTf)),
+      _annexeKv(copy.signauxLabel, _dashOr(c.indicateursOutils)),
+      if (c.noteIndicators.trim().isNotEmpty)
+        _annexeKv(copy.actionPlanLabel, c.noteIndicators),
+    ],
+  );
+
+  addCopies<AnalyseReportSmcCopy>(
+    title: copy.annexeSmc(),
+    copies: s.smcCopies,
+    build: (c) => [
+      _annexeKv(copy.l.analyseReportCellOrderBlock, _dashOr(c.smcOb)),
+      _annexeKv(copy.l.analyseReportCellFvg, _dashOr(c.smcFvg)),
+      _annexeKv(copy.l.analyseReportCellLiqPools, _dashOr(c.smcLiq)),
+      _annexeKv('Fib / OTE', _dashOr(c.smcFibOteLabel)),
+      _annexeKv(copy.fibPriceLabel, _dashOr(c.smcFibPrice)),
+      if (c.noteSmc.trim().isNotEmpty) _annexeKv('Note', c.noteSmc),
+    ],
+  );
 
   return out;
+}
+
+pw.Widget _pdfFooter(AnalyseReportPdfCopy copy) {
+  return pw.Padding(
+    padding: const pw.EdgeInsets.only(top: 10),
+    child: pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        _w(copy.brandFooter, fontSize: 7, color: _OledPdf.zinc600, letterSpacing: 0.8),
+        _w(copy.generatedBy, fontSize: 7, color: _OledPdf.zinc600),
+      ],
+    ),
+  );
 }
 
 Future<Uint8List> buildAnalyseReportPdf(
@@ -682,34 +956,74 @@ Future<Uint8List> buildAnalyseReportPdf(
     theme: pdfTheme,
   );
 
-  final body = <pw.Widget>[
-    pw.Container(
-      color: PdfColors.grey100,
-      padding: const pw.EdgeInsets.all(4),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+  final mainCard = _oledCard(
+    children: [
+      _oledHero(s, copy, labels),
+      _oledDivider(),
+      pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _pdfHeader(s, copy, labels),
-          _executiveSummaryBlock(s, copy, labels),
-          _twoColumnTrendStructure(s, copy, labels),
-          _toolsAndSmcWide(s, copy),
-          _confidenceSectionBlock(s, copy),
-          _volumeCard(s, copy),
+          pw.Expanded(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                _fundamentalSection(s, copy, labels),
+                if (s.gaugeVolumeProfileEnabled) ...[
+                  pw.SizedBox(height: 12),
+                  _volumeSection(s, copy),
+                ],
+                pw.SizedBox(height: 12),
+                _entrySection(s, copy),
+              ],
+            ),
+          ),
+          pw.SizedBox(width: 12),
+          pw.Expanded(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                _zoneCleSection(s, copy),
+                pw.SizedBox(height: 12),
+                _smcPanel(s, copy),
+              ],
+            ),
+          ),
         ],
       ),
-    ),
+      _oledDivider(),
+      _confidencePanel(s, copy),
+      _pdfFooter(copy),
+    ],
+  );
+
+  final body = <pw.Widget>[
+    mainCard,
     ..._annexeBlocks(s, copy, labels),
   ];
 
   if (imageBytes != null && imageBytes.isNotEmpty) {
     body.addAll([
-      pw.SizedBox(height: 12),
-      _pdfSectionTitle(copy.captureSection),
-      pw.SizedBox(height: 6),
-      pw.Image(
-        pw.MemoryImage(imageBytes),
-        width: 480,
-        fit: pw.BoxFit.contain,
+      pw.SizedBox(height: 14),
+      _w(
+        copy.captureSection,
+        fontSize: 9,
+        bold: true,
+        color: _OledPdf.zinc400,
+        letterSpacing: 0.6,
+      ),
+      pw.SizedBox(height: 8),
+      pw.Container(
+        padding: const pw.EdgeInsets.all(8),
+        decoration: pw.BoxDecoration(
+          color: _OledPdf.card,
+          borderRadius: pw.BorderRadius.circular(10),
+          border: pw.Border.all(color: _OledPdf.cardBorder),
+        ),
+        child: pw.Image(
+          pw.MemoryImage(imageBytes),
+          width: 480,
+          fit: pw.BoxFit.contain,
+        ),
       ),
     ]);
   }
@@ -718,9 +1032,9 @@ Future<Uint8List> buildAnalyseReportPdf(
     pw.MultiPage(
       pageTheme: pw.PageTheme(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.fromLTRB(36, 42, 36, 36),
+        margin: const pw.EdgeInsets.fromLTRB(32, 36, 32, 32),
         theme: pdfTheme,
-        buildBackground: (ctx) => pw.Container(color: PdfColors.grey50),
+        buildBackground: (ctx) => pw.Container(color: _OledPdf.bg),
       ),
       build: (ctx) => body,
     ),

@@ -1,7 +1,8 @@
 import 'dart:ui' show Locale;
 
 import '../ajouter_trade/ajouter_trade_plan_analyse_feedback_items.dart';
-import '../checklist/checklist_models.dart' show ChecklistSectionData, defaultNouveauTradeSections;
+import '../checklist/checklist_models.dart'
+    show ChecklistSectionData, defaultNouveauTradeSections;
 import '../etat_mental/mental_state_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_feedback_reference.dart';

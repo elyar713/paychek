@@ -1,51 +1,55 @@
 import 'package:flutter/material.dart';
 
-/// Couleurs et styles « Ma Stratégie » (maquettes).
+import '../analyse/analyse_tokens.dart';
+
+/// Couleurs et styles « Ma Stratégie » — alignés sur [AnalyseTokens] (OLED).
 abstract final class StrategieTokens {
-  static const bg = Colors.black;
-  /// Cartes principales (maquette « My Strategy »).
-  static const cardBg = Color(0xFF1A1A1A);
-  static const cardBorder = Color(0xFF2C2C2E);
-  static const innerCardBg = Color(0xFF121212);
-  static const rowBg = Color(0xFF1A1A1A);
+  static const bg = AnalyseTokens.bg;
+  static const cardBg = AnalyseTokens.cardBg;
+  static const cardBorder = AnalyseTokens.cardBorder;
+  static const innerCardBg = AnalyseTokens.inputBg;
+  static const rowBg = AnalyseTokens.inputBg;
+  static const mesReglesSectionCardBg = AnalyseTokens.cardBg;
+  static const ruleLineCaseBg = AnalyseTokens.inputBgDeep;
 
-  /// Sections gauche : même facette que [cardBg].
-  static const mesReglesSectionCardBg = Color(0xFF1A1A1A);
-
-  /// Lignes de règle numérotées.
-  static const ruleLineCaseBg = Color(0xFF151515);
-
-  /// Libellés type maquette (titres de blocs règles setup).
-  static const maquetteHeadingOrange = Color(0xFFE8A66B);
-
+  /// Libellés de blocs (ex-règles setup) — zinc OLED.
+  static const maquetteHeadingOrange = AnalyseTokens.zinc400;
   static const pageMaxContentWidth = 1180.0;
   static const twoColumnBreakpoint = 960.0;
 
-  static const emerald = Color(0xFF1EB48A);
-  static const labelMuted = Color(0xFF888888);
-  static const titleGrey = Color(0xFF666666);
+  static const emerald = AnalyseTokens.oledGreen;
+  static const labelMuted = AnalyseTokens.zinc500;
+  static const titleGrey = AnalyseTokens.zinc400;
 
-  /// En-tête Gestion du risque (bleu ciel).
-  static const riskHeaderBlue = Color(0xFF64B5F6);
+  static const riskHeaderBlue = AnalyseTokens.oledBlue;
+  static const horairesGold = AnalyseTokens.zinc300;
 
-  /// Horaires & sessions (or).
-  static const horairesGold = Color(0xFFD4AF37);
+  static const riskRed = AnalyseTokens.oledRed;
+  static const ratioTeal = AnalyseTokens.oledGreen;
 
-  static const riskRed = Color(0xFFE53935);
-  static const ratioTeal = Color(0xFF26C694);
+  static const radiusLg = AnalyseTokens.radiusCard;
+  static const radiusMd = 12.0;
+  static const radiusSm = 8.0;
 
-  static const radiusLg = 20.0;
-  static const radiusMd = 14.0;
-  static const radiusSm = 10.0;
-
-  static BoxDecoration sectionDecoration() => BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(radiusLg),
-        border: Border.all(color: cardBorder.withValues(alpha: 0.55)),
-      );
+  static BoxDecoration sectionDecoration() => AnalyseTokens.oledStepDecoration();
 
   static BoxDecoration innerDecoration() => BoxDecoration(
         color: innerCardBg,
         borderRadius: BorderRadius.circular(radiusMd),
+        border: Border.all(color: cardBorder),
       );
+
+  /// Champs / dialogues (sessions, roues horaires).
+  static const dialogBg = AnalyseTokens.bg;
+  static const fieldFill = AnalyseTokens.inputBg;
+  static const fieldBorder = AnalyseTokens.cardBorder;
+  static const wheelBg = AnalyseTokens.inputBg;
+  static const wheelDigit = AnalyseTokens.zinc300;
+  static const wheelSelection = AnalyseTokens.inputBgDeep;
+  static const wheelSeparator = AnalyseTokens.zinc700;
+
+  /// Pastilles sessions « Trade » / « No Trade » (horaires).
+  static const sessionTradeIconBg = Color(0xFF0F2418);
+  static const sessionNoTradeIconBg = Color(0xFF2A1010);
+  static const sessionNoTradeIconFg = Color(0xFFE57373);
 }

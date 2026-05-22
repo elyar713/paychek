@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
+import 'performance_tokens.dart';
 import 'performance_trade_model.dart';
 
 double _rate(int wins, int total) => total == 0 ? 0.0 : wins / total;
@@ -12,19 +13,23 @@ bool _hasDiscipline(Trade t) =>
     t.etatPct != null;
 
 /// Couleurs d'identification Paychek Lens (texte).
-const Color kLensEtat = Color(0xFF4FC3F7);
-const Color kLensChecklist = Color(0xFF66BB6A);
-const Color kLensStrategie = Color(0xFFFFCA28);
-const Color kLensPlan = Color(0xFFCE93D8);
-const Color kLensAccentNum = Color(0xFFFFFFFF);
-const Color kLensLoss = Color(0xFFFF6B6B);
-const Color kLensDuration = Color(0xFF90CAF9);
-const Color kLensWinrate = Color(0xFF69F0AE);
+const Color kLensEtat = PerformanceTokens.oledBlue;
+const Color kLensChecklist = PerformanceTokens.green;
+const Color kLensStrategie = PerformanceTokens.oledAmber;
+const Color kLensPlan = Color(0xFF818CF8);
+const Color kLensAccentNum = PerformanceTokens.textPrimary;
+const Color kLensLoss = PerformanceTokens.red;
+const Color kLensDuration = PerformanceTokens.oledBlue;
+const Color kLensWinrate = PerformanceTokens.green;
 
 /// Moyennes discipline sur les trades où au moins un pourcentage est renseigné.
 class DisciplineRollups {
   const DisciplineRollups({
     required this.countWithAnyDisciplineField,
+    required this.tradesWithPlan,
+    required this.tradesWithStrategie,
+    required this.tradesWithChecklist,
+    required this.tradesWithEtat,
     required this.avgChecklist,
     required this.avgPlan,
     required this.avgStrategie,
@@ -33,6 +38,14 @@ class DisciplineRollups {
   });
 
   final int countWithAnyDisciplineField;
+
+  /// Trades avec % plan renseigné (rapport Mon Analyse lié).
+  final int tradesWithPlan;
+
+  /// Trades avec slider / setup stratégie renseignés à l'enregistrement.
+  final int tradesWithStrategie;
+  final int tradesWithChecklist;
+  final int tradesWithEtat;
   final double avgChecklist;
   final double avgPlan;
   final double avgStrategie;
@@ -88,6 +101,10 @@ DisciplineRollups computeDisciplineRollups(List<Trade> trades) {
 
   return DisciplineRollups(
     countWithAnyDisciplineField: any,
+    tradesWithPlan: nPl,
+    tradesWithStrategie: nSt,
+    tradesWithChecklist: nCl,
+    tradesWithEtat: nEt,
     avgChecklist: avgChecklist,
     avgPlan: avgPlan,
     avgStrategie: avgStrategie,
@@ -113,22 +130,28 @@ DisciplineRollups computeDisciplineRollups(List<Trade> trades) {
 }
 
 (double wr, int n) winRateChecklistBand(
-    List<Trade> trades, bool Function(double pct) inBand) {
+  List<Trade> trades,
+  bool Function(double pct) inBand,
+) {
   return winRateDisciplinePctBand(trades, (t) => t.checklistPct, inBand);
 }
 
 (double wr, int n) winRatePlanBand(
-    List<Trade> trades, bool Function(double pct) inBand) {
+  List<Trade> trades,
+  bool Function(double pct) inBand,
+) {
   return winRateDisciplinePctBand(trades, (t) => t.planPct, inBand);
 }
 
 (double wr, int n) winRateEtatBand(
-    List<Trade> trades, bool Function(double pct) inBand) {
+  List<Trade> trades,
+  bool Function(double pct) inBand,
+) {
   return winRateDisciplinePctBand(trades, (t) => t.etatPct, inBand);
 }
 
-(double wrHigh, int nHigh, double wrLow, int nLow) winRatesStrategieHighVsForced(
-    List<Trade> trades) {
+(double wrHigh, int nHigh, double wrLow, int nLow)
+winRatesStrategieHighVsForced(List<Trade> trades) {
   const highThreshold = 50.0;
   const lowThreshold = 50.0;
   var wH = 0, tH = 0, wL = 0, tL = 0;
@@ -166,6 +189,7 @@ List<StrategieSetupWinStat> winRatesByStrategieSetupTitles(
 ) {
   final map = <String, ({int w, int n})>{};
   for (final tr in trades) {
+    if (tr.strategiePct == null) continue;
     final title = tr.strategieTitle?.trim();
     if (title == null || title.isEmpty) continue;
     final cur = map[title] ?? (w: 0, n: 0);
@@ -190,7 +214,7 @@ List<StrategieSetupWinStat> winRatesByStrategieSetupTitles(
 
 /// `null` = Talent (trade sans notation Principe/Feeling, saisie lite).
 (double wrP, int nP, double wrF, int nF, double wrT, int nT)
-    winRatesMindsetPrincipeFeeling(List<Trade> trades) {
+winRatesMindsetPrincipeFeeling(List<Trade> trades) {
   var wP = 0, tP = 0, wF = 0, tF = 0, wT = 0, tT = 0;
   for (final t in trades) {
     if (t.mindsetPrincipe == null) {
@@ -321,7 +345,13 @@ List<StrategieViolationAgg> aggregateStrategieNonRespect(List<Trade> trades) {
   for (final e in m.entries) {
     final parts = e.key.split(sep);
     if (parts.length != 2) continue;
-    out.add(StrategieViolationAgg(id: parts[1], strategieTitle: parts[0], count: e.value));
+    out.add(
+      StrategieViolationAgg(
+        id: parts[1],
+        strategieTitle: parts[0],
+        count: e.value,
+      ),
+    );
   }
   out.sort((a, b) => b.count.compareTo(a.count));
   return out;

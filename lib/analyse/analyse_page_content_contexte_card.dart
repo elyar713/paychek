@@ -272,14 +272,12 @@ class _AnalyseFeuilleContexteCardState extends State<AnalyseFeuilleContexteCard>
   @override
   Widget build(BuildContext context) {
     final c = _c;
-    return AnalyseCard(
-      editorSection: AnalyseEditorSection.feuillePlan,
-      child: ListenableBuilder(
-        listenable: c,
-        builder: (context, _) {
-          return AnalyseFeuilleContexteCardBody(
-            controller: c,
-            pillsEditMode: _pillsEditMode,
+    final body = ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        return AnalyseFeuilleContexteCardBody(
+          controller: c,
+          pillsEditMode: _pillsEditMode,
             htfDraftOpen: _htfDraftOpen,
             trendDraftOpen: _trendDraftOpen,
             phaseDraftOpen: _phaseDraftOpen,
@@ -298,9 +296,12 @@ class _AnalyseFeuilleContexteCardState extends State<AnalyseFeuilleContexteCard>
             onTrendDraftCancel: () => setState(() => _trendDraftOpen = false),
             onPhaseDraftCommit: _onPhaseDraftCommit,
             onPhaseDraftCancel: () => setState(() => _phaseDraftOpen = false),
-          );
-        },
-      ),
+        );
+      },
+    );
+    return AnalyseCard(
+      editorSection: AnalyseEditorSection.feuillePlan,
+      child: body,
     );
   }
 }

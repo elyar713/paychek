@@ -6322,6 +6322,108 @@ abstract class AppLocalizations {
   /// **'Plan'**
   String get tradeLabelPlan;
 
+  /// No description provided for @tradePlanAnalysisNoData.
+  ///
+  /// In fr, this message translates to:
+  /// **'—'**
+  String get tradePlanAnalysisNoData;
+
+  /// No description provided for @tradePlanAnalysisMissingAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade n\'a de plan Mon Analyse lié. Ouvrez un trade (modifier) et associez un rapport pour afficher le % Plan.'**
+  String get tradePlanAnalysisMissingAll;
+
+  /// No description provided for @tradePlanAnalysisMissingPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'{missing} trade(s) sur {total} sans plan Mon Analyse — associez un rapport depuis Ajouter / modifier trade.'**
+  String tradePlanAnalysisMissingPartial(int missing, int total);
+
+  /// No description provided for @performancePlanAnalysisMissingBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les statistiques « Analyse (plan) » ne comptent que les trades avec un rapport Mon Analyse lié. Sur cette période, aucun trade qualifié — associez un plan depuis le journal.'**
+  String get performancePlanAnalysisMissingBanner;
+
+  /// No description provided for @performancePlanAnalysisSectionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.'**
+  String get performancePlanAnalysisSectionEmpty;
+
+  /// No description provided for @tradeStrategieExecutionNoData.
+  ///
+  /// In fr, this message translates to:
+  /// **'—'**
+  String get tradeStrategieExecutionNoData;
+
+  /// No description provided for @tradeStrategieExecutionMissingAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade n\'a de stratégie renseignée (setup + slider). Modifiez un trade dans Ajouter trade pour afficher le % Stratégie.'**
+  String get tradeStrategieExecutionMissingAll;
+
+  /// No description provided for @tradeStrategieExecutionMissingPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'{missing} trade(s) sur {total} sans stratégie renseignée — choisissez un setup et le slider lors de l\'enregistrement.'**
+  String tradeStrategieExecutionMissingPartial(int missing, int total);
+
+  /// No description provided for @performanceStrategieExecutionSectionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade avec stratégie renseignée (slider / setup). Les cartes Horaires et Gestion du risque plus haut restent calculées automatiquement.'**
+  String get performanceStrategieExecutionSectionEmpty;
+
+  /// No description provided for @tradeChecklistNoData.
+  ///
+  /// In fr, this message translates to:
+  /// **'—'**
+  String get tradeChecklistNoData;
+
+  /// No description provided for @tradeChecklistMissingAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade n\'a de checklist cochée pour le jour d\'entrée. Cochez des cases sur la page Checklist (ou rétroaction sur le trade).'**
+  String get tradeChecklistMissingAll;
+
+  /// No description provided for @tradeChecklistMissingPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'{missing} trade(s) sur {total} sans checklist renseignée pour le jour d\'entrée.'**
+  String tradeChecklistMissingPartial(int missing, int total);
+
+  /// No description provided for @performanceChecklistSectionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade avec checklist cochée le jour d\'entrée. Les stats ne comptent que les trades liés à une checklist remplie.'**
+  String get performanceChecklistSectionEmpty;
+
+  /// No description provided for @tradeEtatNoData.
+  ///
+  /// In fr, this message translates to:
+  /// **'—'**
+  String get tradeEtatNoData;
+
+  /// No description provided for @tradeEtatMissingAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade n\'a d\'état mental réglé pour le jour d\'entrée. Renseignez la page État mental (ou rétroaction sur le trade).'**
+  String get tradeEtatMissingAll;
+
+  /// No description provided for @tradeEtatMissingPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'{missing} trade(s) sur {total} sans état mental réglé pour le jour d\'entrée.'**
+  String tradeEtatMissingPartial(int missing, int total);
+
+  /// No description provided for @performanceEtatSectionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun trade avec état mental réglé pour le jour d\'entrée. Les cartes Horaires / Gestion du risque restent calculées automatiquement.'**
+  String get performanceEtatSectionEmpty;
+
   /// No description provided for @tradeLabelSession.
   ///
   /// In fr, this message translates to:

@@ -2,6 +2,7 @@ import '../checklist/checklist_page_controller.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_models.dart' show TradeListItem, TradeMindset;
+import '../trade/trade_plan_analysis.dart';
 import 'performance_trade_model.dart';
 
 /// Extrait un nombre de lot depuis le champ quantité (ex. « 0.5 Lot », « 1 »).
@@ -63,10 +64,17 @@ Trade tradeListItemToPerformanceTrade(
     profit: profit,
     win: win,
     commission: t.commissionAmount,
-    checklistPct: discipline?.checklistPct ?? t.checklistPct,
-    planPct: discipline?.planPct ?? t.planPct,
-    strategiePct: discipline?.strategiePct ?? t.strategiePct,
-    etatPct: discipline?.etatPct ?? t.etatPct,
+    checklistPct:
+        discipline?.checklistPct ??
+        (tradeHasExplicitChecklist(t) ? t.checklistPct : null),
+    planPct:
+        discipline?.planPct ??
+        (tradeHasExplicitPlanAnalysis(t) ? t.planPct : null),
+    strategiePct:
+        discipline?.strategiePct ??
+        (tradeHasExplicitStrategieExecution(t) ? t.strategiePct : null),
+    etatPct:
+        discipline?.etatPct ?? (tradeHasExplicitEtat(t) ? t.etatPct : null),
     mindsetPrincipe: !t.mindsetExplicit
         ? null
         : switch (t.mindset) {

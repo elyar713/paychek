@@ -44,9 +44,9 @@ class _StrategieSetupEditDialog extends StatefulWidget {
 }
 
 class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
-  static const _labelColor = Color(0xFF888888);
-  static const _fieldBg = Color(0xFF111111);
-  static const _border = Color(0xFF222222);
+  static const _labelColor = StrategieTokens.labelMuted;
+  static const _fieldBg = StrategieTokens.fieldFill;
+  static const _border = StrategieTokens.fieldBorder;
 
   late final TextEditingController _nameC;
   late Color _dotColor;
@@ -155,7 +155,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
     final footerBottom = math.max(16.0, media.padding.bottom);
 
     return Dialog(
-      backgroundColor: const Color(0xFF0a0a0a),
+      backgroundColor: StrategieTokens.dialogBg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: _border),
@@ -244,7 +244,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                                     value: _colorLabel,
                                     isExpanded: true,
                                     isDense: true,
-                                    dropdownColor: const Color(0xFF1A1A1A),
+                                    dropdownColor: StrategieTokens.wheelBg,
                                     style: GoogleFonts.plusJakartaSans(
                                       color: Colors.white,
                                       fontSize: 12,
@@ -388,7 +388,7 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
             ),
             const Divider(height: 1, color: _border),
             Material(
-              color: const Color(0xFF0a0a0a),
+              color: StrategieTokens.dialogBg,
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 12, 20, footerBottom),
                 child: Row(
@@ -397,8 +397,8 @@ class _StrategieSetupEditDialogState extends State<_StrategieSetupEditDialog> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF888888),
-                          side: const BorderSide(color: Color(0xFF333333)),
+                          foregroundColor: StrategieTokens.labelMuted,
+                          side: const BorderSide(color: StrategieTokens.fieldBorder),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

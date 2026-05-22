@@ -40,9 +40,7 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
       _strategieRespectPct = t.strategiePct;
 
       _strategieChoisie = t.strategieTitle;
-      _planAnalyseSelectedReport =
-          t.planReport ??
-          _draftDefaultPlanAnalyseSnapshot(Localizations.localeOf(context));
+      _planAnalyseSelectedReport = t.planReport;
 
       _strategieNonRespectIds = Set<String>.from(t.strategieNonRespectIds);
       _planAnalyseNonRespectIds = Set<String>.from(t.planNonRespectIds);
@@ -106,6 +104,7 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
         _clearPerfLitePreserve();
       }
     });
+    unawaited(_refreshPlanAnalyseFromStorage());
     _applyNewsFlagsFromChecklist();
     if (t.linkedAnalyseReport != null &&
         (t.linkedAnalysePdfBytes == null || t.linkedAnalysePdfBytes!.isEmpty)) {

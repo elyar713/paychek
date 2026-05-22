@@ -103,13 +103,13 @@ class StrategieMesReglesPopupMenu extends StatelessWidget {
               Icon(
                 Icons.delete_outline_rounded,
                 size: 18,
-                color: Color(0xFFE53935),
+                color: StrategieTokens.riskRed,
               ),
               const SizedBox(width: 8),
               Text(
                 l.delete,
                 style: ChecklistTokens.sectionPopupMenuItemStyle.copyWith(
-                  color: Color(0xFFE57373),
+                  color: StrategieTokens.riskRed.withValues(alpha: 0.85),
                 ),
               ),
             ],
@@ -168,7 +168,7 @@ class StrategieMesReglesDraftRuleLine extends StatelessWidget {
                 hintStyle: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF6A6A6A),
+                  color: StrategieTokens.labelMuted,
                 ),
               ),
             ),
@@ -301,7 +301,7 @@ class _MesReglesIndexBadge extends StatelessWidget {
       height: 28,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFF0D2A22),
+        color: StrategieTokens.sessionTradeIconBg,
         borderRadius: BorderRadius.circular(StrategieTokens.radiusSm),
       ),
       child: Text(

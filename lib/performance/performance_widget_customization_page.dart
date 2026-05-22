@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'performance_tokens.dart';
+
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -7,19 +9,21 @@ import '../l10n/app_localizations.dart';
 import 'performance_widget_model.dart';
 import 'performance_widget_storage.dart';
 
-const Color _kGreen = Color(0xFF1eb48a);
-const Color _kBorder = Color(0xFF1A1A1A);
-const Color _kGrey = Color(0xFF555555);
+const Color _kGreen = PerformanceTokens.green;
+const Color _kBorder = PerformanceTokens.borderSubtle;
+const Color _kGrey = PerformanceTokens.labelFaint;
 
-/// Personnalisation Performance â€” enregistre mÃ©trique + type de graphique (persistance locale).
+/// Personnalisation Performance — enregistre métrique + type de graphique (persistance locale).
 class PerformanceWidgetCustomizationPage extends StatefulWidget {
   const PerformanceWidgetCustomizationPage({super.key});
 
   @override
-  State<PerformanceWidgetCustomizationPage> createState() => _PerformanceWidgetCustomizationPageState();
+  State<PerformanceWidgetCustomizationPage> createState() =>
+      _PerformanceWidgetCustomizationPageState();
 }
 
-class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCustomizationPage> {
+class _PerformanceWidgetCustomizationPageState
+    extends State<PerformanceWidgetCustomizationPage> {
   static const _chartIcons = <IconData>[
     LucideIcons.barChart2,
     LucideIcons.pieChart,
@@ -60,7 +64,8 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
     final out = <int>[];
     for (var i = 0; i < all.length; i++) {
       final m = all[i];
-      if (m.title.toLowerCase().contains(q) || m.subtitle.toLowerCase().contains(q)) {
+      if (m.title.toLowerCase().contains(q) ||
+          m.subtitle.toLowerCase().contains(q)) {
         out.add(i);
       }
     }
@@ -171,7 +176,11 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
     );
   }
 
-  Widget _analysisBox(List<int> filtered, List<PerformanceWidgetMetric> all, AppLocalizations l) {
+  Widget _analysisBox(
+    List<int> filtered,
+    List<PerformanceWidgetMetric> all,
+    AppLocalizations l,
+  ) {
     return Container(
       height: 340,
       decoration: BoxDecoration(
@@ -187,12 +196,17 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
               color: Color(0xFF050505),
-              border: Border(bottom: BorderSide(color: Color(0xFF111111))),
+              border: Border(
+                bottom: BorderSide(color: PerformanceTokens.innerBg),
+              ),
             ),
             child: TextField(
               controller: _searchCtrl,
               onChanged: (_) => setState(() {}),
-              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                color: Colors.white,
+              ),
               cursorColor: _kGreen,
               decoration: InputDecoration(
                 isDense: true,
@@ -200,7 +214,10 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                 filled: true,
                 fillColor: Colors.black,
                 hintText: l.perfSearchHint,
-                hintStyle: GoogleFonts.plusJakartaSans(fontSize: 13, color: _kGrey),
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: _kGrey,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(color: _kBorder),
@@ -226,7 +243,10 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                 ? Center(
                     child: Text(
                       l.perfNoResults,
-                      style: GoogleFonts.plusJakartaSans(fontSize: 12, color: _kGrey),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: _kGrey,
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -238,7 +258,9 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                       final selected = _metricIndex == idx;
                       final showBorder = i < filtered.length - 1;
                       return Material(
-                        color: selected ? const Color(0x0D1EB48A) : Colors.transparent,
+                        color: selected
+                            ? const Color(0x0D1EB48A)
+                            : Colors.transparent,
                         child: InkWell(
                           onTap: () => setState(() => _metricIndex = idx),
                           borderRadius: BorderRadius.circular(8),
@@ -247,22 +269,32 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                           child: Container(
                             decoration: showBorder
                                 ? const BoxDecoration(
-                                    border: Border(bottom: BorderSide(color: Color(0xFF111111))),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: PerformanceTokens.innerBg,
+                                      ),
+                                    ),
                                   )
                                 : null,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 14,
+                            ),
                             child: Row(
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         m.title,
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w700,
-                                          color: selected ? _kGreen : Colors.white,
+                                          color: selected
+                                              ? _kGreen
+                                              : Colors.white,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -270,7 +302,7 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                                         m.subtitle,
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 10,
-                                          color: const Color(0xFF666666),
+                                          color: PerformanceTokens.labelDim,
                                         ),
                                       ),
                                     ],
@@ -298,7 +330,7 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? _kGreen : const Color(0xFF333333),
+          color: selected ? _kGreen : PerformanceTokens.labelFaint,
           width: 1.5,
         ),
       ),
@@ -310,7 +342,10 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
           child: Container(
             width: 10,
             height: 10,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: _kGreen),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: _kGreen,
+            ),
           ),
         ),
       ),
@@ -335,7 +370,9 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
               onTap: () => setState(() => _chartIndex = i),
               child: Container(
                 decoration: BoxDecoration(
-                  border: i < n - 1 ? const Border(bottom: BorderSide(color: _kBorder)) : null,
+                  border: i < n - 1
+                      ? const Border(bottom: BorderSide(color: _kBorder))
+                      : null,
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -348,10 +385,18 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: selected ? _kGreen : const Color(0xFF111111),
+                              color: selected
+                                  ? _kGreen
+                                  : PerformanceTokens.innerBg,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(_chartIcons[i], size: 16, color: selected ? Colors.black : const Color(0xFF888888)),
+                            child: Icon(
+                              _chartIcons[i],
+                              size: 16,
+                              color: selected
+                                  ? Colors.black
+                                  : PerformanceTokens.labelMuted,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -372,7 +417,7 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
                                   PerformanceWidgetChartType.hint(i, l),
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 10,
-                                    color: const Color(0xFF666666),
+                                    color: PerformanceTokens.labelDim,
                                     height: 1,
                                   ),
                                 ),
@@ -418,11 +463,16 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             child: Text(
               AppLocalizations.of(context)!.perfAddWidgetButton,
-              style: GoogleFonts.plusJakartaSans(fontSize: 15, fontWeight: FontWeight.w700),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),
@@ -430,6 +480,3 @@ class _PerformanceWidgetCustomizationPageState extends State<PerformanceWidgetCu
     );
   }
 }
-
-
-

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'analyse_models.dart';
 
@@ -8,43 +9,89 @@ abstract final class AnalyseTokens {
   /// Ancienne colonne unique (mobile).
   static const pageMaxWidth = 420.0;
 
-  /// Tableau de bord analyse : grille + panneau latéral.
-  static const pageMaxWidthDashboard = 1180.0;
+  /// Tableau de bord analyse : entonnoir 3 colonnes (maquette Trading Plan).
+  static const pageMaxWidthDashboard = 1280.0;
 
-  /// [LayoutBuilder] : à partir de cette largeur, deux colonnes + sidebar.
-  static const layoutBreakpointWide = 960.0;
+  /// Largeur max du corps (alignée sur [PerformancePage]).
+  static const pageContentMaxWidth = 1200.0;
+
+  /// Breakpoint page / padding horizontal (aligné Performance).
+  static const pageLayoutWideBreakpoint = 920.0;
+
+  /// [LayoutBuilder] : entonnoir 3 colonnes (lg).
+  static const layoutBreakpointWide = 1024.0;
+
+  /// Padding intérieur des cartes section (identique Performance).
+  static const sectionCardPadding = EdgeInsets.all(20);
+
+  /// Padding scroll page analyse (identique Performance).
+  static EdgeInsets pageScrollPadding({required bool wide}) =>
+      EdgeInsets.fromLTRB(wide ? 24 : 16, 0, wide ? 24 : 16, 48);
 
   /// Grille Direction / Tendance | TF / Phase sur la feuille contexte.
   static const layoutBreakpointFeuilleGrid = 520.0;
 
-  static const bg = Colors.black;
-  /// Cartes / sections (plus sombre que le fond page pour le relief).
-  static const cardBg = Color(0xFF070707);
-  static const cardBorder = Color(0xFF1A1A1A);
-  static const muted = Color(0xFF777777);
-  static const muted2 = Color(0xFF555555);
-  static const matteText = Color(0xFFE6E6E6);
+  // —— Palette OLED Dark (maquette pitch black) ——
+  static const bg = Color(0xFF000000);
+  static const textPrimary = Color(0xFFECECF1);
+  static const headerBg = Color(0xE6050508); // #050508/90
+  static const cardBg = Color(0xFF07080B);
+  static const cardBgRaised = Color(0xFF07080B);
+  static const inputBg = Color(0xFF0E0F14);
+  static const inputBgDeep = Color(0xFF050608);
+  static const cardBorder = Color(0xFF1B1C24);
+  static const headerBorder = Color(0xFF1E2026);
+  static const smcPanelBg = Color(0xFF0A0D14);
+  static const vpPanelBg = Color(0xFF090A0E);
 
-  static const accentGreen = Color(0xFF2BD17E);
-  static const accentAmber = Color(0xFFF3B23B);
-  static const accentRed = Color(0xFFE84B4B);
+  static const oledBlue = Color(0xFF3B82F6);
+  static const oledIndigo = Color(0xFF818CF8);
+  static const oledGreen = Color(0xFF10B981);
+  static const oledRed = Color(0xFFEF4444);
+  static const oledAmber = Color(0xFFF59E0B);
 
-  /// Puces « TIMEFRAME » (HTF) sélectionnées : **blanc**.
-  static const chipHtfSelected = Color(0xFFFFFFFF);
+  static const zinc100 = Color(0xFFF4F4F5);
+  static const zinc200 = Color(0xFFE4E4E7);
+  static const zinc300 = Color(0xFFD4D4D8);
+  static const zinc400 = Color(0xFFA1A1AA);
+  static const zinc500 = Color(0xFF71717A);
+  static const zinc600 = Color(0xFF52525B);
+  static const zinc700 = Color(0xFF3F3F46);
 
-  /// Puces « Phase actuelle du marché » sélectionnées : **bleu**.
-  static const chipPhaseSelected = Color(0xFF4A9EFF);
+  // Alias rétrocompat (rapports, puces existantes)
+  static const slate100 = zinc100;
+  static const slate200 = zinc200;
+  static const slate300 = zinc300;
+  static const slate400 = zinc400;
+  static const slate500 = zinc500;
+  static const slate800Border = cardBorder;
+  static const slate800Tint = Color(0xFF0E0F14);
+  static const blue400 = oledBlue;
+  static const blue500 = oledBlue;
+  static const blue600 = oledBlue;
+  static const blue900 = Color(0xFF172554);
+  static const nightBorder = cardBorder;
+  static const funnelHeaderBg = inputBg;
+  static const bgElevated = inputBg;
 
-  static const chipBg = Color(0xFF0A0A0A);
-  static const fieldBg = Color(0xFF080808);
-  /// Fond des blocs « Copie » contexte : un peu plus clair que [cardBg] pour les repérer vite.
-  static const contexteDuplicateBg = Color(0xFF101010);
-  /// Fond des blocs « Copie » structure : même principe que [contexteDuplicateBg].
-  static const structureDuplicateBg = Color(0xFF101010);
-  /// Fond des blocs « Copie » indicateurs : un peu plus clair que [fieldBg] / carte pour trancher avec l’original.
-  static const indicatorsDuplicateBg = Color(0xFF141414);
-  /// Fond des blocs « Copie » SMC (feuille + rapport) pour les repérer comme les autres duplicatas.
-  static const smcDuplicateBg = Color(0xFF141414);
+  static const muted = zinc400;
+  static const muted2 = zinc500;
+  static const matteText = zinc200;
+
+  static const accentGreen = oledGreen;
+  static const accentAmber = oledAmber;
+  static const accentRed = oledRed;
+
+  static const chipHtfSelected = oledBlue;
+  static const chipPhaseSelected = oledBlue;
+  static const blue300 = oledIndigo;
+
+  static const chipBg = inputBg;
+  static const fieldBg = inputBg;
+  static const contexteDuplicateBg = Color(0xFF0E0F14);
+  static const structureDuplicateBg = Color(0xFF0E0F14);
+  static const indicatorsDuplicateBg = Color(0xFF0E0F14);
+  static const smcDuplicateBg = Color(0xFF0E0F14);
 
   /// Aligné sur les libellés figés du snapshot (FR/EN/ES/DE/PT : ACHAT·BUY…, VENTE·SELL…, WATCH…).
   /// L’ancien décor ne reconnaissait que ACHAT/VENTE → tout le reste tombait en ambre.
@@ -126,22 +173,144 @@ abstract final class AnalyseTokens {
     };
   }
 
-  static const radiusCard = 18.0;
-  static const radiusChip = 14.0;
-  static const radiusField = 14.0;
+  static const radiusCard = 16.0;
+  static const radiusChip = 12.0;
+  static const radiusField = 8.0;
+
+  static const pageBackdropDecoration = BoxDecoration(color: bg);
+
+  static List<BoxShadow> get oledCardShadow => const [
+        BoxShadow(
+          color: Color(0x66000000),
+          blurRadius: 28,
+          offset: Offset(0, 12),
+        ),
+      ];
+
+  static List<BoxShadow> get nightCardShadow => oledCardShadow;
+
+  static BoxDecoration get headerDecoration => BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(radiusCard),
+        border: Border.all(color: cardBorder),
+        boxShadow: oledCardShadow,
+      );
+
+  static BoxDecoration get funnelColumnDecoration => BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(radiusCard),
+        border: Border.all(color: cardBorder),
+        boxShadow: oledCardShadow,
+      );
+
+  /// Fond carte étape (bordure uniforme — la barre d’accent est ajoutée dans [AnalyseOledStepShell]).
+  static BoxDecoration oledStepDecoration() => BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(radiusCard),
+        border: Border.all(color: cardBorder),
+        boxShadow: oledCardShadow,
+      );
+
+  static BoxDecoration get fieldDecoration => BoxDecoration(
+        color: inputBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: cardBorder),
+      );
+
+  static BoxDecoration get fieldDecorationDeep => BoxDecoration(
+        color: inputBgDeep,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cardBorder),
+      );
+
+  /// Champs en lecture seule dans le rapport OLED (pas de bordure).
+  static BoxDecoration get reportFieldDecoration => BoxDecoration(
+        color: inputBgDeep,
+        borderRadius: BorderRadius.circular(6),
+      );
+
+  static InputDecoration fieldInputDecoration({String? hint}) => InputDecoration(
+        hintText: hint,
+        hintStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 13,
+          color: slate500,
+        ),
+        filled: true,
+        fillColor: fieldBg,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusField),
+          borderSide: const BorderSide(color: slate800Border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusField),
+          borderSide: const BorderSide(color: slate800Border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusField),
+          borderSide: BorderSide(color: blue500.withValues(alpha: 0.5)),
+        ),
+      );
+
+  static TextStyle get kickerBlueStyle => GoogleFonts.plusJakartaSans(
+        fontSize: 10,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+        color: zinc400,
+      );
+
+  static TextStyle get oledSectionLabel => GoogleFonts.plusJakartaSans(
+        fontSize: 10,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.4,
+        color: zinc400,
+      );
+
+  static TextStyle get oledMicroLabel => GoogleFonts.plusJakartaSans(
+        fontSize: 9,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+        color: zinc400,
+      );
+
+  /// Libellés champs OB / FVG / Liquidité / Fibonacci (panneau SMC OLED).
+  static TextStyle get oledSmcFieldLabel => GoogleFonts.plusJakartaSans(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: zinc500,
+      );
+
+  static TextStyle get inputValueStyle => GoogleFonts.plusJakartaSans(
+        fontSize: 16,
+        fontWeight: FontWeight.w800,
+        color: textPrimary,
+      );
+
+  static TextStyle get inputBodyStyle => GoogleFonts.plusJakartaSans(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: textPrimary,
+      );
+
+  static TextStyle get sectionLabelStyle => GoogleFonts.plusJakartaSans(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.6,
+        color: slate400,
+      );
 
   static const sectionTitleStyle = TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w700,
-    color: matteText,
+    color: slate200,
     letterSpacing: 0.2,
   );
 
   static const labelStyle = TextStyle(
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: FontWeight.w700,
-    letterSpacing: 1.0,
-    color: muted,
+    letterSpacing: 0.6,
+    color: slate400,
   );
 
   /// Libellés POC / VAH (section Profil de volume) — gris froid (évite le ton or / ambre du rapport).
@@ -186,30 +355,14 @@ enum AnalyseEditorSection {
 }
 
 extension AnalyseEditorSectionChrome on AnalyseEditorSection {
-  /// Fond de carte légèrement teinté.
-  Color get sectionCardBg => switch (this) {
-        AnalyseEditorSection.feuillePlan => const Color(0xFF0A1018),
-        AnalyseEditorSection.structure => const Color(0xFF100E18),
-        AnalyseEditorSection.indicateurs => const Color(0xFF0A1518),
-        AnalyseEditorSection.smcLiquidite => const Color(0xFF100E14),
-        AnalyseEditorSection.profilVolume => const Color(0xFF0F0F12),
-      };
-
-  Color get sectionCardBorder => switch (this) {
-        AnalyseEditorSection.feuillePlan => const Color(0xFF1E3A55),
-        AnalyseEditorSection.structure => const Color(0xFF3D2B6E),
-        AnalyseEditorSection.indicateurs => const Color(0xFF1E4555),
-        AnalyseEditorSection.smcLiquidite => const Color(0xFF3D3548),
-        AnalyseEditorSection.profilVolume => const Color(0xFF323238),
-      };
-
-  /// Icône de titre + libellé « FEUILLE DE PLAN » (pas de vert / ambre : même famille que le rapport validé).
+  Color get sectionCardBg => AnalyseTokens.cardBg;
+  Color get sectionCardBorder => AnalyseTokens.cardBorder;
   Color get sectionAccent => switch (this) {
-        AnalyseEditorSection.feuillePlan => const Color(0xFF5E9FFF),
-        AnalyseEditorSection.structure => const Color(0xFFB08CFF),
-        AnalyseEditorSection.indicateurs => const Color(0xFF5EC0D4),
-        AnalyseEditorSection.smcLiquidite => const Color(0xFF9B8CFF),
-        AnalyseEditorSection.profilVolume => const Color(0xFF9BA3B0),
+        AnalyseEditorSection.feuillePlan => AnalyseTokens.oledBlue,
+        AnalyseEditorSection.structure => AnalyseTokens.oledIndigo,
+        AnalyseEditorSection.indicateurs => AnalyseTokens.oledGreen,
+        AnalyseEditorSection.smcLiquidite => AnalyseTokens.oledIndigo,
+        AnalyseEditorSection.profilVolume => AnalyseTokens.zinc300,
       };
 }
 

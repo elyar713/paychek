@@ -48,7 +48,7 @@ class AnalyseConfidenceSlider extends StatelessWidget {
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             trackHeight: 4,
-            inactiveTrackColor: const Color(0xFF1B1B1B),
+            inactiveTrackColor: AnalyseTokens.nightBorder,
             activeTrackColor: band,
             thumbColor: Colors.white,
             overlayColor: band.withValues(alpha: 0.12),

@@ -16,12 +16,8 @@ AnalyseReportStructureCopy _reportStructureCopyFromSnapshot(
     resistance: _orDash(s.structureResistanceMaj),
     structureSupportTested: s.structureSupportTested,
     structureResistanceTested: s.structureResistanceTested,
-    structureExtraSupports: [
-      for (final e in s.extraSupports) _reportStructureExtraLine(e, locale),
-    ],
-    structureExtraResistances: [
-      for (final e in s.extraResistances) _reportStructureExtraLine(e, locale),
-    ],
+    structureExtraSupports: _reportStructureExtraLines(s.extraSupports),
+    structureExtraResistances: _reportStructureExtraLines(s.extraResistances),
   );
 }
 
@@ -115,20 +111,25 @@ String _orDash(String s) {
   return t.isEmpty ? '—' : t;
 }
 
-AnalyseReportStructureExtraLine _reportStructureExtraLine(
-  AnalyseStructureExtraLevel e,
-  Locale locale,
+String? _structureExtraTenueLabel(AnalyseStructureTenue? tenue) {
+  if (tenue == null) return null;
+  return switch (tenue) {
+    AnalyseStructureTenue.tenu => 'Tenu',
+    AnalyseStructureTenue.casse => 'Cassé',
+  };
+}
+
+List<AnalyseReportStructureExtraLine> _reportStructureExtraLines(
+  List<AnalyseStructureExtraLevel> levels,
 ) {
-  return AnalyseReportStructureExtraLine(
-    priceLabel: _orDash(e.price),
-    tenueLabel: switch (e.tenue) {
-      AnalyseStructureTenue.tenu =>
-        _txt(locale, 'Tenu', 'Held', 'Mantenido', 'Gehalten', 'Mantido', '유지'),
-      AnalyseStructureTenue.casse =>
-        _txt(locale, 'Cassé', 'Broken', 'Roto', 'Gebrochen', 'Rompido', '돌파'),
-      null => null,
-    },
-  );
+  return [
+    for (final e in levels)
+      if (e.price.trim().isNotEmpty)
+        AnalyseReportStructureExtraLine(
+          priceLabel: _orDash(e.price),
+          tenueLabel: _structureExtraTenueLabel(e.tenue),
+        ),
+  ];
 }
 
 String _biasLabel(AnalyseDirectionBias b, Locale locale) => switch (b) {

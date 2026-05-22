@@ -14,10 +14,12 @@ class AnalyseFeuilleContexteCardBodyLower extends StatelessWidget {
     super.key,
     required this.controller,
     required this.pillsEditMode,
+    this.hideFeuilleConfidence = false,
   });
 
   final AnalyseController controller;
   final bool pillsEditMode;
+  final bool hideFeuilleConfidence;
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +58,27 @@ class AnalyseFeuilleContexteCardBodyLower extends StatelessWidget {
           maxLines: 4,
           onChanged: (v) => c.notesTimeframe = v,
         ),
-        const SizedBox(height: 14),
-        AnalyseConfidenceSlider(
-          value: c.confidenceFeuille,
-          onChanged: (v) => c.confidenceFeuille = v,
-          impactPercent: c.impactFeuilleDisplay,
-          onImpactTap: () {
-            final f = c.impactFeuille;
-            final s = c.impactStructure;
-            final i = c.impactIndicators;
-            final m = c.impactSmc;
-            showAnalyseImpactModal(
-              context,
-              label: l.analyseImpactFeuille,
-              initialImpact: f,
-              onApply: (w) => c.impactFeuille = w,
-              onCancelRestore: () => c.restoreImpactsSnapshot(f, s, i, m),
-            );
-          },
-        ),
+        if (!hideFeuilleConfidence) ...[
+          const SizedBox(height: 14),
+          AnalyseConfidenceSlider(
+            value: c.confidenceFeuille,
+            onChanged: (v) => c.confidenceFeuille = v,
+            impactPercent: c.impactFeuilleDisplay,
+            onImpactTap: () {
+              final f = c.impactFeuille;
+              final s = c.impactStructure;
+              final i = c.impactIndicators;
+              final m = c.impactSmc;
+              showAnalyseImpactModal(
+                context,
+                label: l.analyseImpactFeuille,
+                initialImpact: f,
+                onApply: (w) => c.impactFeuille = w,
+                onCancelRestore: () => c.restoreImpactsSnapshot(f, s, i, m),
+              );
+            },
+          ),
+        ],
       ],
     );
   }

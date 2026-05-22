@@ -6,6 +6,7 @@ import '../dashboard/widgets/donut_ring.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/app_localizations_month.dart';
 import '../trade/trade_models.dart';
+import '../trade/trade_plan_analysis.dart';
 import '../trade/trade_stats.dart';
 import '../trade/trade_tokens.dart';
 
@@ -281,10 +282,24 @@ class _MonthDetailExpandableCardState extends State<MonthDetailExpandableCard> {
     double avgPct(List<double> xs) =>
         xs.isEmpty ? 0.0 : (xs.fold<double>(0.0, (a, b) => a + b) / xs.length);
 
-    final avgChecklist = avgPct(widget.monthTrades.map((e) => e.checklistPct).toList());
-    final avgPlan = avgPct(widget.monthTrades.map((e) => e.planPct).toList());
-    final avgStrategie = avgPct(widget.monthTrades.map((e) => e.strategiePct).toList());
-    final avgEtat = avgPct(widget.monthTrades.map((e) => e.etatPct).toList());
+    final avgChecklist = avgPct(
+      widget.monthTrades
+          .map(tradeEffectiveChecklistPct)
+          .whereType<double>()
+          .toList(),
+    );
+    final avgPlan = avgPct(
+      widget.monthTrades.map(tradeEffectivePlanPct).whereType<double>().toList(),
+    );
+    final avgStrategie = avgPct(
+      widget.monthTrades
+          .map(tradeEffectiveStrategiePct)
+          .whereType<double>()
+          .toList(),
+    );
+    final avgEtat = avgPct(
+      widget.monthTrades.map(tradeEffectiveEtatPct).whereType<double>().toList(),
+    );
     final winMonth = computeTradeStats(widget.monthTrades).winRatePctDisplay;
     final principeCount =
         widget.monthTrades.where((e) => e.mindset == TradeMindset.principe).length;

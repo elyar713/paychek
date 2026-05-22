@@ -28,8 +28,7 @@ String performancePickLocale(
   String de, [
   String? pt,
   String? ko,
-]) =>
-    performancePickLang(locale.languageCode, fr, en, es, de, pt, ko);
+]) => performancePickLang(locale.languageCode, fr, en, es, de, pt, ko);
 
 /// Raccourci explicite 6 langues (évite d’oublier pt/ko sur la page Performance).
 String perf6(
@@ -40,8 +39,7 @@ String perf6(
   String de,
   String pt,
   String ko,
-) =>
-    performancePickLang(langCode, fr, en, es, de, pt, ko);
+) => performancePickLang(langCode, fr, en, es, de, pt, ko);
 
 /// « trade / trades » (ou équivalent) pour sous-titres et listes Performance.
 String performanceTradeWordPlural(String langCode, int n) {

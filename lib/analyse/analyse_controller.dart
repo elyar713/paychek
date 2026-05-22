@@ -7,6 +7,7 @@ import '../reglage/paychek_prefs_scope.dart';
 import 'analyse_controller_impact_confidence.dart';
 import 'analyse_controller_structure_smc.dart';
 import 'analyse_models.dart';
+import 'analyse_section_impact_toggle.dart';
 
 part 'analyse_controller_contexte_fields.dart';
 part 'analyse_controller_contexte_phase_snapshots.dart';

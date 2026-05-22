@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -20,6 +21,8 @@ import '../checklist/checklist_sections_storage.dart';
 import 'performance_custom_lens_storage.dart';
 import '../strategie/strategie_setups_store.dart';
 import '../trade/trade_discipline_day_snapshot.dart';
+import '../trade/trade_models.dart';
+import '../trade/trade_plan_analysis.dart';
 import '../trade/trade_journal_helper.dart';
 import '../trade/trade_journal_scope.dart';
 import '../trade/trade_journal_store.dart';
@@ -38,6 +41,7 @@ import 'performance_widget_storage.dart';
 import 'performance_custom_lens_card.dart';
 import 'performance_custom_lens_model.dart';
 import 'performance_paychek_lens_section.dart';
+import 'performance_tokens.dart';
 
 part 'performance_page_state.dart';
 part 'performance_page_ui_header_global.dart';
@@ -49,21 +53,9 @@ part 'performance_page_ui_news.dart';
 part 'performance_page_ui_bottom.dart';
 part 'performance_page_ui_custom_lens.dart';
 
-/// Cartes / sections — même famille que le dashboard sombre, avec léger relief.
-BoxDecoration _performanceSectionDecoration() {
-  return BoxDecoration(
-    color: const Color(0xFF0A0A0A),
-    borderRadius: BorderRadius.circular(18),
-    border: Border.all(color: const Color(0xFF2A2A2A)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.5),
-        blurRadius: 28,
-        offset: const Offset(0, 12),
-      ),
-    ],
-  );
-}
+/// Cartes / sections — style OLED ([PerformanceTokens]).
+BoxDecoration _performanceSectionDecoration() =>
+    PerformanceTokens.sectionDecoration();
 
 /// Page « Performance » — mise en page responsive + cartes unifiées.
 class PerformancePage extends StatefulWidget {
@@ -71,18 +63,19 @@ class PerformancePage extends StatefulWidget {
     super.key,
     this.onNavigateToDashboard,
     this.onCloseAsTab,
+    this.onEditTrade,
     this.liteFreemiumRestricted = false,
     this.onLiteFreemiumRestrictedTap,
   });
 
   final VoidCallback? onNavigateToDashboard;
   final VoidCallback? onCloseAsTab;
+
+  /// Ouvre le trade dans Ajouter trade (fourni par le shell dashboard).
+  final ValueChanged<TradeListItem>? onEditTrade;
   final bool liteFreemiumRestricted;
   final VoidCallback? onLiteFreemiumRestrictedTap;
 
   @override
   State<PerformancePage> createState() => _PerformancePageState();
 }
-
-
-

@@ -17,9 +17,7 @@ double customLensBandSharePercent(List<double> thresholds, int bandIndex) {
 /// Seuils équidistants pour [barCount] barres (ex. 2 → [50], 3 → [33.33, 66.67]).
 List<double> customLensEqualThresholds(int barCount) {
   if (barCount < 2) return [50];
-  return [
-    for (var i = 1; i < barCount; i++) (100.0 * i / barCount),
-  ];
+  return [for (var i = 1; i < barCount; i++) (100.0 * i / barCount)];
 }
 
 /// Ajoute une barre en conservant la 1ʳᵉ part, le reste se répartit sur les nouvelles barres.
@@ -30,10 +28,7 @@ List<double> customLensAddBar(List<double> thresholds) {
   final inner = nextBarCount - 1;
   if (inner <= 1) return [first];
   final tail = 100 - first;
-  return [
-    first,
-    for (var k = 1; k < inner; k++) first + tail * k / inner,
-  ];
+  return [first, for (var k = 1; k < inner; k++) first + tail * k / inner];
 }
 
 /// Retire la dernière barre en conservant la 1ʳᵉ part.
@@ -44,10 +39,7 @@ List<double> customLensRemoveBar(List<double> thresholds) {
   if (nextBarCount == 2) return [first];
   final inner = nextBarCount - 1;
   final tail = 100 - first;
-  return [
-    first,
-    for (var k = 1; k < inner; k++) first + tail * k / inner,
-  ];
+  return [first, for (var k = 1; k < inner; k++) first + tail * k / inner];
 }
 
 /// Modifie le 1er seuil ; les suivants sont reprojetés dans l'espace restant (total = 100 %).

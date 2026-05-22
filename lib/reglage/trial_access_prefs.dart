@@ -73,11 +73,7 @@ Future<
         subscriptionCurrentPeriodEndUtc: null,
       );
     }
-    final ts = d['createdAt'];
-    DateTime? createdUtc;
-    if (ts is Timestamp) {
-      createdUtc = ts.toDate().toUtc();
-    }
+    final createdUtc = paychekResolveUserJoinedAtUtc(d);
     DateTime? overrideUntilUtc;
     final rawOv = d[kPaychekUserFieldTrialFreemiumOverrideUntil];
     if (rawOv is Timestamp) {

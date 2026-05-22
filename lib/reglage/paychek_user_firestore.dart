@@ -44,6 +44,54 @@ const String kPaychekUserFieldSubscriptionProSinceUtc =
 
 String _paychekTrimField(Object? v) => v?.toString().trim() ?? '';
 
+/// Parse un instant Firestore ([Timestamp], ms ou secondes Unix).
+DateTime? paychekParseFirestoreInstantUtc(Object? raw) {
+  if (raw == null) return null;
+  if (raw is Timestamp) return raw.toDate().toUtc();
+  if (raw is DateTime) return raw.toUtc();
+  final int? n = switch (raw) {
+    int i => i,
+    num x => x.toInt(),
+    _ => null,
+  };
+  if (n == null || n <= 0) return null;
+  if (n >= 100000000000) {
+    return DateTime.fromMillisecondsSinceEpoch(n, isUtc: true);
+  }
+  if (n >= 100000000) {
+    return DateTime.fromMillisecondsSinceEpoch(n * 1000, isUtc: true);
+  }
+  return null;
+}
+
+bool paychekIsPlausibleUserInstant(DateTime utc) => utc.year >= 2018;
+
+DateTime? paychekAuthUserCreatedAtUtc(User user) {
+  try {
+    final ct = user.metadata.creationTime;
+    if (ct == null) return null;
+    final u = ct.toUtc();
+    return paychekIsPlausibleUserInstant(u) ? u : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Date d’inscription : `createdAt`, sinon `updatedAt` / `lastSeenAt` plausibles.
+DateTime? paychekResolveUserJoinedAtUtc(Map<String, dynamic> d) {
+  final created = paychekParseFirestoreInstantUtc(d['createdAt']);
+  if (created != null && paychekIsPlausibleUserInstant(created)) {
+    return created;
+  }
+  for (final key in ['updatedAt', 'lastSeenAt']) {
+    final t = paychekParseFirestoreInstantUtc(d[key]);
+    if (t != null && paychekIsPlausibleUserInstant(t)) {
+      return t;
+    }
+  }
+  return null;
+}
+
 /// Sépare un libellé type « Prénom Nom » (admin, pas garanti ambigu hors formulaire).
 (String first, String last) _paychekSplitDisplayForNames(String dn) {
   final t = dn.trim();
@@ -203,8 +251,19 @@ Future<void> syncPaychekUserDocument(
       payload['displayName'] = '';
     }
 
+    final existingCreated =
+        paychekParseFirestoreInstantUtc(snap.data()?['createdAt']);
+    final needsCreatedAt = !snap.exists ||
+        existingCreated == null ||
+        !paychekIsPlausibleUserInstant(existingCreated);
+    if (needsCreatedAt) {
+      final authCreated = paychekAuthUserCreatedAtUtc(user);
+      payload['createdAt'] = authCreated != null
+          ? Timestamp.fromDate(authCreated)
+          : now;
+    }
+
     if (!snap.exists) {
-      payload['createdAt'] = now;
       payload['country'] = '';
       payload['isPremium'] = false;
       payload['subscriptionTier'] = 'lite';

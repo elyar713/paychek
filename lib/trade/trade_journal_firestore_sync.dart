@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../reglage/paychek_user_firestore.dart';
 import 'trade_journal_mindset_migration.dart';
+import 'trade_journal_plan_migration.dart';
+import 'trade_journal_strategie_migration.dart';
+import 'trade_journal_checklist_etat_migration.dart';
 import 'trade_journal_storage.dart';
 import 'trade_journal_store.dart';
 import 'trade_models.dart';
@@ -90,10 +93,27 @@ abstract final class TradeJournalFirestoreSync {
     final local = List<TradeListItem>.from(store.items);
     final union = _mergeBySyncRev(local, cloud);
     final mindsetMigrate = journalMindsetMigrationWouldChange(union);
-    final merged = mindsetMigrate
+    var merged = mindsetMigrate
         ? applyJournalMindsetTalentMigration(union)
         : union;
-    final changed = !_sameTradeIdsAndRevs(local, merged) || mindsetMigrate;
+    final planMigrate = journalPlanMigrationWouldChange(merged);
+    if (planMigrate) {
+      merged = applyJournalPlanExplicitMigration(merged);
+    }
+    final strategieMigrate = journalStrategieMigrationWouldChange(merged);
+    if (strategieMigrate) {
+      merged = applyJournalStrategieExplicitMigration(merged);
+    }
+    final checklistEtatMigrate =
+        journalChecklistEtatMigrationWouldChange(merged);
+    if (checklistEtatMigrate) {
+      merged = applyJournalChecklistEtatExplicitMigration(merged);
+    }
+    final changed = !_sameTradeIdsAndRevs(local, merged) ||
+        mindsetMigrate ||
+        planMigrate ||
+        strategieMigrate ||
+        checklistEtatMigrate;
     if (changed) {
       store.replaceAll(merged);
       await TradeJournalStorage.save(merged);
@@ -102,7 +122,11 @@ abstract final class TradeJournalFirestoreSync {
     // absents du cloud). Si le merge n’a fait qu’importer le cloud, un `set` serait inutile
     // et redéclencherait des snapshots / GC.
     if (echoPushToCloud &&
-        (!_sameTradeIdsAndRevs(cloud, merged) || mindsetMigrate)) {
+        (!_sameTradeIdsAndRevs(cloud, merged) ||
+            mindsetMigrate ||
+            planMigrate ||
+            strategieMigrate ||
+            checklistEtatMigrate)) {
       await pushFullJournal(u, List<TradeListItem>.from(store.items));
     }
   }

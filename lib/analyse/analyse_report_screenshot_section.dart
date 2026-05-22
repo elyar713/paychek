@@ -2,7 +2,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../l10n/app_localizations.dart';
 import 'analyse_tokens.dart';
@@ -13,10 +15,12 @@ class AnalyseReportScreenshotSection extends StatefulWidget {
     super.key,
     required this.bytes,
     required this.onBytesChanged,
+    this.funnelStyle = false,
   });
 
   final Uint8List? bytes;
   final ValueChanged<Uint8List?> onBytesChanged;
+  final bool funnelStyle;
 
   @override
   State<AnalyseReportScreenshotSection> createState() =>
@@ -174,17 +178,22 @@ class _AnalyseReportScreenshotSectionState
         ? l.analyseReportScreenshotHintWithCamera
         : l.analyseReportScreenshotHintNoCamera;
 
+    if (widget.funnelStyle) {
+      return _buildFunnelUpload(context, l, hint);
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AnalyseTokens.cardBg,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        border: Border.all(color: AnalyseTokens.cardBorder),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x66000000),
+            color: AnalyseTokens.blue900.withValues(alpha: 0.08),
             blurRadius: 16,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -278,6 +287,82 @@ class _AnalyseReportScreenshotSectionState
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFunnelUpload(
+    BuildContext context,
+    AppLocalizations l,
+    String hint,
+  ) {
+    if (widget.bytes != null) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.memory(widget.bytes!, fit: BoxFit.contain),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(20),
+              child: InkWell(
+                onTap: () => widget.onBytesChanged(null),
+                borderRadius: BorderRadius.circular(20),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _openSourcePicker,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          decoration: BoxDecoration(
+            color: const Color(0x4D0A0D14),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AnalyseTokens.cardBorder,
+              style: BorderStyle.solid,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(LucideIcons.image, size: 32, color: AnalyseTokens.zinc600),
+              const SizedBox(height: 8),
+              Text(
+                'Uploadez ou glissez la capture du graphique',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AnalyseTokens.zinc300,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Soutient PNG et JPG',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  color: AnalyseTokens.zinc500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -134,15 +134,13 @@ class _AnalyseIndicateursCardState extends State<AnalyseIndicateursCard>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final c = widget.controller;
-    return AnalyseCard(
-      editorSection: AnalyseEditorSection.indicateurs,
-      child: ListenableBuilder(
-        listenable: c,
-        builder: (context, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AnalyseSectionTitleRow(
+    final body = ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnalyseSectionTitleRow(
                 title: l.analyseCardIndicators,
                 icon: Icons.monitor_heart_outlined,
                 iconColor: AnalyseEditorSection.indicateurs.sectionAccent,
@@ -166,24 +164,27 @@ class _AnalyseIndicateursCardState extends State<AnalyseIndicateursCard>
                   ],
                 ),
               ),
-              AnalyseCollapsibleSectionBody(
-                expanded: c.indicatorsEnabled,
-                child: AnalyseIndicateursExpandedSection(
-                  controller: c,
-                  indicatorsEditMode: _indicatorsEditMode,
-                  indicatorDraftOpen: _indicatorDraftOpen,
-                  newIndicatorDraft: _newIndicatorDraft,
-                  indicatorDraftFocus: _indicatorDraftFocus,
-                  onFinishDraftFromOutsideDismiss:
-                      _finishDraftFromOutsideDismiss,
-                  onAddButtonTap: _onAddButtonTap,
-                  onDraftSubmitted: _onDraftSubmitted,
-                ),
+            AnalyseCollapsibleSectionBody(
+              expanded: c.indicatorsEnabled,
+              child: AnalyseIndicateursExpandedSection(
+                controller: c,
+                indicatorsEditMode: _indicatorsEditMode,
+                indicatorDraftOpen: _indicatorDraftOpen,
+                newIndicatorDraft: _newIndicatorDraft,
+                indicatorDraftFocus: _indicatorDraftFocus,
+                onFinishDraftFromOutsideDismiss:
+                    _finishDraftFromOutsideDismiss,
+                onAddButtonTap: _onAddButtonTap,
+                onDraftSubmitted: _onDraftSubmitted,
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
+    );
+    return AnalyseCard(
+      editorSection: AnalyseEditorSection.indicateurs,
+      child: body,
     );
   }
 }

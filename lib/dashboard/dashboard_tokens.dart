@@ -1,50 +1,48 @@
 import 'package:flutter/material.dart';
 
-/// Couleurs et rayons partagés par les cartes du dashboard (réf. maquettes).
+import '../analyse/analyse_tokens.dart';
+
+/// Couleurs et rayons du dashboard — alignés sur [AnalyseTokens] (OLED).
 class DashboardTokens {
   DashboardTokens._();
 
-  /// Fond global : graphite très sombre, aspect **mat** (évite le noir pur brillant).
-  static const scaffoldMatte = Color(0xFF0A0A0B);
+  static const scaffoldMatte = AnalyseTokens.bg;
+  static const accent = AnalyseTokens.oledGreen;
+  static const accentDeep = Color(0xFF059669);
+  static const border = AnalyseTokens.cardBorder;
+  static const cardBoxBg = AnalyseTokens.cardBg;
+  static const cardBoxBorder = AnalyseTokens.cardBorder;
+  static const negative = AnalyseTokens.oledRed;
+  static const muted = AnalyseTokens.zinc500;
+  static const labelGrey = AnalyseTokens.zinc400;
+  static const navInactive = AnalyseTokens.zinc600;
+  static const bottomNavFabBg = AnalyseTokens.inputBg;
 
-  /// Accent atténué : moins saturé que le teal vif, rendu plus mat sur fond sombre.
-  static const accent = Color(0xFF2F8F78);
-  static const accentDeep = Color(0xFF267A66);
-  static const border = Color(0xFF1A1A1C);
-  static const cardBoxBg = Color(0xFF0E0E10);
-  static const cardBoxBorder = Color(0xFF232326);
-  static const negative = Color(0xFFD85A4E);
-  static const muted = Color(0xFF7B7B7E);
-  static const labelGrey = Color(0xFF939396);
-  /// Barre du bas : icônes inactives, bordures discrètes.
-  static const navInactive = Color(0xFF5A5A5D);
-  static const bottomNavFabBg = Color(0xFF303032);
+  static const onMatteEmphasis = AnalyseTokens.textPrimary;
+  static const homeHeaderAnthracite = AnalyseTokens.zinc400;
 
-  /// Texte / icônes actifs : blanc cassé mat (moins agressif que [Colors.white] pur).
-  static const onMatteEmphasis = Color(0xFFE6E6E4);
+  /// Libellés de section (ex-calendrier) : zinc OLED, plus de doré maquette.
+  static const titleGold = AnalyseTokens.zinc300;
 
-  /// En-tête accueil (nom trader ou marque) — anthracite doux sur fond mat.
-  static const homeHeaderAnthracite = Color(0xFFA8A8AD);
-
-  /// Titres de sections (or/jaune, comme les maquettes).
-  static const titleGold = Color(0xFFD4A574);
-
-  /// Badge / icône **Pro** (doré).
   static const proBadgeGold = Color(0xFFE6C35C);
 
-  static const radiusCard = 20.0;
+  static const radiusCard = AnalyseTokens.radiusCard;
+  static const EdgeInsets cardPadding = AnalyseTokens.sectionCardPadding;
 
-  static const EdgeInsets cardPadding = EdgeInsets.all(20);
+  /// Padding scroll accueil (aligné Performance / Mon analyse).
+  static const EdgeInsets pageScrollPaddingMobile =
+      EdgeInsets.symmetric(horizontal: 16);
 
-  /// Fond transparent (sections sans cadre).
+  static const EdgeInsets pageScrollPaddingWeb =
+      EdgeInsets.fromLTRB(32, 32, 32, 32);
+
+  static const double sectionGapMobile = 16;
+  static const double sectionGapWeb = 20;
+
   static BoxDecoration cardDecoration() => BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(radiusCard),
       );
 
-  /// Cartes principales : coins arrondis, contraste doux (aspect mat).
-  static BoxDecoration cardBoxDecoration() => BoxDecoration(
-        color: cardBoxBg,
-        borderRadius: BorderRadius.circular(24),
-      );
+  static BoxDecoration cardBoxDecoration() => AnalyseTokens.oledStepDecoration();
 }

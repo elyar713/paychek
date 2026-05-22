@@ -7,7 +7,11 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(LucideIcons.alertTriangle, size: 15, color: _kRed.withValues(alpha: 0.95)),
+          Icon(
+            LucideIcons.alertTriangle,
+            size: 15,
+            color: _kRed.withValues(alpha: 0.95),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -15,7 +19,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
                 height: 1.4,
-                color: const Color(0xFFCCCCCC),
+                color: PerformanceTokens.textBright,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -32,13 +36,19 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     );
   }
 
-  static const Color _kWarningsSplitLine = Color(0xFF333333);
+  static const Color _kWarningsSplitLine = PerformanceTokens.labelFaint;
 
   Widget _cardStrategieWarnings(List<String> strategieWarnings) {
     if (strategieWarnings.isEmpty) return const SizedBox.shrink();
     final code = Localizations.localeOf(context).languageCode;
-    String txt(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     final splitAt = (strategieWarnings.length / 2).ceil();
     final left = strategieWarnings.sublist(0, splitAt);
     final right = strategieWarnings.sublist(splitAt);
@@ -90,7 +100,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF666666),
+              color: PerformanceTokens.labelDim,
               letterSpacing: 0.8,
             ),
           ),
@@ -106,30 +116,329 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     );
   }
 
-  Widget _cardEye(PaychekLensSnapshot lens) {
+  /// Carte colonne gauche : liste des trades incomplets, tap → Ajouter trade.
+  Widget _cardTradesNonRenseignes(PaychekLensSnapshot lens) {
+    final code = Localizations.localeOf(context).languageCode;
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
+    if (lens.tradeCount <= 0) return const SizedBox.shrink();
+
+    final incomplete = _incompleteJournalTrades;
+    final anyMissing = incomplete.length;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: _performanceSectionDecoration(),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              Icon(
+                LucideIcons.clipboardList,
+                size: 16,
+                color: PerformanceTokens.labelMuted,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  txt(
+                    'TRADES NON RENSEIGNÉS',
+                    'UNFILLED TRADES',
+                    'TRADES SIN DATOS',
+                    'NICHT AUSGEFÜLLTE TRADES',
+                    'TRADES NÃO PREENCHIDOS',
+                    '미입력 트레이드',
+                  ),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: PerformanceTokens.labelDim,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            txt(
+              'Appuyez sur un trade pour l’ouvrir et compléter la discipline.',
+              'Tap a trade to open it and fill in discipline.',
+              'Toca un trade para abrirlo y completar la disciplina.',
+              'Trade antippen, um Disziplin zu ergänzen.',
+              'Toque num trade para abrir e completar a disciplina.',
+              '트레이드를 눌러 규율을 입력하세요.',
+            ),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              color: PerformanceTokens.labelFaint,
+              height: 1.4,
+            ),
+          ),
+          if (anyMissing > 0) ...[
+            const SizedBox(height: 12),
+            Text.rich(
+              TextSpan(
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  height: 1.35,
+                  color: PerformanceTokens.labelMuted,
+                ),
                 children: [
-                  Icon(LucideIcons.eye, size: 18, color: _kGreen),
-                  const SizedBox(width: 8),
-                  Text(
-                    'PAYCHEK LENS',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
+                  TextSpan(
+                    text: '$anyMissing ',
+                    style: const TextStyle(
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: DashboardTokens.onMatteEmphasis,
-                      letterSpacing: 1.2,
+                      color: PerformanceTokens.labelMuted,
+                      height: 1,
+                    ),
+                  ),
+                  TextSpan(
+                    text: performanceTradeWordPlural(code, anyMissing),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 340),
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: incomplete.length,
+                separatorBuilder: (context, ignored) =>
+                    const SizedBox(height: 6),
+                itemBuilder: (context, index) =>
+                    _incompleteTradeListTile(incomplete[index], txt: txt),
+              ),
+            ),
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.badgeCheck,
+                    size: 16,
+                    color: _kGreen.withValues(alpha: 0.9),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      txt(
+                        'Tous les trades sont renseignés sur cette période.',
+                        'All trades are filled on this period.',
+                        'Todos los trades están completos en este período.',
+                        'Alle Trades sind in diesem Zeitraum ausgefüllt.',
+                        'Todos os trades estão preenchidos neste período.',
+                        '이번 기간 모든 트레이드가 입력되었습니다.',
+                      ),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: PerformanceTokens.textSecondary,
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _incompleteTradeListTile(
+    TradeListItem item, {
+    required String Function(String, String, String, String, String, String)
+    txt,
+  }) {
+    final amountColor = item.isProfit ? _kGreen : _kRed;
+    final missingChips = <Widget>[];
+    if (!tradeHasExplicitChecklist(item)) {
+      missingChips.add(
+        _incompleteAxisChip(
+          txt(
+            'Checklist',
+            'Checklist',
+            'Checklist',
+            'Checkliste',
+            'Checklist',
+            '체크',
+          ),
+          kLensChecklist,
+        ),
+      );
+    }
+    if (!tradeHasExplicitEtat(item)) {
+      missingChips.add(
+        _incompleteAxisChip(
+          txt('État', 'Mental', 'Estado', 'Mental', 'Estado', '멘탈'),
+          kLensEtat,
+        ),
+      );
+    }
+    if (!tradeHasExplicitStrategieExecution(item)) {
+      missingChips.add(
+        _incompleteAxisChip(
+          txt(
+            'Stratégie',
+            'Strategy',
+            'Estrategia',
+            'Strategie',
+            'Estratégia',
+            '전략',
+          ),
+          kLensStrategie,
+        ),
+      );
+    }
+    if (!tradeHasExplicitPlanAnalysis(item)) {
+      missingChips.add(
+        _incompleteAxisChip(
+          txt('Analyse', 'Analysis', 'Análisis', 'Analyse', 'Análise', '분석'),
+          kLensPlan,
+        ),
+      );
+    }
+
+    return Material(
+      color: PerformanceTokens.innerBgDeep,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () => _openIncompleteTrade(item),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: PerformanceTokens.cardBorder),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.pair,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: DashboardTokens.onMatteEmphasis,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          item.amountLabel,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: amountColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      item.dateLine,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 9,
+                        color: PerformanceTokens.labelDim,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (missingChips.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Wrap(spacing: 4, runSpacing: 4, children: missingChips),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Icon(
+                  LucideIcons.chevronRight,
+                  size: 16,
+                  color: PerformanceTokens.labelFaint,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _incompleteAxisChip(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 8,
+          fontWeight: FontWeight.w700,
+          color: color.withValues(alpha: 0.95),
+        ),
+      ),
+    );
+  }
+
+  Widget _cardEye(PaychekLensSnapshot lens) {
+    final code = Localizations.localeOf(context).languageCode;
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _performanceSectionDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.eye, size: 18, color: _kGreen),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'PAYCHEK LENS',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: DashboardTokens.onMatteEmphasis,
+                    letterSpacing: 1.2,
+                  ),
+                ),
               ),
               ScaleTransition(
                 scale: Tween<double>(begin: 0.95, end: 1.0).animate(_pulseCtrl),
@@ -139,29 +448,451 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   decoration: BoxDecoration(
                     color: _kRed,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: _kRed.withValues(alpha: 0.5), blurRadius: 8)],
+                    boxShadow: [
+                      BoxShadow(
+                        color: _kRed.withValues(alpha: 0.5),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text.rich(
-            TextSpan(children: lens.narrativeSpans),
-          ),
-          if (lens.chips.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final c in lens.chips)
-                  _chip(
-                    c.text,
-                    bg: c.background,
-                    fg: c.foreground,
+          const SizedBox(height: 16),
+          if (lens.tradeCount == 0) ...[
+            Text(
+              lens.insight ?? '',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                height: 1.5,
+                color: PerformanceTokens.labelMuted,
+              ),
+            ),
+          ] else ...[
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 420;
+                final kpis = [
+                  _lensKpiTile(
+                    label: txt(
+                      'Trades',
+                      'Trades',
+                      'Trades',
+                      'Trades',
+                      'Trades',
+                      '트레이드',
+                    ),
+                    value: '${lens.tradeCount}',
+                    valueColor: kLensAccentNum,
+                    icon: LucideIcons.layers,
                   ),
+                  _lensKpiTile(
+                    label: txt(
+                      'Perte max',
+                      'Max loss',
+                      'Pérdida máx',
+                      'Max. Verlust',
+                      'Perda máx',
+                      '최대 손실',
+                    ),
+                    value: lens.maxLoss.toStringAsFixed(0),
+                    valueColor: kLensLoss,
+                    icon: LucideIcons.trendingDown,
+                  ),
+                  _lensKpiTile(
+                    label: txt(
+                      'Durée Ø',
+                      'Avg time',
+                      'Duración Ø',
+                      'Ø Dauer',
+                      'Duração Ø',
+                      '평균 시간',
+                    ),
+                    value: '${lens.avgDurationMinutes} min',
+                    valueColor: kLensDuration,
+                    icon: LucideIcons.clock,
+                  ),
+                ];
+                if (wide) {
+                  return Row(
+                    children: [
+                      for (var i = 0; i < kpis.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 10),
+                        Expanded(child: kpis[i]),
+                      ],
+                    ],
+                  );
+                }
+                return Column(
+                  children: [
+                    for (var i = 0; i < kpis.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 8),
+                      kpis[i],
+                    ],
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 18),
+            Container(height: 1, color: PerformanceTokens.cardBorder),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Text(
+                  txt(
+                    'DISCIPLINE RENSEIGNÉE',
+                    'FILLED-IN DISCIPLINE',
+                    'DISCIPLINA RELLENADA',
+                    'AUSGEFÜLLTE DISZIPLIN',
+                    'DISCIPLINA PREENCHIDA',
+                    '입력된 규율',
+                  ),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: PerformanceTokens.labelDim,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    txt(
+                      'uniquement trades avec données saisies',
+                      'qualified trades only',
+                      'solo trades con datos',
+                      'nur ausgefüllte Trades',
+                      'apenas trades qualificados',
+                      '입력된 트레이드만',
+                    ),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 9,
+                      color: PerformanceTokens.labelFaint,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
+            ),
+            const SizedBox(height: 12),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final twoCol = constraints.maxWidth >= 340;
+                final tiles = [
+                  for (final a in lens.axes) _lensAxisTile(a, txt: txt),
+                ];
+                if (!twoCol) {
+                  return Column(
+                    children: [
+                      for (var i = 0; i < tiles.length; i++) ...[
+                        if (i > 0) const SizedBox(height: 8),
+                        tiles[i],
+                      ],
+                    ],
+                  );
+                }
+                return Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: tiles[0]),
+                        const SizedBox(width: 8),
+                        Expanded(child: tiles[1]),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: tiles[2]),
+                        const SizedBox(width: 8),
+                        Expanded(child: tiles[3]),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+            if (lens.newsLine != null && lens.newsLine!.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    LucideIcons.newspaper,
+                    size: 14,
+                    color: PerformanceTokens.labelMuted,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      lens.newsLine!,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        height: 1.4,
+                        color: PerformanceTokens.labelMuted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (lens.insight != null && lens.insight!.trim().isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: PerformanceTokens.innerBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: PerformanceTokens.cardBorder),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      LucideIcons.sparkles,
+                      size: 14,
+                      color: _kGreen.withValues(alpha: 0.9),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        lens.insight!,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          height: 1.45,
+                          color: PerformanceTokens.textBright,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _lensKpiTile({
+    required String label,
+    required String value,
+    required Color valueColor,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: PerformanceTokens.innerBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: PerformanceTokens.cardBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: valueColor.withValues(alpha: 0.85)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w700,
+                    color: PerformanceTokens.labelDim,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: valueColor,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _lensAxisIcon(PaychekLensAxisKind kind) {
+    return switch (kind) {
+      PaychekLensAxisKind.checklist => LucideIcons.listChecks,
+      PaychekLensAxisKind.etat => LucideIcons.heartPulse,
+      PaychekLensAxisKind.strategie => LucideIcons.crosshair,
+      PaychekLensAxisKind.plan => LucideIcons.lineChart,
+    };
+  }
+
+  Widget _lensAxisTile(
+    PaychekLensAxisStat axis, {
+    required String Function(String, String, String, String, String, String)
+    txt,
+  }) {
+    final filled = axis.qualifiedCount;
+    final missing = axis.missingCount;
+    final active = axis.isActive;
+    final wr = axis.winRateOnQualified;
+    final lang = Localizations.localeOf(context).languageCode;
+    final wrLine = active && wr != null ? '${(wr * 100).round()}% WR' : null;
+    final tradeWordMissing = performanceTradeWordPlural(lang, missing);
+    final nonRenseigneLabel = txt(
+      missing > 1 ? 'non renseignés' : 'non renseigné',
+      missing > 1 ? 'not filled' : 'not filled',
+      missing > 1 ? 'sin datos' : 'sin dato',
+      missing > 1 ? 'nicht ausgefüllt' : 'nicht ausgefüllt',
+      missing > 1 ? 'não preenchidos' : 'não preenchido',
+      '미입력',
+    );
+    final tradesRenseignesLabel = txt(
+      filled > 1 ? 'trades renseignés' : 'trade renseigné',
+      filled > 1 ? 'filled trades' : 'filled trade',
+      filled > 1 ? 'trades rellenados' : 'trade rellenado',
+      filled > 1 ? 'ausgefüllte Trades' : 'ausgefüllter Trade',
+      filled > 1 ? 'trades preenchidos' : 'trade preenchido',
+      filled > 1 ? '입력된 트레이드' : '입력된 트레이드',
+    );
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: active
+            ? PerformanceTokens.innerBg
+            : PerformanceTokens.innerBgDeep,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: active
+              ? axis.color.withValues(alpha: 0.45)
+              : PerformanceTokens.innerBgDeep,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                _lensAxisIcon(axis.kind),
+                size: 14,
+                color: active ? axis.color : PerformanceTokens.labelFaint,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  axis.label,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: active
+                        ? DashboardTokens.onMatteEmphasis
+                        : PerformanceTokens.labelDim,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          if (missing > 0) ...[
+            const SizedBox(height: 10),
+            Text.rich(
+              TextSpan(
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 9,
+                  height: 1.35,
+                  color: PerformanceTokens.labelDim,
+                ),
+                children: [
+                  TextSpan(
+                    text: '$missing ',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: PerformanceTokens.labelMuted,
+                    ),
+                  ),
+                  TextSpan(
+                    text: '$tradeWordMissing $nonRenseigneLabel',
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          if (active) ...[
+            SizedBox(height: missing > 0 ? 8 : 10),
+            Text(
+              '$filled',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: axis.color,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              tradesRenseignesLabel,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
+                color: PerformanceTokens.labelMuted,
+              ),
+            ),
+          ] else if (missing <= 0) ...[
+            const SizedBox(height: 10),
+            Text(
+              txt(
+                'Non renseigné',
+                'Not filled',
+                'Sin datos',
+                'Nicht ausgefüllt',
+                'Não preenchido',
+                '미입력',
+              ),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: PerformanceTokens.labelFaint,
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          _lensAxisSplitBar(
+            filled: filled,
+            missing: missing,
+            filledColor: axis.color,
+          ),
+          const SizedBox(height: 8),
+          if (active && wr != null) ...[
+            _lensAxisWrBar(winRate: wr),
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                wrLine!,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: kLensWinrate,
+                ),
+              ),
             ),
           ],
         ],
@@ -169,13 +900,55 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     );
   }
 
-  Widget _chip(String text, {required Color bg, required Color fg}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
-      child: Text(
-        text,
-        style: GoogleFonts.plusJakartaSans(fontSize: 9, fontWeight: FontWeight.w700, color: fg),
+  /// Barre de progression WR (0–100 %) sur les trades renseignés.
+  Widget _lensAxisWrBar({required double winRate}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2),
+      child: LinearProgressIndicator(
+        value: winRate.clamp(0.0, 1.0),
+        minHeight: 4,
+        backgroundColor: PerformanceTokens.innerBgDeep,
+        color: kLensWinrate,
+      ),
+    );
+  }
+
+  /// Barre double : partie colorée = renseigné, gris = non renseigné.
+  Widget _lensAxisSplitBar({
+    required int filled,
+    required int missing,
+    required Color filledColor,
+  }) {
+    final total = filled + missing;
+    if (total <= 0) {
+      return Container(
+        height: 6,
+        decoration: BoxDecoration(
+          color: PerformanceTokens.innerBgDeep,
+          borderRadius: BorderRadius.circular(3),
+        ),
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2),
+      child: SizedBox(
+        height: 4,
+        child: Row(
+          children: [
+            if (filled > 0)
+              Expanded(
+                flex: filled,
+                child: ColoredBox(color: filledColor),
+              ),
+            if (missing > 0)
+              Expanded(
+                flex: missing,
+                child: const ColoredBox(
+                  color: PerformanceTokens.chipBorderInactive,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -189,7 +962,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     String? sub,
   }) {
     final barColor = fillColor == Colors.white
-        ? const Color(0xFFE2E2E2)
+        ? PerformanceTokens.textPrimary
         : fillColor;
 
     return Padding(
@@ -206,7 +979,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFFCCCCCC),
+                    color: PerformanceTokens.textBright,
                     height: 1.35,
                   ),
                 ),
@@ -217,7 +990,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
-                  color: right == '-' ? const Color(0xFF666666) : barColor,
+                  color: right == '-' ? PerformanceTokens.labelDim : barColor,
                 ),
               ),
             ],
@@ -231,7 +1004,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 8,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF666666),
+                  color: PerformanceTokens.labelDim,
                 ),
               ),
             ),
@@ -242,7 +1015,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             child: LinearProgressIndicator(
               value: fill.clamp(0.0, 1.0),
               minHeight: 3,
-              backgroundColor: const Color(0xFF151515),
+              backgroundColor: PerformanceTokens.innerBgDeep,
               color: barColor,
             ),
           ),
@@ -255,9 +1028,9 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
   Widget _disciplineStatFrame(Widget child) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFF060606),
+        color: PerformanceTokens.innerBgDeep,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2F2F2F)),
+        border: Border.all(color: PerformanceTokens.cardBorder),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
@@ -268,7 +1041,15 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
 
   /// Bloc Mindset : en-tête, barres verticales, synthèse Principe / Feeling / Talent.
   Widget _mindsetPerformanceBlock({
-    required String Function(String fr, String en, String es, String de, String pt, String ko) txt,
+    required String Function(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    )
+    txt,
     required String Function(int n) tradesWord,
     required String principleLabel,
     required String feelingLabel,
@@ -285,7 +1066,19 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
   }) {
     const trackH = 158.0;
     const gap = 10.0;
-    const talentGrey = Color(0xFF888888);
+    const talentGrey = PerformanceTokens.labelMuted;
+    final compactMindsetUi =
+        !kIsWeb && MediaQuery.sizeOf(context).shortestSide < 600;
+    final wrFontSize = compactMindsetUi ? 12.0 : 14.0;
+    final labelFontSize = compactMindsetUi ? 9.0 : 12.0;
+    final labelIconSize = compactMindsetUi ? 11.0 : 14.0;
+    final tradeValueFontSize = compactMindsetUi ? 13.0 : 20.0;
+    final tradeKickerFontSize = compactMindsetUi ? 7.0 : 8.0;
+    final statTilePad = compactMindsetUi
+        ? const EdgeInsets.fromLTRB(8, 8, 6, 8)
+        : const EdgeInsets.fromLTRB(12, 10, 10, 10);
+    final statIconSize = compactMindsetUi ? 14.0 : 18.0;
+    final statRowGap = compactMindsetUi ? 6.0 : 8.0;
 
     Widget columnFor({
       required IconData rowIcon,
@@ -294,10 +1087,13 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
       required double wr,
       required int n,
       required Color fillColor,
+
       /// Si vrai et [n] == 0 : piste vide, aucun segment coloré (ex. Feeling sans trade).
       bool hideFillIfEmpty = false,
     }) {
-      final barColor = fillColor == Colors.white ? const Color(0xFFE8E8E8) : fillColor;
+      final barColor = fillColor == Colors.white
+          ? PerformanceTokens.textBright
+          : fillColor;
       final emptyNoFill = hideFillIfEmpty && n == 0;
       final fill = n > 0 ? wr.clamp(0.0, 1.0) : 0.0;
       const minFill = 0.08;
@@ -319,9 +1115,11 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             child: Text(
               wrText,
               style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
+                fontSize: wrFontSize,
                 fontWeight: FontWeight.w800,
-                color: (wrText == '-' || n == 0) ? const Color(0xFF666666) : barColor,
+                color: (wrText == '-' || n == 0)
+                    ? PerformanceTokens.labelDim
+                    : barColor,
               ),
             ),
           ),
@@ -339,9 +1137,9 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                     height: trackH,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0D0D0D),
+                        color: PerformanceTokens.innerBgDeep,
                         borderRadius: BorderRadius.circular(radius),
-                        border: Border.all(color: const Color(0xFF2A2A2A)),
+                        border: Border.all(color: PerformanceTokens.cardBorder),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(radius - 1),
@@ -379,14 +1177,23 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(rowIcon, size: 14, color: const Color(0xFFAAAAAA)),
-                const SizedBox(width: 6),
-                Text(
-                  name,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                Icon(
+                  rowIcon,
+                  size: labelIconSize,
+                  color: PerformanceTokens.textSecondary,
+                ),
+                SizedBox(width: compactMindsetUi ? 4 : 6),
+                Flexible(
+                  child: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: labelFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -399,18 +1206,18 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
     Widget mindsetStatTile({
       required String kicker,
       required String value,
-      Color kickerColor = const Color(0xFF6B6B6B),
+      Color kickerColor = PerformanceTokens.labelDim,
       Color valueColor = Colors.white,
       IconData? icon,
       Color? iconColor,
       Color? dotColor,
     }) {
       return Container(
-        padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+        padding: statTilePad,
         decoration: BoxDecoration(
-          color: const Color(0xFF080808),
+          color: PerformanceTokens.bg,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF262626)),
+          border: Border.all(color: PerformanceTokens.cardBorder),
         ),
         child: Row(
           children: [
@@ -420,28 +1227,34 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 children: [
                   Text(
                     kicker,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 8,
+                      fontSize: tradeKickerFontSize,
                       fontWeight: FontWeight.w800,
                       color: kickerColor,
                       letterSpacing: 0.9,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: valueColor,
-                      height: 1.05,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      value,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: tradeValueFontSize,
+                        fontWeight: FontWeight.w800,
+                        color: valueColor,
+                        height: 1.05,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             if (icon != null && iconColor != null)
-              Icon(icon, size: 18, color: iconColor),
+              Icon(icon, size: statIconSize, color: iconColor),
             if (dotColor != null)
               Container(
                 width: 9,
@@ -473,7 +1286,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: const Color(0xFF0A1210),
+                color: PerformanceTokens.greenTintBg,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: _kGreen.withValues(alpha: 0.35)),
                 boxShadow: [
@@ -492,7 +1305,14 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    txt('Mindset', 'Mindset', 'Mindset', 'Mindset', 'Mindset', '마인드셋'),
+                    txt(
+                      'Mindset',
+                      'Mindset',
+                      'Mindset',
+                      'Mindset',
+                      'Mindset',
+                      '마인드셋',
+                    ),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
@@ -513,7 +1333,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF6F6F6F),
+                      color: PerformanceTokens.labelDim,
                       letterSpacing: 1.15,
                     ),
                   ),
@@ -531,7 +1351,11 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: Icon(Icons.info_outline_rounded, size: 19, color: const Color(0xFF5C5C5C)),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: 19,
+                  color: PerformanceTokens.labelDim,
+                ),
               ),
             ),
           ],
@@ -577,7 +1401,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
           ],
         ),
         const SizedBox(height: 18),
-        Container(height: 1, color: const Color(0xFF1F1F1F)),
+        Container(height: 1, color: PerformanceTokens.divider),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -591,7 +1415,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 iconColor: _kGreen,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: statRowGap),
             Expanded(
               child: mindsetStatTile(
                 kicker: feelingLabel.toUpperCase(),
@@ -602,7 +1426,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 iconColor: _kRed,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: statRowGap),
             Expanded(
               child: mindsetStatTile(
                 kicker: talentLabel.toUpperCase(),
@@ -621,28 +1445,52 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
 
   Widget _cardDiscipline() {
     final code = Localizations.localeOf(context).languageCode;
-    String txt(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String trades(int n) => performanceTradeWordPlural(code, n);
     final l = AppLocalizations.of(context)!;
     final t = _disciplineVisibleTrades;
+
     /// Mindset ne repose pas sur les % discipline : inclut aussi les saisies « lite » (import, etc.).
     final tm = _visibleTrades;
-    final (fullWr, nFull) = winRateChecklistBand(t, (p) => p >= 80);
-    final (partWr, nPart) = winRateChecklistBand(t, (p) => p >= 50 && p < 80);
-    final (ignWr, nIgn) = winRateChecklistBand(t, (p) => p < 50);
+    final checklistTradeCount = t.where(performanceTradeHasChecklist).length;
+    final etatTradeCount = t.where(performanceTradeHasEtat).length;
+    final tChecklist = t
+        .where(performanceTradeHasChecklist)
+        .toList(growable: false);
+    final tEtat = t.where(performanceTradeHasEtat).toList(growable: false);
+    final (fullWr, nFull) = winRateChecklistBand(tChecklist, (p) => p >= 80);
+    final (partWr, nPart) = winRateChecklistBand(
+      tChecklist,
+      (p) => p >= 50 && p < 80,
+    );
+    final (ignWr, nIgn) = winRateChecklistBand(tChecklist, (p) => p < 50);
+    final planTradeCount = t.where(performanceTradeHasPlanAnalysis).length;
+    final strategieTradeCount = t
+        .where(performanceTradeHasStrategieExecution)
+        .length;
+    final tStrategie = t
+        .where(performanceTradeHasStrategieExecution)
+        .toList(growable: false);
     final (fullPl, nFullPl) = winRatePlanBand(t, (p) => p >= 80);
     final (partPl, nPartPl) = winRatePlanBand(t, (p) => p >= 50 && p < 80);
     final (ignPl, nIgnPl) = winRatePlanBand(t, (p) => p < 50);
-    final (fullEt, nFullEt) = winRateEtatBand(t, (p) => p >= 80);
-    final (partEt, nPartEt) = winRateEtatBand(t, (p) => p >= 50 && p < 80);
-    final (ignEt, nIgnEt) = winRateEtatBand(t, (p) => p < 50);
+    final (fullEt, nFullEt) = winRateEtatBand(tEtat, (p) => p >= 80);
+    final (partEt, nPartEt) = winRateEtatBand(tEtat, (p) => p >= 50 && p < 80);
+    final (ignEt, nIgnEt) = winRateEtatBand(tEtat, (p) => p < 50);
     final (wrP, nP, wrF, nF, wrT, nT) = winRatesMindsetPrincipeFeeling(tm);
-    final strategieViolations = aggregateStrategieNonRespect(t);
-              final (wrHighStrat, nHighStrat, wrLowStrat, nLowStrat) =
-                  winRatesStrategieHighVsForced(t);
+    final strategieViolations = aggregateStrategieNonRespect(tStrategie);
+    final (wrHighStrat, nHighStrat, wrLowStrat, nLowStrat) =
+        winRatesStrategieHighVsForced(tStrategie);
 
-    String wrLabel(double wr, int n) => n > 0 ? '${(wr * 100).round()}% WR' : '-';
+    String wrLabel(double wr, int n) =>
+        n > 0 ? '${(wr * 100).round()}% WR' : '-';
 
     return _dashCard(
       child: Column(
@@ -650,7 +1498,14 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.brain,
-            txt('Discipline & Impact', 'Discipline & Impact', 'Disciplina e impacto', 'Disziplin & Wirkung', 'Disciplina e impacto', '규율·영향'),
+            txt(
+              'Discipline & Impact',
+              'Discipline & Impact',
+              'Disciplina e impacto',
+              'Disziplin & Wirkung',
+              'Disciplina e impacto',
+              '규율·영향',
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -662,14 +1517,48 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
               'Rentabilidade conforme o cumprimento das regras no período filtrado (dados do diário).',
               '필터 기간 규칙 준수에 따른 수익성(일지 데이터).',
             ),
-            style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF888888), height: 1.45),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              color: PerformanceTokens.labelMuted,
+              height: 1.45,
+            ),
           ),
+          if (t.isNotEmpty && planTradeCount < t.length)
+            buildPlanAnalysisMissingNotice(
+              context,
+              missingCount: countPerformanceTradesMissingPlanAnalysis(t),
+              totalCount: t.length,
+              compact: true,
+            ),
+          if (t.isNotEmpty && strategieTradeCount < t.length)
+            buildStrategieExecutionMissingNotice(
+              context,
+              missingCount: countPerformanceTradesMissingStrategieExecution(t),
+              totalCount: t.length,
+              compact: true,
+            ),
+          if (t.isNotEmpty && checklistTradeCount < t.length)
+            buildChecklistMissingNotice(
+              context,
+              missingCount: countPerformanceTradesMissingChecklist(t),
+              totalCount: t.length,
+              compact: true,
+            ),
+          if (t.isNotEmpty && etatTradeCount < t.length)
+            buildEtatMissingNotice(
+              context,
+              missingCount: countPerformanceTradesMissingEtat(t),
+              totalCount: t.length,
+              compact: true,
+            ),
           const SizedBox(height: 20),
           LayoutBuilder(
             builder: (context, constraints) {
               final threeCol = constraints.maxWidth >= 720;
 
-              Widget checklistBlock() => Column(
+              Widget checklistBlock() {
+                if (checklistTradeCount == 0) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _sectionTitle(
@@ -684,112 +1573,81 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _disciplineBandRow(
-                        txt(
-                          'Respectée (80 % – 100 %)',
-                          'Followed (80% - 100%)',
-                          'Seguida (80% - 100%)',
-                          'Eingehalten (80 % – 100 %)',
-                          'Respeitada (80% – 100%)',
-                          '준수(80–100%)',
+                      Text(
+                        l.performanceChecklistSectionEmpty,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          height: 1.45,
+                          color: PerformanceTokens.labelMuted,
                         ),
-                        wrLabel(fullWr, nFull),
-                        fullWr,
-                        _kGreen,
-                        sub: nFull > 0 ? '$nFull ${trades(nFull)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Partielle (50 % – 80 %)',
-                          'Partial (50% - 80%)',
-                          'Parcial (50% - 80%)',
-                          'Teilweise (50 % – 80 %)',
-                          'Parcial (50% – 80%)',
-                          '부분(50–80%)',
-                        ),
-                        wrLabel(partWr, nPart),
-                        partWr,
-                        Colors.white,
-                        sub: nPart > 0 ? '$nPart ${trades(nPart)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Ignorée (< 50 %)',
-                          'Ignored (< 50%)',
-                          'Ignorada (< 50%)',
-                          'Ignoriert (< 50 %)',
-                          'Ignorada (< 50%)',
-                          '미준수(<50%)',
-                        ),
-                        wrLabel(ignWr, nIgn),
-                        ignWr,
-                        _kRed,
-                        sub: nIgn > 0 ? '$nIgn ${trades(nIgn)}' : null,
                       ),
                     ],
                   );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _sectionTitle(
+                      LucideIcons.listChecks,
+                      txt(
+                        'Check-list (Plan de session)',
+                        'Checklist (session plan)',
+                        'Checklist (plan de sesión)',
+                        'Checkliste (Sessionplan)',
+                        'Checklist (plano de sessão)',
+                        '체크리스트(세션 계획)',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _disciplineBandRow(
+                      txt(
+                        'Respectée (80 % – 100 %)',
+                        'Followed (80% - 100%)',
+                        'Seguida (80% - 100%)',
+                        'Eingehalten (80 % – 100 %)',
+                        'Respeitada (80% – 100%)',
+                        '준수(80–100%)',
+                      ),
+                      wrLabel(fullWr, nFull),
+                      fullWr,
+                      _kGreen,
+                      sub: nFull > 0 ? '$nFull ${trades(nFull)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Partielle (50 % – 80 %)',
+                        'Partial (50% - 80%)',
+                        'Parcial (50% - 80%)',
+                        'Teilweise (50 % – 80 %)',
+                        'Parcial (50% – 80%)',
+                        '부분(50–80%)',
+                      ),
+                      wrLabel(partWr, nPart),
+                      partWr,
+                      Colors.white,
+                      sub: nPart > 0 ? '$nPart ${trades(nPart)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Ignorée (< 50 %)',
+                        'Ignored (< 50%)',
+                        'Ignorada (< 50%)',
+                        'Ignoriert (< 50 %)',
+                        'Ignorada (< 50%)',
+                        '미준수(<50%)',
+                      ),
+                      wrLabel(ignWr, nIgn),
+                      ignWr,
+                      _kRed,
+                      sub: nIgn > 0 ? '$nIgn ${trades(nIgn)}' : null,
+                    ),
+                  ],
+                );
+              }
 
-              Widget analyseBlock() => Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _sectionTitle(
-                        LucideIcons.lineChart,
-                        txt(
-                          'Analyse (plan de trade)',
-                          'Analysis (trade plan)',
-                          'Análisis (plan de trade)',
-                          'Analyse (Tradeplan)',
-                          'Análise (plano de trade)',
-                          '분석(트레이드 계획)',
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _disciplineBandRow(
-                        txt(
-                          'Respectée (80 % – 100 %)',
-                          'Followed (80% - 100%)',
-                          'Seguida (80% - 100%)',
-                          'Eingehalten (80 % – 100 %)',
-                          'Respeitada (80% – 100%)',
-                          '준수(80–100%)',
-                        ),
-                        wrLabel(fullPl, nFullPl),
-                        fullPl,
-                        _kGreen,
-                        sub: nFullPl > 0 ? '$nFullPl ${trades(nFullPl)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Partielle (50 % – 80 %)',
-                          'Partial (50% - 80%)',
-                          'Parcial (50% - 80%)',
-                          'Teilweise (50 % – 80 %)',
-                          'Parcial (50% – 80%)',
-                          '부분(50–80%)',
-                        ),
-                        wrLabel(partPl, nPartPl),
-                        partPl,
-                        Colors.white,
-                        sub: nPartPl > 0 ? '$nPartPl ${trades(nPartPl)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Ignorée (< 50 %)',
-                          'Ignored (< 50%)',
-                          'Ignorada (< 50%)',
-                          'Ignoriert (< 50 %)',
-                          'Ignorada (< 50%)',
-                          '미준수(<50%)',
-                        ),
-                        wrLabel(ignPl, nIgnPl),
-                        ignPl,
-                        _kRed,
-                        sub: nIgnPl > 0 ? '$nIgnPl ${trades(nIgnPl)}' : null,
-                      ),
-                    ],
-                  );
-
-              Widget etatBlock() => Column(
+              Widget etatBlock() {
+                if (etatTradeCount == 0) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _sectionTitle(
@@ -804,50 +1662,166 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _disciplineBandRow(
-                        txt(
-                          'Respectée (80 % – 100 %)',
-                          'Followed (80% - 100%)',
-                          'Seguida (80% - 100%)',
-                          'Eingehalten (80 % – 100 %)',
-                          'Respeitada (80% – 100%)',
-                          '준수(80–100%)',
+                      Text(
+                        l.performanceEtatSectionEmpty,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          height: 1.45,
+                          color: PerformanceTokens.labelMuted,
                         ),
-                        wrLabel(fullEt, nFullEt),
-                        fullEt,
-                        _kGreen,
-                        sub: nFullEt > 0 ? '$nFullEt ${trades(nFullEt)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Partielle (50 % – 80 %)',
-                          'Partial (50% - 80%)',
-                          'Parcial (50% - 80%)',
-                          'Teilweise (50 % – 80 %)',
-                          'Parcial (50% – 80%)',
-                          '부분(50–80%)',
-                        ),
-                        wrLabel(partEt, nPartEt),
-                        partEt,
-                        Colors.white,
-                        sub: nPartEt > 0 ? '$nPartEt ${trades(nPartEt)}' : null,
-                      ),
-                      _disciplineBandRow(
-                        txt(
-                          'Ignorée (< 50 %)',
-                          'Ignored (< 50%)',
-                          'Ignorada (< 50%)',
-                          'Ignoriert (< 50 %)',
-                          'Ignorada (< 50%)',
-                          '미준수(<50%)',
-                        ),
-                        wrLabel(ignEt, nIgnEt),
-                        ignEt,
-                        _kRed,
-                        sub: nIgnEt > 0 ? '$nIgnEt ${trades(nIgnEt)}' : null,
                       ),
                     ],
                   );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _sectionTitle(
+                      LucideIcons.heartPulse,
+                      txt(
+                        'État mental',
+                        'Mental state',
+                        'Estado mental',
+                        'Mentalzustand',
+                        'Estado mental',
+                        '멘탈',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _disciplineBandRow(
+                      txt(
+                        'Respectée (80 % – 100 %)',
+                        'Followed (80% - 100%)',
+                        'Seguida (80% - 100%)',
+                        'Eingehalten (80 % – 100 %)',
+                        'Respeitada (80% – 100%)',
+                        '준수(80–100%)',
+                      ),
+                      wrLabel(fullEt, nFullEt),
+                      fullEt,
+                      _kGreen,
+                      sub: nFullEt > 0 ? '$nFullEt ${trades(nFullEt)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Partielle (50 % – 80 %)',
+                        'Partial (50% - 80%)',
+                        'Parcial (50% - 80%)',
+                        'Teilweise (50 % – 80 %)',
+                        'Parcial (50% – 80%)',
+                        '부분(50–80%)',
+                      ),
+                      wrLabel(partEt, nPartEt),
+                      partEt,
+                      Colors.white,
+                      sub: nPartEt > 0 ? '$nPartEt ${trades(nPartEt)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Ignorée (< 50 %)',
+                        'Ignored (< 50%)',
+                        'Ignorada (< 50%)',
+                        'Ignoriert (< 50 %)',
+                        'Ignorada (< 50%)',
+                        '미준수(<50%)',
+                      ),
+                      wrLabel(ignEt, nIgnEt),
+                      ignEt,
+                      _kRed,
+                      sub: nIgnEt > 0 ? '$nIgnEt ${trades(nIgnEt)}' : null,
+                    ),
+                  ],
+                );
+              }
+
+              Widget analyseBlock() {
+                if (planTradeCount == 0) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _sectionTitle(
+                        LucideIcons.lineChart,
+                        txt(
+                          'Analyse (plan de trade)',
+                          'Analysis (trade plan)',
+                          'Análisis (plan de trade)',
+                          'Analyse (Tradeplan)',
+                          'Análise (plano de trade)',
+                          '분석(트레이드 계획)',
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        l.performancePlanAnalysisSectionEmpty,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          height: 1.45,
+                          color: PerformanceTokens.labelMuted,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _sectionTitle(
+                      LucideIcons.lineChart,
+                      txt(
+                        'Analyse (plan de trade)',
+                        'Analysis (trade plan)',
+                        'Análisis (plan de trade)',
+                        'Analyse (Tradeplan)',
+                        'Análise (plano de trade)',
+                        '분석(트레이드 계획)',
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _disciplineBandRow(
+                      txt(
+                        'Respectée (80 % – 100 %)',
+                        'Followed (80% - 100%)',
+                        'Seguida (80% - 100%)',
+                        'Eingehalten (80 % – 100 %)',
+                        'Respeitada (80% – 100%)',
+                        '준수(80–100%)',
+                      ),
+                      wrLabel(fullPl, nFullPl),
+                      fullPl,
+                      _kGreen,
+                      sub: nFullPl > 0 ? '$nFullPl ${trades(nFullPl)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Partielle (50 % – 80 %)',
+                        'Partial (50% - 80%)',
+                        'Parcial (50% - 80%)',
+                        'Teilweise (50 % – 80 %)',
+                        'Parcial (50% – 80%)',
+                        '부분(50–80%)',
+                      ),
+                      wrLabel(partPl, nPartPl),
+                      partPl,
+                      Colors.white,
+                      sub: nPartPl > 0 ? '$nPartPl ${trades(nPartPl)}' : null,
+                    ),
+                    _disciplineBandRow(
+                      txt(
+                        'Ignorée (< 50 %)',
+                        'Ignored (< 50%)',
+                        'Ignorada (< 50%)',
+                        'Ignoriert (< 50 %)',
+                        'Ignorada (< 50%)',
+                        '미준수(<50%)',
+                      ),
+                      wrLabel(ignPl, nIgnPl),
+                      ignPl,
+                      _kRed,
+                      sub: nIgnPl > 0 ? '$nIgnPl ${trades(nIgnPl)}' : null,
+                    ),
+                  ],
+                );
+              }
 
               if (!threeCol) {
                 return Column(
@@ -888,9 +1862,33 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                 children: [
                   _sectionTitle(
                     LucideIcons.crosshair,
-                    txt('Exécution Stratégique', 'Strategy execution', 'Ejecución estratégica', 'Strategieumsetzung', 'Execução da estratégia', '전략 실행'),
+                    txt(
+                      'Exécution Stratégique',
+                      'Strategy execution',
+                      'Ejecución estratégica',
+                      'Strategieumsetzung',
+                      'Execução da estratégia',
+                      '전략 실행',
+                    ),
                   ),
                   const SizedBox(height: 6),
+                  Text(
+                    txt(
+                      'Horaires, sessions et gestion du risque : cartes dédiées plus haut (calcul automatique).',
+                      'Hours, sessions and risk management: dedicated cards above (automatic).',
+                      'Horarios, sesiones y gestión de riesgo: tarjetas arriba (automático).',
+                      'Zeiten, Sessions und Risiko: eigene Karten oben (automatisch).',
+                      'Horários, sessões e gestão de risco: cartões acima (automático).',
+                      '시간·세션·리스크 관리: 상단 전용 카드(자동 계산).',
+                    ),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: PerformanceTokens.labelDim,
+                      height: 1.35,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     txt(
                       'Winrate par setup (titres de la page Stratégie), données journal.',
@@ -902,7 +1900,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                     ),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 10,
-                      color: const Color(0xFF888888),
+                      color: PerformanceTokens.labelMuted,
                       height: 1.35,
                     ),
                   ),
@@ -910,25 +1908,31 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   ListenableBuilder(
                     listenable: StrategieSetupsStore.notifier,
                     builder: (context, _) {
-                      final titles =
-                          StrategieSetupsStore.notifier.value.map((e) => e.title).toList();
-                      final stats = winRatesByStrategieSetupTitles(t, titles);
+                      final titles = StrategieSetupsStore.notifier.value
+                          .map((e) => e.title)
+                          .toList();
+                      final stats = winRatesByStrategieSetupTitles(
+                        tStrategie,
+                        titles,
+                      );
                       final any = stats.any((s) => s.count > 0);
                       if (!any) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            txt(
-                              'Aucun trade avec stratégie renseignée sur cette période.',
-                              'No trades with strategy filled in for this period.',
-                              'No hay trades con estrategia rellenada en este período.',
-                              'Keine Trades mit ausgefüllter Strategie in diesem Zeitraum.',
-                              'Nenhum trade com estratégia preenchida neste período.',
-                              '이 기간에 전략이 입력된 트레이드 없음.',
-                            ),
+                            strategieTradeCount == 0
+                                ? l.performanceStrategieExecutionSectionEmpty
+                                : txt(
+                                    'Aucun trade avec stratégie renseignée sur cette période.',
+                                    'No trades with strategy filled in for this period.',
+                                    'No hay trades con estrategia rellenada en este período.',
+                                    'Keine Trades mit ausgefüllter Strategie in diesem Zeitraum.',
+                                    'Nenhum trade com estratégia preenchida neste período.',
+                                    '이 기간에 전략이 입력된 트레이드 없음.',
+                                  ),
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 10,
-                              color: const Color(0xFF888888),
+                              color: PerformanceTokens.labelMuted,
                               height: 1.4,
                             ),
                           ),
@@ -944,59 +1948,73 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                                 wrLabel(s.winRate, s.count),
                                 s.winRate,
                                 s.winRate >= 0.5 ? _kGreen : _kRed,
-                                sub:
-                                    '${s.count} ${trades(s.count)}',
+                                sub: '${s.count} ${trades(s.count)}',
                               ),
                         ],
                       );
                     },
                   ),
                   const SizedBox(height: 14),
-                  Text(
-                    txt(
-                      'Winrate selon “Stratégie respectée” (slider Ajouter trade).',
-                      'Win rate based on “Strategy respected” (Add trade slider).',
-                      'Win rate según “Estrategia respetada” (slider de Añadir trade).',
-                      'Winrate nach „Strategie eingehalten“ (Slider Trade hinzufügen).',
-                      'Win rate conforme “Estratégia respeitada” (slider Adicionar trade).',
-                      '“전략 준수”(트레이드 추가 슬라이더) 기준 승률.',
+                  if (strategieTradeCount == 0) ...[
+                    Text(
+                      l.performanceStrategieExecutionSectionEmpty,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        height: 1.45,
+                        color: PerformanceTokens.labelMuted,
+                      ),
                     ),
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10,
-                      color: const Color(0xFF888888),
-                      height: 1.35,
-                      fontWeight: FontWeight.w600,
+                  ] else ...[
+                    Text(
+                      txt(
+                        'Winrate selon “Stratégie respectée” (slider Ajouter trade).',
+                        'Win rate based on “Strategy respected” (Add trade slider).',
+                        'Win rate según “Estrategia respetada” (slider de Añadir trade).',
+                        'Winrate nach „Strategie eingehalten“ (Slider Trade hinzufügen).',
+                        'Win rate conforme “Estratégia respeitada” (slider Adicionar trade).',
+                        '“전략 준수”(트레이드 추가 슬라이더) 기준 승률.',
+                      ),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        color: PerformanceTokens.labelMuted,
+                        height: 1.35,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  _disciplineBandRow(
-                    txt(
-                      'Stratégie respectée (≥ 50 %)',
-                      'Strategy respected (≥ 50%)',
-                      'Estrategia respetada (≥ 50%)',
-                      'Strategie eingehalten (≥ 50 %)',
-                      'Estratégia respeitada (≥ 50%)',
-                      '전략 준수(≥50%)',
+                    const SizedBox(height: 10),
+                    _disciplineBandRow(
+                      txt(
+                        'Stratégie respectée (≥ 50 %)',
+                        'Strategy respected (≥ 50%)',
+                        'Estrategia respetada (≥ 50%)',
+                        'Strategie eingehalten (≥ 50 %)',
+                        'Estratégia respeitada (≥ 50%)',
+                        '전략 준수(≥50%)',
+                      ),
+                      wrLabel(wrHighStrat, nHighStrat),
+                      wrHighStrat,
+                      kLensStrategie,
+                      sub: nHighStrat > 0
+                          ? '$nHighStrat ${trades(nHighStrat)}'
+                          : null,
                     ),
-                    wrLabel(wrHighStrat, nHighStrat),
-                    wrHighStrat,
-                    kLensStrategie,
-                    sub: nHighStrat > 0 ? '$nHighStrat ${trades(nHighStrat)}' : null,
-                  ),
-                  _disciplineBandRow(
-                    txt(
-                      'Stratégie forcée (< 50 %)',
-                      'Forced strategy (< 50%)',
-                      'Estrategia forzada (< 50%)',
-                      'Erzwungene Strategie (< 50 %)',
-                      'Estratégia forçada (< 50%)',
-                      '억지 전략(<50%)',
+                    _disciplineBandRow(
+                      txt(
+                        'Stratégie forcée (< 50 %)',
+                        'Forced strategy (< 50%)',
+                        'Estrategia forzada (< 50%)',
+                        'Erzwungene Strategie (< 50 %)',
+                        'Estratégia forçada (< 50%)',
+                        '억지 전략(<50%)',
+                      ),
+                      wrLabel(wrLowStrat, nLowStrat),
+                      wrLowStrat,
+                      _kRed,
+                      sub: nLowStrat > 0
+                          ? '$nLowStrat ${trades(nLowStrat)}'
+                          : null,
                     ),
-                    wrLabel(wrLowStrat, nLowStrat),
-                    wrLowStrat,
-                    _kRed,
-                    sub: nLowStrat > 0 ? '$nLowStrat ${trades(nLowStrat)}' : null,
-                  ),
+                  ],
                   if (strategieViolations.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
@@ -1011,21 +2029,26 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF888888),
+                        color: PerformanceTokens.labelMuted,
                         letterSpacing: 0.3,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...strategieViolations.take(14).map(
+                    ...strategieViolations
+                        .take(14)
+                        .map(
                           (v) => Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF1A1A1A),
+                                    color: PerformanceTokens.cardBg,
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(color: _kBorder),
                                   ),
@@ -1049,7 +2072,7 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                                     ),
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 10,
-                                      color: const Color(0xFFBBBBBB),
+                                      color: PerformanceTokens.textBright,
                                       height: 1.35,
                                     ),
                                   ),
@@ -1070,7 +2093,14 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                   _mindsetPerformanceBlock(
                     txt: txt,
                     tradesWord: trades,
-                    principleLabel: txt('Principal', 'Principle', 'Principio', 'Prinzip', 'Princípio', '원칙'),
+                    principleLabel: txt(
+                      'Principal',
+                      'Principle',
+                      'Principio',
+                      'Prinzip',
+                      'Princípio',
+                      '원칙',
+                    ),
                     feelingLabel: l.tradeMindsetFeeling,
                     talentLabel: l.tradeMindsetTalent,
                     wrP: wrP,
@@ -1082,7 +2112,14 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
                     wrTextP: wrLabel(wrP, nP),
                     wrTextF: nF > 0
                         ? wrLabel(wrF, nF)
-                        : txt('0 % WR', '0% WR', '0 % WR', '0 % WR', '0 % WR', '0% WR'),
+                        : txt(
+                            '0 % WR',
+                            '0% WR',
+                            '0 % WR',
+                            '0 % WR',
+                            '0 % WR',
+                            '0% WR',
+                          ),
                     wrTextT: wrLabel(wrT, nT),
                   ),
                 ],
@@ -1116,13 +2153,32 @@ extension _PerformancePageUiLensDiscipline on _PerformancePageState {
           const SizedBox(height: 16),
           Text.rich(
             TextSpan(
-              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFFAAAAAA), height: 1.45),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                color: PerformanceTokens.textSecondary,
+                height: 1.45,
+              ),
               children: [
                 TextSpan(
-                  text: txt('Observation : ', 'Observation: ', 'Observación: ', 'Beobachtung: ', 'Observação: ', '관찰: '),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  text: txt(
+                    'Observation : ',
+                    'Observation: ',
+                    'Observación: ',
+                    'Beobachtung: ',
+                    'Observação: ',
+                    '관찰: ',
+                  ),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                TextSpan(text: disciplineImpactObservation(t, locale: Localizations.localeOf(context))),
+                TextSpan(
+                  text: disciplineImpactObservation(
+                    t,
+                    locale: Localizations.localeOf(context),
+                  ),
+                ),
               ],
             ),
           ),

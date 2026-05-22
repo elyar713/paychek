@@ -15,6 +15,7 @@ import '../reglage/user_portfolio_scope.dart';
 import 'trade_date_format.dart';
 import 'trade_linked_analyse_pdf.dart';
 import 'trade_models.dart';
+import 'trade_plan_analysis.dart';
 import 'trade_session.dart';
 import 'trade_tokens.dart';
 

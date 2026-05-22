@@ -30,7 +30,11 @@ class PeriodComparisonResult {
   final PeriodStats previous;
 }
 
-PeriodStats aggregateTradesInRange(List<Trade> trades, DateTime start, DateTime end) {
+PeriodStats aggregateTradesInRange(
+  List<Trade> trades,
+  DateTime start,
+  DateTime end,
+) {
   var count = 0;
   var p = 0.0;
   var c = 0.0;
@@ -48,7 +52,10 @@ PeriodStats aggregateTradesInRange(List<Trade> trades, DateTime start, DateTime 
 String _fmtFrDate(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-PeriodComparisonResult compareCurrentVsPreviousPeriod(List<Trade> trades, String period) {
+PeriodComparisonResult compareCurrentVsPreviousPeriod(
+  List<Trade> trades,
+  String period,
+) {
   const empty = PeriodStats(tradeCount: 0, profitSum: 0, commissionSum: 0);
   if (trades.isEmpty) {
     return PeriodComparisonResult(
@@ -95,7 +102,8 @@ PeriodComparisonResult compareCurrentVsPreviousPeriod(List<Trade> trades, String
       final prevEnd = curStart;
       return PeriodComparisonResult(
         anchor: anchor,
-        currentLabel: '${anchor.month.toString().padLeft(2, '0')}/${anchor.year}',
+        currentLabel:
+            '${anchor.month.toString().padLeft(2, '0')}/${anchor.year}',
         previousLabel: 'Mois précédent',
         current: aggregateTradesInRange(trades, curStart, curEnd),
         previous: aggregateTradesInRange(trades, prevStart, prevEnd),

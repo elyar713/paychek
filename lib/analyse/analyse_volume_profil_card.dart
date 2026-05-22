@@ -24,29 +24,27 @@ class AnalyseVolumeProfilCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final c = controller;
-    return AnalyseCard(
-      editorSection: AnalyseEditorSection.profilVolume,
-      child: ListenableBuilder(
-        listenable: c,
-        builder: (context, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AnalyseSectionTitleRow(
+    final body = ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnalyseSectionTitleRow(
                 title: l.analyseCardVolumeProfile,
                 icon: Icons.bar_chart,
                 iconColor: AnalyseEditorSection.profilVolume.sectionAccent,
                 enabled: c.volumeProfileEnabled,
                 onEnabledChanged: (v) => c.volumeProfileEnabled = v,
               ),
-              AnalyseCollapsibleSectionBody(
-                expanded: c.volumeProfileEnabled,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 10),
-                    SizedBox(
+            AnalyseCollapsibleSectionBody(
+              expanded: c.volumeProfileEnabled,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  SizedBox(
                       height: AnalyseTextField.compactRowHeight,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,10 +195,13 @@ class AnalyseVolumeProfilCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ],
-          );
-        },
-      ),
+          ],
+        );
+      },
+    );
+    return AnalyseCard(
+      editorSection: AnalyseEditorSection.profilVolume,
+      child: body,
     );
   }
 }

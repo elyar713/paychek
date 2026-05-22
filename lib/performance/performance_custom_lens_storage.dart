@@ -57,14 +57,13 @@ class PerformanceCustomLensStorage {
     return const [];
   }
 
-  static Future<void> saveSavedCards(List<PerformanceCustomLensSavedCard> cards) async {
+  static Future<void> saveSavedCards(
+    List<PerformanceCustomLensSavedCard> cards,
+  ) async {
     final p = await SharedPreferences.getInstance();
     final slice = cards.length <= maxSavedCards
         ? cards
         : cards.sublist(cards.length - maxSavedCards);
-    await p.setString(
-      _kSaved,
-      jsonEncode([for (final c in slice) c.toJson()]),
-    );
+    await p.setString(_kSaved, jsonEncode([for (final c in slice) c.toJson()]));
   }
 }

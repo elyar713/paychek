@@ -237,9 +237,7 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
 
       _strategieChoisie = strategieSetupDefaultCardDataList().first.title;
       _strategieNonRespectIds = {};
-      _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(
-        Localizations.localeOf(context),
-      );
+      _planAnalyseSelectedReport = null;
       _planAnalyseNonRespectIds = {};
       _checklistNonRespectIds = {};
       _etatMomentNonRespectIds = {};

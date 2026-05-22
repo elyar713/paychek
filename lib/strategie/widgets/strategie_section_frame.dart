@@ -54,7 +54,7 @@ class StrategieSectionFrame extends StatelessWidget {
           : BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(StrategieTokens.radiusLg),
-              border: Border.all(color: StrategieTokens.cardBorder.withValues(alpha: 0.55)),
+              border: Border.all(color: StrategieTokens.cardBorder),
             ),
       child: Padding(
         padding: padding,
@@ -74,8 +74,8 @@ class StrategieSectionFrame extends StatelessWidget {
                           focusNode: titleFocusNode,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.4,
                             color: titleColor,
                           ),
                           cursorColor: titleColor,
@@ -93,8 +93,8 @@ class StrategieSectionFrame extends StatelessWidget {
                           title,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.4,
                             color: titleColor,
                           ),
                         ),

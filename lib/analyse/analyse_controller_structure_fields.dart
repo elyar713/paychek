@@ -7,6 +7,7 @@ mixin AnalyseControllerStructureFields on ChangeNotifier {
   set structureEnabled(bool v) {
     if (v == _structureEnabled) return;
     _structureEnabled = v;
+    rebalanceAnalyseSectionImpacts();
     notifyListeners();
   }
 

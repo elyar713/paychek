@@ -14,6 +14,7 @@ import 'sections/strategie_mes_regles_section.dart';
 import 'sections/strategie_calendrier_section.dart';
 import 'sections/strategie_setup_modeles_section.dart';
 import 'widgets/strategie_day_violations_card.dart';
+import '../analyse/analyse_tokens.dart';
 import 'strategie_export_pdf.dart';
 import 'strategie_tokens.dart';
 
@@ -108,7 +109,7 @@ class _StrategiePageState extends State<StrategiePage> {
                     IconButton(
                       onPressed: _handleLeadingBack,
                       style: IconButton.styleFrom(
-                        foregroundColor: const Color(0xFF555555),
+                        foregroundColor: StrategieTokens.labelMuted,
                         padding: const EdgeInsets.all(10),
                         minimumSize: const Size(40, 40),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -146,7 +147,7 @@ class _StrategiePageState extends State<StrategiePage> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 height: 1.4,
-                                color: const Color(0xFF888888),
+                                color: StrategieTokens.labelMuted,
                               ),
                             ),
                           ],
@@ -167,7 +168,7 @@ class _StrategiePageState extends State<StrategiePage> {
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: const Color(0xFF0F2620),
+                            color: AnalyseTokens.inputBg,
                             border: Border.all(color: StrategieTokens.emerald, width: 1.5),
                             boxShadow: [
                               BoxShadow(

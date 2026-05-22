@@ -26,26 +26,111 @@ class AnalyseReportPdfCopy {
 
   String get confidenceDonutLabel => l.analyseConfidenceLevelTitle;
 
-  String get executiveSummaryTitle => _p(
-        'RÉSUMÉ EXÉCUTIF',
-        'EXECUTIVE SUMMARY',
-        'RESUMEN EJECUTIVO',
-        'EXECUTIVE SUMMARY',
-        'RESUMO EXECUTIVO',
-        '요약',
+  String get globalConfidenceLabel => l.analyseSidebarConfidenceLabel;
+
+  String get confluenceRingLabel => _p(
+        'CONFLUENCE',
+        'CONFLUENCE',
+        'CONFLUENCIA',
+        'KONFLUENZ',
+        'CONFLUÊNCIA',
+        '컨플루언스',
       );
 
-  String get feuilleTendanceSection => _p(
-        'FEUILLE & TENDANCE',
-        'SHEET & TREND',
-        'HOJA Y TENDENCIA',
-        'BLATT & TREND',
-        'FOLHA E TENDÊNCIA',
-        '시트 및 추세',
+  String confluenceStatusLabel(int score) {
+    if (score > 70) {
+      return _p('Setup Optimal', 'Setup Optimal', 'Setup óptimo', 'Setup optimal', 'Setup ótimo', '최적 셋업');
+    }
+    if (score > 40) {
+      return _p('Setup Valide', 'Valid Setup', 'Setup válido', 'Gültiges Setup', 'Setup válido', '유효 셋업');
+    }
+    return _p('Risque Élevé', 'High Risk', 'Riesgo alto', 'Hohes Risiko', 'Risco elevado', '고위험');
+  }
+
+  String get sectionFundamental => _p(
+        'FONDAMENTAL',
+        'FUNDAMENTAL',
+        'FUNDAMENTAL',
+        'FUNDAMENTAL',
+        'FUNDAMENTAL',
+        '기본',
       );
 
-  String structureTitle(String tf) =>
-      '${l.analyseStructure} ${tf.trim().toUpperCase()}';
+  String get sectionZoneCle => _p(
+        'ZONE CLÉ',
+        'KEY ZONE',
+        'ZONA CLAVE',
+        'SCHLÜSSELZONE',
+        'ZONA-CHAVE',
+        '핵심 구간',
+      );
+
+  String get sectionEntry => _p(
+        'ENTRÉE',
+        'ENTRY',
+        'ENTRADA',
+        'EINSTIEG',
+        'ENTRADA',
+        '진입',
+      );
+
+  String get sectionSmc => 'SMC';
+
+  String get sectionVolume => _p(
+        'VOLUME PROFILE',
+        'VOLUME PROFILE',
+        'PERFIL DE VOLUMEN',
+        'VOLUMENPROFIL',
+        'PERFIL DE VOLUME',
+        '볼륨 프로필',
+      );
+
+  String get signauxLabel => _p(
+        'SIGNAUX',
+        'SIGNALS',
+        'SEÑALES',
+        'SIGNALE',
+        'SINAIS',
+        '신호',
+      );
+
+  String get actionPlanLabel => _p(
+        "PLAN D'ACTION",
+        'ACTION PLAN',
+        'PLAN DE ACCIÓN',
+        'AKTIONSPLAN',
+        'PLANO DE AÇÃO',
+        '실행 계획',
+      );
+
+  String get notesMacroLabel => _p(
+        'NOTES MACRO',
+        'MACRO NOTES',
+        'NOTAS MACRO',
+        'MAKRO-NOTIZEN',
+        'NOTAS MACRO',
+        '매크로 메모',
+      );
+
+  String confidencePanelTitle(int impact) => _p(
+        'CONFIANCE PAR SECTION',
+        'CONFIDENCE BY SECTION',
+        'CONFIANZA POR SECCIÓN',
+        'VERTRAUEN PRO ABSCHNITT',
+        'CONFIANÇA POR SECÇÃO',
+        '섹션별 신뢰도',
+      );
+
+  String get brandFooter => 'PAYCHEK · MON ANALYSE';
+
+  String get generatedBy => _p(
+        'Rapport OLED',
+        'OLED report',
+        'Informe OLED',
+        'OLED-Bericht',
+        'Relatório OLED',
+        'OLED 보고서',
+      );
 
   String get sectionDisabled => _p(
         'Section désactivée.',
@@ -54,42 +139,6 @@ class AnalyseReportPdfCopy {
         'Abschnitt deaktiviert.',
         'Secção desativada.',
         '비활성화된 섹션.',
-      );
-
-  String get signalLastPoint => _p(
-        'Signal / dernier point',
-        'Signal / last point',
-        'Señal / último punto',
-        'Signal / letzter Punkt',
-        'Sinal / último ponto',
-        '신호 / 최근 포인트',
-      );
-
-  String get toolsSmcTitle => _p(
-        'OUTILS TECHNIQUE & SMC',
-        'TECHNICAL TOOLS & SMC',
-        'HERRAMIENTAS TÉCNICAS Y SMC',
-        'TECHNIK & SMC',
-        'FERRAMENTAS TÉCNICAS E SMC',
-        '기술 도구 및 SMC',
-      );
-
-  String indicatorsTitle(String tf) => _p(
-        'Indicateurs $tf',
-        'Indicators $tf',
-        'Indicadores $tf',
-        'Indikatoren $tf',
-        'Indicadores $tf',
-        '지표 $tf',
-      );
-
-  String get smcFluxTitle => _p(
-        'Analyse SMC / Flux',
-        'SMC / Flow analysis',
-        'Análisis SMC / flujo',
-        'SMC / Flow-Analyse',
-        'Análise SMC / fluxo',
-        'SMC / 흐름 분석',
       );
 
   String get fibPriceLabel => _p(
@@ -101,26 +150,17 @@ class AnalyseReportPdfCopy {
         '피보나치 가격',
       );
 
-  String confidenceBySection(int impact) => _p(
-        'CONFIANCE PAR SECTION (IMPACT $impact% CHACUNE)',
-        'CONFIDENCE BY SECTION ($impact% IMPACT EACH)',
-        'CONFIANZA POR SECCIÓN ($impact% IMPACTO C/U)',
-        'VERTRAUEN PRO ABSCHNITT ($impact% JE ABSCHNITT)',
-        'CONFIANÇA POR SECÇÃO ($impact% CADA)',
-        '섹션별 신뢰도 (각 $impact% 영향)',
-      );
-
   String get feuilleGaugeRow => l.analyseFeuillePlanTitle;
 
   String get structureGaugeRow => l.analyseStructureSectionTitle;
 
-  String get indicatorsGaugeRow => _p(
-        'Indicateurs',
-        'Indicators',
-        'Indicadores',
-        'Indikatoren',
-        'Indicadores',
-        '지표',
+  String get entryGaugeRow => _p(
+        'Entrée',
+        'Entry',
+        'Entrada',
+        'Einstieg',
+        'Entrada',
+        '진입',
       );
 
   String get smcGaugeRow => _p(
@@ -141,39 +181,6 @@ class AnalyseReportPdfCopy {
         'Analysedatum: $date',
         'Data da análise: $date',
         '분석일: $date',
-      );
-
-  String executiveFallback(int confidence) => _p(
-        'Rapport Mon Analyse — confiance globale $confidence %.',
-        'My Analysis report — overall confidence $confidence %.',
-        'Informe Mi Análisis — confianza global $confidence %.',
-        'Meine Analyse — Gesamtvertrauen $confidence %.',
-        'Relatório Minha Análise — confiança global $confidence %.',
-        '내 분석 보고서 — 전체 신뢰도 $confidence %.',
-      );
-
-  String executiveContextLine(String tf, String trend, String phase) => _p(
-        'Analyse $tf : tendance $trend, phase $phase.',
-        'Analysis $tf: $trend trend, $phase phase.',
-        'Análisis $tf: tendencia $trend, fase $phase.',
-        'Analyse $tf: Trend $trend, Phase $phase.',
-        'Análise $tf: tendência $trend, fase $phase.',
-        '분석 $tf: 추세 $trend, 단계 $phase.',
-      );
-
-  String executiveStructureLine(
-    String tf,
-    String chart,
-    String support,
-    String resist,
-  ) =>
-      _p(
-        'Structure $tf — $chart. Supports / résistances : $support / $resist.',
-        'Structure $tf — $chart. Support / resistance: $support / $resist.',
-        'Estructura $tf — $chart. Soporte / resistencia: $support / $resist.',
-        'Struktur $tf — $chart. Support / Widerstand: $support / $resist.',
-        'Estrutura $tf — $chart. Suporte / resistência: $support / $resist.',
-        '구조 $tf — $chart. 지지 / 저항: $support / $resist.',
       );
 
   String footerNoteLowBoth() => _p(

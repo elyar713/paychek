@@ -47,9 +47,10 @@ class AnalysePageEditorSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF121212),
+                color: AnalyseTokens.cardBgRaised,
                 borderRadius: BorderRadius.circular(AnalyseTokens.radiusCard),
                 border: Border.all(color: AnalyseTokens.cardBorder),
+                boxShadow: AnalyseTokens.nightCardShadow,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,7 +96,7 @@ class AnalysePageEditorSidebar extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: p / 100.0,
                       minHeight: 8,
-                      backgroundColor: const Color(0xFF1E1E1E),
+                      backgroundColor: AnalyseTokens.nightBorder,
                       valueColor: AlwaysStoppedAnimation<Color>(band),
                     ),
                   ),

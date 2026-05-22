@@ -19,7 +19,8 @@ int? _tradeEntryMinutes(Trade t) {
 String _dayKey(DateTime d) =>
     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-String _monthKey(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}';
+String _monthKey(DateTime d) =>
+    '${d.year}-${d.month.toString().padLeft(2, '0')}';
 
 /// `true` si [mins] tombe dans la fenêtre (début inclus ; fin inclusive si fournie ; sinon ouvert après le début).
 bool _minutesInSessionWindow(int mins, StrategieSessionPersisted s) {
@@ -56,6 +57,7 @@ class _StrategieSessionScanResult {
   final _SessionAgg horsSessionAgg;
   final List<StrategieSessionPersisted> noTrade;
   final List<StrategieSessionPersisted> tradeZones;
+
   /// Trades avec heure d’entrée dans au moins une session No Trade.
   final int tradesPendantNoTrade;
 }
@@ -191,6 +193,7 @@ List<String> paychekStrategieWarnings({
     if (c.startsWith('ko')) return '×$mj개월';
     return '×$mj mo';
   }
+
   final out = <String>[];
   if (trades.isEmpty) return out;
 
@@ -226,14 +229,15 @@ List<String> paychekStrategieWarnings({
     final a = e.value;
     final dj = a.days.length;
     final mj = a.months.length;
-    final parts = <String>[
-      '×${a.tradeCount}',
-      dayAggSuffix(dj),
-    ];
+    final parts = <String>['×${a.tradeCount}', dayAggSuffix(dj)];
     if (mj >= 2) parts.add(monthAggSuffix(mj));
     final suffix = ' — ${parts.join(' ')}';
-    final displayTitle = sess != null ? strategieSessionTitleForLocale(sess, locale) : title;
-    final displayTime = sess != null ? formatStrategieSessionWindow(sess, locale) : '—';
+    final displayTitle = sess != null
+        ? strategieSessionTitleForLocale(sess, locale)
+        : title;
+    final displayTime = sess != null
+        ? formatStrategieSessionWindow(sess, locale)
+        : '—';
     out.add(
       t(
         'Session No Trade « $displayTitle » ($displayTime) : ${a.tradeCount} ${tradeWord(a.tradeCount)} pendant la fenêtre interdite$suffix',
@@ -250,10 +254,7 @@ List<String> paychekStrategieWarnings({
     final a = horsSessionAgg;
     final dj = a.days.length;
     final mj = a.months.length;
-    final parts = <String>[
-      '×${a.tradeCount}',
-      dayAggSuffix(dj),
-    ];
+    final parts = <String>['×${a.tradeCount}', dayAggSuffix(dj)];
     if (mj >= 2) parts.add(monthAggSuffix(mj));
     final suffix = ' — ${parts.join(' ')}';
     out.add(

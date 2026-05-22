@@ -38,6 +38,8 @@ class _TradeSaveCapture {
     required this.planNonRespectIds,
     required this.checklistNonRespectIds,
     required this.etatNonRespectIds,
+    required this.checklistLinkedExplicit,
+    required this.etatLinkedExplicit,
     required this.psychTags,
     required this.accountEntitlement,
     this.linkedAnalyseReport,
@@ -79,6 +81,8 @@ class _TradeSaveCapture {
   final Set<String> planNonRespectIds;
   final Set<String> checklistNonRespectIds;
   final Set<String> etatNonRespectIds;
+  final bool checklistLinkedExplicit;
+  final bool etatLinkedExplicit;
   final List<String> psychTags;
   final AccountEntitlementSnapshot? accountEntitlement;
   final AnalyseReportSnapshot? linkedAnalyseReport;
@@ -205,14 +209,21 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       planStoredReports: List<AnalyseReportSnapshot>.from(
         _planAnalyseStoredReports,
       ),
-      checklistRingPercent:
-          widget.checklistController.completionPercentOnDay(entryDay),
-      mentalRingScore: mentalHistorical ?? mentalC.overallScore,
+      checklistRingPercent: widget.checklistController
+              .hasChecklistCheckedOnDay(entryDay)
+          ? widget.checklistController.completionPercentOnDay(entryDay)
+          : 0,
+      mentalRingScore: mentalHistorical ?? 0,
       strategieRespectPct: _strategieRespectPct,
       strategieNonRespectIds: Set<String>.from(_strategieNonRespectIds),
       planNonRespectIds: Set<String>.from(_planAnalyseNonRespectIds),
       checklistNonRespectIds: Set<String>.from(_checklistNonRespectIds),
       etatNonRespectIds: Set<String>.from(_etatMomentNonRespectIds),
+      checklistLinkedExplicit:
+          widget.checklistController.hasChecklistCheckedOnDay(entryDay) ||
+          _checklistNonRespectIds.isNotEmpty,
+      etatLinkedExplicit:
+          mentalHistorical != null || _etatMomentNonRespectIds.isNotEmpty,
       psychTags: List<String>.from(_psychTagSelected),
       accountEntitlement: widget.accountEntitlement,
       linkedAnalyseReport: _tradeLinkedAnalyseReport,
@@ -243,6 +254,11 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
         : (findStoredAnalyseReportMatch(c.planSelected, storedReports) ??
               c.planSelected);
     final discipline = disciplinePctForSave(storedReports: storedReports);
+    final planLinkedExplicit = planReport != null ||
+        (c.linkedAnalysePdfBytes != null && c.linkedAnalysePdfBytes!.isNotEmpty);
+    const strategieLinkedExplicit = true;
+    final savedPlanPct =
+        planReport != null ? discipline.planPct : 0.0;
     final id =
         c.editingTradeId ?? DateTime.now().microsecondsSinceEpoch.toString();
     final net = c.net;
@@ -271,12 +287,17 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       screenshotBytes: c.screenshotBytes,
       prixEntreeLabel: c.prixEntreeLabel,
       prixSortieLabel: c.prixSortieLabel,
-      checklistPct: discipline.checklistPct,
-      planPct: discipline.planPct,
+      checklistPct:
+          c.checklistLinkedExplicit ? c.checklistRingPercent.toDouble() : 0,
+      planPct: savedPlanPct,
       strategiePct: discipline.strategiePct,
-      etatPct: discipline.etatPct,
+      etatPct: c.etatLinkedExplicit ? c.mentalRingScore : 0,
       mindset: _mapMindsetFromCapture(c.tradeMindset),
       mindsetExplicit: c.tradeMindset != 'none',
+      planLinkedExplicit: planLinkedExplicit,
+      strategieLinkedExplicit: strategieLinkedExplicit,
+      checklistLinkedExplicit: c.checklistLinkedExplicit,
+      etatLinkedExplicit: c.etatLinkedExplicit,
       strategieTitle: c.strategieTitle,
       planReport: planReport,
       linkedAnalyseReport:

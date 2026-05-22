@@ -95,7 +95,15 @@ List<PerformanceCustomLensElementOption> performanceCustomLensElementCatalog(
 String performanceCustomLensBandLabel({
   required int bandIndex,
   required List<double> thresholds,
-  required String Function(String fr, String en, String es, String de, String pt, String ko) txt,
+  required String Function(
+    String fr,
+    String en,
+    String es,
+    String de,
+    String pt,
+    String ko,
+  )
+  txt,
 }) {
   final barCount = thresholds.length + 1;
   final b = customLensPartitionBounds(thresholds);
@@ -112,7 +120,14 @@ String performanceCustomLensBandLabel({
       return txt('>$t %', '>$t%', '>$t %', '>$t %', '>$t %', '>$t%');
     }
     final share = bandIndex == 0 ? share0 : share1;
-    return txt('$share %', '$share%', '$share %', '$share %', '$share %', '$share%');
+    return txt(
+      '$share %',
+      '$share%',
+      '$share %',
+      '$share %',
+      '$share %',
+      '$share%',
+    );
   }
 
   if (bandIndex == 0) {
@@ -138,7 +153,15 @@ String performanceCustomLensBandLabel({
 List<PerformanceCustomLensBandStat> performanceCustomLensBandStats({
   required List<Trade> trades,
   required PerformanceCustomLensConfig config,
-  required String Function(String fr, String en, String es, String de, String pt, String ko) txt,
+  required String Function(
+    String fr,
+    String en,
+    String es,
+    String de,
+    String pt,
+    String ko,
+  )
+  txt,
 }) {
   final thresholds = config.sortedThresholds;
   final barCount = config.barCount;
@@ -160,7 +183,11 @@ List<PerformanceCustomLensBandStat> performanceCustomLensBandStats({
 
   final pool = trades.where((t) {
     if (t.performanceLite) return false;
-    if (!performanceCustomLensTradeHasElement(t, config.dimension, config.elementId)) {
+    if (!performanceCustomLensTradeHasElement(
+      t,
+      config.dimension,
+      config.elementId,
+    )) {
       return false;
     }
     return performanceCustomLensPctForTrade(t, config.dimension) != null;

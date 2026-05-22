@@ -20,13 +20,10 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
         .effectiveCapitalAmount(UserCapitalScope.of(context));
     final pct = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
 
-    double avgPct(List<double> xs) =>
-        xs.isEmpty ? 0.0 : (xs.fold<double>(0.0, (a, b) => a + b) / xs.length);
-
-    final avgChecklist = avgPct(monthTrades.map((e) => e.checklistPct).toList());
-    final avgPlan = avgPct(monthTrades.map((e) => e.planPct).toList());
-    final avgStrategie = avgPct(monthTrades.map((e) => e.strategiePct).toList());
-    final avgEtat = avgPct(monthTrades.map((e) => e.etatPct).toList());
+    final avgChecklistVal = averageExplicitChecklistPct(monthTrades);
+    final avgPlanVal = averageExplicitPlanPct(monthTrades);
+    final avgStrategieVal = averageExplicitStrategiePct(monthTrades);
+    final avgEtatVal = averageExplicitEtatPct(monthTrades);
     final winMonth = computeTradeStats(monthTrades).winRatePctDisplay;
     final principeCount =
         monthTrades.where((e) => e.mindset == TradeMindset.principe).length;
@@ -165,14 +162,15 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
 
     Widget ringCell({
       required String title,
-      required double pctVal,
+      required double? pctVal,
       required Color color,
     }) {
+      final lRing = AppLocalizations.of(context)!;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            AppLocalizations.of(context)!.tradeAverageShort,
+            lRing.tradeAverageShort,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: TradeTokens.textSecondary,
                   fontWeight: FontWeight.w800,
@@ -182,8 +180,16 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
           ),
           const SizedBox(height: 4),
           DonutRing(
-            progress: (pctVal / 100.0).clamp(0.0, 1.0),
-            centerPrimary: '${pctVal.round()}%',
+            progress: pctVal == null ? 0 : (pctVal / 100.0).clamp(0.0, 1.0),
+            centerPrimary: pctVal != null
+                ? '${pctVal.round()}%'
+                : (title == lRing.tradeLabelChecklist
+                    ? lRing.tradeChecklistNoData
+                    : title == lRing.tradeLabelEtat
+                        ? lRing.tradeEtatNoData
+                        : title == lRing.tradeLabelStrategie
+                            ? lRing.tradeStrategieExecutionNoData
+                            : lRing.tradePlanAnalysisNoData),
             centerSecondary: title,
             size: 58,
             strokeWidth: 6,
@@ -229,11 +235,11 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
           ? _monthDetailCardExpanded(
               context: context,
               l10n: loc,
-              avgChecklist: avgChecklist,
-              avgPlan: avgPlan,
+              avgChecklist: avgChecklistVal,
+              avgPlan: avgPlanVal,
               winMonth: winMonth,
-              avgStrategie: avgStrategie,
-              avgEtat: avgEtat,
+              avgStrategie: avgStrategieVal,
+              avgEtat: avgEtatVal,
               wMonth: wMonth,
               lMonth: lMonth,
               bMonth: bMonth,

@@ -8,6 +8,7 @@ import '../../performance/performance_paychek_lens_section.dart';
 import '../../web/paychek_web_tokens.dart';
 import '../../web/web_dashboard_config.dart';
 import '../dashboard_tokens.dart';
+import 'dashboard_section_shell.dart';
 
 /// Accueil : en-tête + [PaychekLensSection] (même largeur que « Ma stratégie » sur mobile).
 class DashboardPaychekLensSection extends StatelessWidget {
@@ -93,18 +94,14 @@ class DashboardPaychekLensSection extends StatelessWidget {
       );
     }
 
-    return ColoredBox(
-      color: cardBackgroundColor ?? DashboardTokens.scaffoldMatte,
-      child: Padding(
-        padding: contentPadding ?? const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _header(context, webDash: false),
-            const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
-            lens,
-          ],
-        ),
+    return DashboardSectionShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _header(context, webDash: false),
+          const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
+          lens,
+        ],
       ),
     );
   }

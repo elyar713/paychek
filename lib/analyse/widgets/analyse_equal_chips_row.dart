@@ -114,24 +114,46 @@ class AnalyseEqualChipsRow<T extends Object> extends StatelessWidget {
       );
     }
 
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < options.length; i++) ...[
-            if (i > 0) const SizedBox(width: 8),
-            Expanded(
-              child: _EqualChip(
-                label: options[i].label,
-                accent: options[i].accent,
-                selected: chipSelected(options[i].value),
-                onTap: () => handleChipTap(options[i].value),
-                fillCell: true,
-              ),
-            ),
-          ],
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useWrap =
+            constraints.maxWidth < AnalyseTokens.layoutBreakpointFeuilleGrid;
+        if (useWrap) {
+          return Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var i = 0; i < options.length; i++)
+                _EqualChip(
+                  label: options[i].label,
+                  accent: options[i].accent,
+                  selected: chipSelected(options[i].value),
+                  onTap: () => handleChipTap(options[i].value),
+                  fillCell: false,
+                ),
+            ],
+          );
+        }
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < options.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: _EqualChip(
+                    label: options[i].label,
+                    accent: options[i].accent,
+                    selected: chipSelected(options[i].value),
+                    onTap: () => handleChipTap(options[i].value),
+                    fillCell: true,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -237,6 +259,49 @@ class _AddPillButton extends StatelessWidget {
   }
 }
 
+/// Taille de police pour tenir sur une ligne dans une puce [fillCell] étroite.
+double _equalChipFontSize(BuildContext context, String label) {
+  const base = 11.0;
+  final w = MediaQuery.sizeOf(context).width;
+  if (w >= 400) return base;
+  final len = label.length;
+  if (len >= 13) return 8.0;
+  if (len >= 11) return 8.5;
+  if (len >= 9) return 9.5;
+  return 10.0;
+}
+
+/// Libellé de puce : une ligne sans coupure au milieu du mot (petits écrans).
+class _ChipLabel extends StatelessWidget {
+  const _ChipLabel({
+    required this.label,
+    required this.color,
+    required this.fillCell,
+  });
+
+  final String label;
+  final Color color;
+  final bool fillCell;
+
+  @override
+  Widget build(BuildContext context) {
+    final fontSize = fillCell ? _equalChipFontSize(context, label) : 11.0;
+    return Text(
+      label,
+      textAlign: TextAlign.center,
+      maxLines: fillCell ? 1 : 2,
+      softWrap: false,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: color,
+        fontSize: fontSize,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+      ),
+    );
+  }
+}
+
 class _EqualChip extends StatelessWidget {
   const _EqualChip({
     required this.label,
@@ -257,7 +322,7 @@ class _EqualChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = selected ? accent.withValues(alpha: 0.18) : AnalyseTokens.chipBg;
+    final bg = selected ? accent.withValues(alpha: 0.1) : AnalyseTokens.chipBg;
     final fg = selected ? accent : AnalyseTokens.muted;
 
     final child = AnimatedContainer(
@@ -279,21 +344,16 @@ class _EqualChip extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(AnalyseTokens.radiusChip),
         border: Border.all(
-          color: selected ? accent.withValues(alpha: 0.72) : const Color(0xFF1E242E),
-          width: selected ? 1.25 : 1,
+          color: selected
+              ? accent.withValues(alpha: 0.45)
+              : AnalyseTokens.nightBorder,
+          width: 1,
         ),
       ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: fg,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          height: 1.15,
-        ),
+      child: _ChipLabel(
+        label: label,
+        color: fg,
+        fillCell: fillCell,
       ),
     );
 

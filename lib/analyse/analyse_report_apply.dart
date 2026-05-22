@@ -80,12 +80,30 @@ ContextePick<AnalysePhase> _phasePickFromReportLabel(String reportLabel) {
 }
 
 void _applyHtfToController(AnalyseController c, String line) {
-  final pick = _htfPickFromReportLine(line);
-  if (pick.isEnum) {
-    c.htfPick = pick;
-    return;
+  final t = line.trim();
+  if (t.isEmpty || t == '—') return;
+  for (final tf in AnalyseTimeframe.values) {
+    if (ctxLabelHtf(tf) == t) {
+      c.htfPick = ContextePick.enumOf(tf);
+      return;
+    }
   }
-  c.addHtfCustomLabel(pick.custom ?? '');
+  c.addHtfCustomLabel(t);
+}
+
+void _applyChartTfLabel(
+  AnalyseController c,
+  String raw, {
+  required void Function(String) registerAndSet,
+  required void Function(String) setOnly,
+}) {
+  final t = _stripReportDash(raw);
+  if (t.isEmpty) return;
+  if (_structureChartTfLabels.contains(t)) {
+    setOnly(t);
+  } else {
+    registerAndSet(t);
+  }
 }
 
 void _applyTrendToController(AnalyseController c, String line) {
@@ -145,18 +163,6 @@ AnalyseContexteTendanceSnapshot _contexteSnapshotFromReportCopy(
   );
 }
 
-AnalyseStructureExtraLevel _extraFromReportLine(AnalyseReportStructureExtraLine line) {
-  final price = _stripReportDash(line.priceLabel);
-  AnalyseStructureTenue? tenue;
-  final state = line.tenueLabel?.trim().toLowerCase();
-  if (state == 'tenu' || state == 'held' || state == 'mantenido') {
-    tenue = AnalyseStructureTenue.tenu;
-  } else if (state == 'cassé' || state == 'casse' || state == 'broken' || state == 'roto') {
-    tenue = AnalyseStructureTenue.casse;
-  }
-  return AnalyseStructureExtraLevel(price: price, tenue: tenue);
-}
-
 String _structureTfFromReportValue(String raw) {
   final t = _stripReportDash(raw);
   if (t.isEmpty) return AnalyseStructureChartTf.h1.label;
@@ -172,16 +178,10 @@ AnalyseStructureSnapshot _structureSnapshotFromReportCopy(
     structureTenue: AnalyseStructureTenue.tenu,
     structureSupportMaj: _stripReportDash(copy.support),
     structureResistanceMaj: _stripReportDash(copy.resistance),
-    structureSupportTested: copy.structureSupportTested,
-    structureResistanceTested: copy.structureResistanceTested,
-    extraSupports: [
-      for (final e in copy.structureExtraSupports)
-        _extraFromReportLine(e),
-    ],
-    extraResistances: [
-      for (final e in copy.structureExtraResistances)
-        _extraFromReportLine(e),
-    ],
+    structureSupportTested: false,
+    structureResistanceTested: false,
+    extraSupports: const [],
+    extraResistances: const [],
   );
 }
 
@@ -226,13 +226,13 @@ void _applySmcMainFromReport(AnalyseController c, AnalyseReportSnapshot s) {
     c.smcTf = ob;
     c.smcZone = '';
   } else {
+    c.smcTf = AnalyseStructureChartTf.h1.label;
     c.smcZone = ob;
   }
   c.smcFvg = _stripReportDash(s.smcFvg);
   c.smcLiquidityPools = _stripReportDash(s.smcLiq);
   c.smcFibPrice = _stripReportDash(s.smcFibPrice);
-  final fib = _fibLevelFromOteLabel(s.smcFibOteLabel);
-  c.smcFibLevel = fib;
+  c.smcFibLevel = _fibLevelFromOteLabel(s.smcFibOteLabel);
   c.notesSmc = s.noteSmc;
 }
 
@@ -280,23 +280,22 @@ void applyAnalyseReportToController(
       _contexteSnapshotFromReportCopy(copy),
   ]);
 
-  c.structureTf = _structureTfFromReportValue(s.structureTf);
+  _applyChartTfLabel(
+    c,
+    s.structureTf,
+    registerAndSet: c.addStructureTfCustom,
+    setOnly: (v) => c.structureTf = v,
+  );
   c.structureDernierPoint = _stripReportDash(s.chartisme);
   c.structureSupportMaj = _stripReportDash(s.support);
   c.structureResistanceMaj = _stripReportDash(s.resistance);
-  c.structureSupportTested = s.structureSupportTested == true;
-  c.structureResistanceTested = s.structureResistanceTested == true;
+  c.structureSupportTested = false;
+  c.structureResistanceTested = false;
   while (c.extraSupports.isNotEmpty) {
     c.removeExtraSupport(c.extraSupports.length - 1);
   }
   while (c.extraResistances.isNotEmpty) {
     c.removeExtraResistance(c.extraResistances.length - 1);
-  }
-  for (final e in s.structureExtraSupports ?? const []) {
-    c.addExtraSupport(_extraFromReportLine(e));
-  }
-  for (final e in s.structureExtraResistances ?? const []) {
-    c.addExtraResistance(_extraFromReportLine(e));
   }
   c.notesStructure = s.noteStructure;
 
@@ -307,11 +306,19 @@ void applyAnalyseReportToController(
 
   final tools = _parseIndicateursToolNames(s.indicateursOutils);
   if (tools.isEmpty) {
-    c.replaceIndicatorsPaletteAndSetup(['RSI', 'MACD'], {'RSI', 'MACD'});
+    c.replaceIndicatorsPaletteAndSetup(
+      List<String>.from(kAnalyseDefaultEntrySignalLabels),
+      Set<String>.from(kAnalyseDefaultEntrySignalLabels),
+    );
   } else {
     c.replaceIndicatorsPaletteAndSetup(tools, tools.toSet());
   }
-  c.indicatorsTf = _structureTfFromReportValue(s.indicatorsTf);
+  _applyChartTfLabel(
+    c,
+    s.indicatorsTf,
+    registerAndSet: c.addIndicatorsTfCustom,
+    setOnly: (v) => c.indicatorsTf = v,
+  );
   while (c.indicatorExtraFields.isNotEmpty) {
     c.removeIndicatorExtraField(c.indicatorExtraFields.length - 1);
   }
@@ -324,6 +331,24 @@ void applyAnalyseReportToController(
   ]);
 
   _applySmcMainFromReport(c, s);
+  for (var i = c.smcZoneExtras.length - 1; i >= 0; i--) {
+    c.removeSmcZoneExtraAt(i);
+  }
+  for (final e in s.smcObExtras) {
+    c.addSmcZoneExtra(e);
+  }
+  for (var i = c.smcFvgExtras.length - 1; i >= 0; i--) {
+    c.removeSmcFvgExtraAt(i);
+  }
+  for (final e in s.smcFvgExtras) {
+    c.addSmcFvgExtra(e);
+  }
+  for (var i = c.smcLiquidityExtras.length - 1; i >= 0; i--) {
+    c.removeSmcLiquidityExtraAt(i);
+  }
+  for (final e in s.smcLiquidityExtras) {
+    c.addSmcLiquidityExtra(e);
+  }
   while (c.smcExtraFields.isNotEmpty) {
     c.removeSmcExtraFieldAt(c.smcExtraFields.length - 1);
   }
@@ -339,7 +364,12 @@ void applyAnalyseReportToController(
   c.notesVolumeProfile = s.noteVolume;
   final volTf = s.volumeProfileTf?.trim();
   if (volTf != null && volTf.isNotEmpty && volTf != '—' && volTf != '-') {
-    c.volumeProfileTf = volTf;
+    _applyChartTfLabel(
+      c,
+      volTf,
+      registerAndSet: c.addVolumeProfileTfCustom,
+      setOnly: (v) => c.volumeProfileTf = v,
+    );
   }
   c.volumeProfileZoneActive = s.volumeProfileZoneActive ?? false;
   c.volumeProfileZoneFrom = _stripReportDash(s.volumeProfileZoneFrom ?? '');

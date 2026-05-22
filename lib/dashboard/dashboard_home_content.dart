@@ -12,6 +12,7 @@ import 'dashboard_home_plan_logic.dart';
 import 'dashboard_home_layout_keys.dart';
 import 'dashboard_home_layout_scope.dart';
 import 'dashboard_home_strategie_teaser.dart';
+import 'dashboard_tokens.dart';
 import '../reglage/user_profile_scope.dart';
 import '../web/paychek_web_tokens.dart';
 import '../web/web_dashboard_capital_evolution_pair.dart';
@@ -251,7 +252,9 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     var needsGap = false;
 
     void addGap() {
-      if (needsGap) children.add(const SizedBox(height: 20));
+      if (needsGap) {
+        children.add(const SizedBox(height: 16));
+      }
       needsGap = true;
     }
 
@@ -262,7 +265,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
         addGap();
         children.add(_sectionForId(capId));
         if (showCheckAnalysePair) {
-          children.add(const SizedBox(height: 20));
+          children.add(const SizedBox(height: 16));
           children.add(
             _buildMobileAnalyseChecklistPair(
               hasAnalyse: hasAnalyse,
@@ -410,7 +413,10 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               if (hasCheck) {
                 return WebDashboardPairedCard(child: _sectionForId(checkId));
               }
-              return WebDashboardPairedCard(child: _sectionForId(analyseId));
+              return WebDashboardPairedCard(
+                bare: true,
+                child: _sectionForId(analyseId),
+              );
             },
           ),
         if (gapAfterCheckAnalyse) const SizedBox(height: 20),
@@ -570,8 +576,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
       bottom: false,
       child: SingleChildScrollView(
         padding: web
-            ? const EdgeInsets.fromLTRB(32, 32, 32, 32)
-            : const EdgeInsets.symmetric(horizontal: 24),
+            ? DashboardTokens.pageScrollPaddingWeb
+            : DashboardTokens.pageScrollPaddingMobile,
         child: ListenableBuilder(
           listenable: profileStore,
           builder: (context, _) {
@@ -608,7 +614,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                   onUpgradeTap:
                       showUpgrade ? widget.onHomeUpgradeTap : null,
                 ),
-                SizedBox(height: web ? 24 : 20),
+                SizedBox(
+                    height: web ? 24 : DashboardTokens.sectionGapMobile),
                 ListenableBuilder(
                   listenable: layoutStore,
                   builder: (context, _) {

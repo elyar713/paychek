@@ -9,6 +9,9 @@ import '../analyse/analyse_report_snapshot_codec.dart';
 import '../reglage/paychek_prefs_scope.dart';
 import '../reglage/user_portfolio_models.dart';
 import 'trade_journal_mindset_migration.dart';
+import 'trade_journal_plan_migration.dart';
+import 'trade_journal_strategie_migration.dart';
+import 'trade_journal_checklist_etat_migration.dart';
 import 'trade_models.dart';
 
 const _kBase = 'trade_journal_items_v1';
@@ -52,6 +55,10 @@ Map<String, dynamic> _encodeTrade(TradeListItem t) {
       TradeMindset.principe => 'principe',
     },
     'mindsetExplicit': t.mindsetExplicit,
+    'planLinkedExplicit': t.planLinkedExplicit,
+    'strategieLinkedExplicit': t.strategieLinkedExplicit,
+    'checklistLinkedExplicit': t.checklistLinkedExplicit,
+    'etatLinkedExplicit': t.etatLinkedExplicit,
     'strategieTitle': t.strategieTitle,
     'planReport': t.planReport == null
         ? null
@@ -181,6 +188,10 @@ TradeListItem? _decodeTrade(Map<String, dynamic> m) {
       etatPct: (m['etatPct'] as num?)?.toDouble() ?? 0,
       mindset: mindset,
       mindsetExplicit: mindsetExplicit,
+      planLinkedExplicit: m['planLinkedExplicit'] as bool? ?? false,
+      strategieLinkedExplicit: m['strategieLinkedExplicit'] as bool? ?? false,
+      checklistLinkedExplicit: m['checklistLinkedExplicit'] as bool? ?? false,
+      etatLinkedExplicit: m['etatLinkedExplicit'] as bool? ?? false,
       strategieTitle: m['strategieTitle'] as String? ?? '',
       planReport: planReport,
       linkedAnalyseReport: linkedAnalyseReport,
@@ -252,8 +263,15 @@ abstract final class TradeJournalStorage {
         final t = _decodeTrade(Map<String, dynamic>.from(e));
         if (t != null) out.add(t);
       }
-      final migrated = applyJournalMindsetTalentMigration(out);
-      if (journalMindsetMigrationWouldChange(out)) {
+      var migrated = applyJournalMindsetTalentMigration(out);
+      migrated = applyJournalPlanExplicitMigration(migrated);
+      migrated = applyJournalStrategieExplicitMigration(migrated);
+      migrated = applyJournalChecklistEtatExplicitMigration(migrated);
+      final needsSave = journalMindsetMigrationWouldChange(out) ||
+          journalPlanMigrationWouldChange(out) ||
+          journalStrategieMigrationWouldChange(out) ||
+          journalChecklistEtatMigrationWouldChange(out);
+      if (needsSave) {
         await save(migrated, firebaseUidOverride: firebaseUidOverride);
       }
       return migrated;

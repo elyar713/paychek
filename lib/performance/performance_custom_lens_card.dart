@@ -1,3 +1,5 @@
+import 'performance_tokens.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -17,23 +19,11 @@ import 'performance_custom_lens_plan.dart';
 import 'performance_locale_copy.dart';
 import 'performance_trade_model.dart';
 
-const Color kPerformanceLensGreen = Color(0xFF1eb48a);
+const Color kPerformanceLensGreen = PerformanceTokens.green;
 
-/// Cartes / sections — même famille que le dashboard sombre, avec léger relief.
-BoxDecoration performanceCustomLensSectionDecoration() {
-  return BoxDecoration(
-    color: Colors.black,
-    borderRadius: BorderRadius.circular(18),
-    border: Border.all(color: const Color(0xFF2A2A2A)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.5),
-        blurRadius: 28,
-        offset: const Offset(0, 12),
-      ),
-    ],
-  );
-}
+/// Cartes / sections — style OLED ([PerformanceTokens]).
+BoxDecoration performanceCustomLensSectionDecoration() =>
+    PerformanceTokens.sectionDecoration();
 
 /// Style du conteneur de [PerformanceCustomLensCard].
 enum PerformanceCustomLensCardChrome {
@@ -78,8 +68,14 @@ class PerformanceCustomLensCard extends StatelessWidget {
     final code = Localizations.localeOf(context).languageCode;
     final locale = Localizations.localeOf(context);
     final l = AppLocalizations.of(context)!;
-    String txt(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String tradesWord(int n) => performanceTradeWordPlural(code, n);
 
     String? strategieTitleHint;
@@ -171,12 +167,12 @@ class PerformanceCustomLensCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: active
                   ? kPerformanceLensGreen.withValues(alpha: 0.14)
-                  : const Color(0xFF0D0D0D),
+                  : PerformanceTokens.innerBgDeep,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: active
                     ? kPerformanceLensGreen.withValues(alpha: 0.55)
-                    : const Color(0xFF2A2A2A),
+                    : PerformanceTokens.cardBorder,
               ),
             ),
             child: Text(
@@ -187,7 +183,9 @@ class PerformanceCustomLensCard extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: active ? kPerformanceLensGreen : const Color(0xFFAAAAAA),
+                color: active
+                    ? kPerformanceLensGreen
+                    : PerformanceTokens.textSecondary,
                 height: 1.2,
               ),
             ),
@@ -202,9 +200,9 @@ class PerformanceCustomLensCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A0A0A),
+          color: PerformanceTokens.bg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFF2A2A2A)),
+          border: Border.all(color: PerformanceTokens.cardBorder),
         ),
         child: Row(
           children: [
@@ -221,7 +219,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFFAAAAAA),
+                  color: PerformanceTokens.textSecondary,
                 ),
               ),
             ),
@@ -254,8 +252,11 @@ class PerformanceCustomLensCard extends StatelessWidget {
             ),
             _performanceCustomLensThresholdStepBtn(
               icon: Icons.add,
-              onTap: firstShare >=
-                      100 - kCustomLensMinBandShare * (effectiveConfig.barCount - 1)
+              onTap:
+                  firstShare >=
+                      100 -
+                          kCustomLensMinBandShare *
+                              (effectiveConfig.barCount - 1)
                   ? null
                   : () {
                       applyConfig(
@@ -306,14 +307,14 @@ class PerformanceCustomLensCard extends StatelessWidget {
                       LucideIcons.slidersHorizontal,
                       readOnly
                           ? (elementTitle ??
-                              txt(
-                                'Analyse enregistrée',
-                                'Saved analysis',
-                                'Análisis guardado',
-                                'Gespeicherte Auswertung',
-                                'Análise guardada',
-                                '저장된 분석',
-                              ))
+                                txt(
+                                  'Analyse enregistrée',
+                                  'Saved analysis',
+                                  'Análisis guardado',
+                                  'Gespeicherte Auswertung',
+                                  'Análise guardada',
+                                  '저장된 분석',
+                                ))
                           : txt(
                               'Analyse personnalisée',
                               'Custom analysis',
@@ -333,7 +334,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFCCCCCC),
+                          color: PerformanceTokens.textBright,
                         ),
                       ),
                     ],
@@ -342,7 +343,14 @@ class PerformanceCustomLensCard extends StatelessWidget {
               ),
               if (!readOnly && onAdd != null) ...[
                 _performanceCustomLensHeaderBtn(
-                  label: txt('Ajouter', 'Add', 'Añadir', 'Hinzufügen', 'Adicionar', '추가'),
+                  label: txt(
+                    'Ajouter',
+                    'Add',
+                    'Añadir',
+                    'Hinzufügen',
+                    'Adicionar',
+                    '추가',
+                  ),
                   onTap: onAdd!,
                   filled: true,
                 ),
@@ -363,7 +371,14 @@ class PerformanceCustomLensCard extends StatelessWidget {
                 ),
               if (readOnly && onRemove != null)
                 _performanceCustomLensHeaderBtn(
-                  label: txt('Retirer', 'Remove', 'Quitar', 'Entfernen', 'Remover', '제거'),
+                  label: txt(
+                    'Retirer',
+                    'Remove',
+                    'Quitar',
+                    'Entfernen',
+                    'Remover',
+                    '제거',
+                  ),
                   onTap: onRemove!,
                   filled: false,
                 ),
@@ -382,7 +397,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 height: 1.45,
               ),
             ),
@@ -401,7 +416,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF666666),
+                color: PerformanceTokens.labelDim,
                 letterSpacing: 0.6,
               ),
             ),
@@ -410,22 +425,50 @@ class PerformanceCustomLensCard extends StatelessWidget {
               children: [
                 dimensionChip(
                   PerformanceCustomLensDimension.etat,
-                  txt('État mental', 'Mental state', 'Estado mental', 'Mental', 'Estado mental', '멘탈'),
+                  txt(
+                    'État mental',
+                    'Mental state',
+                    'Estado mental',
+                    'Mental',
+                    'Estado mental',
+                    '멘탈',
+                  ),
                 ),
                 const SizedBox(width: 6),
                 dimensionChip(
                   PerformanceCustomLensDimension.checklist,
-                  txt('Checklist', 'Checklist', 'Checklist', 'Checkliste', 'Checklist', '체크리스트'),
+                  txt(
+                    'Checklist',
+                    'Checklist',
+                    'Checklist',
+                    'Checkliste',
+                    'Checklist',
+                    '체크리스트',
+                  ),
                 ),
                 const SizedBox(width: 6),
                 dimensionChip(
                   PerformanceCustomLensDimension.plan,
-                  txt('Analyse', 'Analysis', 'Análisis', 'Analyse', 'Análise', '분석'),
+                  txt(
+                    'Analyse',
+                    'Analysis',
+                    'Análisis',
+                    'Analyse',
+                    'Análise',
+                    '분석',
+                  ),
                 ),
                 const SizedBox(width: 6),
                 dimensionChip(
                   PerformanceCustomLensDimension.strategie,
-                  txt('Stratégie', 'Strategy', 'Estrategia', 'Strategie', 'Estratégia', '전략'),
+                  txt(
+                    'Stratégie',
+                    'Strategy',
+                    'Estrategia',
+                    'Strategie',
+                    'Estratégia',
+                    '전략',
+                  ),
                 ),
               ],
             ),
@@ -442,7 +485,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF666666),
+                color: PerformanceTokens.labelDim,
                 letterSpacing: 0.6,
               ),
             ),
@@ -458,7 +501,8 @@ class PerformanceCustomLensCard extends StatelessWidget {
                 'Escolher um elemento',
                 '요소 선택',
               ),
-              onSelected: (id) => applyConfig(effectiveConfig.copyWith(elementId: id)),
+              onSelected: (id) =>
+                  applyConfig(effectiveConfig.copyWith(elementId: id)),
             ),
             const SizedBox(height: 16),
             Row(
@@ -475,12 +519,13 @@ class PerformanceCustomLensCard extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF666666),
+                    color: PerformanceTokens.labelDim,
                     letterSpacing: 0.6,
                   ),
                 ),
                 const Spacer(),
-                if (effectiveConfig.barCount < PerformanceCustomLensConfig.maxBars)
+                if (effectiveConfig.barCount <
+                    PerformanceCustomLensConfig.maxBars)
                   TextButton.icon(
                     onPressed: () {
                       applyConfig(
@@ -489,7 +534,11 @@ class PerformanceCustomLensCard extends StatelessWidget {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.add, size: 16, color: kPerformanceLensGreen),
+                    icon: const Icon(
+                      Icons.add,
+                      size: 16,
+                      color: kPerformanceLensGreen,
+                    ),
                     label: Text(
                       txt('Barre', 'Bar', 'Barra', 'Balken', 'Barra', '막대'),
                       style: GoogleFonts.plusJakartaSans(
@@ -499,7 +548,8 @@ class PerformanceCustomLensCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (effectiveConfig.barCount > PerformanceCustomLensConfig.minBars)
+                if (effectiveConfig.barCount >
+                    PerformanceCustomLensConfig.minBars)
                   TextButton(
                     onPressed: () {
                       applyConfig(
@@ -509,10 +559,17 @@ class PerformanceCustomLensCard extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      txt('Retirer', 'Remove', 'Quitar', 'Entfernen', 'Remover', '제거'),
+                      txt(
+                        'Retirer',
+                        'Remove',
+                        'Quitar',
+                        'Entfernen',
+                        'Remover',
+                        '제거',
+                      ),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
-                        color: const Color(0xFF888888),
+                        color: PerformanceTokens.labelMuted,
                       ),
                     ),
                   ),
@@ -532,7 +589,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
-                color: const Color(0xFF666666),
+                color: PerformanceTokens.labelDim,
                 height: 1.4,
               ),
             ),
@@ -548,7 +605,10 @@ class PerformanceCustomLensCard extends StatelessWidget {
                 'Selecione um elemento.',
                 '요소를 선택하세요.',
               ),
-              style: GoogleFonts.plusJakartaSans(fontSize: 12, color: const Color(0xFFAAAAAA)),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                color: PerformanceTokens.textSecondary,
+              ),
             )
           else if (effectiveConfig.elementId.isNotEmpty)
             for (var i = 0; i < bands.length; i++)
@@ -566,7 +626,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
 Widget _performanceCustomLensCardTitle(
   IconData icon,
   String title, {
-  Color titleColor = const Color(0xFF9A9A9A),
+  Color titleColor = PerformanceTokens.textSecondary,
 }) {
   return Row(
     children: [
@@ -593,7 +653,9 @@ Widget _performanceCustomLensHeaderBtn({
   required bool filled,
 }) {
   return Material(
-    color: filled ? kPerformanceLensGreen.withValues(alpha: 0.18) : Colors.transparent,
+    color: filled
+        ? kPerformanceLensGreen.withValues(alpha: 0.18)
+        : Colors.transparent,
     borderRadius: BorderRadius.circular(8),
     child: InkWell(
       onTap: onTap,
@@ -603,7 +665,9 @@ Widget _performanceCustomLensHeaderBtn({
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: filled ? kPerformanceLensGreen.withValues(alpha: 0.55) : const Color(0xFF3A3A3A),
+            color: filled
+                ? kPerformanceLensGreen.withValues(alpha: 0.55)
+                : PerformanceTokens.chipBorderInactive,
           ),
         ),
         child: Text(
@@ -611,7 +675,9 @@ Widget _performanceCustomLensHeaderBtn({
           style: GoogleFonts.plusJakartaSans(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: filled ? kPerformanceLensGreen : const Color(0xFFAAAAAA),
+            color: filled
+                ? kPerformanceLensGreen
+                : PerformanceTokens.textSecondary,
           ),
         ),
       ),
@@ -624,8 +690,10 @@ Widget _performanceCustomLensThresholdStepBtn({
   required VoidCallback? onTap,
 }) {
   return Material(
-    color: const Color(0xFF141414),
-    shape: const CircleBorder(side: BorderSide(color: Color(0xFF2A2A2A))),
+    color: PerformanceTokens.innerBg,
+    shape: const CircleBorder(
+      side: BorderSide(color: PerformanceTokens.cardBorder),
+    ),
     child: InkWell(
       onTap: onTap,
       customBorder: const CircleBorder(),
@@ -634,7 +702,7 @@ Widget _performanceCustomLensThresholdStepBtn({
         child: Icon(
           icon,
           size: 14,
-          color: onTap == null ? const Color(0xFF444444) : Colors.white70,
+          color: onTap == null ? PerformanceTokens.labelFaint : Colors.white70,
         ),
       ),
     ),
@@ -673,15 +741,20 @@ Widget _performanceCustomLensBandRow({
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                color: has ? barTint : const Color(0xFF666666),
+                color: has ? barTint : PerformanceTokens.labelDim,
               ),
             ),
           ],
         ),
         const SizedBox(height: 4),
         Text(
-          has ? '${band.tradeCount} ${tradesWord(band.tradeCount)}' : '0 ${tradesWord(0)}',
-          style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFF777777)),
+          has
+              ? '${band.tradeCount} ${tradesWord(band.tradeCount)}'
+              : '0 ${tradesWord(0)}',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 10,
+            color: PerformanceTokens.labelMuted,
+          ),
         ),
         const SizedBox(height: 6),
         _performanceCustomLensRoundedHistogramBar(
@@ -724,9 +797,9 @@ Widget _performanceCustomLensRoundedHistogramBar({
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xFF0A0A0A),
+                color: PerformanceTokens.bg,
                 borderRadius: BorderRadius.circular(r),
-                border: Border.all(color: const Color(0xFF2A2A2A)),
+                border: Border.all(color: PerformanceTokens.cardBorder),
               ),
               child: SizedBox(width: w, height: height),
             ),
@@ -773,7 +846,10 @@ class _PerformanceCustomLensElementField extends StatelessWidget {
       final overlay = overlayState.context.findRenderObject();
       if (overlay is! RenderBox) return;
 
-      final topLeft = renderObject.localToGlobal(Offset.zero, ancestor: overlay);
+      final topLeft = renderObject.localToGlobal(
+        Offset.zero,
+        ancestor: overlay,
+      );
       final bottomRight = renderObject.localToGlobal(
         renderObject.size.bottomRight(Offset.zero),
         ancestor: overlay,
@@ -861,7 +937,9 @@ class _PerformanceCustomLensElementField extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
-                      fontWeight: label != null ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: label != null
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: label != null
                           ? DashboardTokens.onMatteEmphasis
                           : DashboardTokens.labelGrey,

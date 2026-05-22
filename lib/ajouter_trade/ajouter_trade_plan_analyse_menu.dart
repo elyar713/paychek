@@ -124,7 +124,8 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
   }
 
   void _notifyReportsLoaded() {
-    widget.onReportsLoaded?.call(_reports, _currentSnapshot);
+    // Ne pas imposer le démo GOLD : le parent choisit via le stockage Mon Analyse.
+    widget.onReportsLoaded?.call(_reports, widget.selectedSnapshot);
   }
 
   AnalyseReportSnapshot? get _currentSnapshot {

@@ -455,14 +455,14 @@ Future<Uint8List> buildTradePdf(
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelChecklist),
-                          discipline.checklistPct,
+                          discipline.checklistPct ?? 0,
                         ),
                       ),
                       pw.SizedBox(width: 12),
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelPlan),
-                          discipline.planPct,
+                          discipline.planPct ?? 0,
                         ),
                       ),
                     ],
@@ -473,14 +473,14 @@ Future<Uint8List> buildTradePdf(
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelStrategie),
-                          discipline.strategiePct,
+                          discipline.strategiePct ?? 0,
                         ),
                       ),
                       pw.SizedBox(width: 12),
                       pw.Expanded(
                         child: _pctBar(
                           _t(l.tradeLabelEtat),
-                          discipline.etatPct,
+                          discipline.etatPct ?? 0,
                         ),
                       ),
                     ],

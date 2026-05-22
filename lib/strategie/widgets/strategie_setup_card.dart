@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../analyse/analyse_tokens.dart';
 import '../strategie_tokens.dart';
 import 'strategie_setup_rule_styles.dart';
 import 'strategie_setup_tag_format.dart';
@@ -123,8 +124,8 @@ class StrategieSetupCard extends StatelessWidget {
   final bool isDashboardStarred;
   final VoidCallback? onToggleDashboardStar;
 
-  static const Color _starActive = Color(0xFFE6C35C);
-  static const Color _webRuleHeadingGold = Color(0xFFE6C35C);
+  static const Color _starActive = StrategieTokens.horairesGold;
+  static const Color _webRuleHeadingGold = AnalyseTokens.zinc400;
 
   @override
   Widget build(BuildContext context) {
@@ -220,10 +221,11 @@ class StrategieSetupCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(webDashboardPreview ? 14 : 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF0A0A0A),
+              color: AnalyseTokens.inputBgDeep,
               borderRadius: BorderRadius.circular(
                 webDashboardPreview ? 10 : StrategieTokens.radiusMd,
               ),
+              border: Border.all(color: AnalyseTokens.cardBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

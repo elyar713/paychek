@@ -6,6 +6,7 @@ import '../analyse/analyse_reports_storage.dart';
 import '../checklist/checklist_page_controller.dart';
 import '../etat_mental/mental_state_controller.dart';
 import 'trade_models.dart';
+import 'trade_plan_analysis.dart';
 
 /// % discipline dérivés des anneaux / scores du **jour d’entrée** du trade.
 @immutable
@@ -13,13 +14,15 @@ class TradeDisciplineDaySnapshot {
   const TradeDisciplineDaySnapshot({
     required this.checklistPct,
     required this.etatPct,
-    required this.planPct,
+    this.planPct,
     this.planReport,
   });
 
   final double checklistPct;
   final double etatPct;
-  final double planPct;
+
+  /// `null` si aucun rapport Mon Analyse n’est lié au trade.
+  final double? planPct;
   final AnalyseReportSnapshot? planReport;
 }
 
@@ -50,7 +53,6 @@ TradeDisciplineDaySnapshot resolveTradeDisciplineForEntryDay({
   required ChecklistPageController checklist,
   List<AnalyseReportSnapshot> storedReports = const [],
   AnalyseReportSnapshot? planReport,
-  String? importedPair,
 }) {
   final day = tradeEntryDateOnly(entryAt);
   final checklistRaw = checklist.completionPercentForCalendarDay(
@@ -64,15 +66,13 @@ TradeDisciplineDaySnapshot resolveTradeDisciplineForEntryDay({
   final historical = mental.overallScoreForCalendarDay(day);
   final etatPct = (historical ?? mental.overallScore).toDouble().clamp(0.0, 100.0);
 
-  final planSel = planReport ??
-      (importedPair != null
-          ? planReportForImportedSymbol(importedPair, storedReports)
-          : null) ??
-      pickStoredAnalyseReportDefaultPreferGold(storedReports);
-  final planPct = resolvePlanGlobalConfidencePercent(
-    planSel,
-    storedReports,
-  ).toDouble().clamp(0.0, 100.0);
+  final planSel = planReport;
+  final double? planPct = planSel == null
+      ? null
+      : resolvePlanGlobalConfidencePercent(
+          planSel,
+          storedReports,
+        ).toDouble().clamp(0.0, 100.0);
 
   final freshPlan = planSel == null
       ? null
@@ -89,17 +89,17 @@ TradeDisciplineDaySnapshot resolveTradeDisciplineForEntryDay({
 /// % discipline affichés (PDF, cartes) — anneaux jour + confiance analyse ; stratégie = journal.
 class TradeDisciplineDisplay {
   const TradeDisciplineDisplay({
-    required this.checklistPct,
-    required this.planPct,
-    required this.etatPct,
-    required this.strategiePct,
+    this.checklistPct,
+    this.planPct,
+    this.etatPct,
+    this.strategiePct,
     this.planReport,
   });
 
-  final double checklistPct;
-  final double planPct;
-  final double etatPct;
-  final double strategiePct;
+  final double? checklistPct;
+  final double? planPct;
+  final double? etatPct;
+  final double? strategiePct;
   final AnalyseReportSnapshot? planReport;
 }
 
@@ -108,19 +108,20 @@ TradeDisciplineDisplay resolveTradeDisciplineDisplay({
   required ChecklistPageController checklist,
   List<AnalyseReportSnapshot> storedReports = const [],
 }) {
+  final explicitPlan = trade.linkedAnalyseReport ??
+      (trade.planLinkedExplicit ? trade.planReport : null);
   final snap = resolveTradeDisciplineForEntryDay(
     entryAt: trade.entreeAt,
     checklist: checklist,
     storedReports: storedReports,
-    planReport: trade.planReport,
-    importedPair: trade.pair,
+    planReport: explicitPlan,
   );
   return TradeDisciplineDisplay(
-    checklistPct: snap.checklistPct,
+    checklistPct: tradeHasExplicitChecklist(trade) ? trade.checklistPct : null,
     planPct: snap.planPct,
-    etatPct: snap.etatPct,
-    strategiePct: trade.strategiePct,
-    planReport: snap.planReport ?? trade.planReport,
+    etatPct: tradeHasExplicitEtat(trade) ? trade.etatPct : null,
+    strategiePct: trade.strategieLinkedExplicit ? trade.strategiePct : null,
+    planReport: snap.planReport ?? explicitPlan,
   );
 }
 
@@ -149,10 +150,10 @@ TradeDisciplineDisplay resolveTradeDisciplineDisplay({
       ),
   ];
   return (
-    checklist: avg(displays.map((d) => d.checklistPct)),
-    plan: avg(displays.map((d) => d.planPct)),
-    strategie: avg(displays.map((d) => d.strategiePct)),
-    etat: avg(displays.map((d) => d.etatPct)),
+    checklist: avg(displays.map((d) => d.checklistPct).whereType<double>()),
+    plan: avg(displays.map((d) => d.planPct).whereType<double>()),
+    strategie: avg(displays.map((d) => d.strategiePct).whereType<double>()),
+    etat: avg(displays.map((d) => d.etatPct).whereType<double>()),
   );
 }
 

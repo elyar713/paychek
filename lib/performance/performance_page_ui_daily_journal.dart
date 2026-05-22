@@ -3,12 +3,19 @@ part of 'performance_page.dart';
 extension _PerformancePageUiDailyJournal on _PerformancePageState {
   Widget _cardDailyJournalVolume(List<DailyJournalVolumeBucketStat> stats) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String tradeWord(int n) => performanceTradeWordPlural(code, n);
     String dayWord(int n) => performanceDayWordPlural(code, n);
     // Tiret ASCII : le « — » (U+2014) peut manquer au sous-ensemble web de Plus Jakarta Sans (carré / tofu).
-    String wrLabel(double wr, int n) => n > 0 ? '${(wr * 100).round()}% WR' : '-';
+    String wrLabel(double wr, int n) =>
+        n > 0 ? '${(wr * 100).round()}% WR' : '-';
 
     return _dashCard(
       child: Column(
@@ -16,7 +23,14 @@ extension _PerformancePageUiDailyJournal on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.calendarDays,
-            t('Journée & volume', 'Day & volume', 'Día y volumen', 'Tag & Volumen', 'Dia e volume', '일·거래량'),
+            t(
+              'Journée & volume',
+              'Day & volume',
+              'Día y volumen',
+              'Tag & Volumen',
+              'Dia e volume',
+              '일·거래량',
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -30,7 +44,7 @@ extension _PerformancePageUiDailyJournal on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.45,
             ),
           ),
@@ -43,7 +57,7 @@ extension _PerformancePageUiDailyJournal on _PerformancePageState {
               i == 0 ? _kGreen : (i == 1 ? Colors.white : _kRed),
               sub: stats[i].tradeCount > 0
                   ? '${stats[i].tradeCount} ${tradeWord(stats[i].tradeCount)} · '
-                      '${stats[i].dayCount} ${dayWord(stats[i].dayCount)}'
+                        '${stats[i].dayCount} ${dayWord(stats[i].dayCount)}'
                   : null,
             ),
         ],

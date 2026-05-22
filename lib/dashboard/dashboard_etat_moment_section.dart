@@ -11,9 +11,11 @@ import '../etat_mental/widgets/mental_state_inline_editable_name.dart';
 import '../etat_mental/widgets/mental_state_moment_section.dart';
 import '../etat_mental/widgets/mental_state_sentiment_card.dart';
 import '../reglage/lite_freemium_page_lock.dart';
+import '../analyse/analyse_tokens.dart';
 import '../web/paychek_web_tokens.dart';
 import '../web/web_dashboard_config.dart';
 import 'dashboard_tokens.dart';
+import 'widgets/dashboard_section_shell.dart';
 
 /// Section sous **Mon Analyse** : grille des curseurs (mÃªme rendu que la page Ã‰tat mental).
 /// En-tÃªte **au-dessus** de la carte, comme [DashboardAnalyseShortcut] ; pas de 100 % / + / Ã©dition : **>** vers la page complÃ¨te.
@@ -208,8 +210,9 @@ class _DashboardEtatMomentSectionState extends State<DashboardEtatMomentSection>
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF141414),
+                        color: AnalyseTokens.inputBg,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AnalyseTokens.cardBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -239,70 +242,66 @@ class _DashboardEtatMomentSectionState extends State<DashboardEtatMomentSection>
           );
         }
 
-        return ColoredBox(
-          color: widget.cardBackgroundColor ?? DashboardTokens.scaffoldMatte,
-          child: Padding(
-            padding: widget.contentPadding ??
-                const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.activity,
-                      size: 18,
-                      color: ChecklistTokens.sectionTitleOnCardStyle.color,
+        return DashboardSectionShell(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.activity,
+                    size: 18,
+                    color: ChecklistTokens.sectionTitleOnCardStyle.color,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l.dashboardMyStateSection,
+                      style: _momentTitleStyle,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l.dashboardMyStateSection,
-                        style: _momentTitleStyle,
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: widget.onOpenEtatMental,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(
-                            Icons.chevron_right_rounded,
-                            size: 24,
-                            color: ChecklistTokens.sectionTitleOnCardStyle.color,
-                          ),
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: widget.onOpenEtatMental,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          size: 24,
+                          color: ChecklistTokens.sectionTitleOnCardStyle.color,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
-                LiteFreemiumInteractionBarrier(
-                  locked: widget.liteInteractionLocked,
-                  onLockedInteraction: () =>
-                      widget.onLiteInteractionLockedTap?.call(),
-                  child: RepaintBoundary(
-                    child: MentalStateSentimentCard(
-                      padding: const EdgeInsets.all(20),
-                      child: MentalStateMomentSection(
-                        controller: c,
-                        titleStyle: _momentTitleStyle,
-                        editMoment: false,
-                        onToggleEditMoment: () {},
-                        keyForMetricRow: _keyForMetricRow,
-                        compactForDashboard: true,
-                        wrapGap: null,
-                        thinMetricBars: false,
-                      ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
+              LiteFreemiumInteractionBarrier(
+                locked: widget.liteInteractionLocked,
+                onLockedInteraction: () =>
+                    widget.onLiteInteractionLockedTap?.call(),
+                child: RepaintBoundary(
+                  child: MentalStateSentimentCard(
+                    borderless: true,
+                    padding: EdgeInsets.zero,
+                    child: MentalStateMomentSection(
+                      controller: c,
+                      titleStyle: _momentTitleStyle,
+                      editMoment: false,
+                      onToggleEditMoment: () {},
+                      keyForMetricRow: _keyForMetricRow,
+                      compactForDashboard: true,
+                      wrapGap: null,
+                      thinMetricBars: false,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

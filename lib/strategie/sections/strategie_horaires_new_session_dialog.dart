@@ -48,8 +48,6 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
   /// Roues heure/minute ouvertes sous **DÃ‰BUT** ou **FIN** (`null` = fermÃ©).
   _TimePick? _openTimePick;
 
-  static const _labelColor = Color(0xFF888888);
-
   bool get _editing => widget.initial != null;
 
   @override
@@ -74,21 +72,21 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
         fontSize: 10,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.9,
-        color: _labelColor,
+        color: StrategieTokens.labelMuted,
       );
 
   InputDecoration _fieldDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
       hintStyle: GoogleFonts.plusJakartaSans(
-        color: const Color(0xFF666666),
+        color: StrategieTokens.titleGrey,
         fontSize: 13,
       ),
       filled: true,
-      fillColor: const Color(0xFF111111),
+      fillColor: StrategieTokens.fieldFill,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF222222)),
+        borderSide: const BorderSide(color: StrategieTokens.fieldBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -165,8 +163,9 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF111111),
+                color: StrategieTokens.fieldFill,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: StrategieTokens.fieldBorder),
               ),
               child: Row(
                 children: [
@@ -220,10 +219,10 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     return Dialog(
-      backgroundColor: const Color(0xFF0a0a0a),
+      backgroundColor: StrategieTokens.dialogBg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF222222)),
+        side: const BorderSide(color: StrategieTokens.fieldBorder),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: kIsWeb ? 360 : 320),
@@ -268,7 +267,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                       icon: const Icon(
                         LucideIcons.x,
                         size: 20,
-                        color: Color(0xFF555555),
+                        color: StrategieTokens.labelMuted,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -306,8 +305,9 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF111111),
+                    color: StrategieTokens.fieldFill,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: StrategieTokens.fieldBorder),
                   ),
                   child: Row(
                     children: [
@@ -315,7 +315,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                         child: Material(
                           color: !_noTradeZone
                               ? StrategieTokens.emerald
-                              : const Color(0xFF111111),
+                              : StrategieTokens.fieldFill,
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
                             onTap: () => setState(() => _noTradeZone = false),
@@ -330,7 +330,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                                     fontWeight: FontWeight.w700,
                                     color: !_noTradeZone
                                         ? Colors.black
-                                        : const Color(0xFF666666),
+                                        : StrategieTokens.titleGrey,
                                   ),
                                 ),
                               ),
@@ -343,7 +343,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                         child: Material(
                           color: _noTradeZone
                               ? StrategieTokens.riskRed
-                              : const Color(0xFF111111),
+                              : StrategieTokens.fieldFill,
                           borderRadius: BorderRadius.circular(10),
                           child: InkWell(
                             onTap: () => setState(() => _noTradeZone = true),
@@ -358,7 +358,7 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                                     fontWeight: FontWeight.w700,
                                     color: _noTradeZone
                                         ? Colors.black
-                                        : const Color(0xFF666666),
+                                        : StrategieTokens.titleGrey,
                                   ),
                                 ),
                               ),
@@ -376,8 +376,8 @@ class _StrategieNewSessionDialogState extends State<_StrategieNewSessionDialog> 
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF888888),
-                          side: const BorderSide(color: Color(0xFF333333)),
+                          foregroundColor: StrategieTokens.labelMuted,
+                          side: const BorderSide(color: StrategieTokens.fieldBorder),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

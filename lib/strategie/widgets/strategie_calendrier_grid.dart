@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../calendrier/calendrier_constants.dart';
 import '../../calendrier/calendrier_utils.dart';
 import '../../trade/trade_models.dart';
+import '../../trade/trade_plan_analysis.dart';
 import '../strategie_calendrier_marks.dart' show buildStrategieCalendrierMarksForDay;
 import 'strategie_calendrier_day_cell.dart';
 
@@ -60,9 +61,8 @@ class StrategieCalendrierGrid extends StatelessWidget {
     for (final t in journalTrades) {
       final d = DateTime(t.entreeAt.year, t.entreeAt.month, t.entreeAt.day);
       final dk = dayKey(d);
-      final v = t.strategiePct;
-      // strategiePct est toujours défini dans TradeListItem, mais on garde un garde-fou.
-      if (v.isNaN || v.isInfinite) continue;
+      final v = tradeEffectiveStrategiePct(t);
+      if (v == null || v.isNaN || v.isInfinite) continue;
       sum[dk] = (sum[dk] ?? 0) + v;
       n[dk] = (n[dk] ?? 0) + 1;
     }

@@ -75,7 +75,7 @@ class _StrategieHorairesSessionsSectionState
     return [
       _SessionItem(
         icon: LucideIcons.sunrise,
-        iconBg: const Color(0xFF0D2A22),
+        iconBg: StrategieTokens.sessionTradeIconBg,
         iconColor: StrategieTokens.emerald,
         title: defaults[0].titre,
         subtitle: defaults[0].sousTitre,
@@ -87,7 +87,7 @@ class _StrategieHorairesSessionsSectionState
       ),
       _SessionItem(
         icon: LucideIcons.sun,
-        iconBg: const Color(0xFF0D2A22),
+        iconBg: StrategieTokens.sessionTradeIconBg,
         iconColor: StrategieTokens.emerald,
         title: defaults[1].titre,
         subtitle: defaults[1].sousTitre,
@@ -99,8 +99,8 @@ class _StrategieHorairesSessionsSectionState
       ),
       _SessionItem(
         icon: LucideIcons.moon,
-        iconBg: const Color(0xFF2A1515),
-        iconColor: const Color(0xFFE57373),
+        iconBg: StrategieTokens.sessionNoTradeIconBg,
+        iconColor: StrategieTokens.sessionNoTradeIconFg,
         title: defaults[2].titre,
         subtitle: defaults[2].sousTitre,
         time: defaults[2].creneau,
@@ -356,8 +356,11 @@ class _StrategieHorairesSessionsSectionState
     final noTrade = r.isNoTradeZone;
     return _SessionItem(
       icon: noTrade ? LucideIcons.moon : (preferredTradeIcon ?? LucideIcons.sunrise),
-      iconBg: noTrade ? const Color(0xFF2A1515) : const Color(0xFF0D2A22),
-      iconColor: noTrade ? const Color(0xFFE57373) : StrategieTokens.emerald,
+      iconBg: noTrade
+          ? StrategieTokens.sessionNoTradeIconBg
+          : StrategieTokens.sessionTradeIconBg,
+      iconColor:
+          noTrade ? StrategieTokens.sessionNoTradeIconFg : StrategieTokens.emerald,
       title: r.title,
       subtitle: r.description,
       time: _formatSessionTimeRange(r.startTime, r.endTime),

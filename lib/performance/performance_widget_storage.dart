@@ -29,7 +29,11 @@ class PerformanceWidgetStorage {
     final c = p.getInt(_kChart);
     final at = p.getInt(_kAt) ?? 0;
     if (m == null || c == null) return null;
-    final w = SavedPerformanceWidget(metricIndex: m, chartTypeIndex: c, savedAtMillis: at);
+    final w = SavedPerformanceWidget(
+      metricIndex: m,
+      chartTypeIndex: c,
+      savedAtMillis: at,
+    );
     return w.isValid ? w : null;
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Checklist « Nouveau Trade » : fond noir, cartes **noir** (à peine relevé).
+import '../analyse/analyse_tokens.dart';
+
+/// Checklist : palette OLED alignée sur [AnalyseTokens].
 class ChecklistTokens {
   ChecklistTokens._();
 
@@ -27,12 +29,12 @@ class ChecklistTokens {
     height: 1.4,
   );
 
-  /// Titres de section (ex. « GESTION DE RISQUE ») : bronze **atténué** (moins jaune que l’ancien doré).
+  /// Titres de section — même rendu que [AnalyseTokens.oledSectionLabel].
   static const sectionTitleOnCardStyle = TextStyle(
-    fontSize: 9.5,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0.55,
-    color: Color(0xFF8A8278),
+    fontSize: 10,
+    fontWeight: FontWeight.w800,
+    letterSpacing: 1.4,
+    color: AnalyseTokens.zinc400,
     height: 1.2,
   );
 
@@ -52,16 +54,13 @@ class ChecklistTokens {
     height: 1.35,
   );
 
-  /// Fond de section : noir quasiment pur, très subtil contraste.
-  static const cardBg = Color(0xFF080808);
+  static const cardBg = AnalyseTokens.cardBg;
+  static const sectionCardBorder = AnalyseTokens.cardBorder;
+  static const sectionCardBorderWidth = 1.0;
 
-  /// Contour (lisible sur noir quasi pur).
-  static const sectionCardBorder = Color(0xFF3A3A3A);
-  static const sectionCardBorderWidth = 0.75;
+  static const dividerOnCard = AnalyseTokens.cardBorder;
 
-  static const dividerOnCard = Color(0xFF1A1A1A);
-
-  static const pillBg = Color(0xFF141414);
+  static const pillBg = AnalyseTokens.inputBg;
   static const pillText = Color(0xFFA8A8A8);
 
   static const cardRadius = 14.0;

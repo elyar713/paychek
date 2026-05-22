@@ -92,11 +92,81 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
     notifyListeners();
   }
 
+  final List<String> _smcZoneExtras = <String>[];
+  final List<String> _smcFvgExtras = <String>[];
+  final List<String> _smcLiquidityExtras = <String>[];
+
+  List<String> get smcZoneExtras => List.unmodifiable(_smcZoneExtras);
+  List<String> get smcFvgExtras => List.unmodifiable(_smcFvgExtras);
+  List<String> get smcLiquidityExtras => List.unmodifiable(_smcLiquidityExtras);
+
+  void addSmcZoneExtra(String raw) {
+    _smcZoneExtras.add(raw);
+    notifyListeners();
+  }
+
+  void setSmcZoneExtraAt(int index, String value) {
+    if (index < 0 || index >= _smcZoneExtras.length) return;
+    _smcZoneExtras[index] = value;
+    notifyListeners();
+  }
+
+  void removeSmcZoneExtraAt(int index) {
+    if (index < 0 || index >= _smcZoneExtras.length) return;
+    _smcZoneExtras.removeAt(index);
+    notifyListeners();
+  }
+
+  void addSmcFvgExtra(String raw) {
+    _smcFvgExtras.add(raw);
+    notifyListeners();
+  }
+
+  void setSmcFvgExtraAt(int index, String value) {
+    if (index < 0 || index >= _smcFvgExtras.length) return;
+    _smcFvgExtras[index] = value;
+    notifyListeners();
+  }
+
+  void removeSmcFvgExtraAt(int index) {
+    if (index < 0 || index >= _smcFvgExtras.length) return;
+    _smcFvgExtras.removeAt(index);
+    notifyListeners();
+  }
+
+  void addSmcLiquidityExtra(String raw) {
+    _smcLiquidityExtras.add(raw);
+    notifyListeners();
+  }
+
+  void setSmcLiquidityExtraAt(int index, String value) {
+    if (index < 0 || index >= _smcLiquidityExtras.length) return;
+    _smcLiquidityExtras[index] = value;
+    notifyListeners();
+  }
+
+  void removeSmcLiquidityExtraAt(int index) {
+    if (index < 0 || index >= _smcLiquidityExtras.length) return;
+    _smcLiquidityExtras.removeAt(index);
+    notifyListeners();
+  }
+
+  List<String> _smcMergedExtraFields() => [
+        for (final e in _smcZoneExtras)
+          if (e.trim().isNotEmpty) 'OB: ${e.trim()}',
+        for (final e in _smcFvgExtras)
+          if (e.trim().isNotEmpty) 'FVG: ${e.trim()}',
+        for (final e in _smcLiquidityExtras)
+          if (e.trim().isNotEmpty) 'LIQ: ${e.trim()}',
+        ..._smcExtraFields,
+      ];
+
   bool _smcEnabled = true;
   bool get smcEnabled => _smcEnabled;
   set smcEnabled(bool v) {
     if (v == _smcEnabled) return;
     _smcEnabled = v;
+    rebalanceAnalyseSectionImpacts();
     notifyListeners();
   }
 
@@ -122,7 +192,7 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
         smcFibLevel: _smcFibLevel,
         smcFibPrice: _smcFibPrice,
         notesSmc: _notesSmc,
-        extraFields: List<String>.from(_smcExtraFields),
+        extraFields: _smcMergedExtraFields(),
       ),
     );
     notifyListeners();
@@ -345,6 +415,9 @@ mixin AnalyseControllerStructureSmcIndicators on AnalyseControllerStructureIndic
     _smcTf = AnalyseStructureChartTf.h1.label;
     _notesSmc = '';
     _smcExtraFields.clear();
+    _smcZoneExtras.clear();
+    _smcFvgExtras.clear();
+    _smcLiquidityExtras.clear();
     _volumeProfilePoc = '';
     _volumeProfileVah = '';
     _volumeProfileVal = '';

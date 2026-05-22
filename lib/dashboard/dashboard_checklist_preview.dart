@@ -14,6 +14,7 @@ import '../checklist/widgets/checklist_item_row.dart';
 import '../checklist/widgets/checklist_schedule_calendar_button.dart';
 import '../web/paychek_web_tokens.dart';
 import 'dashboard_tokens.dart';
+import 'widgets/dashboard_section_shell.dart';
 
 typedef _DashboardChecklistPreviewEntry = ({
   String sectionId,
@@ -22,7 +23,7 @@ typedef _DashboardChecklistPreviewEntry = ({
 
 /// Limite **mobile / desktop app** : fenêtre glissante sur les lignes non cochées (file globale).
 /// Sur **web**, l’aperçu affiche toutes les lignes non cochées (pas de limite).
-const int _kDashboardChecklistPreviewMaxUncheckedRowsMobile = 3;
+const int _kDashboardChecklistPreviewMaxUncheckedRowsMobile = 4;
 
 /// Aperçu accueil : hors web, les lignes cochées disparaissent et au plus
 /// [_kDashboardChecklistPreviewMaxUncheckedRowsMobile] lignes non cochées.
@@ -244,42 +245,38 @@ class DashboardChecklistPreview extends StatelessWidget {
             );
           }
 
-          return ColoredBox(
-            color: bg,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.fact_check_outlined,
-                    size: 18,
-                    color: ChecklistTokens.sectionTitleOnCardStyle.color,
+          return DashboardSectionShell(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.fact_check_outlined,
+                  size: 18,
+                  color: ChecklistTokens.sectionTitleOnCardStyle.color,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l.dashboardChecklistHeading,
+                    style: ChecklistTokens.sectionTitleOnCardStyle,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l.dashboardChecklistHeading,
-                      style: ChecklistTokens.sectionTitleOnCardStyle,
-                    ),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: headerTap,
-                      borderRadius: BorderRadius.circular(20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          size: 24,
-                          color: ChecklistTokens.sectionTitleOnCardStyle.color,
-                        ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: headerTap,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        size: 24,
+                        color: ChecklistTokens.sectionTitleOnCardStyle.color,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
@@ -350,59 +347,55 @@ class DashboardChecklistPreview extends StatelessWidget {
             );
           }
 
-          return ColoredBox(
-            color: bg,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.fact_check_outlined,
-                        size: 18,
-                        color: ChecklistTokens.sectionTitleOnCardStyle.color,
+          return DashboardSectionShell(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.fact_check_outlined,
+                      size: 18,
+                      color: ChecklistTokens.sectionTitleOnCardStyle.color,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l.dashboardChecklistHeading,
+                        style: ChecklistTokens.sectionTitleOnCardStyle,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          l.dashboardChecklistHeading,
-                          style: ChecklistTokens.sectionTitleOnCardStyle,
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: headerTap,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Padding(
-                            padding: const EdgeInsets.all(6),
-                            child: Icon(
-                              Icons.chevron_right_rounded,
-                              size: 24,
-                              color:
-                                  ChecklistTokens.sectionTitleOnCardStyle.color,
-                            ),
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: headerTap,
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Icon(
+                            Icons.chevron_right_rounded,
+                            size: 24,
+                            color:
+                                ChecklistTokens.sectionTitleOnCardStyle.color,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l.dashboardChecklistAllDoneBravo,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 1.35,
-                      color: DashboardTokens.labelGrey.withValues(alpha: 0.95),
-                      fontWeight: FontWeight.w400,
                     ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l.dashboardChecklistAllDoneBravo,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.35,
+                    color: DashboardTokens.labelGrey.withValues(alpha: 0.95),
+                    fontWeight: FontWeight.w400,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         }
@@ -467,59 +460,55 @@ class DashboardChecklistPreview extends StatelessWidget {
           );
         }
 
-        return ColoredBox(
-          color: bg,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.fact_check_outlined,
-                      size: 18,
-                      color: ChecklistTokens.sectionTitleOnCardStyle.color,
+        return DashboardSectionShell(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.fact_check_outlined,
+                    size: 18,
+                    color: ChecklistTokens.sectionTitleOnCardStyle.color,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l.dashboardChecklistHeading,
+                      style: ChecklistTokens.sectionTitleOnCardStyle,
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l.dashboardChecklistHeading,
-                        style: ChecklistTokens.sectionTitleOnCardStyle,
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: headerTap,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(
-                            Icons.chevron_right_rounded,
-                            size: 24,
-                            color: ChecklistTokens.sectionTitleOnCardStyle.color,
-                          ),
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: headerTap,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          size: 24,
+                          color: ChecklistTokens.sectionTitleOnCardStyle.color,
                         ),
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(
-                  height: includeRiskSectionPreview
-                      ? 10
-                      : ChecklistTokens.sectionHeaderToItemsGap,
-                ),
-                _mobileFlatRows(
-                  l: l,
-                  controller: controller,
-                  sections: sections,
-                  liteInteractionLocked: liteInteractionLocked,
-                  onLiteInteractionLockedTap: onLiteInteractionLockedTap,
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: includeRiskSectionPreview
+                    ? 10
+                    : ChecklistTokens.sectionHeaderToItemsGap,
+              ),
+              _mobileFlatRows(
+                l: l,
+                controller: controller,
+                sections: sections,
+                liteInteractionLocked: liteInteractionLocked,
+                onLiteInteractionLockedTap: onLiteInteractionLockedTap,
+              ),
+            ],
           ),
         );
       },

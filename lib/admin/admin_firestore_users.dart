@@ -20,7 +20,7 @@ AdminUserRow adminUserRowFromFirestore(
 ) {
   final d = doc.data() ?? {};
   final email = d['email'] as String? ?? '';
-  final created = (d['createdAt'] as Timestamp?)?.toDate() ??
+  final created = paychekResolveUserJoinedAtUtc(d) ??
       DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
   final country = (d['country'] as String?)?.trim();
   var firstName = _adminFirestoreStr(d['firstName']);

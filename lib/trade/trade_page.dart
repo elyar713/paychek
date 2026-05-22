@@ -21,6 +21,7 @@ import 'trade_discipline_day_snapshot.dart';
 import 'trade_export_pdf.dart';
 import 'trade_filter_pills.dart';
 import 'trade_models.dart';
+import 'trade_plan_analysis.dart';
 import 'trade_psych_tags_chips.dart';
 import 'trade_summary_bar.dart';
 import 'trade_stats.dart';

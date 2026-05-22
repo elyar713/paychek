@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../analyse/analyse_tokens.dart';
 import 'mental_state_models.dart';
 
-/// Couleurs et constantes de mise en page « État mental ».
+/// Couleurs et constantes de mise en page « État mental » (OLED).
 class MentalStateTokens {
   MentalStateTokens._();
 
   static const matteGreen = kMentalStateRingGreen;
   static const matteRed = kMentalStateMatteRed;
-  static const scaffoldBg = Color(0xFF0A0A0A);
-  static const cardBg = Color(0xFF111111);
-  /// Fond carte « Mes routines » (facteurs).
-  static const factorSectionBg = Color(0xFF0D0D0D);
-  static const cardBorder = Color(0xFF1F1F1F);
-  static const trackBg = Color(0xFF1c1c1c);
+  static const scaffoldBg = AnalyseTokens.bg;
+  static const cardBg = AnalyseTokens.cardBg;
+  static const factorSectionBg = AnalyseTokens.inputBg;
+  static const cardBorder = AnalyseTokens.cardBorder;
+  static const trackBg = AnalyseTokens.inputBg;
   static const modalSliderThumbBlue = Color(0xFF2196F3);
 
   /// Ancienne contrainte étroite (ex. [StrategiePage]).

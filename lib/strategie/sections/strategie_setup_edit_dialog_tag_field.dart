@@ -30,7 +30,7 @@ class StrategieSetupTagField extends StatefulWidget {
 class StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
   late final TextEditingController _c;
 
-  static const _chipBg = Color(0xFF2A2A2A);
+  static const _chipBg = StrategieTokens.wheelSelection;
 
   /// Utilisé à l'enregistrement du dialogue Modifier setup.
   List<String> tagsIncludingPending() {
@@ -71,7 +71,7 @@ class StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 38),
           decoration: BoxDecoration(
-            color: const Color(0xFF111111),
+            color: StrategieTokens.fieldFill,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -127,7 +127,7 @@ class StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
                 decoration: InputDecoration(
                   hintText: widget.hintText,
                   hintStyle: GoogleFonts.plusJakartaSans(
-                    color: const Color(0xFF666666),
+                    color: StrategieTokens.titleGrey,
                     fontSize: 13,
                   ),
                   border: InputBorder.none,
@@ -143,7 +143,7 @@ class StrategieSetupTagFieldState extends State<StrategieSetupTagField> {
           right: 6,
           bottom: 6,
           child: Material(
-            color: const Color(0xFF333333),
+            color: StrategieTokens.fieldBorder,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
             child: InkWell(

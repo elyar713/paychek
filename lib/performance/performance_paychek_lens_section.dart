@@ -41,7 +41,8 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
   List<Trade> _trades = [];
   TradeJournalStore? _journalStore;
   UserPortfolioStore? _portfolioStore;
-  PerformanceCustomLensConfig _customLensDraft = PerformanceCustomLensConfig.defaults();
+  PerformanceCustomLensConfig _customLensDraft =
+      PerformanceCustomLensConfig.defaults();
   List<PerformanceCustomLensSavedCard> _customLensSavedCards = const [];
   List<ChecklistSectionData> _checklistSections = defaultNouveauTradeSections();
 
@@ -153,7 +154,10 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
     unawaited(PerformanceCustomLensStorage.saveSavedCards(next));
   }
 
-  Widget _customLensSavedCard(List<Trade> trades, PerformanceCustomLensSavedCard saved) {
+  Widget _customLensSavedCard(
+    List<Trade> trades,
+    PerformanceCustomLensSavedCard saved,
+  ) {
     return PerformanceCustomLensCard(
       trades: trades,
       config: saved.config,
@@ -208,7 +212,9 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
   @override
   Widget build(BuildContext context) {
     final trades = _disciplineVisibleTrades;
-    final gap = MediaQuery.sizeOf(context).width >= kPaychekLensWideBreakpoint ? 14.0 : 16.0;
+    final gap = MediaQuery.sizeOf(context).width >= kPaychekLensWideBreakpoint
+        ? 14.0
+        : 16.0;
     final savedBlock = _customLensSavedCardsLayout(trades, gap);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

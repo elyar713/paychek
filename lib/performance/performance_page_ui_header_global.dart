@@ -3,8 +3,14 @@ part of 'performance_page.dart';
 extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
   Widget _dataSourceBanner() {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String tradesTxt(int n) => performanceTradeWordPlural(code, n);
     final pid = _portfolioStore?.activePortfolioId ?? kDefaultPortfolioId;
     final rawCount = _journalStore?.itemsForPortfolio(pid).length ?? 0;
@@ -22,7 +28,11 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
             'As análises usam os trades do seu diário (aba Trade). Adicione trades para ver indicadores reais.',
             '분석은 일지(Trade 탭)의 트레이드를 사용합니다. 트레이드를 추가하면 실제 지표를 볼 수 있습니다.',
           ),
-          style: GoogleFonts.plusJakartaSans(fontSize: 12, color: _kGrey, height: 1.45),
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            color: _kGrey,
+            height: 1.45,
+          ),
         ),
       );
     }
@@ -41,8 +51,11 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
                 'Demonstração — $n ${tradesTxt(n)} (diário vazio nesta carteira).',
                 '데모 예시 — $n ${tradesTxt(n)}(이 포트폴리오 일지 비어 있음).',
               ),
-              style:
-                  GoogleFonts.plusJakartaSans(fontSize: 12, color: _kGrey, height: 1.45),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                color: _kGrey,
+                height: 1.45,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
@@ -56,7 +69,7 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
-                color: const Color(0xFF666666),
+                color: PerformanceTokens.labelDim,
                 height: 1.4,
               ),
             ),
@@ -75,7 +88,10 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
           'Fonte: diário — $n ${tradesTxt(n)}',
           '출처: 일지 — $n ${tradesTxt(n)}',
         ),
-        style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF666666)),
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 11,
+          color: PerformanceTokens.labelDim,
+        ),
       ),
     );
   }
@@ -83,8 +99,14 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
   Widget _buildHeader() {
     final l = AppLocalizations.of(context)!;
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20, top: 4),
       child: Row(
@@ -98,8 +120,7 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
               minimumSize: const Size(40, 40),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            tooltip:
-                MaterialLocalizations.of(context).backButtonTooltip,
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           ),
           Expanded(
@@ -132,7 +153,7 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       height: 1.4,
-                      color: const Color(0xFF888888),
+                      color: PerformanceTokens.labelMuted,
                     ),
                   ),
                 ],
@@ -153,7 +174,7 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  color: const Color(0xFF0F2620),
+                  color: PerformanceTokens.greenTintBg,
                   border: Border.all(color: _kGreen, width: 1.5),
                   boxShadow: [
                     BoxShadow(
@@ -175,7 +196,10 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
                     splashColor: _kGreen.withValues(alpha: 0.28),
                     highlightColor: _kGreen.withValues(alpha: 0.14),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 10,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -209,8 +233,14 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
 
   Widget _cardGlobal(int winPct, TradeAggregates agg) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
       decoration: _performanceSectionDecoration(),
@@ -225,7 +255,9 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
               children: [
                 CustomPaint(
                   size: const Size(104, 104),
-                  painter: WinrateRingPainter(progress: agg.winrate.clamp(0.0, 1.0)),
+                  painter: WinrateRingPainter(
+                    progress: agg.winrate.clamp(0.0, 1.0),
+                  ),
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -241,11 +273,18 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      t('WINRATE', 'WINRATE', 'TASA', 'WINRATE', 'WINRATE', '승률'),
+                      t(
+                        'WINRATE',
+                        'WINRATE',
+                        'TASA',
+                        'WINRATE',
+                        'WINRATE',
+                        '승률',
+                      ),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 8,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF666666),
+                        color: PerformanceTokens.labelDim,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -259,27 +298,71 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _tradeRow(t('Gagnants', 'Winners', 'Ganadores', 'Gewinner', 'Vencedores', '승자'), '${agg.wins}', _kGreen),
+                _tradeRow(
+                  t(
+                    'Gagnants',
+                    'Winners',
+                    'Ganadores',
+                    'Gewinner',
+                    'Vencedores',
+                    '승자',
+                  ),
+                  '${agg.wins}',
+                  _kGreen,
+                ),
                 const SizedBox(height: 10),
-                _tradeRow(t('Perdants', 'Losers', 'Perdedores', 'Verlierer', 'Perdedores', '패자'), '${agg.losses}', _kRed),
+                _tradeRow(
+                  t(
+                    'Perdants',
+                    'Losers',
+                    'Perdedores',
+                    'Verlierer',
+                    'Perdedores',
+                    '패자',
+                  ),
+                  '${agg.losses}',
+                  _kRed,
+                ),
                 const SizedBox(height: 10),
-                _tradeRow(t('Breakeven', 'Breakeven', 'Breakeven', 'Breakeven', 'Empate', '본전'), '${agg.breakeven}', const Color(0xFF555555)),
+                _tradeRow(
+                  t(
+                    'Breakeven',
+                    'Breakeven',
+                    'Breakeven',
+                    'Breakeven',
+                    'Empate',
+                    '본전',
+                  ),
+                  '${agg.breakeven}',
+                  PerformanceTokens.labelFaint,
+                ),
                 const Divider(height: 20, color: _kBorder),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      t('TOTAL TRADES', 'TOTAL TRADES', 'TOTAL DE TRADES', 'TRADES GESAMT', 'TOTAL DE TRADES', '총 트레이드'),
+                      t(
+                        'TOTAL TRADES',
+                        'TOTAL TRADES',
+                        'TOTAL DE TRADES',
+                        'TRADES GESAMT',
+                        'TOTAL DE TRADES',
+                        '총 트레이드',
+                      ),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF666666),
+                        color: PerformanceTokens.labelDim,
                         letterSpacing: 1,
                       ),
                     ),
                     Text(
                       '${agg.total}',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -294,8 +377,14 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
   Widget _buildLiteFreemiumStatsPlaceholder() {
     final l = AppLocalizations.of(context)!;
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     final onTap = widget.onLiteFreemiumRestrictedTap;
 
     return Padding(
@@ -342,7 +431,7 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     height: 1.45,
-                    color: const Color(0xFF888888),
+                    color: PerformanceTokens.labelMuted,
                   ),
                 ),
                 if (onTap != null) ...[
@@ -377,12 +466,30 @@ extension _PerformancePageUiHeaderGlobal on _PerformancePageState {
       children: [
         Row(
           children: [
-            Container(width: 6, height: 6, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+            ),
             const SizedBox(width: 8),
-            Text(label, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: const Color(0xFFAAAAAA), fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                color: PerformanceTokens.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
-        Text(value, style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+        Text(
+          value,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
       ],
     );
   }

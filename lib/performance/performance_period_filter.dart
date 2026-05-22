@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import '../trade/trade_models.dart';
 import 'performance_trade_model.dart';
 
 /// Périodes alignées sur la maquette HTML (filtres KPI / graphiques / PDF).
@@ -68,7 +69,9 @@ DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 DateTime anchorDateForTrades(List<Trade> trades) {
   final today = _dateOnly(DateTime.now());
   if (trades.isEmpty) return today;
-  final maxTrade = trades.map((t) => _dateOnly(t.date)).reduce((a, b) => a.isAfter(b) ? a : b);
+  final maxTrade = trades
+      .map((t) => _dateOnly(t.date))
+      .reduce((a, b) => a.isAfter(b) ? a : b);
   return maxTrade.isAfter(today) ? maxTrade : today;
 }
 
@@ -114,7 +117,9 @@ PerformanceDateRange? rangeForPeriod({
       final firstDayOfMonth = DateTime(end.year, end.month, 1);
       return PerformanceDateRange(start: firstDayOfMonth, end: end);
     case PerformancePeriodFilter.custom:
-      if (customStart == null) return PerformanceDateRange(start: end, end: end);
+      if (customStart == null) {
+        return PerformanceDateRange(start: end, end: end);
+      }
       final s = _dateOnly(customStart);
       if (s.isAfter(end)) {
         return PerformanceDateRange(start: end, end: s);
@@ -124,12 +129,29 @@ PerformanceDateRange? rangeForPeriod({
 }
 
 /// Filtre les trades dont la [Trade.date] tombe dans la plage (inclusif).
-List<Trade> filterTradesByRange(List<Trade> trades, PerformanceDateRange? range) {
+List<Trade> filterTradesByRange(
+  List<Trade> trades,
+  PerformanceDateRange? range,
+) {
   if (range == null) return List<Trade>.from(trades);
   final start = _dateOnly(range.start);
   final end = _dateOnly(range.end);
   return trades.where((t) {
     final d = _dateOnly(t.date);
+    return !d.isBefore(start) && !d.isAfter(end);
+  }).toList();
+}
+
+/// Filtre les trades journal par date d'entrée (même plage que [filterTradesByRange]).
+List<TradeListItem> filterJournalItemsByRange(
+  List<TradeListItem> items,
+  PerformanceDateRange? range,
+) {
+  if (range == null) return List<TradeListItem>.from(items);
+  final start = _dateOnly(range.start);
+  final end = _dateOnly(range.end);
+  return items.where((t) {
+    final d = _dateOnly(t.entreeAt);
     return !d.isBefore(start) && !d.isAfter(end);
   }).toList();
 }

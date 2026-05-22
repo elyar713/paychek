@@ -1,15 +1,16 @@
 part of 'performance_page.dart';
 
-const Color _kGreen = Color(0xFF1eb48a);
-const Color _kRed = Color(0xFFFF4D4D);
-const Color _kBorder = Color(0xFF161616);
-const Color _kGrey = Color(0xFF555555);
-const Color _kFilterActive = Color(0xFF546E7A);
+const Color _kGreen = PerformanceTokens.green;
+const Color _kRed = PerformanceTokens.red;
+const Color _kBorder = PerformanceTokens.borderSubtle;
+const Color _kGrey = PerformanceTokens.labelFaint;
+const Color _kFilterActive = PerformanceTokens.filterActive;
 
 const double _kPerformanceLayoutWideBreakpoint = 920;
 const double _kPerformanceContentMaxWidth = 1200;
 
-class _PerformancePageState extends State<PerformancePage> with SingleTickerProviderStateMixin {
+class _PerformancePageState extends State<PerformancePage>
+    with SingleTickerProviderStateMixin {
   List<Trade> _trades = [];
   TradeJournalStore? _journalStore;
   UserPortfolioStore? _portfolioStore;
@@ -25,23 +26,49 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   /// Marché sélectionné pour les libellés de la section Volume (micro/mini vs fourchettes contrats).
   AjouterTradeAssetClass _volumeSectionMarche = AjouterTradeAssetClass.forex;
-  AjouterTradeAssetClass _mostTradedSectionMarche = AjouterTradeAssetClass.forex;
+  AjouterTradeAssetClass _mostTradedSectionMarche =
+      AjouterTradeAssetClass.forex;
 
   late final AnimationController _pulseCtrl;
 
   DateTime get _anchorDate => anchorDateForTrades(_trades);
 
   PerformanceDateRange? get _range => rangeForPeriod(
-        period: _periodFilter,
-        anchor: _anchorDate,
-        customStart: _customStartDate,
-      );
+    period: _periodFilter,
+    anchor: _anchorDate,
+    customStart: _customStartDate,
+  );
 
   List<Trade> get _visibleTrades => filterTradesByRange(_trades, _range);
 
   /// Trades avec au moins un signal discipline (hors saisie minimale).
   List<Trade> get _disciplineVisibleTrades =>
       _visibleTrades.where((t) => !t.performanceLite).toList();
+
+  /// Trades journal incomplets sur la période filtrée (ordre : plus récent d'abord).
+  List<TradeListItem> get _incompleteJournalTrades {
+    final items = filterJournalItemsByRange(
+      activeJournalTradesOrDemo(
+        context,
+      ).where((t) => !t.performanceLite).toList(growable: false),
+      _range,
+    );
+    return items.where(tradeHasAnyDisciplineMissing).toList()
+      ..sort((a, b) => b.entreeAt.compareTo(a.entreeAt));
+  }
+
+  void _openIncompleteTrade(TradeListItem item) {
+    if (widget.liteFreemiumRestricted) {
+      widget.onLiteFreemiumRestrictedTap?.call();
+      return;
+    }
+    final edit = widget.onEditTrade;
+    if (edit != null) {
+      edit(item);
+      return;
+    }
+    widget.onCloseAsTab?.call();
+  }
 
   bool get _embeddedInTabShell => widget.onCloseAsTab != null;
 
@@ -57,7 +84,10 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
   void initState() {
     super.initState();
     StrategieSetupsStore.ensureLoaded();
-    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
     StrategieRealtimeNotifier.tick.addListener(_onStrategieChanged);
     _loadSavedWidget();
     _loadLensContext();
@@ -139,7 +169,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
           data: ThemeData.dark(useMaterial3: true).copyWith(
             colorScheme: ColorScheme.dark(
               primary: _kGreen,
-              surface: const Color(0xFF1A1A1A),
+              surface: PerformanceTokens.cardBg,
             ),
           ),
           child: child!,
@@ -156,8 +186,14 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   Widget _buildPeriodFilterBar() {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: SingleChildScrollView(
@@ -174,11 +210,25 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
               PerformancePeriodFilter.yesterday,
             ),
             _periodChip(
-              t('Cette semaine', 'This week', 'Esta semana', 'Diese Woche', 'Esta semana', '이번 주'),
+              t(
+                'Cette semaine',
+                'This week',
+                'Esta semana',
+                'Diese Woche',
+                'Esta semana',
+                '이번 주',
+              ),
               PerformancePeriodFilter.oneWeek,
             ),
             _periodChip(
-              t('Ce mois', 'This month', 'Este mes', 'Dieser Monat', 'Este mês', '이번 달'),
+              t(
+                'Ce mois',
+                'This month',
+                'Este mes',
+                'Dieser Monat',
+                'Este mês',
+                '이번 달',
+              ),
               PerformancePeriodFilter.currentMonth,
             ),
             const SizedBox(width: 8),
@@ -191,15 +241,28 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   Widget _resetAllPeriodIcon() {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     final active = _periodFilter == PerformancePeriodFilter.all;
     return Padding(
       padding: const EdgeInsets.only(right: 4),
       child: IconButton(
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-        tooltip: t('Tout l\'historique', 'All history', 'Todo el historial', 'Gesamte Historie', 'Todo o histórico', '전체 기록'),
+        tooltip: t(
+          'Tout l\'historique',
+          'All history',
+          'Todo el historial',
+          'Gesamte Historie',
+          'Todo o histórico',
+          '전체 기록',
+        ),
         onPressed: () {
           setState(() {
             _periodFilter = PerformancePeriodFilter.all;
@@ -230,10 +293,12 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
-              color: active ? Colors.white : const Color(0xFF121212),
+              color: active ? Colors.white : PerformanceTokens.filterInactive,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: active ? Colors.white : const Color(0xFF3A3A3A),
+                color: active
+                    ? Colors.white
+                    : PerformanceTokens.chipBorderInactive,
               ),
             ),
             child: Text(
@@ -252,8 +317,14 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
 
   Widget _customDatePill() {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     final active = _periodFilter == PerformancePeriodFilter.custom;
     final label = _customStartDate == null
         ? t('Date', 'Date', 'Fecha', 'Datum', 'Data', '날짜')
@@ -266,10 +337,12 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: active ? Colors.white : const Color(0xFF121212),
+            color: active ? Colors.white : PerformanceTokens.innerBgDeep,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: active ? Colors.white : const Color(0xFF3A3A3A),
+              color: active
+                  ? Colors.white
+                  : PerformanceTokens.chipBorderInactive,
             ),
           ),
           child: Row(
@@ -299,6 +372,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context);
+
     /// Trades avec contexte discipline (hors saisie minimale si ce filtre est réactivé).
     final disc = _disciplineVisibleTrades;
 
@@ -312,7 +386,9 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
     );
     final gestion = _gestionParams ?? StrategieGestionRisqueParams.defaults;
     final capStore = UserCapitalScope.of(context);
-    final capital = UserPortfolioScope.of(context).effectiveCapitalAmount(capStore);
+    final capital = UserPortfolioScope.of(
+      context,
+    ).effectiveCapitalAmount(capStore);
     final lensStrategieWarnings = paychekStrategieWarnings(
       trades: disc,
       params: gestion,
@@ -347,7 +423,7 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
         }
         if (didPop) widget.onNavigateToDashboard?.call();
       },
-        child: Scaffold(
+      child: Scaffold(
         backgroundColor: DashboardTokens.scaffoldMatte,
         body: SafeArea(
           child: LayoutBuilder(
@@ -386,97 +462,103 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
               final gap = wide ? 14.0 : 16.0;
 
               final List<Widget> bodyChildren = lite
-                  ? [
-                      _buildHeader(),
-                      _buildLiteFreemiumStatsPlaceholder(),
-                    ]
+                  ? [_buildHeader(), _buildLiteFreemiumStatsPlaceholder()]
                   : [
-                _buildHeader(),
-                _dataSourceBanner(),
-                if (wide) ...[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                      _buildHeader(),
+                      _dataSourceBanner(),
+                      if (wide) ...[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _cardGlobal(winPct, agg),
-                            SizedBox(height: gap),
-                            _buildPeriodFilterBar(),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _cardGlobal(winPct, agg),
+                                  SizedBox(height: gap),
+                                  _cardTradesNonRenseignes(lens),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: gap),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _cardEye(lens),
+                                  SizedBox(height: gap),
+                                  _buildPeriodFilterBar(),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                      SizedBox(width: gap),
-                      Expanded(child: _cardEye(lens)),
-                    ],
-                  ),
-                  if (lensStrategieWarnings.isNotEmpty) ...[
-                    SizedBox(height: gap),
-                    _cardStrategieWarnings(lensStrategieWarnings),
-                  ],
-                  SizedBox(height: gap),
-                  _cardDailyJournalVolume(dailyJournalBuckets),
-                  SizedBox(height: gap),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: _cardTimeSlots(slots, horaireViol),
-                      ),
-                      SizedBox(width: gap),
-                      Expanded(child: _cardDuration(buckets)),
-                    ],
-                  ),
-                  SizedBox(height: gap),
-                  _cardNewsTiming(disc),
-                  SizedBox(height: gap),
-                  _cardDiscipline(),
-                  SizedBox(height: gap),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: _cardVolume()),
-                      SizedBox(width: gap),
-                      Expanded(
-                        child: _cardMostTradedAssetBars(assetBarStats),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: gap),
-                  const PaychekLensSection(),
-                ] else ...[
-                  _cardGlobal(winPct, agg),
-                  const SizedBox(height: 12),
-                  _buildPeriodFilterBar(),
-                  if (lensStrategieWarnings.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    _cardStrategieWarnings(lensStrategieWarnings),
-                  ],
-                  const SizedBox(height: 16),
-                  _cardEye(lens),
-                  const SizedBox(height: 16),
-                  _cardDailyJournalVolume(dailyJournalBuckets),
-                  const SizedBox(height: 16),
-                  _cardTimeSlots(slots, horaireViol),
-                  const SizedBox(height: 16),
-                  _cardNewsTiming(disc),
-                  const SizedBox(height: 16),
-                  _cardDiscipline(),
-                  const SizedBox(height: 16),
-                  _cardDuration(buckets),
-                  const SizedBox(height: 16),
-                  _cardVolume(),
-                  const SizedBox(height: 16),
-                  _cardMostTradedAssetBars(assetBarStats),
-                  const SizedBox(height: 16),
-                  const PaychekLensSection(),
-                ],
-                if (savedInsight != null) ...[
-                  SizedBox(height: gap),
-                  savedInsight,
-                ],
-              ];
+                        if (lensStrategieWarnings.isNotEmpty) ...[
+                          SizedBox(height: gap),
+                          _cardStrategieWarnings(lensStrategieWarnings),
+                        ],
+                        SizedBox(height: gap),
+                        _cardDailyJournalVolume(dailyJournalBuckets),
+                        SizedBox(height: gap),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _cardTimeSlots(slots, horaireViol)),
+                            SizedBox(width: gap),
+                            Expanded(child: _cardDuration(buckets)),
+                          ],
+                        ),
+                        SizedBox(height: gap),
+                        _cardNewsTiming(disc),
+                        SizedBox(height: gap),
+                        _cardDiscipline(),
+                        SizedBox(height: gap),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _cardVolume()),
+                            SizedBox(width: gap),
+                            Expanded(
+                              child: _cardMostTradedAssetBars(assetBarStats),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: gap),
+                        const PaychekLensSection(),
+                      ] else ...[
+                        _cardGlobal(winPct, agg),
+                        const SizedBox(height: 12),
+                        _cardTradesNonRenseignes(lens),
+                        if (lensStrategieWarnings.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          _cardStrategieWarnings(lensStrategieWarnings),
+                        ],
+                        const SizedBox(height: 16),
+                        _cardEye(lens),
+                        const SizedBox(height: 12),
+                        _buildPeriodFilterBar(),
+                        const SizedBox(height: 16),
+                        _cardDailyJournalVolume(dailyJournalBuckets),
+                        const SizedBox(height: 16),
+                        _cardTimeSlots(slots, horaireViol),
+                        const SizedBox(height: 16),
+                        _cardNewsTiming(disc),
+                        const SizedBox(height: 16),
+                        _cardDiscipline(),
+                        const SizedBox(height: 16),
+                        _cardDuration(buckets),
+                        const SizedBox(height: 16),
+                        _cardVolume(),
+                        const SizedBox(height: 16),
+                        _cardMostTradedAssetBars(assetBarStats),
+                        const SizedBox(height: 16),
+                        const PaychekLensSection(),
+                      ],
+                      if (savedInsight != null) ...[
+                        SizedBox(height: gap),
+                        savedInsight,
+                      ],
+                    ];
 
               return Center(
                 child: ConstrainedBox(
@@ -508,7 +590,9 @@ class _PerformancePageState extends State<PerformancePage> with SingleTickerProv
   Future<void> _exportPerformancePdf() async {
     final gestion = _gestionParams ?? StrategieGestionRisqueParams.defaults;
     final capStore = UserCapitalScope.of(context);
-    final capital = UserPortfolioScope.of(context).effectiveCapitalAmount(capStore);
+    final capital = UserPortfolioScope.of(
+      context,
+    ).effectiveCapitalAmount(capStore);
     final customLensCards = await PerformanceCustomLensStorage.loadSavedCards();
     final checklistSections =
         await ChecklistSectionsStorage.load() ?? defaultNouveauTradeSections();

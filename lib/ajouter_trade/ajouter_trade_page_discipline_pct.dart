@@ -15,13 +15,15 @@ extension _AjouterTradeDisciplinePct on _AjouterTradePageState {
         _entreeDateTime.day,
       );
 
-  int get _checklistRingPercent => widget.checklistController
-      .completionPercentOnDay(_tradeEntryDateOnly);
+  int get _checklistRingPercent =>
+      widget.checklistController.hasChecklistCheckedOnDay(_tradeEntryDateOnly)
+          ? widget.checklistController.completionPercentOnDay(_tradeEntryDateOnly)
+          : 0;
 
   double get _mentalRingScore {
     final c = MentalStateController.instance;
     final historical = c.overallScoreForCalendarDay(_tradeEntryDateOnly);
-    return historical ?? c.overallScore;
+    return historical ?? 0;
   }
 
   int get _planConfidencePercent => resolvePlanGlobalConfidencePercent(

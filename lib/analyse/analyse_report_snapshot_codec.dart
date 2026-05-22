@@ -30,6 +30,10 @@ Map<String, dynamic> encodeAnalyseReportSnapshot(AnalyseReportSnapshot s) {
     'biasFg': _argb(s.biasFg),
     'globalConfidencePercent': s.globalConfidencePercent,
     'globalConfidenceColor': _argb(s.globalConfidenceColor),
+    'confluenceScore': s.confluenceScore,
+    'smcObExtras': s.smcObExtras,
+    'smcFvgExtras': s.smcFvgExtras,
+    'smcLiquidityExtras': s.smcLiquidityExtras,
     'contexteTfLine': s.contexteTfLine,
     'phaseLabel': s.phaseLabel,
     'phaseBg': _argb(s.phaseBg),
@@ -155,7 +159,7 @@ Map<String, dynamic> encodeAnalyseReportSnapshot(AnalyseReportSnapshot s) {
 AnalyseReportStructureExtraLine _extraLine(Map<String, dynamic> m) {
   return AnalyseReportStructureExtraLine(
     priceLabel: m['priceLabel'] as String? ?? '',
-    tenueLabel: m['tenueLabel'] as String?,
+    tenueLabel: null,
   );
 }
 
@@ -234,6 +238,21 @@ AnalyseReportSnapshot decodeAnalyseReportSnapshot(Map<String, dynamic> m) {
     biasFg: _color(m['biasFg']),
     globalConfidencePercent: (m['globalConfidencePercent'] as num?)?.round() ?? 0,
     globalConfidenceColor: _color(m['globalConfidenceColor']),
+    confluenceScore: (m['confluenceScore'] as num?)?.round() ??
+        (m['globalConfidencePercent'] as num?)?.round() ??
+        0,
+    smcObExtras: [
+      for (final e in (m['smcObExtras'] as List<dynamic>? ?? const []))
+        e.toString(),
+    ],
+    smcFvgExtras: [
+      for (final e in (m['smcFvgExtras'] as List<dynamic>? ?? const []))
+        e.toString(),
+    ],
+    smcLiquidityExtras: [
+      for (final e in (m['smcLiquidityExtras'] as List<dynamic>? ?? const []))
+        e.toString(),
+    ],
     contexteTfLine: m['contexteTfLine'] as String? ?? '',
     phaseLabel: m['phaseLabel'] as String? ?? '',
     phaseBg: _color(m['phaseBg']),

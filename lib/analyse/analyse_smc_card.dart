@@ -130,15 +130,13 @@ class _AnalyseSmcCardState extends State<AnalyseSmcCard>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final c = widget.controller;
-    return AnalyseCard(
-      editorSection: AnalyseEditorSection.smcLiquidite,
-      child: ListenableBuilder(
-        listenable: c,
-        builder: (context, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AnalyseSectionTitleRow(
+    final body = ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AnalyseSectionTitleRow(
                 title: l.analyseCardSmcLiquidity,
                 icon: Icons.blur_on_outlined,
                 iconColor: AnalyseEditorSection.smcLiquidite.sectionAccent,
@@ -162,24 +160,27 @@ class _AnalyseSmcCardState extends State<AnalyseSmcCard>
                   ],
                 ),
               ),
-              AnalyseCollapsibleSectionBody(
-                expanded: c.smcEnabled,
-                child: AnalyseSmcExpandedBody(
-                  controller: c,
-                  smcEditMode: _smcEditMode,
-                  smcDraftOpen: _smcDraftOpen,
-                  smcDraftCtrl: _smcDraftCtrl,
-                  smcDraftFocus: _smcDraftFocus,
-                  onSmcAjouterTap: _onSmcAjouterTap,
-                  onSmcDraftSubmitted: _onSmcDraftSubmitted,
-                  onFinishSmcDraftFromOutsideDismiss:
-                      _finishSmcDraftFromOutsideDismiss,
-                ),
+            AnalyseCollapsibleSectionBody(
+              expanded: c.smcEnabled,
+              child: AnalyseSmcExpandedBody(
+                controller: c,
+                smcEditMode: _smcEditMode,
+                smcDraftOpen: _smcDraftOpen,
+                smcDraftCtrl: _smcDraftCtrl,
+                smcDraftFocus: _smcDraftFocus,
+                onSmcAjouterTap: _onSmcAjouterTap,
+                onSmcDraftSubmitted: _onSmcDraftSubmitted,
+                onFinishSmcDraftFromOutsideDismiss:
+                    _finishSmcDraftFromOutsideDismiss,
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
+    );
+    return AnalyseCard(
+      editorSection: AnalyseEditorSection.smcLiquidite,
+      child: body,
     );
   }
 }

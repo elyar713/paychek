@@ -1,267 +1,361 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../trade/trade_plan_analysis.dart';
 import 'performance_discipline_rollups.dart';
 import 'performance_locale_copy.dart';
 import 'performance_trade_model.dart';
 
-TextStyle _lensBase() => GoogleFonts.plusJakartaSans(
-      fontSize: 15,
-      height: 1.4,
-      color: const Color(0xFFCCCCCC),
-      fontWeight: FontWeight.w300,
-    );
+String _txt(
+  Locale locale,
+  String fr,
+  String en,
+  String es,
+  String de,
+  String pt,
+  String ko,
+) => performancePickLocale(locale, fr, en, es, de, pt, ko);
 
-TextStyle _lensBold(Color c) => _lensBase().copyWith(color: c, fontWeight: FontWeight.w700);
+/// Axe discipline affiché dans Paychek Lens (données **explicites** uniquement).
+enum PaychekLensAxisKind { checklist, etat, strategie, plan }
 
-String _txt(Locale locale, String fr, String en, String es, String de, String pt, String ko) =>
-    performancePickLocale(locale, fr, en, es, de, pt, ko);
-
-String _tradeWord(Locale locale, int n) => performanceTradeWordPlural(locale.languageCode, n);
-
-/// Une puce par axe discipline (pas de regroupement ×2 / ×3).
-List<PaychekLensChip> _buildDisciplineChips(DisciplineRollups roll, Locale locale) {
-  final items = <(String name, int pct, Color col)>[
-    (_txt(locale, 'État', 'State', 'Estado', 'Zustand', 'Estado', '상태'), roll.avgEtat.round(), kLensEtat),
-    ('CL', roll.avgChecklist.round(), kLensChecklist),
-    (_txt(locale, 'Strat', 'Strat', 'Estrategia', 'Strat.', 'Estrat.', '전략'), roll.avgStrategie.round(), kLensStrategie),
-    (_txt(locale, 'Analyse', 'Analysis', 'Análisis', 'Analyse', 'Análise', '분석'), roll.avgPlan.round(), kLensPlan),
-  ];
-  return [
-    for (final it in items)
-      PaychekLensChip(
-        text: '${it.$1} ${it.$2} %',
-        background: const Color(0xFF222222),
-        foreground: it.$3,
-      ),
-  ];
-}
-
-class PaychekLensChip {
-  const PaychekLensChip({
-    required this.text,
-    required this.background,
-    required this.foreground,
+class PaychekLensAxisStat {
+  const PaychekLensAxisStat({
+    required this.kind,
+    required this.label,
+    required this.color,
+    required this.qualifiedCount,
+    required this.totalCount,
+    this.avgPct,
+    this.winRateOnQualified,
   });
 
-  final String text;
-  final Color background;
-  final Color foreground;
+  final PaychekLensAxisKind kind;
+  final String label;
+  final Color color;
+  final int qualifiedCount;
+  final int totalCount;
+
+  /// Moyenne % sur les trades qualifiés ; `null` si aucun trade qualifié.
+  final double? avgPct;
+
+  /// Winrate sur les trades qualifiés (tous, pas par bande).
+  final double? winRateOnQualified;
+
+  bool get isActive => qualifiedCount > 0;
+
+  int get missingCount => (totalCount - qualifiedCount).clamp(0, totalCount);
+
+  double get coverage =>
+      totalCount <= 0 ? 0.0 : (qualifiedCount / totalCount).clamp(0.0, 1.0);
 }
 
+/// Synthèse structurée pour la carte Paychek Lens (Performance).
 class PaychekLensSnapshot {
   const PaychekLensSnapshot({
-    required this.narrativeSpans,
-    required this.chips,
+    required this.tradeCount,
+    required this.maxLoss,
+    required this.avgDurationMinutes,
+    required this.axes,
+    this.newsLine,
+    this.insight,
   });
 
-  final List<InlineSpan> narrativeSpans;
-  final List<PaychekLensChip> chips;
-}
+  final int tradeCount;
+  final double maxLoss;
+  final int avgDurationMinutes;
+  final List<PaychekLensAxisStat> axes;
+  final String? newsLine;
+  final String? insight;
 
-PaychekLensSnapshot buildPaychekLensSnapshot(List<Trade> trades, {required Locale locale}) {
-  if (trades.isEmpty) {
+  int get qualifiedDisciplineTradeCount {
+    var maxQ = 0;
+    for (final a in axes) {
+      if (a.qualifiedCount > maxQ) maxQ = a.qualifiedCount;
+    }
+    return maxQ;
+  }
+
+  bool get hasAnyDisciplineAxis => axes.any((a) => a.isActive);
+
+  factory PaychekLensSnapshot.empty(Locale locale) {
     return PaychekLensSnapshot(
-      narrativeSpans: [
-        TextSpan(
-          text: _txt(
-            locale,
-            "Ajoutez des trades depuis le journal pour obtenir une synthèse basée sur votre stratégie, vos pertes, le délai de position et vos scores discipline (état mental, checklist, analyse, stratégie).",
-            'Add trades from your journal to get a summary based on your strategy, losses, position holding time, and discipline scores (mental state, checklist, analysis, strategy).',
-            'Añade trades desde tu diario para obtener un resumen basado en tu estrategia, pérdidas, tiempo en posición y puntuaciones de disciplina (estado mental, checklist, análisis, estrategia).',
-            'Fügen Sie Trades aus dem Journal hinzu, um eine Auswertung zu erhalten – Strategie, Verluste, Haltezeit und Disziplinwerte (mental, Checkliste, Analyse, Strategie).',
-            'Adicione trades do diário para ver um resumo com base na estratégia, perdas, tempo em posição e disciplina (mental, checklist, análise, estratégia).',
-            '일지에서 트레이드를 추가하면 전략·손실·보유 시간·규율 점수(멘탈·체크리스트·분석·전략) 요약을 볼 수 있습니다.',
-          ),
-          style: _lensBase(),
-        ),
-      ],
-      chips: const [],
+      tradeCount: 0,
+      maxLoss: 0,
+      avgDurationMinutes: 0,
+      axes: const [],
+      insight: _txt(
+        locale,
+        'Ajoutez des trades au journal pour voir volume, durée et discipline renseignée (checklist, état mental, stratégie, plan).',
+        'Add journal trades to see volume, duration, and filled-in discipline (checklist, mental state, strategy, plan).',
+        'Añade trades al diario para ver volumen, duración y disciplina rellenada.',
+        'Fügen Sie Journal-Trades hinzu für Volumen, Dauer und ausgefüllte Disziplin.',
+        'Adicione trades ao diário para ver volume, duração e disciplina preenchida.',
+        '일지에 트레이드를 추가하면 거래량·시간·규율을 볼 수 있습니다.',
+      ),
     );
   }
+}
+
+double? _winRateOnTrades(List<Trade> trades) {
+  if (trades.isEmpty) return null;
+  final w = trades.where((t) => t.win).length;
+  return w / trades.length;
+}
+
+/// Trades Performance avec au moins un axe discipline non renseigné (explicite).
+int countTradesWithAnyDisciplineMissing(List<Trade> trades) => trades
+    .where(
+      (t) =>
+          !performanceTradeHasChecklist(t) ||
+          !performanceTradeHasEtat(t) ||
+          !performanceTradeHasStrategieExecution(t) ||
+          !performanceTradeHasPlanAnalysis(t),
+    )
+    .length;
+
+List<Trade> _filter(List<Trade> trades, bool Function(Trade) pred) =>
+    trades.where(pred).toList(growable: false);
+
+PaychekLensAxisStat _axisStat({
+  required PaychekLensAxisKind kind,
+  required String label,
+  required Color color,
+  required int total,
+  required int qualified,
+  required double? avgPct,
+  required List<Trade> qualifiedTrades,
+}) {
+  return PaychekLensAxisStat(
+    kind: kind,
+    label: label,
+    color: color,
+    qualifiedCount: qualified,
+    totalCount: total,
+    avgPct: qualified > 0 ? avgPct : null,
+    winRateOnQualified: _winRateOnTrades(qualifiedTrades),
+  );
+}
+
+String? _buildInsight({
+  required Locale locale,
+  required int total,
+  required List<PaychekLensAxisStat> axes,
+  required List<Trade> trades,
+  required DisciplineRollups roll,
+}) {
+  if (total == 0) return null;
+
+  final missingAny = axes.where((a) => !a.isActive).length;
+  if (!axes.any((a) => a.isActive)) {
+    return _txt(
+      locale,
+      'Aucune discipline renseignée sur cette période. Cochez la checklist, réglez l’état mental, ou complétez stratégie / plan depuis Ajouter trade.',
+      'No discipline filled on this period. Check the checklist, set mental state, or complete strategy / plan when adding a trade.',
+      'Sin disciplina en este período. Marca checklist, estado mental o estrategia / plan al añadir trade.',
+      'Keine Disziplin in diesem Zeitraum. Checkliste, Mentalzustand oder Strategie / Plan beim Trade-Eintrag.',
+      'Sem disciplina neste período. Preencha checklist, estado mental ou estratégia / plano ao adicionar trade.',
+      '이번 기간 규율 데이터 없음. 트레이드 추가 시 체크리스트·멘탈·전략·계획을 입력하세요.',
+    );
+  }
+
+  final tradesStrat = _filter(trades, performanceTradeHasStrategieExecution);
+  final wrs = winRatesStrategieHighVsForced(tradesStrat);
+  if (wrs.$2 >= 2 && wrs.$4 >= 2 && wrs.$1 > wrs.$3 + 0.08) {
+    return _txt(
+      locale,
+      'Stratégie respectée (≥50 %) : ${(wrs.$1 * 100).round()} % WR vs ${(wrs.$3 * 100).round()} % quand elle est forcée — la discipline paie.',
+      'Strategy respected (≥50%): ${(wrs.$1 * 100).round()}% WR vs ${(wrs.$3 * 100).round()}% when forced — discipline pays off.',
+      'Estrategia respetada (≥50%): ${(wrs.$1 * 100).round()}% WR vs ${(wrs.$3 * 100).round()}% forzada.',
+      'Strategie eingehalten (≥50 %): ${(wrs.$1 * 100).round()} % WR vs ${(wrs.$3 * 100).round()} % erzwungen.',
+      'Estratégia respeitada (≥50%): ${(wrs.$1 * 100).round()}% WR vs ${(wrs.$3 * 100).round()}% forçada.',
+      '전략 준수(≥50%): ${(wrs.$1 * 100).round()}% WR vs 강제 ${(wrs.$3 * 100).round()}%.',
+    );
+  }
+
+  if (missingAny >= 2) {
+    return _txt(
+      locale,
+      'Les moyennes ci-dessous ne comptent que les trades où vous avez renseigné chaque axe. Horaires & gestion du risque restent dans leurs cartes dédiées.',
+      'Averages below only include trades where you filled each axis. Hours & risk management stay in their dedicated cards.',
+      'Las medias solo incluyen trades con cada eje rellenado. Horarios y riesgo tienen sus propias tarjetas.',
+      'Mittelwerte nur für Trades mit ausgefüllter Achse. Zeiten & Risiko in eigenen Karten.',
+      'Médias só nos trades com cada eixo preenchido. Horários e risco têm cartões próprios.',
+      '평균은 해당 축을 입력한 트레이드만 포함합니다. 시간·리스크는 별도 카드입니다.',
+    );
+  }
+
+  final cl = axes.firstWhere((a) => a.kind == PaychekLensAxisKind.checklist);
+  final et = axes.firstWhere((a) => a.kind == PaychekLensAxisKind.etat);
+  if (cl.isActive &&
+      et.isActive &&
+      (cl.avgPct ?? 0) >= 65 &&
+      (et.avgPct ?? 0) >= 65) {
+    return _txt(
+      locale,
+      'Checklist et état mental solides sur les trades renseignés — bon socle de session.',
+      'Solid checklist and mental state on filled trades — a strong session foundation.',
+      'Checklist y estado mental sólidos en los trades rellenados.',
+      'Solide Checkliste und Mentalzustand bei ausgefüllten Trades.',
+      'Checklist e estado mental sólidos nos trades preenchidos.',
+      '입력된 트레이드에서 체크리스트·멘탈이 탄탄합니다.',
+    );
+  }
+
+  return disciplineImpactObservation(trades, locale: locale);
+}
+
+PaychekLensSnapshot buildPaychekLensSnapshot(
+  List<Trade> trades, {
+  required Locale locale,
+}) {
+  if (trades.isEmpty) return PaychekLensSnapshot.empty(locale);
 
   final n = trades.length;
   final worst = worstSingleLoss(trades);
   final avgDur = averageDurationMinutes(trades);
   final roll = computeDisciplineRollups(trades);
 
-  final spans = <InlineSpan>[
-    TextSpan(text: _txt(locale, 'Sur cette période : ', 'For this period: ', 'En este período: ', 'In diesem Zeitraum: ', 'Neste período: ', '이번 기간: '), style: _lensBase()),
-    TextSpan(text: '$n', style: _lensBold(kLensAccentNum)),
-    TextSpan(
-      text: n > 1
-          ? _txt(locale, ' trades. ', ' trades. ', ' trades. ', ' Trades. ', ' trades. ', ' 트레이드. ')
-          : _txt(locale, ' trade. ', ' trade. ', ' trade. ', ' Trade. ', ' trade. ', ' 트레이드. '),
-      style: _lensBase(),
-    ),
-    TextSpan(text: _txt(locale, 'Perte max sur une position : ', 'Max loss on one position: ', 'Pérdida máx. en una posición: ', 'Max. Verlust je Position: ', 'Perda máx. em uma posição: ', '포지션당 최대 손실: '), style: _lensBase()),
-    TextSpan(text: worst.toStringAsFixed(0), style: _lensBold(kLensLoss)),
-    TextSpan(text: _txt(locale, '. Durée moyenne des positions : ', '. Average position duration: ', '. Duración media de posición: ', '. Mittlere Positionsdauer: ', '. Duração média das posições: ', '. 평균 보유 시간: '), style: _lensBase()),
-    TextSpan(text: '${avgDur.round()}', style: _lensBold(kLensDuration)),
-    TextSpan(text: _txt(locale, ' min. ', ' min. ', ' min. ', ' Min. ', ' min. ', '분. '), style: _lensBase()),
-  ];
+  final nCl = roll.tradesWithChecklist;
+  final nEt = roll.tradesWithEtat;
+  final nSt = roll.tradesWithStrategie;
+  final nPl = roll.tradesWithPlan;
 
-  final beforeNews = trades.where((t) => t.avantNews).toList(growable: false);
-  final afterNews = trades.where((t) => t.apresNews).toList(growable: false);
-  if (beforeNews.isNotEmpty || afterNews.isNotEmpty) {
-    int wins(List<Trade> xs) => xs.where((t) => t.win).length;
-    int total(List<Trade> xs) => xs.length;
-    int wrPct(List<Trade> xs) =>
-        xs.isEmpty ? 0 : ((wins(xs) / total(xs)) * 100).round();
-    spans.addAll([
-      TextSpan(
-        text: _txt(
-          locale,
-          'News : ',
-          'News: ',
-          'Noticias: ',
-          'News: ',
-          'Notícias: ',
-          '뉴스: ',
-        ),
-        style: _lensBase(),
-      ),
-      if (beforeNews.isNotEmpty)
-        TextSpan(
-          text: _txt(
-            locale,
-            'Avant ${total(beforeNews)} (${wrPct(beforeNews)}% WR)',
-            'Before ${total(beforeNews)} (${wrPct(beforeNews)}% WR)',
-            'Antes ${total(beforeNews)} (${wrPct(beforeNews)}% WR)',
-            'Vor ${total(beforeNews)} (${wrPct(beforeNews)}% WR)',
-            'Antes ${total(beforeNews)} (${wrPct(beforeNews)}% WR)',
-            '전 ${total(beforeNews)}개 (${wrPct(beforeNews)}% WR)',
-          ),
-          style: _lensBold(kLensWinrate),
-        ),
-      if (beforeNews.isNotEmpty && afterNews.isNotEmpty)
-        TextSpan(text: _txt(locale, ' · ', ' · ', ' · ', ' · ', ' · ', ' · '), style: _lensBase()),
-      if (afterNews.isNotEmpty)
-        TextSpan(
-          text: _txt(
-            locale,
-            'Après ${total(afterNews)} (${wrPct(afterNews)}% WR). ',
-            'After ${total(afterNews)} (${wrPct(afterNews)}% WR). ',
-            'Después ${total(afterNews)} (${wrPct(afterNews)}% WR). ',
-            'Nach ${total(afterNews)} (${wrPct(afterNews)}% WR). ',
-            'Depois ${total(afterNews)} (${wrPct(afterNews)}% WR). ',
-            '후 ${total(afterNews)}개 (${wrPct(afterNews)}% WR). ',
-          ),
-          style: _lensBold(kLensWinrate),
-        ),
-      if (afterNews.isEmpty)
-        TextSpan(text: '. ', style: _lensBase()),
-    ]);
-  }
-
-  if (roll.hasData) {
-    final ae = roll.avgEtat.round();
-    final ac = roll.avgChecklist.round();
-    final ast = roll.avgStrategie.round();
-    final ap = roll.avgPlan.round();
-    spans.addAll([
-      TextSpan(text: _txt(locale, 'Globaux discipline : état mental ', 'Discipline totals: mental state ', 'Totales disciplina: estado mental ', 'Disziplin gesamt: mental ', 'Totais disciplina: estado mental ', '규율 합계: 멘탈 '), style: _lensBase()),
-      TextSpan(text: '$ae', style: _lensBold(kLensEtat)),
-      TextSpan(text: _txt(locale, ' %, checklist ', '%, checklist ', ' %, checklist ', ' %, Checkliste ', ' %, checklist ', ' %, 체크리스트 '), style: _lensBase()),
-      TextSpan(text: '$ac', style: _lensBold(kLensChecklist)),
-      TextSpan(text: _txt(locale, ' %, stratégie ', '%, strategy ', ' %, estrategia ', ' %, Strategie ', ' %, estratégia ', ' %, 전략 '), style: _lensBase()),
-      TextSpan(text: '$ast', style: _lensBold(kLensStrategie)),
-      TextSpan(text: _txt(locale, ' %, analyse / plan ', '%, analysis / plan ', ' %, análisis / plan ', ' %, Analyse / Plan ', ' %, análise / plano ', ' %, 분석/계획 '), style: _lensBase()),
-      TextSpan(text: '$ap', style: _lensBold(kLensPlan)),
-      TextSpan(text: _txt(locale, ' %. ', '%. ', ' %. ', ' %. ', ' %. ', ' %. '), style: _lensBase()),
-    ]);
-
-    final wrs = winRatesStrategieHighVsForced(trades);
-    final wrHigh = wrs.$1;
-    final nHigh = wrs.$2;
-    final wrLow = wrs.$3;
-    final nLow = wrs.$4;
-    if (nHigh >= 2 && nLow >= 2 && wrHigh > wrLow + 0.05) {
-      spans.addAll([
-        TextSpan(
-          text: _txt(
-            locale,
-            'Votre winrate est nettement plus élevé lorsque la stratégie est respectée (',
-            'Your win rate is clearly higher when strategy is respected (',
-            'Tu win rate es claramente más alto cuando se respeta la estrategia (',
-            'Ihre Gewinnrate ist deutlich höher, wenn die Strategie eingehalten wird (',
-            'Seu win rate é bem maior quando a estratégia é respeitada (',
-            '전략을 지킬 때 승률이 훨씬 높습니다 (',
-          ),
-          style: _lensBase(),
-        ),
-        TextSpan(text: '${(wrHigh * 100).round()}', style: _lensBold(kLensWinrate)),
-        TextSpan(text: _txt(locale, ' % vs ', '% vs ', ' % vs ', ' % vs ', ' % vs ', ' % 대 '), style: _lensBase()),
-        TextSpan(text: '${(wrLow * 100).round()}', style: _lensBold(kLensLoss)),
-        TextSpan(
-          text: _txt(locale, ' % sur les exécutions plus lâches). ', '% on looser executions). ', ' % en ejecuciones más laxas). ', ' % bei lockereren Umsetzungen). ', ' % em execuções mais soltas). ', '느슨한 실행 대비). '),
-          style: _lensBase(),
-        ),
-      ]);
-    } else if (roll.avgStrategie < 55 || roll.avgChecklist < 55) {
-      spans.add(TextSpan(
-        text: _txt(
-          locale,
-          'Des écarts sur checklist ou stratégie peuvent peser sur la constance des résultats. ',
-          'Gaps in checklist or strategy can weigh on result consistency. ',
-          'Las brechas en checklist o estrategia pueden afectar la constancia de resultados. ',
-          'Lücken bei Checkliste oder Strategie können die Ergebniskonstanz belasten. ',
-          'Falhas na checklist ou na estratégia podem afetar a constância dos resultados. ',
-          '체크리스트나 전략의 차이가 결과의 일관성에 영향을 줄 수 있습니다. ',
-        ),
-        style: _lensBase(),
-      ));
-    } else if (roll.avgEtat >= 65 && roll.avgStrategie >= 65) {
-      spans.add(TextSpan(
-        text: _txt(
-          locale,
-          'État mental et stratégie restent alignés avec une discipline soutenue. ',
-          'Mental state and strategy stay aligned with sustained discipline. ',
-          'Estado mental y estrategia se mantienen alineados con disciplina sostenida. ',
-          'Mentalzustand und Strategie bleiben mit solider Disziplin im Einklang. ',
-          'Estado mental e estratégia alinhados com disciplina consistente. ',
-          '멘탈과 전략이 꾸준한 규율과 잘 맞습니다. ',
-        ),
-        style: _lensBase(),
-      ));
-    }
-  } else {
-    spans.add(TextSpan(
-      text: _txt(
+  final axes = [
+    _axisStat(
+      kind: PaychekLensAxisKind.checklist,
+      label: _txt(
         locale,
-        'Renseignez la discipline (checklist, stratégie, état, plan) sur vos trades dans le journal pour affiner cette analyse. ',
-        'Fill in discipline data (checklist, strategy, state, plan) on your journal trades to refine this analysis. ',
-        'Completa datos de disciplina (checklist, estrategia, estado, plan) en tus trades del diario para afinar este análisis. ',
-        'Tragen Sie Disziplin (Checkliste, Strategie, Zustand, Plan) bei Ihren Journal-Trades ein, um diese Analyse zu verfeinern. ',
-        'Preencha disciplina (checklist, estratégia, estado, plano) nos trades do diário para refinar esta análise. ',
-        '일지 트레이드에 규율(체크리스트·전략·상태·계획)을 입력하면 분석이 정교해집니다. ',
+        'Checklist',
+        'Checklist',
+        'Checklist',
+        'Checkliste',
+        'Checklist',
+        '체크리스트',
       ),
-      style: _lensBase(),
-    ));
-  }
-
-  final chips = <PaychekLensChip>[
-    PaychekLensChip(text: '$n ${_tradeWord(locale, n)}', background: Colors.white, foreground: Colors.black),
-    PaychekLensChip(
-      text: _txt(locale, 'Perte max ${worst.toStringAsFixed(0)}', 'Max loss ${worst.toStringAsFixed(0)}', 'Pérdida máx ${worst.toStringAsFixed(0)}', 'Max. Verlust ${worst.toStringAsFixed(0)}', 'Perda máx ${worst.toStringAsFixed(0)}', '최대 손실 ${worst.toStringAsFixed(0)}'),
-      background: Colors.white,
-      foreground: kLensLoss,
+      color: kLensChecklist,
+      total: n,
+      qualified: nCl,
+      avgPct: roll.avgChecklist,
+      qualifiedTrades: _filter(trades, performanceTradeHasChecklist),
     ),
-    PaychekLensChip(
-      text: _txt(locale, 'Durée Ø ${avgDur.round()} min', 'Avg duration ${avgDur.round()} min', 'Duración media ${avgDur.round()} min', 'Ø Dauer ${avgDur.round()} Min', 'Duração Ø ${avgDur.round()} min', '평균 ${avgDur.round()}분'),
-      background: Colors.white,
-      foreground: kLensDuration,
+    _axisStat(
+      kind: PaychekLensAxisKind.etat,
+      label: _txt(
+        locale,
+        'État mental',
+        'Mental state',
+        'Estado mental',
+        'Mentalzustand',
+        'Estado mental',
+        '멘탈',
+      ),
+      color: kLensEtat,
+      total: n,
+      qualified: nEt,
+      avgPct: roll.avgEtat,
+      qualifiedTrades: _filter(trades, performanceTradeHasEtat),
+    ),
+    _axisStat(
+      kind: PaychekLensAxisKind.strategie,
+      label: _txt(
+        locale,
+        'Stratégie',
+        'Strategy',
+        'Estrategia',
+        'Strategie',
+        'Estratégia',
+        '전략',
+      ),
+      color: kLensStrategie,
+      total: n,
+      qualified: nSt,
+      avgPct: roll.avgStrategie,
+      qualifiedTrades: _filter(trades, performanceTradeHasStrategieExecution),
+    ),
+    _axisStat(
+      kind: PaychekLensAxisKind.plan,
+      label: _txt(
+        locale,
+        'Analyse',
+        'Analysis',
+        'Análisis',
+        'Analyse',
+        'Análise',
+        '분석',
+      ),
+      color: kLensPlan,
+      total: n,
+      qualified: nPl,
+      avgPct: roll.avgPlan,
+      qualifiedTrades: _filter(trades, performanceTradeHasPlanAnalysis),
     ),
   ];
-  if (roll.hasData) {
-    chips.addAll(_buildDisciplineChips(roll, locale));
+
+  String? newsLine;
+  final beforeNews = trades.where((t) => t.avantNews).toList();
+  final afterNews = trades.where((t) => t.apresNews).toList();
+  if (beforeNews.isNotEmpty || afterNews.isNotEmpty) {
+    int wrPct(List<Trade> xs) {
+      if (xs.isEmpty) return 0;
+      return ((_winRateOnTrades(xs) ?? 0) * 100).round();
+    }
+
+    final parts = <String>[];
+    if (beforeNews.isNotEmpty) {
+      parts.add(
+        _txt(
+          locale,
+          'Avant news ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+          'Before news ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+          'Antes noticias ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+          'Vor News ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+          'Antes notícias ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+          '뉴스 전 ${beforeNews.length} (${wrPct(beforeNews)}% WR)',
+        ),
+      );
+    }
+    if (afterNews.isNotEmpty) {
+      parts.add(
+        _txt(
+          locale,
+          'Après news ${afterNews.length} (${wrPct(afterNews)}% WR)',
+          'After news ${afterNews.length} (${wrPct(afterNews)}% WR)',
+          'Después noticias ${afterNews.length} (${wrPct(afterNews)}% WR)',
+          'Nach News ${afterNews.length} (${wrPct(afterNews)}% WR)',
+          'Depois notícias ${afterNews.length} (${wrPct(afterNews)}% WR)',
+          '뉴스 후 ${afterNews.length} (${wrPct(afterNews)}% WR)',
+        ),
+      );
+    }
+    newsLine = parts.join(' · ');
   }
 
-  return PaychekLensSnapshot(narrativeSpans: spans, chips: chips);
+  final insight = _buildInsight(
+    locale: locale,
+    total: n,
+    axes: axes,
+    trades: trades,
+    roll: roll,
+  );
+
+  return PaychekLensSnapshot(
+    tradeCount: n,
+    maxLoss: worst,
+    avgDurationMinutes: avgDur.round(),
+    axes: axes,
+    newsLine: newsLine,
+    insight: insight,
+  );
 }
 
-String disciplineImpactObservation(List<Trade> trades, {required Locale locale}) {
-  final wrs = winRatesStrategieHighVsForced(trades);
+String disciplineImpactObservation(
+  List<Trade> trades, {
+  required Locale locale,
+}) {
+  final tradesStrat = trades
+      .where(performanceTradeHasStrategieExecution)
+      .toList();
+  final wrs = winRatesStrategieHighVsForced(tradesStrat);
   final wrHigh = wrs.$1;
   final nHigh = wrs.$2;
   final wrLow = wrs.$3;

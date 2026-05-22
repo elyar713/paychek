@@ -1354,6 +1354,47 @@
   "tradeLabelExit": "Sortie",
   "tradeLabelHours": "Heures",
   "tradeLabelPlan": "Plan",
+  "tradePlanAnalysisNoData": "—",
+  "tradePlanAnalysisMissingAll": "Aucun trade n'a de plan Mon Analyse lié. Ouvrez un trade (modifier) et associez un rapport pour afficher le % Plan.",
+  "tradePlanAnalysisMissingPartial": "{missing} trade(s) sur {total} sans plan Mon Analyse — associez un rapport depuis Ajouter / modifier trade.",
+  "@tradePlanAnalysisMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performancePlanAnalysisMissingBanner": "Les statistiques « Analyse (plan) » ne comptent que les trades avec un rapport Mon Analyse lié. Sur cette période, aucun trade qualifié — associez un plan depuis le journal.",
+  "performancePlanAnalysisSectionEmpty": "Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.",
+  "tradeStrategieExecutionNoData": "—",
+  "tradeStrategieExecutionMissingAll": "Aucun trade n'a de stratégie renseignée (setup + slider). Modifiez un trade dans Ajouter trade pour afficher le % Stratégie.",
+  "tradeStrategieExecutionMissingPartial": "{missing} trade(s) sur {total} sans stratégie renseignée — choisissez un setup et le slider lors de l'enregistrement.",
+  "@tradeStrategieExecutionMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceStrategieExecutionSectionEmpty": "Aucun trade avec stratégie renseignée (slider / setup). Les cartes Horaires et Gestion du risque plus haut restent calculées automatiquement.",
+  "tradeChecklistNoData": "—",
+  "tradeChecklistMissingAll": "Aucun trade n'a de checklist cochée pour le jour d'entrée. Cochez des cases sur la page Checklist (ou rétroaction sur le trade).",
+  "tradeChecklistMissingPartial": "{missing} trade(s) sur {total} sans checklist renseignée pour le jour d'entrée.",
+  "@tradeChecklistMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceChecklistSectionEmpty": "Aucun trade avec checklist cochée le jour d'entrée. Les stats ne comptent que les trades liés à une checklist remplie.",
+  "tradeEtatNoData": "—",
+  "tradeEtatMissingAll": "Aucun trade n'a d'état mental réglé pour le jour d'entrée. Renseignez la page État mental (ou rétroaction sur le trade).",
+  "tradeEtatMissingPartial": "{missing} trade(s) sur {total} sans état mental réglé pour le jour d'entrée.",
+  "@tradeEtatMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceEtatSectionEmpty": "Aucun trade avec état mental réglé pour le jour d'entrée. Les cartes Horaires / Gestion du risque restent calculées automatiquement.",
   "tradeLabelSession": "Session",
   "tradeLabelStrategie": "Stratégie",
   "tradeLabelNews": "News",

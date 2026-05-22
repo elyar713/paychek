@@ -1,6 +1,6 @@
-﻿import '../l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
-/// MÃ©triques et types de graphique â€” partagÃ©s entre personnalisation et page Performance.
+/// Métriques et types de graphique — partagés entre personnalisation et page Performance.
 class PerformanceWidgetMetric {
   const PerformanceWidgetMetric({required this.title, required this.subtitle});
   final String title;
@@ -11,25 +11,55 @@ class PerformanceWidgetMetric {
   static PerformanceWidgetMetric at(int index, AppLocalizations l) {
     switch (index) {
       case 0:
-        return PerformanceWidgetMetric(title: l.perf0Title, subtitle: l.perf0Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf0Title,
+          subtitle: l.perf0Sub,
+        );
       case 1:
-        return PerformanceWidgetMetric(title: l.perf1Title, subtitle: l.perf1Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf1Title,
+          subtitle: l.perf1Sub,
+        );
       case 2:
-        return PerformanceWidgetMetric(title: l.perf2Title, subtitle: l.perf2Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf2Title,
+          subtitle: l.perf2Sub,
+        );
       case 3:
-        return PerformanceWidgetMetric(title: l.perf3Title, subtitle: l.perf3Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf3Title,
+          subtitle: l.perf3Sub,
+        );
       case 4:
-        return PerformanceWidgetMetric(title: l.perf4Title, subtitle: l.perf4Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf4Title,
+          subtitle: l.perf4Sub,
+        );
       case 5:
-        return PerformanceWidgetMetric(title: l.perf5Title, subtitle: l.perf5Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf5Title,
+          subtitle: l.perf5Sub,
+        );
       case 6:
-        return PerformanceWidgetMetric(title: l.perf6Title, subtitle: l.perf6Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf6Title,
+          subtitle: l.perf6Sub,
+        );
       case 7:
-        return PerformanceWidgetMetric(title: l.perf7Title, subtitle: l.perf7Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf7Title,
+          subtitle: l.perf7Sub,
+        );
       case 8:
-        return PerformanceWidgetMetric(title: l.perf8Title, subtitle: l.perf8Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf8Title,
+          subtitle: l.perf8Sub,
+        );
       case 9:
-        return PerformanceWidgetMetric(title: l.perf9Title, subtitle: l.perf9Sub);
+        return PerformanceWidgetMetric(
+          title: l.perf9Title,
+          subtitle: l.perf9Sub,
+        );
       default:
         throw RangeError.index(index, count);
     }
@@ -99,6 +129,3 @@ class SavedPerformanceWidget {
       chartTypeIndex >= 0 &&
       chartTypeIndex < PerformanceWidgetChartType.count;
 }
-
-
-

@@ -190,11 +190,9 @@ class _StrategieDayViolationsCardState extends State<StrategieDayViolationsCard>
             return Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF0F0F11),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: StrategieTokens.horairesGold.withValues(alpha: 0.35),
-                ),
+                color: StrategieTokens.innerCardBg,
+                borderRadius: BorderRadius.circular(StrategieTokens.radiusMd),
+                border: Border.all(color: StrategieTokens.cardBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -217,7 +215,7 @@ class _StrategieDayViolationsCardState extends State<StrategieDayViolationsCard>
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFFB5B5B5),
+                            color: StrategieTokens.labelMuted,
                           ),
                         ),
                       ),
@@ -229,7 +227,7 @@ class _StrategieDayViolationsCardState extends State<StrategieDayViolationsCard>
                             fontWeight: FontWeight.w900,
                             color: avgPct >= 95
                                 ? StrategieTokens.emerald
-                                : const Color(0xFFE5E5E5),
+                                : StrategieTokens.titleGrey,
                           ),
                         )
                       else
@@ -238,7 +236,7 @@ class _StrategieDayViolationsCardState extends State<StrategieDayViolationsCard>
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            color: const Color(0xFF5C5C5C),
+                            color: StrategieTokens.labelMuted,
                           ),
                         ),
                     ],

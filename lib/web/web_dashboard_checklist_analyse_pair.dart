@@ -1,37 +1,35 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
-import '../dashboard/dashboard_tokens.dart';
+import '../analyse/analyse_tokens.dart';
 import '../l10n/app_localizations.dart';
 import 'paychek_web_tokens.dart';
 
 /// Carte encadrée (web) pour un bloc seul sur l’accueil.
 class WebDashboardPairedCard extends StatelessWidget {
-  const WebDashboardPairedCard({super.key, required this.child});
+  const WebDashboardPairedCard({
+    super.key,
+    required this.child,
+    this.bare = false,
+  });
 
   final Widget child;
 
+  /// Sans cadre gris (ex. « Mon analyse » : seul le rapport OLED garde sa carte).
+  final bool bare;
+
   @override
   Widget build(BuildContext context) {
-    final radius = kIsWeb ? PaychekWebTokens.radiusCard : 20.0;
-    final fill =
-        kIsWeb ? PaychekWebTokens.cardBg : DashboardTokens.cardBoxBg;
-    final side = kIsWeb
-        ? PaychekWebTokens.cardBorder.withValues(alpha: 0.85)
-        : DashboardTokens.border.withValues(alpha: 0.55);
-    return Material(
-      color: fill,
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(radius),
-        side: BorderSide(color: side),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-        child: child,
+    if (bare) return child;
+
+    final deco = AnalyseTokens.oledStepDecoration();
+    return DecoratedBox(
+      decoration: deco,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AnalyseTokens.radiusCard),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+          child: child,
+        ),
       ),
     );
   }
@@ -102,7 +100,7 @@ class _WebDashboardChecklistAnalysePairState
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          WebDashboardPairedCard(child: widget.analyseChild),
+          WebDashboardPairedCard(bare: true, child: widget.analyseChild),
           const SizedBox(height: 16),
           WebDashboardPairedCard(child: widget.checklistChild),
         ],
@@ -138,6 +136,7 @@ class _WebDashboardChecklistAnalysePairState
               flex: flexAnalyse,
               child: WebDashboardPairedCard(
                 key: _analyseCardKey,
+                bare: true,
                 child: widget.analyseChild,
               ),
             ),

@@ -1,8 +1,11 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../analyse_controller.dart';
+import '../analyse_entry_tf_storage.dart';
 import '../analyse_models.dart';
 import '../analyse_tokens.dart';
 
@@ -94,6 +97,7 @@ Future<void> showAnalyseStructureTfPicker(
         c.setIndicatorsSnapshotTf(indSnap, label);
       } else {
         c.indicatorsTf = label;
+        unawaited(AnalyseEntryTfStorage.saveFromController(c));
       }
     } else {
       if (structSnap != null) {
@@ -144,6 +148,7 @@ Future<void> showAnalyseStructureTfPicker(
           c.addIndicatorsSnapshotTfCustom(indSnap, v);
         } else {
           c.addIndicatorsTfCustom(v);
+          unawaited(AnalyseEntryTfStorage.saveFromController(c));
         }
       } else {
         if (structSnap != null) {

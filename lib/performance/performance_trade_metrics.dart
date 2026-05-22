@@ -39,7 +39,11 @@ TradeAggregates aggregateTrades(List<Trade> trades) {
 }
 
 class DurationBucketStat {
-  const DurationBucketStat({required this.label, required this.winRate, required this.count});
+  const DurationBucketStat({
+    required this.label,
+    required this.winRate,
+    required this.count,
+  });
 
   final String label;
   final double winRate;
@@ -106,7 +110,7 @@ List<AssetTradeBarStat> computeTopAssetBarStats(
         symbol: e.key,
         count: e.value.length,
         winRate: e.value.where((t) => t.win).length / e.value.length,
-      )
+      ),
   ];
 }
 
@@ -145,7 +149,9 @@ int _histogramBucketIndexForDayTradeCount(int n) {
 DateTime _calendarDay(DateTime d) => DateTime(d.year, d.month, d.day);
 
 /// Regroupe les trades par jour calendaire (période filtrée en amont), puis quatre barres pour la page Performance.
-List<DayIntensityHistogramBucketStat> computeDayIntensityHistogramBuckets(List<Trade> trades) {
+List<DayIntensityHistogramBucketStat> computeDayIntensityHistogramBuckets(
+  List<Trade> trades,
+) {
   const kBuckets = 4;
   if (trades.isEmpty) {
     return List<DayIntensityHistogramBucketStat>.filled(
@@ -184,7 +190,9 @@ List<DayIntensityHistogramBucketStat> computeDayIntensityHistogramBuckets(List<T
 }
 
 /// Tranche de durée avec le meilleur winrate (toutes tranches confondues ; ignoré si aucun trade).
-DurationBucketStat? pickBestDurationBucketByWinrate(List<DurationBucketStat> buckets) {
+DurationBucketStat? pickBestDurationBucketByWinrate(
+  List<DurationBucketStat> buckets,
+) {
   DurationBucketStat? best;
   for (final b in buckets) {
     if (b.count == 0) continue;
@@ -290,19 +298,51 @@ List<TimeSlotStat> timeSlotWinRates(
   return [
     TimeSlotStat(
       label: '09:00 - 11:30',
-      sub: performancePickLocale(locale, '(Début)', '(Start)', '(Inicio)', '(Start)', '(Início)', '(시작)'),
+      sub: performancePickLocale(
+        locale,
+        '(Début)',
+        '(Start)',
+        '(Inicio)',
+        '(Start)',
+        '(Início)',
+        '(시작)',
+      ),
       winRate: a.$1,
       count: a.$2,
     ),
     TimeSlotStat(
       label: '14:30 - 16:30',
-      sub: performancePickLocale(locale, '(US Open)', '(US Open)', '(Apertura US)', '(US Open)', '(Abertura EUA)', '(미국장)'),
+      sub: performancePickLocale(
+        locale,
+        '(US Open)',
+        '(US Open)',
+        '(Apertura US)',
+        '(US Open)',
+        '(Abertura EUA)',
+        '(미국장)',
+      ),
       winRate: b.$1,
       count: b.$2,
     ),
     TimeSlotStat(
-      label: performancePickLocale(locale, '19h00 et +', '19:00+', '19:00+', '19:00+', '19:00+', '19:00+'),
-      sub: performancePickLocale(locale, '(Fin/Soir)', '(Evening)', '(Noche)', '(Abend)', '(Fim/Noite)', '(저녁)'),
+      label: performancePickLocale(
+        locale,
+        '19h00 et +',
+        '19:00+',
+        '19:00+',
+        '19:00+',
+        '19:00+',
+        '19:00+',
+      ),
+      sub: performancePickLocale(
+        locale,
+        '(Fin/Soir)',
+        '(Evening)',
+        '(Noche)',
+        '(Abend)',
+        '(Fim/Noite)',
+        '(저녁)',
+      ),
       winRate: c.$1,
       count: c.$2,
     ),
@@ -315,18 +355,28 @@ int winrateDropPercentPoints(SessionFilterResult s) {
 }
 
 class NamedWinRate {
-  const NamedWinRate({required this.label, required this.winRate, required this.count});
+  const NamedWinRate({
+    required this.label,
+    required this.winRate,
+    required this.count,
+  });
 
   final String label;
   final double winRate;
   final int count;
 }
 
-List<NamedWinRate> weekdayWinRates(List<Trade> trades, {required Locale locale}) {
+List<NamedWinRate> weekdayWinRates(
+  List<Trade> trades, {
+  required Locale locale,
+}) {
   // Semaine calendaire Mon–Sun alignée sur [trades] : libellés selon la locale de l’app (pas la locale système).
   final baseMonday = DateTime(2024, 1, 1);
   final fmt = intl.DateFormat.E(locale.toString());
-  final names = List<String>.generate(7, (i) => fmt.format(baseMonday.add(Duration(days: i))));
+  final names = List<String>.generate(
+    7,
+    (i) => fmt.format(baseMonday.add(Duration(days: i))),
+  );
   final by = List.generate(7, (_) => <Trade>[]);
   for (final t in trades) {
     final d = t.date.weekday;
@@ -339,20 +389,31 @@ List<NamedWinRate> weekdayWinRates(List<Trade> trades, {required Locale locale})
       if (t.win) wins++;
     }
     final n = list.length;
-    return NamedWinRate(label: names[i], winRate: n == 0 ? 0.0 : wins / n, count: n);
+    return NamedWinRate(
+      label: names[i],
+      winRate: n == 0 ? 0.0 : wins / n,
+      count: n,
+    );
   });
 }
 
-List<NamedWinRate> timeSlotWinRatesNamed(List<Trade> trades, {required Locale locale}) {
+List<NamedWinRate> timeSlotWinRatesNamed(
+  List<Trade> trades, {
+  required Locale locale,
+}) {
   final slots = timeSlotWinRates(trades, locale: locale);
   return [
-    for (final s in slots) NamedWinRate(label: s.label, winRate: s.winRate, count: s.count),
+    for (final s in slots)
+      NamedWinRate(label: s.label, winRate: s.winRate, count: s.count),
   ];
 }
 
 List<NamedWinRate> durationBucketWinRatesNamed(List<Trade> trades) {
   final b = durationBucketWinRates(trades);
-  return [for (final d in b) NamedWinRate(label: d.label, winRate: d.winRate, count: d.count)];
+  return [
+    for (final d in b)
+      NamedWinRate(label: d.label, winRate: d.winRate, count: d.count),
+  ];
 }
 
 List<NamedWinRate> profitAmplitudeBuckets(List<Trade> trades) {
@@ -375,7 +436,11 @@ List<NamedWinRate> profitAmplitudeBuckets(List<Trade> trades) {
       if (t.win) wins++;
     }
     final n = list.length;
-    return NamedWinRate(label: labels[i], winRate: n == 0 ? 0.0 : wins / n, count: n);
+    return NamedWinRate(
+      label: labels[i],
+      winRate: n == 0 ? 0.0 : wins / n,
+      count: n,
+    );
   });
 }
 
@@ -416,9 +481,14 @@ class DailyJournalVolumeBucketStat {
   final int dayCount;
 }
 
-List<DailyJournalVolumeBucketStat> dailyJournalVolumeBucketWinRates(List<Trade> trades) {
+List<DailyJournalVolumeBucketStat> dailyJournalVolumeBucketWinRates(
+  List<Trade> trades,
+) {
   // Backward-compatible default for older call sites.
-  return dailyJournalVolumeBucketWinRatesLocalized(trades, locale: const Locale('en'));
+  return dailyJournalVolumeBucketWinRatesLocalized(
+    trades,
+    locale: const Locale('en'),
+  );
 }
 
 List<DailyJournalVolumeBucketStat> dailyJournalVolumeBucketWinRatesLocalized(

@@ -42,7 +42,10 @@ import 'trade/trade_page.dart';
 import 'strategie/strategie_setups_store.dart';
 import 'strategie/strategie_starred_setup_storage.dart';
 import 'strategie/widgets/strategie_setup_card.dart';
+import 'trade/trade_journal_checklist_etat_migration.dart';
+import 'trade/trade_journal_scope.dart';
 import 'trade/trade_models.dart';
+import 'trade/trade_plan_analysis.dart';
 import 'performance/performance_page.dart';
 import 'reglage/reglage_dashboard_layout_page.dart';
 import 'reglage/reglage_page.dart';
@@ -190,9 +193,11 @@ class _DashboardPageState extends State<DashboardPage>
     WidgetsBinding.instance.addObserver(this);
     AnalyseRealtimeNotifier.tick.addListener(_reloadAnalyseHomePreview);
     AnalyseRealtimeNotifier.reportsTick.addListener(_reloadAnalyseHomePreview);
-    PaychekFrameCallbacks.runPostFrame(() {
-      _checklistController.hydrateFromStorage();
-      _checkPaychekRemoteAccessGate();
+    tradeDisciplineChecklistResolver = _checklistController;
+    PaychekFrameCallbacks.runPostFrame(() async {
+      await _checklistController.hydrateFromStorage();
+      if (mounted) _reconcileJournalDisciplineFromCalendar();
+      if (mounted) _checkPaychekRemoteAccessGate();
     });
     _reloadAnalyseHomePreview();
     _reloadStrategieHomePreview();
@@ -257,7 +262,26 @@ class _DashboardPageState extends State<DashboardPage>
 
   void _onChecklistCloudTick() {
     if (_checklistController.isEditingChecklist) return;
-    unawaited(_checklistController.reloadFromStorage());
+    unawaited(
+      _checklistController.reloadFromStorage().then((_) {
+        if (mounted) _reconcileJournalDisciplineFromCalendar();
+      }),
+    );
+  }
+
+  void _reconcileJournalDisciplineFromCalendar() {
+    tradeDisciplineChecklistResolver = _checklistController;
+    final store = TradeJournalScope.of(context);
+    final current = store.items;
+    if (current.isEmpty) return;
+    reconcileJournalChecklistEtatFromCalendar(
+      List<TradeListItem>.from(current),
+      onChanged: (next) {
+        if (journalChecklistEtatMigrationWouldChange(current)) {
+          store.replaceAll(next);
+        }
+      },
+    );
   }
 
   Future<void> _checkPaychekRemoteAccessGate() async {
@@ -344,12 +368,10 @@ class _DashboardPageState extends State<DashboardPage>
       final inList = stored.any(
         (s) => analyseSnapshotsEqualForStar(s, starred),
       );
-      // Liste vide = démos non encore persistés ou course disque ; garder l’étoile.
       if (stored.isEmpty || inList) {
         setState(() => _analyseHomePreview = starred);
         return;
       }
-      // Étoile pointant vers un rapport supprimé.
       unawaited(AnalyseStarredReportStorage.clear());
     }
 
@@ -360,7 +382,7 @@ class _DashboardPageState extends State<DashboardPage>
       return;
     }
 
-    // 3) Nouveau compte : même aperçu démo que la page Analyse (GOLD H4).
+    // 3) Nouveau compte : aperçu rapport démo (générateur vierge sur la page Analyse).
     final locale = mounted
         ? Localizations.localeOf(context)
         : WidgetsBinding.instance.platformDispatcher.locale;
@@ -873,6 +895,15 @@ class _DashboardPageState extends State<DashboardPage>
                             _liteRestricted ? _showLitePaywallSheet : null,
                         onCloseAsTab: () =>
                             setState(() => _overlayPage = _overlayNone),
+                        onEditTrade: (t) {
+                          if (_liteRestricted) {
+                            _showLitePaywallSheet();
+                            return;
+                          }
+                          setState(() => _overlayPage = _overlayNone);
+                          _editTrade.value = t;
+                          _applyTabIndex(2);
+                        },
                       ),
                     _overlayChecklist => _wrapLiteProOverlayPage(
                         ChecklistPage(

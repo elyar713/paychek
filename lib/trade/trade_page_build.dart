@@ -164,6 +164,29 @@ extension _TradePageBuild on _TradePageState {
                       });
                     },
                   ),
+                  if (items.isNotEmpty) ...[
+                    buildPlanAnalysisMissingNotice(
+                      context,
+                      missingCount: countTradesMissingPlanAnalysis(items),
+                      totalCount: items.length,
+                    ),
+                    buildStrategieExecutionMissingNotice(
+                      context,
+                      missingCount:
+                          countTradesMissingStrategieExecution(items),
+                      totalCount: items.length,
+                    ),
+                    buildChecklistMissingNotice(
+                      context,
+                      missingCount: countTradesMissingChecklist(items),
+                      totalCount: items.length,
+                    ),
+                    buildEtatMissingNotice(
+                      context,
+                      missingCount: countTradesMissingEtat(items),
+                      totalCount: items.length,
+                    ),
+                  ],
                   if (mostTraded.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Text(

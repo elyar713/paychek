@@ -13,6 +13,7 @@ mixin AnalyseControllerContexteFields on ChangeNotifier {
   set contextEnabled(bool v) {
     if (v == _contextEnabled) return;
     _contextEnabled = v;
+    rebalanceAnalyseSectionImpacts();
     notifyListeners();
   }
 

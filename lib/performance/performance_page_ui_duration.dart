@@ -3,8 +3,14 @@ part of 'performance_page.dart';
 extension _PerformancePageUiDuration on _PerformancePageState {
   Widget _cardDuration(List<DurationBucketStat> buckets) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     String trades(int n) => performanceTradeWordPlural(code, n);
     const emptyBucket = DurationBucketStat(label: '', winRate: 0, count: 0);
     final b = buckets.isNotEmpty
@@ -17,7 +23,14 @@ extension _PerformancePageUiDuration on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.clock,
-            t('Durée des positions', 'Position duration', 'Duración de posiciones', 'Positionsdauer', 'Duração das posições', '포지션 보유 시간'),
+            t(
+              'Durée des positions',
+              'Position duration',
+              'Duración de posiciones',
+              'Positionsdauer',
+              'Duração das posições',
+              '포지션 보유 시간',
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -31,14 +44,21 @@ extension _PerformancePageUiDuration on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.45,
             ),
           ),
           const SizedBox(height: 16),
           if (best != null) ...[
             Text(
-              t('Meilleur winrate', 'Best win rate', 'Mejor win rate', 'Beste Gewinnrate', 'Melhor win rate', '최고 승률'),
+              t(
+                'Meilleur winrate',
+                'Best win rate',
+                'Mejor win rate',
+                'Beste Gewinnrate',
+                'Melhor win rate',
+                '최고 승률',
+              ),
               style: _labelStyle(),
             ),
             const SizedBox(height: 8),
@@ -95,7 +115,7 @@ extension _PerformancePageUiDuration on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 height: 1.4,
               ),
             ),
@@ -114,7 +134,7 @@ extension _PerformancePageUiDuration on _PerformancePageState {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               letterSpacing: 0.2,
             ),
           ),
@@ -133,7 +153,7 @@ extension _PerformancePageUiDuration on _PerformancePageState {
                         (b[i].winRate * 100).round(),
                         b[i].winRate,
                         b[i].label.isEmpty ? '-' : b[i].label,
-                        i.isEven ? Colors.white : const Color(0xFF444444),
+                        i.isEven ? Colors.white : PerformanceTokens.labelFaint,
                       ),
                     ),
                 ],
@@ -146,11 +166,11 @@ extension _PerformancePageUiDuration on _PerformancePageState {
   }
 
   TextStyle _labelStyle() => GoogleFonts.plusJakartaSans(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: const Color(0xFF666666),
-        letterSpacing: 0.5,
-      );
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: PerformanceTokens.labelDim,
+    letterSpacing: 0.5,
+  );
 
   Widget _miniBar(int pctText, double wr, String label, Color color) {
     const trackH = 56.0;
@@ -160,39 +180,52 @@ extension _PerformancePageUiDuration on _PerformancePageState {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-            Text(
-              '$pctText%',
-              style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: color),
+          Text(
+            '$pctText%',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: color,
             ),
-            const SizedBox(height: 4),
-            SizedBox(
-              height: trackH,
-              width: double.infinity,
-              child: Align(
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            height: trackH,
+            width: double.infinity,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: FractionallySizedBox(
+                widthFactor: 1,
+                heightFactor: (0.12 + wr.clamp(0.0, 1.0) * 0.88).clamp(
+                  0.12,
+                  1.0,
+                ),
                 alignment: Alignment.bottomCenter,
-                child: FractionallySizedBox(
-                  widthFactor: 1,
-                  heightFactor: (0.12 + wr.clamp(0.0, 1.0) * 0.88).clamp(0.12, 1.0),
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(4),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.plusJakartaSans(fontSize: 8, fontWeight: FontWeight.w700, color: const Color(0xFF666666)),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              color: PerformanceTokens.labelDim,
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }

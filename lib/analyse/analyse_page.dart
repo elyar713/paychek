@@ -1,11 +1,9 @@
 import 'dart:async' show unawaited;
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
-import 'package:mon_app_finder/l10n/app_localizations.dart';
-
 import 'analyse_controller.dart';
+import 'analyse_entry_tf_storage.dart';
 import 'analyse_default_demo_seed.dart';
 import 'analyse_realtime_notifier.dart';
 import 'analyse_page_content.dart';
@@ -16,8 +14,11 @@ import 'analyse_report_snapshot_codec.dart';
 import 'analyse_reports_storage.dart';
 import 'analyse_firestore_sync.dart';
 import 'analyse_starred_report_storage.dart';
+import 'analyse_oled_plan_ui.dart';
 import 'analyse_tokens.dart';
+import '../l10n/app_localizations.dart';
 import '../strategie/strategie_setups_store.dart';
+import '../widgets/paychek_page_header.dart';
 
 class AnalysePage extends StatefulWidget {
   const AnalysePage({
@@ -50,6 +51,13 @@ class _AnalysePageState extends State<AnalysePage> {
   int _nextReportEmbedKey = 1;
   AnalyseReportSnapshot? _storedDashboardStarSnapshot;
   bool _lastEditedWasStarred = false;
+  bool _showSaveBanner = false;
+
+  /// Incrémenté au crayon : force la reconstruction des champs OLED (initialValue).
+  int _generatorContentEpoch = 0;
+
+  /// Index du rapport en cours de réédition (crayon) — masqué dans la liste, remplacé à la sauvegarde.
+  int? _editingReportIndex;
 
   bool get _embeddedInTabShell => widget.onCloseAsTab != null;
 
@@ -71,13 +79,10 @@ class _AnalysePageState extends State<AnalysePage> {
       setState(() => _storedDashboardStarSnapshot = s);
     });
     _c = AnalyseController();
+    unawaited(AnalyseEntryTfStorage.applyToController(_c));
     _strategieSetupIndex = ValueNotifier<int>(0);
     StrategieSetupsStore.ensureLoaded();
-    _reportEntries = _buildDemoEntries(
-      WidgetsBinding.instance.platformDispatcher.locale,
-    );
-    _c.resetAfterReportValidation();
-    _restoreStoredReportsIfAny();
+    unawaited(_restoreStoredReportsIfAny());
   }
 
   void _onRemoteAnalyseTick() {
@@ -104,19 +109,6 @@ class _AnalysePageState extends State<AnalysePage> {
   }
 
 
-  List<AnalyseStackedReportEntry> _buildDemoEntries(Locale locale) {
-    applyAnalyseDefaultGoldBreakoutDemo(_c, locale: locale);
-    final goldSnap = AnalyseReportSnapshot.fromController(_c, locale: locale);
-    final goldKey = _nextReportEmbedKey++;
-    applyAnalyseDefaultEuroUsdWeeklySwingDemo(_c, locale: locale);
-    final eurSnap = AnalyseReportSnapshot.fromController(_c, locale: locale);
-    final eurKey = _nextReportEmbedKey++;
-    return [
-      AnalyseStackedReportEntry(snapshot: goldSnap, embedKey: goldKey),
-      AnalyseStackedReportEntry(snapshot: eurSnap, embedKey: eurKey),
-    ];
-  }
-
   @override
   void dispose() {
     AnalyseRealtimeNotifier.tick.removeListener(_onRemoteAnalyseTick);
@@ -125,8 +117,17 @@ class _AnalysePageState extends State<AnalysePage> {
     super.dispose();
   }
 
+  /// Un rapport démo figé sous le générateur ; le contrôleur reste vierge (modifiable).
+  void _seedDemoReportOnly(Locale locale) {
+    _reportEntries = [
+      AnalyseStackedReportEntry(
+        snapshot: buildAnalyseDashboardPreviewSnapshot(locale: locale),
+        embedKey: _nextReportEmbedKey++,
+      ),
+    ];
+  }
+
   Future<void> _restoreStoredReportsIfAny() async {
-    final platformLoc = WidgetsBinding.instance.platformDispatcher.locale;
     final stored = await AnalyseReportsStorage.loadAll();
     if (!mounted) return;
     if (stored.isNotEmpty) {
@@ -141,13 +142,7 @@ class _AnalysePageState extends State<AnalysePage> {
       });
       return;
     }
-    final appLoc = Localizations.localeOf(context);
-    if (appLoc.languageCode != platformLoc.languageCode) {
-      setState(() {
-        _reportEntries = _buildDemoEntries(appLoc);
-      });
-      _c.resetAfterReportValidation();
-    }
+    setState(() => _seedDemoReportOnly(Localizations.localeOf(context)));
   }
 
   Future<void> _persistCurrentReports() async {
@@ -173,6 +168,68 @@ class _AnalysePageState extends State<AnalysePage> {
       }
     }
     return 0;
+  }
+
+  void _onSavePlan() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final locale = Localizations.localeOf(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final snap = AnalyseReportSnapshot.fromController(_c, locale: locale);
+      _commitReportFromGenerator(snap);
+    });
+  }
+
+  /// Nouveau rapport en tête, ou remplacement du rapport ouvert au crayon.
+  void _commitReportFromGenerator(AnalyseReportSnapshot snap) {
+    final editIdx = _editingReportIndex;
+    final wasEditingStar = _lastEditedWasStarred;
+    _editingReportIndex = null;
+    _lastEditedWasStarred = false;
+
+    final AnalyseStackedReportEntry entry;
+    if (editIdx != null &&
+        editIdx >= 0 &&
+        editIdx < _reportEntries.length) {
+      final prev = _reportEntries[editIdx];
+      entry = AnalyseStackedReportEntry(
+        snapshot: snap,
+        embedKey: prev.embedKey,
+        screenshotBytes: _c.draftReportScreenshotBytes ?? prev.screenshotBytes,
+      );
+    } else {
+      entry = AnalyseStackedReportEntry(
+        snapshot: snap,
+        embedKey: _nextReportEmbedKey++,
+        screenshotBytes: _c.draftReportScreenshotBytes,
+      );
+    }
+
+    setState(() {
+      _showSaveBanner = true;
+      if (editIdx != null &&
+          editIdx >= 0 &&
+          editIdx < _reportEntries.length) {
+        final list = List<AnalyseStackedReportEntry>.from(_reportEntries);
+        list[editIdx] = entry;
+        _reportEntries = list;
+      } else {
+        _reportEntries = [entry, ..._reportEntries];
+      }
+    });
+
+    if (wasEditingStar) {
+      AnalyseStarredReportStorage.save(snap).then((_) {
+        if (!mounted) return;
+        setState(() => _storedDashboardStarSnapshot = snap);
+        AnalyseRealtimeNotifier.bump();
+      });
+    }
+    _persistCurrentReports();
+    _c.resetAfterReportValidation();
+    Future<void>.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _showSaveBanner = false);
+    });
   }
 
   bool _reportStarredAt(int index) {
@@ -208,9 +265,7 @@ class _AnalysePageState extends State<AnalysePage> {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final maxW =
-        math.min(AnalyseTokens.pageMaxWidthDashboard, media.size.width);
+    final l = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _c,
@@ -226,110 +281,40 @@ class _AnalysePageState extends State<AnalysePage> {
           },
           child: Scaffold(
             backgroundColor: AnalyseTokens.bg,
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          center: const Alignment(0, -0.9),
-                          radius: 1.4,
-                          colors: [
-                            AnalyseTokens.accentGreen.withValues(alpha: 0.06),
-                            Colors.transparent,
-                          ],
-                        ),
+            body: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final maxContent = math.min(
+                    AnalyseTokens.pageContentMaxWidth,
+                    constraints.maxWidth,
+                  );
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      PaychekPageHeader(
+                        onBack: _handleBack,
+                        title: l.analysePageHeroTitle,
+                        subtitle: l.analysePageHeroSubtitle,
+                        subtitleMaxLines: 2,
+                        maxContentWidth: AnalyseTokens.pageMaxWidthDashboard,
                       ),
-                    ),
-                  ),
-                ),
-                SafeArea(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxW),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 10, 16, 0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 2),
-                                  child: IconButton(
-                                    onPressed: _handleBack,
-                                    style: IconButton.styleFrom(
-                                      foregroundColor: AnalyseTokens.muted2,
-                                      padding: const EdgeInsets.all(10),
-                                      minimumSize: const Size(40, 40),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    tooltip:
-                                        MaterialLocalizations.of(context)
-                                            .backButtonTooltip,
-                                    icon: const Icon(
-                                      Icons.arrow_back_ios_new_rounded,
-                                      size: 18,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 2,
-                                      top: 6,
-                                      right: 8,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .analysePageHeroTitle,
-                                          style: const TextStyle(
-                                            color: AnalyseTokens.matteText,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w800,
-                                            height: 1.15,
-                                            letterSpacing: -0.4,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .analysePageHeroSubtitle,
-                                          style: TextStyle(
-                                            color: AnalyseTokens.muted2,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.4,
-                                            letterSpacing: 0.1,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
-                            child: Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: AnalyseTokens.cardBorder.withValues(
-                                alpha: 0.85,
-                              ),
-                            ),
-                          ),
-                          Expanded(
+                      AnalyseOledStickyHeader(
+                        controller: _c,
+                        onSave: _onSavePlan,
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints:
+                                BoxConstraints(maxWidth: maxContent),
                             child: AnalysePageScrollContent(
-                              controller: _c,
+                          controller: _c,
+                          generatorContentEpoch: _generatorContentEpoch,
+                          editingReportIndex: _editingReportIndex,
+                          showSaveBanner: _showSaveBanner,
+                          onDismissSaveBanner: () {
+                            if (mounted) setState(() => _showSaveBanner = false);
+                          },
                               strategieVisibleSetupIndex: _strategieSetupIndex,
                               reportEntries: _reportEntries,
                               initialScrollToReports:
@@ -337,53 +322,24 @@ class _AnalysePageState extends State<AnalysePage> {
                               scrollTargetReportIndex: _scrollTargetReportIndex,
                               reportStarred: _reportStarredAt,
                               onToggleReportStar: _toggleDashboardStarAt,
-                              onReportValidated: (s) {
-                                final shot = _c.draftReportScreenshotBytes;
-                                final wasEditingStar = _lastEditedWasStarred;
-                                _lastEditedWasStarred = false;
-                                setState(() {
-                                  // Ajoute en haut de liste (historique).
-                                  _reportEntries = [
-                                    AnalyseStackedReportEntry(
-                                      snapshot: s,
-                                      embedKey: _nextReportEmbedKey++,
-                                      screenshotBytes: shot,
-                                    ),
-                                    ..._reportEntries,
-                                  ];
-                                });
-                                if (wasEditingStar) {
-                                  AnalyseStarredReportStorage.save(s).then((_) {
-                                    if (!mounted) return;
-                                    setState(() => _storedDashboardStarSnapshot = s);
-                                    AnalyseRealtimeNotifier.bump();
-                                  });
-                                }
-                                _persistCurrentReports();
-                              },
+                              onReportValidated: _commitReportFromGenerator,
                               onEditReport: (index) {
                                 if (index < 0 ||
                                     index >= _reportEntries.length) {
                                   return;
                                 }
-                                final snap = _reportEntries[index].snapshot;
+                                final entry = _reportEntries[index];
+                                final snap = entry.snapshot;
                                 final wasStarred =
                                     AnalyseStarredReportStorage.matches(
                                       _storedDashboardStarSnapshot,
                                       snap,
                                     );
                                 _lastEditedWasStarred = wasStarred;
-                                final previousShot =
-                                    _reportEntries[index].screenshotBytes;
+                                _editingReportIndex = index;
                                 applyAnalyseReportToController(_c, snap);
-                                _c.setDraftReportScreenshot(previousShot);
-                                setState(() {
-                                  _reportEntries =
-                                      List<AnalyseStackedReportEntry>.from(
-                                        _reportEntries,
-                                      )..removeAt(index);
-                                });
-                                _persistCurrentReports();
+                                _c.setDraftReportScreenshot(entry.screenshotBytes);
+                                setState(() => _generatorContentEpoch++);
                               },
                               onExportPdf: (index) {
                                 if (index < 0 ||
@@ -409,6 +365,13 @@ class _AnalysePageState extends State<AnalysePage> {
                                       deleting,
                                     );
                                 setState(() {
+                                  if (_editingReportIndex == index) {
+                                    _editingReportIndex = null;
+                                  } else if (_editingReportIndex != null &&
+                                      _editingReportIndex! > index) {
+                                    _editingReportIndex =
+                                        _editingReportIndex! - 1;
+                                  }
                                   _reportEntries =
                                       List<AnalyseStackedReportEntry>.from(
                                         _reportEntries,
@@ -425,12 +388,12 @@ class _AnalysePageState extends State<AnalysePage> {
                               },
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+                },
+              ),
             ),
           ),
         );

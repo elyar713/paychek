@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../performance/performance_locale_copy.dart';
+import 'analyse_confluence_score.dart';
 import 'analyse_controller.dart';
 import 'analyse_models.dart';
 import 'analyse_phase_locale.dart';
@@ -21,6 +22,10 @@ class AnalyseReportSnapshot {
     required this.biasFg,
     required this.globalConfidencePercent,
     required this.globalConfidenceColor,
+    required this.confluenceScore,
+    this.smcObExtras = const [],
+    this.smcFvgExtras = const [],
+    this.smcLiquidityExtras = const [],
     required this.contexteTfLine,
     required this.phaseLabel,
     required this.phaseBg,
@@ -91,6 +96,10 @@ class AnalyseReportSnapshot {
   final Color biasFg;
   final int globalConfidencePercent;
   final Color globalConfidenceColor;
+  final int confluenceScore;
+  final List<String> smcObExtras;
+  final List<String> smcFvgExtras;
+  final List<String> smcLiquidityExtras;
 
   final String contexteTfLine;
   final String phaseLabel;
@@ -248,6 +257,10 @@ class AnalyseReportSnapshot {
       biasFg: biasFg,
       globalConfidencePercent: p,
       globalConfidenceColor: gColor,
+      confluenceScore: computeOledConfluenceScore(c),
+      smcObExtras: List<String>.from(c.smcZoneExtras),
+      smcFvgExtras: List<String>.from(c.smcFvgExtras),
+      smcLiquidityExtras: List<String>.from(c.smcLiquidityExtras),
       contexteTfLine: htfLine,
       phaseLabel: phaseStr.toUpperCase(),
       phaseBg: phBg,
@@ -262,12 +275,8 @@ class AnalyseReportSnapshot {
       resistance: _orDash(c.structureResistanceMaj),
       structureSupportTested: c.structureSupportTested,
       structureResistanceTested: c.structureResistanceTested,
-      structureExtraSupports: [
-        for (final e in c.extraSupports) _reportStructureExtraLine(e, loc),
-      ],
-      structureExtraResistances: [
-        for (final e in c.extraResistances) _reportStructureExtraLine(e, loc),
-      ],
+      structureExtraSupports: _reportStructureExtraLines(c.extraSupports),
+      structureExtraResistances: _reportStructureExtraLines(c.extraResistances),
       noteContexte: c.notesTimeframe.trim(),
       noteStructure: c.notesStructure.trim(),
       indicatorsTf: _orDash(c.indicatorsTf),

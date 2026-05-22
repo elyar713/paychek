@@ -1321,6 +1321,47 @@
   "tradeLabelExit": "Exit",
   "tradeLabelHours": "Hours",
   "tradeLabelPlan": "Plan",
+  "tradePlanAnalysisNoData": "—",
+  "tradePlanAnalysisMissingAll": "No trade has a linked My Analysis plan. Edit a trade and attach a report to show the Plan %.",
+  "tradePlanAnalysisMissingPartial": "{missing} of {total} trades have no linked analysis plan — attach a report when adding or editing a trade.",
+  "@tradePlanAnalysisMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performancePlanAnalysisMissingBanner": "Analysis (plan) stats only include trades with a linked My Analysis report. None on this period — link a plan from the journal.",
+  "performancePlanAnalysisSectionEmpty": "No trades with a linked plan. Attach a My Analysis report to your trades to see win rate by plan adherence.",
+  "tradeStrategieExecutionNoData": "—",
+  "tradeStrategieExecutionMissingAll": "No trade has strategy filled in (setup + slider). Edit a trade in Add trade to show the Strategy %.",
+  "tradeStrategieExecutionMissingPartial": "{missing} of {total} trades have no strategy filled in — pick a setup and slider when saving.",
+  "@tradeStrategieExecutionMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceStrategieExecutionSectionEmpty": "No trades with strategy filled in (slider / setup). Hours and Risk management cards above still use automatic calculation.",
+  "tradeChecklistNoData": "—",
+  "tradeChecklistMissingAll": "No trade has checklist items checked for the entry day. Check boxes on the Checklist page (or trade feedback).",
+  "tradeChecklistMissingPartial": "{missing} of {total} trades have no checklist filled for the entry day.",
+  "@tradeChecklistMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceChecklistSectionEmpty": "No trades with checklist checked on entry day. Stats only include trades linked to a filled checklist.",
+  "tradeEtatNoData": "—",
+  "tradeEtatMissingAll": "No trade has mental state set for the entry day. Fill in Mental State (or trade feedback).",
+  "tradeEtatMissingPartial": "{missing} of {total} trades have no mental state set for the entry day.",
+  "@tradeEtatMissingPartial": {
+    "placeholders": {
+      "missing": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "performanceEtatSectionEmpty": "No trades with mental state set for entry day. Hours / Risk management cards above still calculate automatically.",
   "tradeLabelSession": "Session",
   "tradeLabelStrategie": "Strategy",
   "tradeLabelNews": "News",

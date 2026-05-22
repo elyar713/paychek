@@ -282,14 +282,25 @@ extension _TradeCardBuild on TradeCard {
                                     Expanded(
                                       child: _MiniStat(
                                         label: l.tradeLabelChecklist,
-                                        value: '${item.checklistPct.round()}%',
+                                        value: () {
+                                          final c =
+                                              tradeEffectiveChecklistPct(item);
+                                          return c != null
+                                              ? '${c.round()}%'
+                                              : l.tradeChecklistNoData;
+                                        }(),
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: _MiniStat(
                                         label: l.tradeLabelPlan,
-                                        value: '${item.planPct.round()}%',
+                                        value: () {
+                                          final p = tradeEffectivePlanPct(item);
+                                          return p != null
+                                              ? '${p.round()}%'
+                                              : l.tradePlanAnalysisNoData;
+                                        }(),
                                       ),
                                     ),
                                   ],
@@ -300,14 +311,25 @@ extension _TradeCardBuild on TradeCard {
                                     Expanded(
                                       child: _MiniStat(
                                         label: l.tradeLabelStrategie,
-                                        value: '${item.strategiePct.round()}%',
+                                        value: () {
+                                          final s =
+                                              tradeEffectiveStrategiePct(item);
+                                          return s != null
+                                              ? '${s.round()}%'
+                                              : l.tradeStrategieExecutionNoData;
+                                        }(),
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: _MiniStat(
                                         label: l.tradeLabelEtat,
-                                        value: '${item.etatPct.round()}%',
+                                        value: () {
+                                          final e = tradeEffectiveEtatPct(item);
+                                          return e != null
+                                              ? '${e.round()}%'
+                                              : l.tradeEtatNoData;
+                                        }(),
                                       ),
                                     ),
                                   ],

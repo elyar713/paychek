@@ -68,69 +68,69 @@ class AnalyseFeuilleContexteCardBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
-          children: [
-            Expanded(
-              child: Text(
-                l.analyseFeuillePlanTitle,
-                style: AnalyseTokens.labelStyle.copyWith(
-                  color: AnalyseEditorSection.feuillePlan.sectionAccent,
+            children: [
+              Expanded(
+                child: Text(
+                  l.analyseFeuillePlanTitle,
+                  style: AnalyseTokens.labelStyle.copyWith(
+                    color: AnalyseEditorSection.feuillePlan.sectionAccent,
+                  ),
                 ),
               ),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Tooltip(
-                  message: l.analyseTooltipPickTemplate,
-                  child: KeyedSubtree(
-                    key: templateMenuAnchorKey,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Tooltip(
+                    message: l.analyseTooltipPickTemplate,
+                    child: KeyedSubtree(
+                      key: templateMenuAnchorKey,
+                      child: AnalyseSquareIconButton(
+                        icon: LucideIcons.chevronDown,
+                        onTap: onTapTemplateMenu,
+                        boxSize: 30,
+                        iconSize: 15,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: l.analyseTooltipSaveTemplatePills,
                     child: AnalyseSquareIconButton(
-                      icon: LucideIcons.chevronDown,
-                      onTap: onTapTemplateMenu,
+                      icon: LucideIcons.save,
+                      iconColor: AnalyseTokens.accentGreen,
+                      onTap: onSaveTemplate,
                       boxSize: 30,
                       iconSize: 15,
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Tooltip(
-                  message: l.analyseTooltipSaveTemplatePills,
-                  child: AnalyseSquareIconButton(
-                    icon: LucideIcons.save,
-                    iconColor: AnalyseTokens.accentGreen,
-                    onTap: onSaveTemplate,
-                    boxSize: 30,
-                    iconSize: 15,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: AnalyseAddInlineFieldRow(
-                label: l.labelActif,
-                value: c.analyseActif,
-                hint: l.analyseHintActifExamples,
-                onCommitted: (v) => c.analyseActif = v,
+                ],
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: AnalyseAddInlineFieldRow(
-                label: l.analyseNameFieldLabel,
-                value: c.nomAnalyse,
-                hint: l.analyseNameFieldHint,
-                onCommitted: (v) => c.nomAnalyse = v,
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: AnalyseAddInlineFieldRow(
+                  label: l.labelActif,
+                  value: c.analyseActif,
+                  hint: l.analyseHintActifExamples,
+                  onCommitted: (v) => c.analyseActif = v,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
+              const SizedBox(width: 10),
+              Expanded(
+                child: AnalyseAddInlineFieldRow(
+                  label: l.analyseNameFieldLabel,
+                  value: c.nomAnalyse,
+                  hint: l.analyseNameFieldHint,
+                  onCommitted: (v) => c.nomAnalyse = v,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
         AnalyseSectionTitleRow(
           title: l.analyseTrendLabel,
           icon: LucideIcons.globe,
@@ -161,35 +161,35 @@ class AnalyseFeuilleContexteCardBody extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 10),
-              CompositedTransformTarget(
-                link: contexteDateLayerLink,
-                child: Material(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  child: InkWell(
-                    onTap: onTapContexteDate,
+                CompositedTransformTarget(
+                  link: contexteDateLayerLink,
+                  child: Material(
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 12,
-                            color: AnalyseTokens.muted2,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            c.contexteAnalyseDateLabel,
-                            style: AnalyseTokens.inlineMutedStyle,
-                          ),
-                        ],
+                    child: InkWell(
+                      onTap: onTapContexteDate,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 12,
+                              color: AnalyseTokens.muted2,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              c.contexteAnalyseDateLabel,
+                              style: AnalyseTokens.inlineMutedStyle,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 14),
+                const SizedBox(height: 14),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final wide = constraints.maxWidth >=
@@ -263,40 +263,40 @@ class AnalyseFeuilleContexteCardBody extends StatelessWidget {
                     ],
                   );
                   final tfCol = Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        l.analyseTimeframeLabelShort,
-                        style: AnalyseTokens.labelStyle,
-                      ),
-                      const SizedBox(height: 10),
-                      AnalyseEqualChipsRow<ContextePick<AnalyseTimeframe>>(
-                        value: c.htfPick,
-                        onChanged: (v) {
-                          if (v != null) c.htfPick = v;
-                        },
-                        options: buildHtfChipOptions(c),
-                        pillEditing: pillsEditMode,
-                        onRemoveOption: (pick) {
-                          if (pick.isEnum) {
-                            c.toggleHtfPill(pick.enumVal!);
-                          } else {
-                            c.removeHtfCustomLabel(pick.custom!);
-                          }
-                        },
-                        onAddOption: pillsEditMode ? onOpenHtfAdd : null,
-                        pillEditingWrapSuffix: [
-                          if (pillsEditMode && htfDraftOpen)
-                            AnalyseContexteDraftPill(
-                              hint: l.analyseHintHtfChipExample,
-                              accent: AnalyseTokens.chipHtfSelected,
-                              onCommit: onHtfDraftCommit,
-                              onCancel: onHtfDraftCancel,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              l.analyseTimeframeLabelShort,
+                              style: AnalyseTokens.labelStyle,
                             ),
-                        ],
-                      ),
-                    ],
-                  );
+                            const SizedBox(height: 10),
+                            AnalyseEqualChipsRow<ContextePick<AnalyseTimeframe>>(
+                              value: c.htfPick,
+                              onChanged: (v) {
+                                if (v != null) c.htfPick = v;
+                              },
+                              options: buildHtfChipOptions(c),
+                              pillEditing: pillsEditMode,
+                              onRemoveOption: (pick) {
+                                if (pick.isEnum) {
+                                  c.toggleHtfPill(pick.enumVal!);
+                                } else {
+                                  c.removeHtfCustomLabel(pick.custom!);
+                                }
+                              },
+                              onAddOption: pillsEditMode ? onOpenHtfAdd : null,
+                              pillEditingWrapSuffix: [
+                                if (pillsEditMode && htfDraftOpen)
+                                  AnalyseContexteDraftPill(
+                                    hint: l.analyseHintHtfChipExample,
+                                    accent: AnalyseTokens.chipHtfSelected,
+                                    onCommit: onHtfDraftCommit,
+                                    onCancel: onHtfDraftCancel,
+                                  ),
+                              ],
+                            ),
+                          ],
+                        );
                   final phaseCol = Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -339,9 +339,9 @@ class AnalyseFeuilleContexteCardBody extends StatelessWidget {
                   Widget framed(Widget child) {
                     return DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0D1118),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFF263042)),
+                        color: AnalyseTokens.bgElevated,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AnalyseTokens.nightBorder),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(14),
@@ -399,6 +399,7 @@ class AnalyseFeuilleContexteCardBody extends StatelessWidget {
               AnalyseFeuilleContexteCardBodyLower(
                 controller: c,
                 pillsEditMode: pillsEditMode,
+                hideFeuilleConfidence: false,
               ),
             ],
           ),

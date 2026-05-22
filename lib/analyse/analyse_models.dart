@@ -23,6 +23,13 @@ const List<String> kAnalyseHtfExtraPresetLabels = <String>[
   'Monthly',
 ];
 
+/// Signaux par défaut (carte ENTRÉE — générateur + rapport démo).
+const List<String> kAnalyseDefaultEntrySignalLabels = <String>[
+  'Pin bar',
+  'RSI',
+  'CVD convergence',
+];
+
 Set<String> htfVisibleLabelSet({
   required Iterable<AnalyseTimeframe> visibleEnums,
   required Iterable<String> customLabels,

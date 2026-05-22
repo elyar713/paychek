@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../strategie_tokens.dart';
+
 /// Sélecteur d'heure sous DÉBUT / FIN — roues (mobile) ou listes (web, clics fiables).
 class StrategieSessionInlineTimeWheels extends StatelessWidget {
   const StrategieSessionInlineTimeWheels({
@@ -51,8 +53,8 @@ class _StrategieSessionWebTimePickers extends StatefulWidget {
 
 class _StrategieSessionWebTimePickersState
     extends State<_StrategieSessionWebTimePickers> {
-  static const _fieldBg = Color(0xFF1A1A1A);
-  static const _border = Color(0xFF333333);
+  static const _fieldBg = StrategieTokens.wheelBg;
+  static const _border = StrategieTokens.fieldBorder;
 
   late int _hour;
   late int _minute;
@@ -96,9 +98,9 @@ class _StrategieSessionWebTimePickersState
           isExpanded: true,
           isDense: true,
           iconSize: 18,
-          dropdownColor: const Color(0xFF1A1A1A),
+          dropdownColor: StrategieTokens.wheelBg,
           style: _valueStyle,
-          iconEnabledColor: const Color(0xFF888888),
+          iconEnabledColor: StrategieTokens.labelMuted,
           items: [
             for (var h = 0; h < 24; h++)
               DropdownMenuItem(value: h, child: Text(_pad(h))),
@@ -121,9 +123,9 @@ class _StrategieSessionWebTimePickersState
           isExpanded: true,
           isDense: true,
           iconSize: 18,
-          dropdownColor: const Color(0xFF1A1A1A),
+          dropdownColor: StrategieTokens.wheelBg,
           style: _valueStyle,
-          iconEnabledColor: const Color(0xFF888888),
+          iconEnabledColor: StrategieTokens.labelMuted,
           items: [
             for (var m = 0; m < 60; m++)
               DropdownMenuItem(value: m, child: Text(_pad(m))),
@@ -141,7 +143,7 @@ class _StrategieSessionWebTimePickersState
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFF111111),
+      color: StrategieTokens.fieldFill,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -156,7 +158,7 @@ class _StrategieSessionWebTimePickersState
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF888888),
+                  color: StrategieTokens.labelMuted,
                 ),
               ),
             ),
@@ -186,9 +188,9 @@ class _StrategieSessionMobileTimeWheels extends StatefulWidget {
 
 class _StrategieSessionMobileTimeWheelsState
     extends State<_StrategieSessionMobileTimeWheels> {
-  static const _digitColor = Color(0xFFC8C8C8);
-  static const _selectionFill = Color(0xFF2A2A2A);
-  static const _separatorColor = Color(0xFF444444);
+  static const _digitColor = StrategieTokens.wheelDigit;
+  static const _selectionFill = StrategieTokens.wheelSelection;
+  static const _separatorColor = StrategieTokens.wheelSeparator;
 
   static const _itemExtent = 26.0;
   static const _visibleLines = 5;
@@ -223,7 +225,7 @@ class _StrategieSessionMobileTimeWheelsState
     final wheelHeight = _itemExtent * _visibleLines;
 
     return Material(
-      color: const Color(0xFF111111),
+      color: StrategieTokens.fieldFill,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(

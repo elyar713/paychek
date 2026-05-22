@@ -38,6 +38,18 @@ class TradeListItem {
 
     /// `true` si l'utilisateur (ou la session auto-tag) a choisi Principe ou Feeling.
     this.mindsetExplicit = false,
+
+    /// `true` si un plan Mon Analyse a été choisi à l'enregistrement (pas import CSV auto).
+    this.planLinkedExplicit = false,
+
+    /// `true` si le slider / setup stratégie a été renseigné à l'enregistrement (pas défaut CSV).
+    this.strategieLinkedExplicit = false,
+
+    /// `true` si au moins une case checklist était cochée pour le jour d'entrée (ou rétroaction trade).
+    this.checklistLinkedExplicit = false,
+
+    /// `true` si l'état mental du jour d'entrée a été réglé (page EM / rétroaction trade).
+    this.etatLinkedExplicit = false,
     required this.strategieTitle,
     this.planReport,
     this.linkedAnalyseReport,
@@ -87,6 +99,10 @@ class TradeListItem {
   final double etatPct;
   final TradeMindset mindset;
   final bool mindsetExplicit;
+  final bool planLinkedExplicit;
+  final bool strategieLinkedExplicit;
+  final bool checklistLinkedExplicit;
+  final bool etatLinkedExplicit;
 
   /// Stratégie choisie (pour résoudre les libellés non respectés).
   final String strategieTitle;
@@ -139,6 +155,10 @@ class TradeListItem {
     int? syncRev,
     TradeMindset? mindset,
     bool? mindsetExplicit,
+    bool? planLinkedExplicit,
+    bool? strategieLinkedExplicit,
+    bool? checklistLinkedExplicit,
+    bool? etatLinkedExplicit,
     Uint8List? screenshotBytes,
     String? screenshotPath,
     Uint8List? linkedAnalysePdfBytes,
@@ -168,6 +188,12 @@ class TradeListItem {
       etatPct: etatPct,
       mindset: mindset ?? this.mindset,
       mindsetExplicit: mindsetExplicit ?? this.mindsetExplicit,
+      planLinkedExplicit: planLinkedExplicit ?? this.planLinkedExplicit,
+      strategieLinkedExplicit:
+          strategieLinkedExplicit ?? this.strategieLinkedExplicit,
+      checklistLinkedExplicit:
+          checklistLinkedExplicit ?? this.checklistLinkedExplicit,
+      etatLinkedExplicit: etatLinkedExplicit ?? this.etatLinkedExplicit,
       strategieTitle: strategieTitle,
       planReport: planReport,
       linkedAnalyseReport: linkedAnalyseReport,

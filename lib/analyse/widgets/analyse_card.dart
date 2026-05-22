@@ -23,12 +23,9 @@ class AnalyseCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AnalyseTokens.radiusCard),
+        border: Border.all(color: AnalyseTokens.cardBorder),
         boxShadow: [
-          const BoxShadow(
-            color: Color(0x66000000),
-            blurRadius: 18,
-            offset: Offset(0, 10),
-          ),
+          ...AnalyseTokens.nightCardShadow,
           if (glow != null)
             BoxShadow(
               color: glow,

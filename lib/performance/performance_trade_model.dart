@@ -13,16 +13,20 @@ class Trade {
     required this.profit,
     required this.win,
     this.commission = 0,
+
     /// Renseignés quand le trade vient du journal (discipline).
     this.checklistPct,
     this.planPct,
     this.strategiePct,
     this.etatPct,
+
     /// `true` = Principe, `false` = Feeling, `null` = Talent (sans notation).
     this.mindsetPrincipe,
+
     /// Lot parsé depuis la quantité (journal) ; `null` si absent.
     this.lotSize,
     this.strategieTitle,
+
     /// Points stratégie cochés « non respectés » (journal).
     this.strategieNonRespectIds,
     this.planNonRespectIds,
@@ -75,7 +79,9 @@ class Trade {
 
   DateTime get sortKey {
     final t = timeOfDay;
-    if (t == null || t.isEmpty) return DateTime(date.year, date.month, date.day);
+    if (t == null || t.isEmpty) {
+      return DateTime(date.year, date.month, date.day);
+    }
     final p = t.split(':');
     if (p.length >= 2) {
       final h = int.tryParse(p[0].trim()) ?? 0;
@@ -123,7 +129,8 @@ double _rate(int wins, int total) => total == 0 ? 0.0 : wins / total;
 SessionFilterResult sessionFilterFirstTwoVsRest(List<Trade> trades) {
   final byDay = <String, List<Trade>>{};
   for (final t in trades) {
-    final k = '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}-${t.date.day.toString().padLeft(2, '0')}';
+    final k =
+        '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}-${t.date.day.toString().padLeft(2, '0')}';
     byDay.putIfAbsent(k, () => []).add(t);
   }
   var earlyWins = 0, earlyTotal = 0;
@@ -181,10 +188,20 @@ double? _parseDoubleLoose(String s) {
 
 bool _parseBoolLoose(String s) {
   final v = s.trim().toLowerCase();
-  if (v == '1' || v == 'true' || v == 'oui' || v == 'yes' || v == 'gagne' || v == 'win') {
+  if (v == '1' ||
+      v == 'true' ||
+      v == 'oui' ||
+      v == 'yes' ||
+      v == 'gagne' ||
+      v == 'win') {
     return true;
   }
-  if (v == '0' || v == 'false' || v == 'non' || v == 'no' || v == 'perdu' || v == 'loss') {
+  if (v == '0' ||
+      v == 'false' ||
+      v == 'non' ||
+      v == 'no' ||
+      v == 'perdu' ||
+      v == 'loss') {
     return false;
   }
   return false;
@@ -194,10 +211,15 @@ bool _parseBoolLoose(String s) {
 List<Trade> parsePerformanceCsv(String raw) {
   var text = raw.trim();
   if (text.startsWith('\uFEFF')) text = text.substring(1);
-  final lines = text.split(RegExp(r'\r?\n')).where((l) => l.trim().isNotEmpty).toList();
+  final lines = text
+      .split(RegExp(r'\r?\n'))
+      .where((l) => l.trim().isNotEmpty)
+      .toList();
   if (lines.isEmpty) return [];
 
-  final sep = lines.first.contains(';') && !lines.first.contains(',') ? ';' : ',';
+  final sep = lines.first.contains(';') && !lines.first.contains(',')
+      ? ';'
+      : ',';
   List<String> splitLine(String line) =>
       line.split(sep).map((e) => e.trim().replaceAll('"', '')).toList();
 
@@ -219,10 +241,18 @@ List<Trade> parsePerformanceCsv(String raw) {
   final iDur = idx(['duration_min', 'duration', 'duree', 'duree_min']);
   final iProfit = idx(['profit', 'pnl', 'resultat', 'gain']);
   final iWin = idx(['win', 'success', 'gagne']);
-  final iComm = idx(['commission', 'commissions', 'fee', 'frais', 'frais_commission']);
+  final iComm = idx([
+    'commission',
+    'commissions',
+    'fee',
+    'frais',
+    'frais_commission',
+  ]);
 
   if (iDate < 0 || iDur < 0) {
-    throw FormatException('CSV : colonnes date et duration_min (ou duration) requises.');
+    throw FormatException(
+      'CSV : colonnes date et duration_min (ou duration) requises.',
+    );
   }
 
   final out = <Trade>[];
@@ -237,12 +267,20 @@ List<Trade> parsePerformanceCsv(String raw) {
       (String s) {
         final p = RegExp(r'^(\d{4})-(\d{2})-(\d{2})').firstMatch(s);
         if (p == null) return null;
-        return DateTime(int.parse(p.group(1)!), int.parse(p.group(2)!), int.parse(p.group(3)!));
+        return DateTime(
+          int.parse(p.group(1)!),
+          int.parse(p.group(2)!),
+          int.parse(p.group(3)!),
+        );
       },
       (String s) {
         final p = RegExp(r'^(\d{2})/(\d{2})/(\d{4})').firstMatch(s);
         if (p == null) return null;
-        return DateTime(int.parse(p.group(3)!), int.parse(p.group(2)!), int.parse(p.group(1)!));
+        return DateTime(
+          int.parse(p.group(3)!),
+          int.parse(p.group(2)!),
+          int.parse(p.group(1)!),
+        );
       },
     ]) {
       date = pattern(ds);
@@ -252,12 +290,14 @@ List<Trade> parsePerformanceCsv(String raw) {
 
     final durStr = cell(iDur);
     final durMatch = RegExp(r'\d+').firstMatch(durStr);
-    final dur = int.tryParse(durMatch?.group(0) ?? '') ??
+    final dur =
+        int.tryParse(durMatch?.group(0) ?? '') ??
         _parseDoubleLoose(durStr)?.round() ??
         0;
 
     final profitStr = cell(iProfit);
-    final profit = _parseDoubleLoose(profitStr.isEmpty ? '0' : profitStr) ?? 0.0;
+    final profit =
+        _parseDoubleLoose(profitStr.isEmpty ? '0' : profitStr) ?? 0.0;
 
     bool win;
     if (iWin >= 0 && cell(iWin).isNotEmpty) {
@@ -266,36 +306,40 @@ List<Trade> parsePerformanceCsv(String raw) {
       win = profit > 0;
     }
 
-    final commission = iComm >= 0 ? (_parseDoubleLoose(cell(iComm)) ?? 0.0) : 0.0;
+    final commission = iComm >= 0
+        ? (_parseDoubleLoose(cell(iComm)) ?? 0.0)
+        : 0.0;
 
     final tim = iTime >= 0 ? cell(iTime) : null;
 
-    out.add(Trade(
-      date: DateTime(date.year, date.month, date.day),
-      timeOfDay: tim?.isEmpty ?? true ? null : tim,
-      durationMinutes: dur,
-      profit: profit,
-      win: win,
-      commission: commission,
-      checklistPct: null,
-      planPct: null,
-      strategiePct: null,
-      etatPct: null,
-      mindsetPrincipe: null,
-      lotSize: null,
-      strategieTitle: null,
-      strategieNonRespectIds: null,
-      planNonRespectIds: null,
-      checklistNonRespectIds: null,
-      etatNonRespectIds: null,
-      planReport: null,
-      psychTags: const [],
-      assetClass: null,
-      pair: null,
-      avantNews: false,
-      apresNews: false,
-      performanceLite: false,
-    ));
+    out.add(
+      Trade(
+        date: DateTime(date.year, date.month, date.day),
+        timeOfDay: tim?.isEmpty ?? true ? null : tim,
+        durationMinutes: dur,
+        profit: profit,
+        win: win,
+        commission: commission,
+        checklistPct: null,
+        planPct: null,
+        strategiePct: null,
+        etatPct: null,
+        mindsetPrincipe: null,
+        lotSize: null,
+        strategieTitle: null,
+        strategieNonRespectIds: null,
+        planNonRespectIds: null,
+        checklistNonRespectIds: null,
+        etatNonRespectIds: null,
+        planReport: null,
+        psychTags: const [],
+        assetClass: null,
+        pair: null,
+        avantNews: false,
+        apresNews: false,
+        performanceLite: false,
+      ),
+    );
   }
   return out;
 }

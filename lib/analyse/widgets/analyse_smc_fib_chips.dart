@@ -66,16 +66,21 @@ class _FibPill extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            color: selected ? AnalyseTokens.oledIndigo : AnalyseTokens.inputBg,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: selected ? Colors.transparent : AnalyseTokens.cardBorder,
+            ),
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.white : AnalyseTokens.muted,
-              fontWeight: FontWeight.w700,
-              fontSize: 11,
+              color: selected ? Colors.black : AnalyseTokens.zinc400,
+              fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+              fontSize: 10,
+              fontFamily: 'monospace',
             ),
           ),
         ),

@@ -293,11 +293,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         final amountLabel =
             '${net >= 0 ? '+' : ''}${net.toStringAsFixed(2).replaceAll('.', ',')}\$';
         final pair = _normalizeImportedPair(row.symbol);
+        final planReport =
+            planReportForImportedSymbol(pair, storedAnalyseReports);
         final discipline = resolveTradeDisciplineForEntryDay(
           entryAt: row.openTime,
           checklist: widget.checklistController,
           storedReports: storedAnalyseReports,
-          importedPair: pair,
+          planReport: planReport,
         );
         final newsFlags = resolveTradeNewsTimingFlagsFromController(
           entreeAt: row.openTime,
@@ -321,12 +323,12 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
             prixEntreeLabel: row.openPrice.toStringAsFixed(5),
             prixSortieLabel: row.closePrice.toStringAsFixed(5),
             checklistPct: discipline.checklistPct,
-            planPct: discipline.planPct,
-            strategiePct: 50,
+            planPct: discipline.planPct ?? 0,
+            strategiePct: 0,
             etatPct: discipline.etatPct,
             mindset: TradeMindset.none,
             planReport: discipline.planReport,
-            strategieTitle: _strategieChoisie,
+            strategieTitle: '',
             isProfit: net >= 0,
             assetClass: _assetClassForImportedRow(source, row),
             performanceLite: false,

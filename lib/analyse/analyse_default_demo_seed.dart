@@ -10,6 +10,21 @@ bool isAnalyseDefaultGoldDemoAsset(AnalyseReportSnapshot s) {
   return u.contains('GOLD') && (u.contains('XAU') || u.contains('XAU/USD'));
 }
 
+/// Rapport figé issu de la démo EUR/USD (plan swing hebdomadaire).
+bool isAnalyseEuroUsdDemoSnapshot(AnalyseReportSnapshot s) {
+  if (s.actif.trim().toUpperCase() != 'EUR/USD') return false;
+  final t = s.sousTitre.toLowerCase();
+  return t.contains('swing') ||
+      t.contains('hebdom') ||
+      t.contains('weekly') ||
+      t.contains('semanal') ||
+      t.contains('wöchent');
+}
+
+/// Démos locales Ajouter trade / menu vide (GOLD + EUR/USD).
+bool isAnalyseAjouterTradeDemoFallbackSnapshot(AnalyseReportSnapshot s) =>
+    isAnalyseDefaultGoldDemoAsset(s) || isAnalyseEuroUsdDemoSnapshot(s);
+
 /// Rapport par défaut (dashboard, plan d’analyse…) : GOLD / XAU si présent, sinon le premier.
 AnalyseReportSnapshot? pickStoredAnalyseReportDefaultPreferGold(
   List<AnalyseReportSnapshot> stored,
@@ -18,6 +33,14 @@ AnalyseReportSnapshot? pickStoredAnalyseReportDefaultPreferGold(
   for (final s in stored) {
     if (isAnalyseDefaultGoldDemoAsset(s)) return s;
   }
+  return stored.first;
+}
+
+/// Plan d’analyse Ajouter trade : le plus récent persisté (premier de la liste).
+AnalyseReportSnapshot? pickStoredAnalyseReportForAjouterTrade(
+  List<AnalyseReportSnapshot> stored,
+) {
+  if (stored.isEmpty) return null;
   return stored.first;
 }
 
@@ -50,14 +73,69 @@ int resolvePlanGlobalConfidencePercent(
   return selected?.globalConfidencePercent ?? 0;
 }
 
-/// Aperçu dashboard (aligné sur la 1ʳᵉ fiche démo GOLD).
+/// Rapport OLED démo figé (EUR/USD) — **sans** remplir le [AnalyseController] du générateur.
 AnalyseReportSnapshot buildAnalyseDashboardPreviewSnapshot({Locale? locale}) {
   final c = AnalyseController();
   final loc = locale ?? WidgetsBinding.instance.platformDispatcher.locale;
-  applyAnalyseDefaultGoldBreakoutDemo(c, locale: loc);
+  applyAnalyseDefaultOledFullDemo(c, locale: loc);
   final snap = AnalyseReportSnapshot.fromController(c, locale: loc);
   c.dispose();
   return snap;
+}
+
+/// Démo unique : générateur OLED + rapport alignés (toutes sections actives).
+void applyAnalyseDefaultOledFullDemo(
+  AnalyseController c, {
+  required Locale locale,
+}) {
+  applyAnalyseDefaultEuroUsdWeeklySwingDemo(c, locale: locale);
+  _finishOledDemoExtras(c, locale);
+}
+
+void _finishOledDemoExtras(AnalyseController c, Locale locale) {
+  final fr = locale.languageCode == 'fr';
+  c.contextEnabled = true;
+  c.structureEnabled = true;
+  c.indicatorsEnabled = true;
+  c.smcEnabled = true;
+  c.volumeProfileEnabled = true;
+
+  c.confidenceFeuille = 72;
+  c.confidenceStructure = 64;
+  c.confidenceIndicators = 78;
+  c.confidenceSmc = 68;
+
+  c.structureDernierPoint = fr ? 'BOS haussier H4' : 'Bullish BOS H4';
+  c.notesStructure = fr
+      ? 'CHoCH validé · structure haussière, creux ascendants'
+      : 'CHoCH confirmed · bullish structure, higher lows';
+
+  c.smcZone = fr
+      ? "Zone d'achat H4 1.0820 - 1.0840"
+      : 'H4 demand zone 1.0820 - 1.0840';
+  while (c.smcZoneExtras.isNotEmpty) {
+    c.removeSmcZoneExtraAt(c.smcZoneExtras.length - 1);
+  }
+  c.addSmcZoneExtra(fr ? 'OB retest 1.08380' : 'OB retest 1.08380');
+
+  while (c.smcFvgExtras.isNotEmpty) {
+    c.removeSmcFvgExtraAt(c.smcFvgExtras.length - 1);
+  }
+  c.addSmcFvgExtra(fr ? 'FVG H1 1.08480 - 1.08520' : 'H1 FVG 1.08480 - 1.08520');
+
+  while (c.smcLiquidityExtras.isNotEmpty) {
+    c.removeSmcLiquidityExtraAt(c.smcLiquidityExtras.length - 1);
+  }
+
+  c.replaceIndicatorsPaletteAndSetup(
+    kAnalyseDefaultEntrySignalLabels,
+    kAnalyseDefaultEntrySignalLabels.toSet(),
+  );
+
+  c.notesIndicators = fr
+      ? 'Entrée : 1.08520 · SL : 1.08180 · TP1 : 1.09200 · TP2 : 1.09500'
+      : 'Entry: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500';
+
 }
 
 /// Démo GOLD / XAU/USD — en premier dans la pile par défaut (SMC & volume désactivés).
@@ -114,7 +192,7 @@ void applyAnalyseDefaultGoldBreakoutDemo(
   c.structureTf = AnalyseStructureChartTf.h4.label;
   c.structureSupportMaj = '2150.00';
   c.structureResistanceMaj = '2200.00';
-  c.structureSupportTested = true;
+  c.structureSupportTested = false;
   c.structureResistanceTested = false;
 
   c.smcEnabled = false;
@@ -210,7 +288,7 @@ void applyAnalyseDefaultEuroUsdWeeklySwingDemo(
   c.structureTf = AnalyseStructureChartTf.h4.label;
   c.structureSupportMaj = '1.08200';
   c.structureResistanceMaj = '1.09500';
-  c.structureSupportTested = true;
+  c.structureSupportTested = false;
   c.structureResistanceTested = false;
 
   c.smcTf = AnalyseStructureChartTf.h4.label;

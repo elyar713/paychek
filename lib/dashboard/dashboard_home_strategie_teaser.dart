@@ -4,11 +4,12 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../l10n/app_localizations.dart';
 import '../checklist/checklist_tokens.dart';
-import '../strategie/strategie_tokens.dart';
+import 'dashboard_tokens.dart';
+import 'widgets/dashboard_section_shell.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
+import '../analyse/analyse_tokens.dart';
 import '../web/paychek_web_tokens.dart';
 import '../web/web_dashboard_config.dart';
-import 'dashboard_tokens.dart';
 
 /// Aperçu accueil : setup épinglé → sinon 1ᵉʳ setup → sinon titre « Ma stratégie » seul.
 ///
@@ -187,8 +188,9 @@ class DashboardHomeStrategieTeaser extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
+                  color: AnalyseTokens.inputBg,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AnalyseTokens.cardBorder),
                 ),
                 child: StrategieSetupCard(
                   title: s.title,
@@ -208,67 +210,58 @@ class DashboardHomeStrategieTeaser extends StatelessWidget {
       );
     }
 
-    return ColoredBox(
-      color: cardBackgroundColor ?? DashboardTokens.scaffoldMatte,
-      child: Padding(
-        padding: contentPadding ?? const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  LucideIcons.target,
-                  size: 16,
-                  color: ChecklistTokens.sectionTitleOnCardStyle.color,
+    return DashboardSectionShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                LucideIcons.target,
+                size: 16,
+                color: ChecklistTokens.sectionTitleOnCardStyle.color,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.plusMyStrategy,
+                  style: _titleStyle,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l.plusMyStrategy,
-                    style: _titleStyle,
-                  ),
-                ),
-                Tooltip(
-                  message: l.dashboardOpenStrategyTooltip,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: onOpenStrategie,
-                      borderRadius: BorderRadius.circular(20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          size: 24,
-                          color: ChecklistTokens.sectionTitleOnCardStyle.color,
-                        ),
+              ),
+              Tooltip(
+                message: l.dashboardOpenStrategyTooltip,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onOpenStrategie,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        size: 24,
+                        color: ChecklistTokens.sectionTitleOnCardStyle.color,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
-            Container(
-              width: double.infinity,
-              decoration: StrategieTokens.sectionDecoration(),
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-              child: StrategieSetupCard(
-                title: s.title,
-                dotColor: s.dotColor,
-                timeframes: s.timeframes,
-                indicateurs: s.indicateurs,
-                pattern: s.pattern,
-                signalText: s.signalText,
-                signalColor: s.signalColor,
-                ruleBlocks: s.ruleBlocks,
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
+          StrategieSetupCard(
+            title: s.title,
+            dotColor: s.dotColor,
+            timeframes: s.timeframes,
+            indicateurs: s.indicateurs,
+            pattern: s.pattern,
+            signalText: s.signalText,
+            signalColor: s.signalColor,
+            ruleBlocks: s.ruleBlocks,
+          ),
+        ],
       ),
     );
   }

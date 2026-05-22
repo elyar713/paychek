@@ -120,6 +120,15 @@ mixin AnalyseControllerImpactConfidence on ChangeNotifier {
     notifyListeners();
   }
 
+  /// Met à jour les 4 poids stockés (somme = 100) sans [notifyListeners].
+  void setImpactPartsSilent(List<int> parts) {
+    if (parts.length != 4) return;
+    _impactFeuille = parts[0].clamp(0, 100);
+    _impactStructure = parts[1].clamp(0, 100);
+    _impactIndicators = parts[2].clamp(0, 100);
+    _impactSmc = parts[3].clamp(0, 100);
+  }
+
   int _confidenceFeuille = 45;
   int get confidenceFeuille => _confidenceFeuille;
   set confidenceFeuille(int v) {

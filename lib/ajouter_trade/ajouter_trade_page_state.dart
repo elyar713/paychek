@@ -274,19 +274,20 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   Future<void> _refreshPlanAnalyseFromStorage() async {
     final stored = await AnalyseReportsStorage.loadAll();
     if (!mounted) return;
+    final locale = Localizations.localeOf(context);
     setState(() {
       _planAnalyseStoredReports = stored;
-      final sel = _planAnalyseSelectedReport;
-      if (sel != null) {
+      var sel = _planAnalyseSelectedReport;
+      if (stored.isNotEmpty) {
         final fresh = findStoredAnalyseReportMatch(sel, stored);
         if (fresh != null) {
-          _planAnalyseSelectedReport = fresh;
+          sel = fresh;
+        } else if (sel == null || isAnalyseAjouterTradeDemoFallbackSnapshot(sel)) {
+          sel = pickStoredAnalyseReportForAjouterTrade(stored);
         }
-      } else {
-        final pick = pickStoredAnalyseReportDefaultPreferGold(stored);
-        if (pick != null) {
-          _planAnalyseSelectedReport = pick;
-        }
+        _planAnalyseSelectedReport = sel;
+      } else if (sel == null) {
+        _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(locale);
       }
     });
   }
@@ -296,22 +297,15 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     AnalyseReportSnapshot? current,
   ) {
     if (!mounted) return;
-    setState(() {
-      _planAnalyseStoredReports = reports;
-      if (current != null) {
-        _planAnalyseSelectedReport = current;
-      }
-    });
+    setState(() => _planAnalyseStoredReports = reports);
+    unawaited(_refreshPlanAnalyseFromStorage());
   }
 
   @override
   void initState() {
     super.initState();
     AnalyseRealtimeNotifier.reportsTick.addListener(_onAnalyseReportsStorageTick);
-    _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(
-      WidgetsBinding.instance.platformDispatcher.locale,
-    );
-    _refreshPlanAnalyseFromStorage();
+    unawaited(_refreshPlanAnalyseFromStorage());
     AjouterTradeCustomActifsStorage.load().then((_) {
       if (!mounted) return;
       setState(() {});

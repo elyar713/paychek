@@ -1,3 +1,5 @@
+import 'performance_tokens.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,7 +9,7 @@ import 'performance_trade_model.dart';
 import 'performance_period_filter.dart';
 
 /// Même vert que la page Performance (`_kGreen`).
-const Color kWinrateRingGreen = Color(0xFF1eb48a);
+const Color kWinrateRingGreen = PerformanceTokens.green;
 
 /// Épaisseur de trait identique pour les anneaux KPI sous le capital (winrate, état mental).
 const double kDashboardRingStrokeWidth = 2.5;
@@ -111,7 +113,7 @@ class WinrateRingPainter extends CustomPainter {
       radius: r,
     );
     final bg = Paint()
-      ..color = const Color(0xFF111111)
+      ..color = PerformanceTokens.innerBg
       ..style = PaintingStyle.stroke
       ..strokeWidth = sw;
     canvas.drawArc(c, -math.pi / 2, math.pi * 2, false, bg);
@@ -120,11 +122,18 @@ class WinrateRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = sw
       ..strokeCap = StrokeCap.round;
-    canvas.drawArc(c, -math.pi / 2, math.pi * 2 * progress.clamp(0.0, 1.0), false, fg);
+    canvas.drawArc(
+      c,
+      -math.pi / 2,
+      math.pi * 2 * progress.clamp(0.0, 1.0),
+      false,
+      fg,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant WinrateRingPainter oldDelegate) => oldDelegate.progress != progress;
+  bool shouldRepaint(covariant WinrateRingPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 /// Anneau de progression (ex. état mental sur le dashboard) — même géométrie que [WinrateRingPainter], couleur paramétrable.
@@ -143,7 +152,7 @@ class ClDisciplineRingPainter extends CustomPainter {
       radius: r,
     );
     final bg = Paint()
-      ..color = const Color(0xFF111111)
+      ..color = PerformanceTokens.innerBg
       ..style = PaintingStyle.stroke
       ..strokeWidth = sw;
     canvas.drawArc(c, -math.pi / 2, math.pi * 2, false, bg);
@@ -152,7 +161,13 @@ class ClDisciplineRingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = sw
       ..strokeCap = StrokeCap.round;
-    canvas.drawArc(c, -math.pi / 2, math.pi * 2 * progress.clamp(0.0, 1.0), false, fg);
+    canvas.drawArc(
+      c,
+      -math.pi / 2,
+      math.pi * 2 * progress.clamp(0.0, 1.0),
+      false,
+      fg,
+    );
   }
 
   @override

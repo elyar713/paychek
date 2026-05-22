@@ -10,7 +10,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
+              color: PerformanceTokens.cardBg,
               borderRadius: BorderRadius.circular(4),
               border: Border.all(color: _kBorder),
             ),
@@ -29,7 +29,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
               label,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
-                color: const Color(0xFFBBBBBB),
+                color: PerformanceTokens.textBright,
                 height: 1.35,
               ),
             ),
@@ -44,12 +44,16 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
     HoraireTradingViolationStats hv,
   ) {
     final code = Localizations.localeOf(context).languageCode;
-    String t(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String t(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
     final s = slots.isEmpty
-        ? [
-            const TimeSlotStat(label: '-', sub: '', winRate: 0, count: 0),
-          ]
+        ? [const TimeSlotStat(label: '-', sub: '', winRate: 0, count: 0)]
         : slots;
 
     Color cFor(TimeSlotStat slot) {
@@ -65,7 +69,8 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
       return LucideIcons.sun;
     }
 
-    final hasHoraireViolation = hv.sessionsConfigurees &&
+    final hasHoraireViolation =
+        hv.sessionsConfigurees &&
         (hv.horsCreaneauxAutorises > 0 ||
             hv.pendantFenetreNoTrade > 0 ||
             hv.sansHeureEntree > 0);
@@ -76,7 +81,14 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
         children: [
           _cardTitle(
             LucideIcons.sun,
-            t('Horaires de Performance', 'Performance hours', 'Horarios de rendimiento', 'Performance-Zeiten', 'Horários de desempenho', '성과 시간대'),
+            t(
+              'Horaires de Performance',
+              'Performance hours',
+              'Horarios de rendimiento',
+              'Performance-Zeiten',
+              'Horários de desempenho',
+              '성과 시간대',
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -90,14 +102,21 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.45,
             ),
           ),
           const SizedBox(height: 20),
           _sectionTitle(
             LucideIcons.sunrise,
-            t('Par plage horaire', 'By time range', 'Por franja horaria', 'Nach Zeitfenster', 'Por faixa de horário', '시간대별'),
+            t(
+              'Par plage horaire',
+              'By time range',
+              'Por franja horaria',
+              'Nach Zeitfenster',
+              'Por faixa de horário',
+              '시간대별',
+            ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -111,7 +130,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 10,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.35,
             ),
           ),
@@ -141,7 +160,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 height: 1.4,
               ),
             ),
@@ -159,7 +178,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 letterSpacing: 0.3,
               ),
             ),
@@ -167,12 +186,26 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
             if (hv.horsCreaneauxAutorises > 0)
               _horaireNonRespectBadgeRow(
                 hv.horsCreaneauxAutorises,
-                t('Hors créneaux autorisés', 'Outside allowed windows', 'Fuera de ventanas permitidas', 'Außerhalb erlaubter Fenster', 'Fora das janelas permitidas', '허용 시간 외'),
+                t(
+                  'Hors créneaux autorisés',
+                  'Outside allowed windows',
+                  'Fuera de ventanas permitidas',
+                  'Außerhalb erlaubter Fenster',
+                  'Fora das janelas permitidas',
+                  '허용 시간 외',
+                ),
               ),
             if (hv.pendantFenetreNoTrade > 0)
               _horaireNonRespectBadgeRow(
                 hv.pendantFenetreNoTrade,
-                t('Pendant session No Trade', 'During No Trade session', 'Durante sesión No Trade', 'Während No-Trade-Session', 'Durante sessão No Trade', '노 트레이드 세션 중'),
+                t(
+                  'Pendant session No Trade',
+                  'During No Trade session',
+                  'Durante sesión No Trade',
+                  'Während No-Trade-Session',
+                  'Durante sessão No Trade',
+                  '노 트레이드 세션 중',
+                ),
               ),
             if (hv.sansHeureEntree > 0)
               _horaireNonRespectBadgeRow(
@@ -199,7 +232,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 height: 1.4,
               ),
             ),
@@ -231,19 +264,30 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: dim ? const Color(0xFF888888) : Colors.white,
+                    color: dim ? PerformanceTokens.labelMuted : Colors.white,
                   ),
                   children: [
                     TextSpan(text: title),
                     TextSpan(
                       text: sub.isEmpty ? '' : ' $sub',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 9, color: _kGrey, fontWeight: FontWeight.w400),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 9,
+                        color: _kGrey,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            Text(wr, style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w700, color: c)),
+            Text(
+              wr,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: c,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -252,7 +296,7 @@ extension _PerformancePageUiHoraires on _PerformancePageState {
           child: LinearProgressIndicator(
             value: w.clamp(0.0, 1.0),
             minHeight: 4,
-            backgroundColor: const Color(0xFF111111),
+            backgroundColor: PerformanceTokens.innerBg,
             color: c,
           ),
         ),

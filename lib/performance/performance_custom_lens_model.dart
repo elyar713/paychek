@@ -1,10 +1,5 @@
 /// Configuration de la carte « discipline personnalisée » (Performance).
-enum PerformanceCustomLensDimension {
-  etat,
-  checklist,
-  plan,
-  strategie,
-}
+enum PerformanceCustomLensDimension { etat, checklist, plan, strategie }
 
 class PerformanceCustomLensConfig {
   const PerformanceCustomLensConfig({
@@ -22,7 +17,8 @@ class PerformanceCustomLensConfig {
   static const int maxBars = 5;
   static const int minBars = 2;
 
-  factory PerformanceCustomLensConfig.defaults() => const PerformanceCustomLensConfig(
+  factory PerformanceCustomLensConfig.defaults() =>
+      const PerformanceCustomLensConfig(
         dimension: PerformanceCustomLensDimension.etat,
         elementId: '',
         thresholds: [50],
@@ -48,14 +44,17 @@ class PerformanceCustomLensConfig {
   }
 
   Map<String, dynamic> toJson() => {
-        'dimension': dimension.index,
-        'elementId': elementId,
-        'thresholds': thresholds,
-      };
+    'dimension': dimension.index,
+    'elementId': elementId,
+    'thresholds': thresholds,
+  };
 
   factory PerformanceCustomLensConfig.fromJson(Map<String, dynamic> json) {
     final dim = json['dimension'];
-    final dimension = dim is int && dim >= 0 && dim < PerformanceCustomLensDimension.values.length
+    final dimension =
+        dim is int &&
+            dim >= 0 &&
+            dim < PerformanceCustomLensDimension.values.length
         ? PerformanceCustomLensDimension.values[dim]
         : PerformanceCustomLensDimension.etat;
     final rawT = json['thresholds'];
@@ -102,10 +101,10 @@ class PerformanceCustomLensSavedCard {
   final int savedAtMillis;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'config': config.toJson(),
-        'savedAtMillis': savedAtMillis,
-      };
+    'id': id,
+    'config': config.toJson(),
+    'savedAtMillis': savedAtMillis,
+  };
 
   factory PerformanceCustomLensSavedCard.fromJson(Map<String, dynamic> json) {
     final cfg = json['config'];
@@ -114,7 +113,9 @@ class PerformanceCustomLensSavedCard {
       config: cfg is Map<String, dynamic>
           ? PerformanceCustomLensConfig.fromJson(cfg)
           : PerformanceCustomLensConfig.defaults(),
-      savedAtMillis: json['savedAtMillis'] is int ? json['savedAtMillis'] as int : 0,
+      savedAtMillis: json['savedAtMillis'] is int
+          ? json['savedAtMillis'] as int
+          : 0,
     );
   }
 }
@@ -128,6 +129,7 @@ class PerformanceCustomLensBandStat {
   });
 
   final String label;
+
   /// Part du score discipline (0–100) couverte par cette barre ; la somme des barres = 100.
   final double sharePercent;
   final double winRate;

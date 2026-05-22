@@ -15,13 +15,16 @@ mixin AnalyseControllerStructureIndicators on AnalyseControllerStructureSnapshot
   set indicatorsEnabled(bool v) {
     if (v == _indicatorsEnabled) return;
     _indicatorsEnabled = v;
+    rebalanceAnalyseSectionImpacts();
     notifyListeners();
   }
 
-  final List<String> indicators = <String>['RSI', 'MACD'];
+  final List<String> indicators =
+      List<String>.from(kAnalyseDefaultEntrySignalLabels);
 
   /// Outils du setup cochés (tap sur pilule). Ordre d’affichage rapport = ordre de [indicators].
-  final Set<String> _indicatorsSetupSelected = <String>{'RSI', 'MACD'};
+  final Set<String> _indicatorsSetupSelected =
+      Set<String>.from(kAnalyseDefaultEntrySignalLabels);
 
   bool indicatorSetupIsSelected(String name) =>
       _indicatorsSetupSelected.contains(name);
@@ -53,7 +56,7 @@ mixin AnalyseControllerStructureIndicators on AnalyseControllerStructureSnapshot
   }
 
   /// Timeframe de la section Indicateurs (même presets que Structure & chartisme).
-  String _indicatorsTf = AnalyseStructureChartTf.h1.label;
+  String _indicatorsTf = AnalyseStructureChartTf.m5.label;
   final List<String> _indicatorsTfCustom = <String>[];
 
   String get indicatorsTf => _indicatorsTf;
@@ -233,7 +236,7 @@ mixin AnalyseControllerStructureIndicators on AnalyseControllerStructureSnapshot
 
   AnalyseIndicatorsSnapshot _blankIndicatorsSnapshot() {
     return AnalyseIndicatorsSnapshot(
-      indicatorsTf: AnalyseStructureChartTf.h1.label,
+      indicatorsTf: AnalyseStructureChartTf.m5.label,
       indicatorNames: const [],
       indicatorSetupSelected: const [],
       extraFields: const [],
@@ -244,13 +247,12 @@ mixin AnalyseControllerStructureIndicators on AnalyseControllerStructureSnapshot
   void resetIndicatorsMainAfterValidation() {
     _notesIndicators = '';
     _indicatorExtraFields.clear();
-    _indicatorsTf = AnalyseStructureChartTf.h1.label;
+    _indicatorsTf = AnalyseStructureChartTf.m5.label;
     indicators.clear();
-    indicators.addAll(['RSI', 'MACD']);
+    indicators.addAll(kAnalyseDefaultEntrySignalLabels);
     _indicatorsSetupSelected
       ..clear()
-      ..add('RSI')
-      ..add('MACD');
+      ..addAll(kAnalyseDefaultEntrySignalLabels);
     notifyListeners();
   }
 

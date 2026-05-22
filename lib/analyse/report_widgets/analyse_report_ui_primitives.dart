@@ -226,22 +226,26 @@ Widget analyseReportContextePill({
   required Color bg,
   required Color fg,
 }) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-    decoration: BoxDecoration(
-      color: bg,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Text(
-      text,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.start,
-      style: TextStyle(
-        color: fg,
-        fontWeight: FontWeight.w800,
-        fontSize: 10,
-        letterSpacing: 0.4,
+  return SizedBox(
+    width: double.infinity,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.start,
+        style: TextStyle(
+          color: fg,
+          fontWeight: FontWeight.w800,
+          fontSize: 10,
+          letterSpacing: 0.4,
+        ),
       ),
     ),
   );

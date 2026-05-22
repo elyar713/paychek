@@ -3,8 +3,14 @@ part of 'performance_page.dart';
 extension _PerformancePageUiNews on _PerformancePageState {
   Widget _cardNewsTiming(List<Trade> trades) {
     final code = Localizations.localeOf(context).languageCode;
-    String txt(String fr, String en, String es, String de, String pt, String ko) =>
-        perf6(code, fr, en, es, de, pt, ko);
+    String txt(
+      String fr,
+      String en,
+      String es,
+      String de,
+      String pt,
+      String ko,
+    ) => perf6(code, fr, en, es, de, pt, ko);
 
     final before = trades.where((t) => t.avantNews).toList(growable: false);
     final after = trades.where((t) => t.apresNews).toList(growable: false);
@@ -54,7 +60,7 @@ extension _PerformancePageUiNews on _PerformancePageState {
             ),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
-              color: const Color(0xFF888888),
+              color: PerformanceTokens.labelMuted,
               height: 1.45,
             ),
           ),
@@ -71,18 +77,32 @@ extension _PerformancePageUiNews on _PerformancePageState {
               ),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
-                color: const Color(0xFF888888),
+                color: PerformanceTokens.labelMuted,
                 height: 1.4,
               ),
             )
           else ...[
             row(
-              txt('Avant news', 'Before news', 'Antes de noticias', 'Vor News', 'Antes de notícias', '뉴스 전'),
+              txt(
+                'Avant news',
+                'Before news',
+                'Antes de noticias',
+                'Vor News',
+                'Antes de notícias',
+                '뉴스 전',
+              ),
               before,
               Colors.white,
             ),
             row(
-              txt('Après news', 'After news', 'Después de noticias', 'Nach News', 'Depois de notícias', '뉴스 후'),
+              txt(
+                'Après news',
+                'After news',
+                'Después de noticias',
+                'Nach News',
+                'Depois de notícias',
+                '뉴스 후',
+              ),
               after,
               _kGreen,
             ),
@@ -92,4 +112,3 @@ extension _PerformancePageUiNews on _PerformancePageState {
     );
   }
 }
-

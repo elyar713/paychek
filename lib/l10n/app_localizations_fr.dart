@@ -3451,6 +3451,74 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tradeLabelPlan => 'Plan';
 
   @override
+  String get tradePlanAnalysisNoData => '—';
+
+  @override
+  String get tradePlanAnalysisMissingAll =>
+      'Aucun trade n\'a de plan Mon Analyse lié. Ouvrez un trade (modifier) et associez un rapport pour afficher le % Plan.';
+
+  @override
+  String tradePlanAnalysisMissingPartial(int missing, int total) {
+    return '$missing trade(s) sur $total sans plan Mon Analyse — associez un rapport depuis Ajouter / modifier trade.';
+  }
+
+  @override
+  String get performancePlanAnalysisMissingBanner =>
+      'Les statistiques « Analyse (plan) » ne comptent que les trades avec un rapport Mon Analyse lié. Sur cette période, aucun trade qualifié — associez un plan depuis le journal.';
+
+  @override
+  String get performancePlanAnalysisSectionEmpty =>
+      'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.';
+
+  @override
+  String get tradeStrategieExecutionNoData => '—';
+
+  @override
+  String get tradeStrategieExecutionMissingAll =>
+      'Aucun trade n\'a de stratégie renseignée (setup + slider). Modifiez un trade dans Ajouter trade pour afficher le % Stratégie.';
+
+  @override
+  String tradeStrategieExecutionMissingPartial(int missing, int total) {
+    return '$missing trade(s) sur $total sans stratégie renseignée — choisissez un setup et le slider lors de l\'enregistrement.';
+  }
+
+  @override
+  String get performanceStrategieExecutionSectionEmpty =>
+      'Aucun trade avec stratégie renseignée (slider / setup). Les cartes Horaires et Gestion du risque plus haut restent calculées automatiquement.';
+
+  @override
+  String get tradeChecklistNoData => '—';
+
+  @override
+  String get tradeChecklistMissingAll =>
+      'Aucun trade n\'a de checklist cochée pour le jour d\'entrée. Cochez des cases sur la page Checklist (ou rétroaction sur le trade).';
+
+  @override
+  String tradeChecklistMissingPartial(int missing, int total) {
+    return '$missing trade(s) sur $total sans checklist renseignée pour le jour d\'entrée.';
+  }
+
+  @override
+  String get performanceChecklistSectionEmpty =>
+      'Aucun trade avec checklist cochée le jour d\'entrée. Les stats ne comptent que les trades liés à une checklist remplie.';
+
+  @override
+  String get tradeEtatNoData => '—';
+
+  @override
+  String get tradeEtatMissingAll =>
+      'Aucun trade n\'a d\'état mental réglé pour le jour d\'entrée. Renseignez la page État mental (ou rétroaction sur le trade).';
+
+  @override
+  String tradeEtatMissingPartial(int missing, int total) {
+    return '$missing trade(s) sur $total sans état mental réglé pour le jour d\'entrée.';
+  }
+
+  @override
+  String get performanceEtatSectionEmpty =>
+      'Aucun trade avec état mental réglé pour le jour d\'entrée. Les cartes Horaires / Gestion du risque restent calculées automatiquement.';
+
+  @override
   String get tradeLabelSession => 'Session';
 
   @override

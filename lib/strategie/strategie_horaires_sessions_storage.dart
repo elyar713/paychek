@@ -147,8 +147,11 @@ abstract final class StrategieHorairesSessionsStorage {
   final noTrade = s.isNoTradeZone;
   return (
     icon: noTrade ? LucideIcons.moon : LucideIcons.sunrise,
-    iconBg: noTrade ? const Color(0xFF2A1515) : const Color(0xFF0D2A22),
-    iconColor: noTrade ? const Color(0xFFE57373) : StrategieTokens.emerald,
+    iconBg: noTrade
+        ? StrategieTokens.sessionNoTradeIconBg
+        : StrategieTokens.sessionTradeIconBg,
+    iconColor:
+        noTrade ? StrategieTokens.sessionNoTradeIconFg : StrategieTokens.emerald,
     titleColor: noTrade ? StrategieTokens.riskRed : Colors.white,
     timeColor: noTrade ? StrategieTokens.riskRed : Colors.white,
     startTime: TimeOfDay(hour: s.startHour, minute: s.startMinute),

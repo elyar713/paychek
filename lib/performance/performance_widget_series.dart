@@ -1,11 +1,11 @@
-﻿import 'dart:ui' show Locale;
+import 'dart:ui' show Locale;
 
 import '../l10n/app_localizations.dart';
 import 'performance_analysis.dart' hide Trade;
 import 'performance_trade_model.dart';
 import 'performance_widget_model.dart';
 
-/// DonnÃ©es agrÃ©gÃ©es depuis [Performance (1).csv] selon la mÃ©trique choisie.
+/// Données agrégées depuis [Performance (1).csv] selon la métrique choisie.
 class MetricSeriesBundle {
   const MetricSeriesBundle({
     required this.named,
@@ -64,8 +64,5 @@ class MetricSeriesBundle {
 String widgetCardSubtitle(SavedPerformanceWidget w, AppLocalizations l) {
   final chart = PerformanceWidgetChartType.title(w.chartTypeIndex, l);
   final m = PerformanceWidgetMetric.at(w.metricIndex, l);
-  return '${m.subtitle} Â· $chart';
+  return '${m.subtitle} · $chart';
 }
-
-
-

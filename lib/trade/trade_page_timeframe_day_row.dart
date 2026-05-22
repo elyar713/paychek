@@ -18,13 +18,10 @@ extension _TradePageTimeframeDayRow on _TradePageState {
         .effectiveCapitalAmount(UserCapitalScope.of(context));
     final pct = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
 
-    double avgPct(List<double> xs) =>
-        xs.isEmpty ? 0.0 : (xs.fold<double>(0.0, (a, b) => a + b) / xs.length);
-
-    final avgChecklist = avgPct(dayTrades.map((e) => e.checklistPct).toList());
-    final avgPlan = avgPct(dayTrades.map((e) => e.planPct).toList());
-    final avgStrategie = avgPct(dayTrades.map((e) => e.strategiePct).toList());
-    final avgEtat = avgPct(dayTrades.map((e) => e.etatPct).toList());
+    final avgChecklistVal = averageExplicitChecklistPct(dayTrades);
+    final avgPlanVal = averageExplicitPlanPct(dayTrades);
+    final avgStrategieVal = averageExplicitStrategiePct(dayTrades);
+    final avgEtatVal = averageExplicitEtatPct(dayTrades);
     final winDay = computeTradeStats(dayTrades).winRatePctDisplay;
     final principeCount =
         dayTrades.where((e) => e.mindset == TradeMindset.principe).length;
@@ -44,14 +41,15 @@ extension _TradePageTimeframeDayRow on _TradePageState {
 
     Widget ringCell({
       required String title,
-      required double pctVal,
+      required double? pctVal,
       required Color color,
     }) {
+      final lRing = AppLocalizations.of(context)!;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            AppLocalizations.of(context)!.tradeAverageShort,
+            lRing.tradeAverageShort,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: TradeTokens.textSecondary,
                   fontWeight: FontWeight.w800,
@@ -61,8 +59,16 @@ extension _TradePageTimeframeDayRow on _TradePageState {
           ),
           const SizedBox(height: 4),
           DonutRing(
-            progress: (pctVal / 100.0).clamp(0.0, 1.0),
-            centerPrimary: '${pctVal.round()}%',
+            progress: pctVal == null ? 0 : (pctVal / 100.0).clamp(0.0, 1.0),
+            centerPrimary: pctVal != null
+                ? '${pctVal.round()}%'
+                : (title == lRing.tradeLabelChecklist
+                    ? lRing.tradeChecklistNoData
+                    : title == lRing.tradeLabelEtat
+                        ? lRing.tradeEtatNoData
+                        : title == lRing.tradeLabelStrategie
+                            ? lRing.tradeStrategieExecutionNoData
+                            : lRing.tradePlanAnalysisNoData),
             centerSecondary: title,
             size: 58,
             strokeWidth: 6,
@@ -243,10 +249,10 @@ extension _TradePageTimeframeDayRow on _TradePageState {
               context: context,
               l10n: loc,
               winDay: winDay,
-              avgChecklist: avgChecklist,
-              avgPlan: avgPlan,
-              avgStrategie: avgStrategie,
-              avgEtat: avgEtat,
+              avgChecklist: avgChecklistVal,
+              avgPlan: avgPlanVal,
+              avgStrategie: avgStrategieVal,
+              avgEtat: avgEtatVal,
               wDay: wDay,
               lDay: lDay,
               bDay: bDay,

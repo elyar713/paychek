@@ -1,18 +1,19 @@
-﻿import 'package:fl_chart/fl_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import 'performance_analysis.dart';
 import 'performance_locale_copy.dart';
+import 'performance_tokens.dart';
 import 'performance_widget_model.dart';
 import 'performance_widget_series.dart';
 
-const Color _kGreen = Color(0xFF1eb48a);
-const Color _kRed = Color(0xFFFF4D4D);
-const Color _kGrey = Color(0xFF555555);
+const Color _kGreen = PerformanceTokens.green;
+const Color _kRed = PerformanceTokens.red;
+const Color _kGrey = PerformanceTokens.labelFaint;
 
-/// Graphique selon le type enregistrÃ© + donnÃ©es CSV.
+/// Graphique selon le type enregistr? + donn?es CSV.
 class PerformanceWidgetChart extends StatelessWidget {
   const PerformanceWidgetChart({
     super.key,
@@ -52,29 +53,34 @@ class PerformanceWidgetChart extends StatelessWidget {
       child: Text(
         msg,
         textAlign: TextAlign.center,
-        style: GoogleFonts.plusJakartaSans(fontSize: 12, color: _kGrey, height: 1.4),
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 12,
+          color: _kGrey,
+          height: 1.4,
+        ),
       ),
     );
   }
 
   String _chartEmptyLine(BuildContext context) => performancePickLocale(
-        Localizations.localeOf(context),
-        'Aucune donnée.',
-        'No data.',
-        'Sin datos.',
-        'Keine Daten.',
-        'Sem dados.',
-        '데이터 없음.',
-      );
+    Localizations.localeOf(context),
+    'Aucune donn?e.',
+    'No data.',
+    'Sin datos.',
+    'Keine Daten.',
+    'Sem dados.',
+    '??? ??.',
+  );
 
-  String _chartNotEnoughTradesPie(BuildContext context) => performancePickLocale(
+  String _chartNotEnoughTradesPie(BuildContext context) =>
+      performancePickLocale(
         Localizations.localeOf(context),
         'Pas assez de trades pour ce graphique.',
         'Not enough trades for this chart.',
-        'No hay suficientes trades para este gráfico.',
-        'Nicht genug Trades für dieses Diagramm.',
-        'Trades insuficientes para este gráfico.',
-        '이 차트를 만들 트레이드가 부족합니다.',
+        'No hay suficientes trades para este gr?fico.',
+        'Nicht genug Trades f?r dieses Diagramm.',
+        'Trades insuficientes para este gr?fico.',
+        '? ??? ?? ????? ?????.',
       );
 
   Widget _barChart(BuildContext context, List<NamedWinRate> named) {
@@ -93,22 +99,31 @@ class PerformanceWidgetChart extends StatelessWidget {
             barTouchData: BarTouchData(enabled: true),
             titlesData: FlTitlesData(
               show: true,
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 28,
                   getTitlesWidget: (v, m) {
                     final i = v.toInt();
-                    if (i < 0 || i >= named.length) return const SizedBox.shrink();
+                    if (i < 0 || i >= named.length) {
+                      return const SizedBox.shrink();
+                    }
                     final t = named[i].label;
-                    final short = t.length > 5 ? '${t.substring(0, 4)}…' : t;
+                    final short = t.length > 5 ? '${t.substring(0, 4)}?' : t;
                     return Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
                         short,
-                        style: GoogleFonts.plusJakartaSans(fontSize: 8, color: _kGrey),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 8,
+                          color: _kGrey,
+                        ),
                       ),
                     );
                   },
@@ -121,7 +136,10 @@ class PerformanceWidgetChart extends StatelessWidget {
                   interval: 25,
                   getTitlesWidget: (v, m) => Text(
                     '${v.toInt()}%',
-                    style: GoogleFonts.plusJakartaSans(fontSize: 9, color: _kGrey),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 9,
+                      color: _kGrey,
+                    ),
                   ),
                 ),
               ),
@@ -130,7 +148,8 @@ class PerformanceWidgetChart extends StatelessWidget {
               show: true,
               drawVerticalLine: false,
               horizontalInterval: 25,
-              getDrawingHorizontalLine: (v) => FlLine(color: const Color(0xFF1A1A1A), strokeWidth: 1),
+              getDrawingHorizontalLine: (v) =>
+                  FlLine(color: PerformanceTokens.cardBorder, strokeWidth: 1),
             ),
             borderData: FlBorderData(show: false),
             barGroups: [
@@ -142,7 +161,9 @@ class PerformanceWidgetChart extends StatelessWidget {
                       toY: named[i].winRate * 100,
                       color: _kGreen,
                       width: 10,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(4),
+                      ),
                     ),
                   ],
                 ),
@@ -221,7 +242,8 @@ class PerformanceWidgetChart extends StatelessWidget {
             gridData: FlGridData(
               show: true,
               drawVerticalLine: false,
-              getDrawingHorizontalLine: (v) => FlLine(color: const Color(0xFF1A1A1A), strokeWidth: 1),
+              getDrawingHorizontalLine: (v) =>
+                  FlLine(color: PerformanceTokens.cardBorder, strokeWidth: 1),
             ),
             titlesData: FlTitlesData(
               leftTitles: AxisTitles(
@@ -230,19 +252,29 @@ class PerformanceWidgetChart extends StatelessWidget {
                   reservedSize: 44,
                   getTitlesWidget: (v, m) => Text(
                     v.toStringAsFixed(0),
-                    style: GoogleFonts.plusJakartaSans(fontSize: 9, color: _kGrey),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 9,
+                      color: _kGrey,
+                    ),
                   ),
                 ),
               ),
-              bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
             borderData: FlBorderData(show: false),
             lineBarsData: [
               LineChartBarData(
                 spots: [
-                  for (var i = 0; i < cumulative.length; i++) FlSpot(i.toDouble(), cumulative[i]),
+                  for (var i = 0; i < cumulative.length; i++)
+                    FlSpot(i.toDouble(), cumulative[i]),
                 ],
                 isCurved: true,
                 color: _kGreen,
@@ -278,7 +310,10 @@ class PerformanceWidgetChart extends StatelessWidget {
                   n.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFFAAAAAA)),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    color: const Color(0xFFAAAAAA),
+                  ),
                 ),
               ),
               Expanded(
@@ -295,7 +330,11 @@ class PerformanceWidgetChart extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '${(n.winRate * 100).round()}%',
-                style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
@@ -306,7 +345,7 @@ class PerformanceWidgetChart extends StatelessWidget {
   }
 }
 
-/// Carte complÃ¨te (titre + graphique + lÃ©gende optionnelle).
+/// Carte compl?te (titre + graphique + l?gende optionnelle).
 class SavedWidgetInsightCard extends StatelessWidget {
   const SavedWidgetInsightCard({
     super.key,
@@ -327,11 +366,7 @@ class SavedWidgetInsightCard extends StatelessWidget {
     final m = PerformanceWidgetMetric.at(config.metricIndex, l);
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF161616)),
-      ),
+      decoration: PerformanceTokens.sectionDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -353,7 +388,10 @@ class SavedWidgetInsightCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       widgetCardSubtitle(config, l),
-                      style: GoogleFonts.plusJakartaSans(fontSize: 10, color: _kGrey),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        color: _kGrey,
+                      ),
                     ),
                   ],
                 ),
@@ -366,11 +404,16 @@ class SavedWidgetInsightCard extends StatelessWidget {
                 ),
             ],
           ),
-          if (series.dataFootnote != null && series.dataFootnote!.isNotEmpty) ...[
+          if (series.dataFootnote != null &&
+              series.dataFootnote!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
               series.dataFootnote!,
-              style: GoogleFonts.plusJakartaSans(fontSize: 9, color: const Color(0xFF666666), fontStyle: FontStyle.italic),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 9,
+                color: const Color(0xFF666666),
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
           const SizedBox(height: 12),
@@ -379,14 +422,16 @@ class SavedWidgetInsightCard extends StatelessWidget {
             series: series,
             tradesEmpty: tradesEmpty,
           ),
-          if (config.chartTypeIndex == PerformanceWidgetChartType.line && !tradesEmpty) ...[
+          if (config.chartTypeIndex == PerformanceWidgetChartType.line &&
+              !tradesEmpty) ...[
             const SizedBox(height: 6),
             Text(
               l.perfLineChartCaption,
               style: GoogleFonts.plusJakartaSans(fontSize: 9, color: _kGrey),
             ),
           ],
-          if (config.chartTypeIndex == PerformanceWidgetChartType.pie && !tradesEmpty) ...[
+          if (config.chartTypeIndex == PerformanceWidgetChartType.pie &&
+              !tradesEmpty) ...[
             const SizedBox(height: 6),
             Text(
               l.perfPieChartCaption,
@@ -398,6 +443,3 @@ class SavedWidgetInsightCard extends StatelessWidget {
     );
   }
 }
-
-
-

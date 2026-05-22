@@ -128,9 +128,9 @@ DateTime _utcDay(DateTime utc) =>
     DateTime.utc(utc.year, utc.month, utc.day);
 
 DateTime _adminUserDocCreatedAtUtc(DocumentSnapshot<Map<String, dynamic>> d) {
-  final raw = d.data()?['createdAt'];
-  if (raw is Timestamp) return raw.toDate().toUtc();
-  return DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+  final data = d.data() ?? {};
+  return paychekResolveUserJoinedAtUtc(data) ??
+      DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
 }
 
 int _requireCount(AggregateQuerySnapshot snap) {

@@ -260,7 +260,7 @@ class DashboardTradeExtremesRow extends StatelessWidget {
     }
 
     return Material(
-      color: kIsWeb ? const Color(0xFF0D0D0D) : DashboardTokens.cardBoxBg,
+      color: DashboardTokens.cardBoxBg,
       borderRadius: BorderRadius.circular(radius),
       clipBehavior: Clip.antiAlias,
       child: Container(
