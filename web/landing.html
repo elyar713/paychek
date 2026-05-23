@@ -2,6 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <!-- URL directe /landing.html → racine (paychek.pro/). En iframe Flutter : pas de redirection. -->
+    <script>
+        (function () {
+            try {
+                if (window.parent !== window) return;
+                var path = window.location.pathname || '';
+                if (!/\/landing\.html$/i.test(path)) return;
+                var target = (window.location.origin || '') + '/'
+                    + (window.location.search || '')
+                    + (window.location.hash || '');
+                window.location.replace(target);
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="canonical" href="https://paychek.pro/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAYCHEK | Transformez vos données en profits</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1087,6 +1102,24 @@
             }, PREVIEW_CAROUSEL_MS);
         }
 
+        /** true quand la page est affichée dans l’iframe Flutter (paychek.pro/). */
+        function paychekIsEmbeddedInApp() {
+            try {
+                return window.parent !== window;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        /** Hors iframe : ouvre l’app Flutter à la racine avec la modale auth (voir WebAuthGate ?auth=). */
+        function paychekGoToAppAuth(mode) {
+            var m = (mode === 'login' || mode === 'signin' || mode === 'connexion')
+                ? 'login'
+                : 'signup';
+            var base = window.location.origin || '';
+            window.location.href = base + '/?auth=' + encodeURIComponent(m);
+        }
+
         function paychekPostToFlutterHost(payload) {
             var targets = [];
             try {
@@ -1123,6 +1156,10 @@
         }
 
         function paychekNotifyParentAuth(mode) {
+            if (!paychekIsEmbeddedInApp()) {
+                paychekGoToAppAuth(mode);
+                return;
+            }
             paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
         }
 
