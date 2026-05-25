@@ -7,7 +7,7 @@ Sans `ios/ci_scripts/`, Xcode Cloud ne lance pas `flutter pub get`, `pod install
 ## Scripts ajoutés
 
 - `ios/ci_scripts/ci_post_clone.sh` — Flutter + pub get + gen-l10n + pod install
-- `ios/ci_scripts/ci_pre_xcodebuild.sh` — `flutter build ios --config-only --no-codesign` (réexporte `$HOME/flutter/bin`)
+- `ios/ci_scripts/ci_pre_xcodebuild.sh` — config + `flutter build ios --release --no-codesign` (erreurs visibles avant Archive)
 
 ## Après `git pull` sur le Mac
 
@@ -32,3 +32,9 @@ Quand le build est **Réussi** (coche verte) :
 1. Onglet **TestFlight** (pas Xcode Cloud)
 2. Build **Ready to Test**
 3. Testeurs internes → installer via l’app **TestFlight** sur iPhone
+
+## Archive - iOS en échec (scripts verts)
+
+1. **Archive - iOS** → **Journaux** → chercher la première ligne `error:`
+2. **Signature** : Xcode → Product → Xcode Cloud → Manage Workflows → workflow **Default** → **Signing** → gestion automatique + bonne équipe (`pro.paychek.app`)
+3. Causes fréquentes : certificat / profil, erreur Dart dans `xcode_backend.sh`, version `$(FLUTTER_BUILD_NAME)` non résolue
