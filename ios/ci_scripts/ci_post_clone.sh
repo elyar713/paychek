@@ -1,15 +1,22 @@
 #!/bin/sh
 
-# Xcode Cloud — après clone : installer Flutter, dépendances, CocoaPods.
+# Xcode Cloud — après clone : Flutter + dépendances + CocoaPods.
 # https://docs.flutter.dev/deployment/cd#xcode-cloud
+# Ne pas lancer "flutter build ios" ici (réservé à ci_pre_xcodebuild.sh).
 
 set -e
+set -x
 
-cd "$CI_PRIMARY_REPOSITORY_PATH"
+ROOT="${CI_PRIMARY_REPOSITORY_PATH:-${CI_WORKSPACE:-.}}"
+cd "$ROOT" || exit 1
+
+echo ">> Repo: $ROOT"
 
 echo ">> Flutter SDK"
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable "$HOME/flutter"
-export PATH="$PATH:$HOME/flutter/bin"
+if [ ! -x "$HOME/flutter/bin/flutter" ]; then
+  git clone https://github.com/flutter/flutter.git --depth 1 -b stable "$HOME/flutter"
+fi
+export PATH="$HOME/flutter/bin:$PATH"
 
 flutter --version
 flutter precache --ios
@@ -22,13 +29,13 @@ flutter gen-l10n
 
 echo ">> CocoaPods"
 export HOMEBREW_NO_AUTO_UPDATE=1
-brew install cocoapods
+if ! command -v pod >/dev/null 2>&1; then
+  brew install cocoapods
+fi
 
 cd ios
 pod install
-cd "$CI_PRIMARY_REPOSITORY_PATH"
+cd "$ROOT"
 
-echo ">> flutter build ios --config-only (post-clone)"
-flutter build ios --config-only --no-codesign
-
+echo ">> ci_post_clone terminé"
 exit 0
