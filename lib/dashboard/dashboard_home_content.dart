@@ -195,9 +195,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
   }
 
   static const _analyseChecklistPairGap = 12.0;
-  static const _analyseChecklistMinSideBySide = 360.0;
 
-  /// Mobile : rapport d’analyse (gauche) + checklist (droite).
+  /// Mobile / app native : Mon analyse au-dessus, checklist en dessous (jamais côte à côte).
   Widget _buildMobileAnalyseChecklistPair({
     required bool hasAnalyse,
     required bool hasCheck,
@@ -208,38 +207,13 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     if (!hasAnalyse && !hasCheck) return const SizedBox.shrink();
 
     if (hasAnalyse && hasCheck) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          const gap = _analyseChecklistPairGap;
-          if (constraints.maxWidth < _analyseChecklistMinSideBySide + gap) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _sectionForId(analyseId),
-                const SizedBox(height: gap),
-                _sectionForId(checkId),
-              ],
-            );
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: _sectionForId(analyseId),
-                ),
-              ),
-              const SizedBox(width: gap),
-              Expanded(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: _sectionForId(checkId),
-                ),
-              ),
-            ],
-          );
-        },
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _sectionForId(analyseId),
+          const SizedBox(height: _analyseChecklistPairGap),
+          _sectionForId(checkId),
+        ],
       );
     }
 
