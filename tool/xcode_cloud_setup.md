@@ -7,7 +7,7 @@ Sans `ios/ci_scripts/`, Xcode Cloud ne lance pas `flutter pub get`, `pod install
 ## Scripts ajoutés
 
 - `ios/ci_scripts/ci_post_clone.sh` — Flutter + pub get + gen-l10n + pod install
-- `ios/ci_scripts/ci_pre_xcodebuild.sh` — `flutter build ios --config-only` (versions Info.plist)
+- `ios/ci_scripts/ci_pre_xcodebuild.sh` — `flutter build ios --config-only --no-codesign` (réexporte `$HOME/flutter/bin`)
 
 ## Après `git pull` sur le Mac
 

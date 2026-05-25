@@ -26,5 +26,9 @@ brew install cocoapods
 
 cd ios
 pod install
+cd "$CI_PRIMARY_REPOSITORY_PATH"
+
+echo ">> flutter build ios --config-only (post-clone)"
+flutter build ios --config-only --no-codesign
 
 exit 0
