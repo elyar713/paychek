@@ -67,6 +67,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  firebase_core_platform_interface: ^7.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -102,6 +103,35 @@ flutter:
     - assets/fonts/
     - assets/logos/csv_sources/
     - assets/help_center/
+    - assets/help_center/dashboard_capital_balance.gif
+    - assets/help_center/dashboard_capital_balance.png
+    - assets/help_center/dashboard_capital_evolution.gif
+    - assets/help_center/dashboard_capital_evolution.png
+    - assets/help_center/dashboard_personal_analysis.gif
+    - assets/help_center/dashboard_personal_analysis.png
+    - assets/help_center/dashboard_checklist.gif
+    - assets/help_center/dashboard_checklist.png
+    - assets/help_center/dashboard_mental_state.gif
+    - assets/help_center/dashboard_mental_state.png
+    - assets/help_center/dashboard_strategy.gif
+    - assets/help_center/dashboard_strategy.png
+    - assets/help_center/dashboard_calendar.png
+    - assets/help_center/dashboard_custom_performance.gif
+    - assets/help_center/dashboard_custom_performance.png
+    - assets/help_center/add_trade.gif
+    - assets/help_center/add_trade_custom_actif.gif
+    - assets/help_center/add_trade_screenshot_csv_note.gif
+    - assets/help_center/guides/add_trade/
+    - assets/help_center/guides/calendar/
+    - assets/help_center/guides/checklist/
+    - assets/help_center/guides/dashboard/
+    - assets/help_center/guides/export_pdf/
+    - assets/help_center/guides/mental_state/
+    - assets/help_center/guides/my_analysis/
+    - assets/help_center/guides/my_strategy/
+    - assets/help_center/guides/performance/
+    - assets/help_center/guides/reset_data/
+    - assets/help_center/guides/trade_page/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

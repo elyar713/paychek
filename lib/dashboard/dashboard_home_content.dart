@@ -35,9 +35,11 @@ class DashboardHomeContent extends StatefulWidget {
     required this.onOpenChecklist,
     required this.onOpenAnalyse,
     required this.onOpenEtatMental,
+    required this.onOpenPerformance,
     required this.onOpenStrategie,
     required this.onOpenTrade,
     required this.onOpenTradeById,
+    required this.onOpenTradeDayKey,
     this.accountPlanIsPro,
     this.liteFreemiumRestricted = false,
     this.onLiteFreemiumRestrictedTap,
@@ -50,9 +52,11 @@ class DashboardHomeContent extends StatefulWidget {
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenAnalyse;
   final VoidCallback onOpenEtatMental;
+  final VoidCallback onOpenPerformance;
   final VoidCallback onOpenStrategie;
   final VoidCallback onOpenTrade;
   final ValueChanged<String> onOpenTradeById;
+  final ValueChanged<String> onOpenTradeDayKey;
 
   /// `null` : entitlement pas encore chargé ; `true`/`false` : Pro / Lite ([DashboardHomePlanLogic]).
   final bool? accountPlanIsPro;
@@ -94,8 +98,12 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           checklistController: widget.checklistController,
           onOpenChecklist: widget.onOpenChecklist,
           onOpenEtatMental: widget.onOpenEtatMental,
+          onOpenPerformance: widget.onOpenPerformance,
           onOpenTrade: widget.onOpenTrade,
           onOpenTradeById: kIsWeb ? null : widget.onOpenTradeById,
+          onOpenTradeDayKey: kIsWeb || widget.liteFreemiumRestricted
+              ? null
+              : widget.onOpenTradeDayKey,
           hideTimeframePills: WebDashboardConfig.useLeftRail,
           cardDecoration: WebDashboardConfig.useLeftRail
               ? PaychekWebTokens.shellCardDecoration()
@@ -165,6 +173,9 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                   }
                 }),
           onOpenTradeById: widget.onOpenTradeById,
+          onOpenTradeDayKey: widget.liteFreemiumRestricted
+              ? null
+              : widget.onOpenTradeDayKey,
           hideTimeframePills: WebDashboardConfig.useLeftRail || !kIsWeb,
           cardDecoration: WebDashboardConfig.useLeftRail
               ? PaychekWebTokens.shellCardDecoration()
@@ -461,6 +472,9 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                             onOpenTradeById: widget.liteFreemiumRestricted
                                 ? null
                                 : widget.onOpenTradeById,
+                            onOpenTradeDayKey: widget.liteFreemiumRestricted
+                                ? null
+                                : widget.onOpenTradeDayKey,
                             liteInteractionLocked: widget.liteFreemiumRestricted,
                             onLiteInteractionLockedTap:
                                 widget.onLiteFreemiumRestrictedTap,
@@ -510,6 +524,9 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                         onOpenTradeById: widget.liteFreemiumRestricted
                             ? null
                             : widget.onOpenTradeById,
+                        onOpenTradeDayKey: widget.liteFreemiumRestricted
+                            ? null
+                            : widget.onOpenTradeDayKey,
                         liteInteractionLocked: widget.liteFreemiumRestricted,
                         onLiteInteractionLockedTap:
                             widget.onLiteFreemiumRestrictedTap,

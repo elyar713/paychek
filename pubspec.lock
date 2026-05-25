@@ -378,7 +378,7 @@ packages:
     source: hosted
     version: "4.8.0"
   firebase_core_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: firebase_core_platform_interface
       sha256: "7aafd426ad1926cfb1a7e9e012df5eff7d9a55200b31b04bc65ef45329ea5dee"

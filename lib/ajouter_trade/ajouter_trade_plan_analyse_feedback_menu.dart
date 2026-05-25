@@ -34,13 +34,23 @@ class _AjouterTradePlanAnalyseFeedbackMenuState
 
   final Set<String> _nonRespectSelection = <String>{};
 
+  void _clearNonRespectIfOffAddTradeTab() {
+    final scope = AjouterTradeShellScope.maybeOf(context);
+    if (scope == null || scope.shellTabIndex == 2) return;
+    _closeOverlay();
+    if (_nonRespectSelection.isEmpty) return;
+    _nonRespectSelection.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onNonRespectSelectionChanged
+          ?.call(Set<String>.from(_nonRespectSelection));
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = AjouterTradeShellScope.maybeOf(context);
-    if (scope != null && scope.shellTabIndex != 2) {
-      _closeOverlay();
-    }
+    _clearNonRespectIfOffAddTradeTab();
   }
 
   @override

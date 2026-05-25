@@ -3043,53 +3043,50 @@ class AppLocalizationsPt extends AppLocalizations {
   String get helpCenterEmptyResults => 'Sem resultados.';
 
   @override
+  String get helpCenterArticleDashboardTitle =>
+      'Dashboard — Centro de controlo';
+
+  @override
   String get helpCenterArticleAddTradeTitle => 'Adicionar um trade';
 
   @override
-  String get helpCenterArticleAddTradeBody =>
-      'Vá ao separador Adicionar, preencha os campos (ativo, entrada, stop, alvo…) e guarde. Pode anexar uma captura de ecrã se precisar.';
+  String get helpCenterArticleAddTradeBody => '';
 
   @override
   String get helpCenterArticleEditTradeTitle => 'Diário — página do trade';
 
   @override
-  String get helpCenterArticleEditTradeBody =>
-      'Guide : Maîtriser votre Journal de Trading (Page Trade)\nLa page Trade est le centre d\'archivage intelligent de Paychek. Elle ne se contente pas de lister vos opérations ; elle les organise pour vous offrir une vision claire de votre progression, du trade individuel à la performance mensuelle.\n\n[img:assets/help_center/trade_page_header_filters.png]\n\n1. Tableau de Bord de Période (Header)\nEn haut de votre journal, vous disposez d\'un résumé instantané de la période sélectionnée :\n\nProfit Net : Votre résultat financier net en dollars et son impact en pourcentage sur votre capital (ex: +1070,00\$ / +53,50%).\n\nLe Win Rate Ring : L\'anneau central affiche votre pourcentage de réussite global. C\'est l\'indicateur visuel immédiat de la santé de votre trading.\n\nCompteur de Trades : Le détail précis du nombre de positions Gagnantes (G), Perdantes (P) et à l\'équilibre (Br).\n\n2. Navigation et Filtres Temporels\nPersonnalisez votre vue selon votre besoin d\'analyse grâce aux sélecteurs rapides :\n\nSélecteur 1D / 1S / 1M / ALL : Basculez instantanément entre une vue journalière, hebdomadaire, mensuelle ou l\'historique complet.\n\nFiltres de statut : Isolez vos trades Gagnants, Perdants ou Breakeven d\'un seul clic pour étudier des comportements spécifiques.\n\nActifs les plus tradés : Visualisez rapidement vos statistiques sur vos instruments préférés (ex: XAUUSD, EURUSD).\n\n[img:assets/help_center/trade_page_period_pdf_report.png]\n\n3. Structure en Accordéons et Rapports PDF\nL\'interface utilise un système de \"replier/déplier\" pour une lecture fluide et des options d\'exportation à tous les niveaux :\n\nRapports de Période (Jour/Semaine/Mois) : Chaque bloc de date (ex: \"14 Mars\") affiche un résumé de la performance du jour.\n\nEn cliquant sur l\'icône PDF à côté de la date, vous téléchargez un rapport complet de cette période spécifique. Idéal pour vos bilans de fin de semaine ou de mois.\n\nRapports de Trade Individuel : Cliquez sur un trade pour le déplier et voir ses détails (Heures, Session, Entry/Exit).\n\nChaque trade possède son propre bouton PDF. Ce document génère une fiche technique pro avec votre graphique et vos scores de discipline.\n\n[img:assets/help_center/trade_page_rings_week_view.png]\n\n4. Analyse visuelle par Ring\nChaque ligne (journée ou trade) est accompagnée d\'un Ring (anneau) :\n\nPour une journée, le ring représente le Win Rate global du jour.\n\nCela vous permet d\'identifier en une seconde vos journées \"rouges\" ou \"vertes\" sans avoir à lire chaque ligne de trade.\n\n[img:assets/help_center/trade_page_options_menu.png]\n\n5. Options de Gestion et Correction (Les 3 points)\nParce qu\'une erreur de saisie peut arriver, Paychek vous donne un contrôle total sur vos archives. À côté de l\'icône PDF de chaque fiche trade, vous trouverez un menu \"Options\" (représenté par 3 points verticaux) :\n\nModifier le Trade : Vous permet de réouvrir le formulaire de saisie pour corriger un prix, changer l\'heure, ajouter un screenshot oublié ou ajuster vos scores de discipline.\n\nSupprimer le Trade : Efface définitivement l\'enregistrement de votre journal.\n\nAttention : La suppression d\'un trade mettra à jour instantanément vos statistiques globales, votre Win Rate et votre capital dans les pages Trade et Performance.';
+  String get helpCenterArticleEditTradeBody => '';
 
   @override
   String get helpCenterArticleChecklistTitle => 'Checklist';
 
   @override
-  String get helpCenterArticleChecklistBody =>
-      '📋 Checklist\n\n[img:assets/help_center/checklist_routine_discipline.png]\n\n1. Understanding the progress ring\nThe colored circle at the top of your screen is your readiness indicator.\n\n- Real-time progress: each ticked box moves the percentage forward.\n- Your checklist ring is not only on Routine — it stays in sync on your main Dashboard.\n- The gold standard: we recommend never opening a position unless your ring is at 100%. A trade taken with an incomplete checklist is often an emotional trade.\n\n2. Customize your routine\nEvery trader is unique. Paychek lets you build your own verification system.\n\n- Add a section: tap “+ Add a section” at the bottom to create a category (e.g. morning routine, economic news, post-session).\n- Manage items (⋯ menu):\n  - Add a task: open the three-dot menu next to a section title to insert a new checkpoint.\n  - Delete / edit: if a rule no longer fits your strategy, remove it to keep the UI clean.\n\n3. Default sections\nTo help you get started, we include three pillars:\n\n- Technical Analysis: validate your confluences (trend, S/R, indicators).\n- Risk Management: confirm your stop-loss is set and your risk per trade is respected.\n- Psychology: a quick check that you are not in revenge mode or euphoria.';
+  String get helpCenterArticleChecklistBody => '';
 
   @override
   String get helpCenterArticleCalendarTitle => 'Calendário';
 
   @override
-  String get helpCenterArticleCalendarBody =>
-      '📅 Guide: Calendar & performance analysis\n\nThe Paychek Calendar is your main steering tool. It turns raw data into a visual map of your success and discipline.\n\n[img:assets/help_center/calendar_overview.png]\n\n1. Month overview\nColor coding: Green cells show net profit, red cells a loss, and gray cells days with no activity.\n\nQuick summary: Above the calendar, see your win rate, trade count, and total monthly P&L at a glance.\n\nMonthly objective: Watch the progress bar to see how far you are from your financial goal. Tap the settings icon to change your target.\n\n[img:assets/help_center/calendar_monthly_objective.png]\n\n2. Expandable menu (deep analysis)\nTap any month header to open detailed analysis.\n\n[img:assets/help_center/calendar_deep_analysis.png]\n\nDiscipline rings: View your average discipline scores for the month (plan followed, checklist completed, mental state).\n\nSession breakdown: See performance by timezone — Asia, Europe, and US. Great for spotting which part of the day pays best for you.\n\nInteractive sparkline (performance curve):\n- Hover the line to pinpoint a trade (on mobile, drag along the curve with your finger).\n- Tap a point on the curve to open that trade’s full record instantly.\n\n3. Session statistics (sidebar)\nTo the right of your calendar, your consistency stats:\n\nCumulative performance: How your capital evolves day by day.\n\nBest day: Your largest daily gain of the month.\n\nAverage day: What you gain or lose on average per day.\n\n[img:assets/help_center/calendar_trades_month_report.png]\n\n4. PDF export 📄\nAt the top right of the Calendar page, the PDF icon generates a professional report in one tap.\n\nWhat’s inside: The report includes the visual calendar, the performance curve, and a recap of your discipline averages.';
+  String get helpCenterArticleCalendarBody => '';
 
   @override
   String get helpCenterArticleMentalStateTitle => 'Estado mental';
 
   @override
-  String get helpCenterArticleMentalStateBody =>
-      'Guide: Mental state — tailor your psychology\n\nRoughly 80% of trading success is psychology. The Mental state page lets you measure how you feel and see how emotions affect your results.\n\n[img:assets/help_center/mental_state_dashboard.png]\n\n1. Global score (The Ring)\nThe central ring shows your “Solid Balance”. It updates from all your indicators (emotions, rest, routines). The higher the score, the more you are in a mindset suited to trading.\n\n2. Personalized impact (gear ⚙️)\nEvery trader is different. Paychek lets you define your own rules:\n\n[img:assets/help_center/mental_state_adjust_impact.png]\n\n- Impact nature: open a criterion’s gear to set Positive (+) or Negative (−). Example: if excitement is dangerous for you, set it to Negative.\n\n- Global impact (%): the slider sets how much that criterion weighs on your global score. Crank it up for what matters most; lower it for secondary criteria.\n\n3. Sections & emotions\n\n[img:assets/help_center/mental_state_section_controls.png]\n\n- Edit / delete: pencil to rename an emotion or indicator; trash to remove it.\n\n- Section toggle (ON / OFF 100%): turn off an entire section (e.g. My Routines). When off, it no longer counts toward your daily global score.\n\n- Add (+): create your own indicators to match your routine.\n\n4. Score calendar & time window\nThe mini-calendar shows your mental score for past days.\n\n- Session settings (⚙️): set a start time and an end time.\n\n- Day mode: track from morning to evening (full-day style window).\n\n- Session mode: focus on trading hours only (e.g. 3:30 PM – 10:00 PM).';
+  String get helpCenterArticleMentalStateBody => '';
 
   @override
   String get helpCenterArticleExportPdfTitle => 'Exportar PDF';
 
   @override
-  String get helpCenterArticleExportPdfBody =>
-      'Em Trade ou Desempenho, use Exportar PDF. Se falhar, verifique as permissões e tente novamente.';
+  String get helpCenterArticleExportPdfBody => '';
 
   @override
   String get helpCenterArticleResetDataTitle => 'Apagar dados locais';
 
   @override
-  String get helpCenterArticleResetDataBody =>
-      'Em Definições > Dados pode apagar os dados guardados neste dispositivo. É irreversível; recomendamos reiniciar a app depois.';
+  String get helpCenterArticleResetDataBody => '';
 
   @override
   String get helpCenterArticleMyStrategyTitle => 'Minha estratégia — Playbook';
@@ -3099,8 +3096,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Minha análise — planos de trade';
 
   @override
-  String get helpCenterArticleMyAnalysisBody =>
-      '🔬 My Analysis: Build Your Trading Plans\n\nThe My Analysis page lets you build a full roadmap before you enter the market. By quantifying each technical element, Paychek calculates a global confidence score to validate your setup.\n\n[img:assets/help_center/analyse_trend_sheet.png]\n\n1. Trend card (context)\nDefine the frame for your opportunity:\n\nAsset & name: Use (+) to name your analysis and the instrument (e.g. EUR/USD — Weekly Swing Plan).\n\nDirection & phase: Choose your bias (Buy, Sell, or Watch) and the current market phase (Accumulation, Impulse, Distribution).\n\nConfidence slider: Set how certain you feel for this section. Open the gear (⚙️) to adjust this card’s impact (weight %) on the final report confidence.\n\n[img:assets/help_center/analyse_card_controls.png]\n\nCustomization: Use the pencil to edit available timeframes or phases, and Duplicate to compare several analyses on different timeframes in the same section.\n\n2. Technical sections (Structure, SMC, Indicators, Volume)\nEveryone trades differently. Turn cards on or off with the ON/OFF switch:\n\n[img:assets/help_center/analyse_technical_cards.png]\n\nStructure: Log support and resistance. Tick if a level was tested more than twice to strengthen relevance.\n\nSMC & Liquidity: Record Order Blocks, Fair Value Gaps (FVG), and Fibonacci levels.\n\nIndicators & Volume profile: Detail RSI/MACD signals or Point of Control (POC) zones.\n\nScreenshot: Attach a chart capture to illustrate your plan visually.\n\n3. Generating the report\nWhen your analysis is ready, tap Report.\n\n[img:assets/help_center/analyse_summary_report.png]\n\nGlobal confidence ring: The final ring is computed from your sliders and their impact weights.\n\nDynamic color coding: The validated report at the bottom uses a color that matches your direction: green (Buy), red (Sell), or yellow (Watch).\n\n[img:assets/help_center/analyse_report_embedded.png]\n\n4. Managing reports\nHistory: Reports are saved and tied to your instruments.\n\nActions: You can edit (pencil), delete (trash), or export a professional PDF of your analysis to archive or share.\n\n[img:assets/help_center/analyse_report_pdf.png]';
+  String get helpCenterArticleMyAnalysisBody => '';
 
   @override
   String get helpCenterArticlePerformanceTitle =>
@@ -3237,6 +3233,55 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get analyseReportTitle => 'Relatório';
+
+  @override
+  String get analyseReportOledSectionFundamental => 'FUNDAMENTAL';
+
+  @override
+  String get analyseReportOledSectionVolumeProfile => 'VOLUME PROFILE';
+
+  @override
+  String get analyseReportOledSectionKeyZone => 'ZONA-CHAVE';
+
+  @override
+  String get analyseReportOledSectionSmc => 'SMC';
+
+  @override
+  String get analyseReportOledSectionEntry => 'ENTRADA';
+
+  @override
+  String get analyseReportOledSectionHidden => 'Secção oculta';
+
+  @override
+  String get analyseReportOledFieldChartism => 'CHARTISMO';
+
+  @override
+  String get analyseReportOledFieldMacroNotes => 'NOTAS MACRO';
+
+  @override
+  String get analyseReportOledFieldSignals => 'SINAIS';
+
+  @override
+  String get analyseReportOledFieldActionPlan => 'PLANO DE AÇÃO';
+
+  @override
+  String get analyseReportOledLiquidity => 'Liquidez';
+
+  @override
+  String get analyseReportShowOnDashboard => 'Mostrar no início';
+
+  @override
+  String get analyseReportRemoveFromDashboard => 'Remover do início';
+
+  @override
+  String get analyseReportEditTooltip =>
+      'Editar — recarregar a folha a partir deste relatório';
+
+  @override
+  String get analyseReportExportPdfTooltip => 'Exportar em PDF';
+
+  @override
+  String get analyseReportDeleteTooltip => 'Eliminar relatório';
 
   @override
   String get strategieGestionCaptionMaximum => 'Máximo';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../performance/performance_locale_copy.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
 import 'analyse_report_oled_body.dart';
@@ -50,8 +49,6 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final code = l.localeName.toLowerCase();
-    String txt(String fr, String en, String es, String de) => performancePickLang(code, fr, en, es, de);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -62,7 +59,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  txt('Rapport', 'Report', 'Informe', 'Bericht'),
+                  l.analyseReportTitle,
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
@@ -75,8 +72,8 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
               IconButton(
                 onPressed: onToggleDashboardStar,
                 tooltip: isDashboardStarred
-                    ? txt('Retirer de l’accueil', 'Remove from dashboard', 'Quitar del inicio', 'Vom Dashboard entfernen')
-                    : txt('Afficher sur l’accueil', 'Show on dashboard', 'Mostrar en inicio', 'Auf dem Dashboard anzeigen'),
+                    ? l.analyseReportRemoveFromDashboard
+                    : l.analyseReportShowOnDashboard,
                 style: IconButton.styleFrom(
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
@@ -95,12 +92,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
-                tooltip: txt(
-                  'Modifier — recharger la feuille depuis ce rapport',
-                  'Edit — reload the sheet from this report',
-                  'Editar — recargar la hoja desde este informe',
-                  'Bearbeiten — Blatt aus diesem Bericht neu laden',
-                ),
+                tooltip: l.analyseReportEditTooltip,
                 icon: const Icon(Icons.edit_outlined, color: AnalyseTokens.zinc500),
               ),
               IconButton(
@@ -109,7 +101,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
-                tooltip: txt('Exporter en PDF', 'Export as PDF', 'Exportar en PDF', 'Als PDF exportieren'),
+                tooltip: l.analyseReportExportPdfTooltip,
                 icon: const Icon(Icons.picture_as_pdf_outlined, color: AnalyseTokens.zinc500),
               ),
               IconButton(
@@ -118,7 +110,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
-                tooltip: txt('Supprimer le rapport', 'Delete report', 'Eliminar informe', 'Bericht löschen'),
+                tooltip: l.analyseReportDeleteTooltip,
                 icon: const Icon(Icons.delete_outline, color: AnalyseTokens.zinc500),
               ),
             ],

@@ -220,6 +220,7 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                       dateRowMeasureKey: entreeDateRowKey,
                       highlightDateRow: entreeDatePickerOpen,
                       onDateTimeTap: onEntreeDateTimeTap,
+                      alignStart: true,
                       checkboxValue: breakeven,
                       onCheckboxChanged: (v) {
                         onBreakevenChanged(v ?? false);
@@ -229,7 +230,7 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                       checkboxLabelStyle: checkboxLabelStyle,
                     ),
                     const SizedBox(height: 4),
-                    _MiniCheckboxRow(
+                    AjouterTradeInlineCheckboxRow(
                       value: avantNews,
                       onChanged: onAvantNewsChanged,
                       label: l.ajouterTradeCheckboxAvantNews,
@@ -275,6 +276,7 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                           dateRowMeasureKey: sortieDateRowKey,
                           highlightDateRow: sortieDatePickerOpen,
                           onDateTimeTap: onSortieDateTimeTap,
+                          alignStart: true,
                           checkboxValue: positionEnCours,
                           onCheckboxChanged: (v) {
                             onPositionEnCoursChanged(v ?? false);
@@ -284,7 +286,7 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                           checkboxLabelStyle: checkboxLabelStyle,
                         ),
                         const SizedBox(height: 4),
-                        _MiniCheckboxRow(
+                        AjouterTradeInlineCheckboxRow(
                           value: apresNews,
                           onChanged: onApresNewsChanged,
                           label: l.ajouterTradeCheckboxApresNews,
@@ -321,80 +323,6 @@ class AjouterTradeInstrumentCard extends StatelessWidget {
                 ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MiniCheckboxRow extends StatelessWidget {
-  const _MiniCheckboxRow({
-    required this.value,
-    required this.onChanged,
-    required this.label,
-    required this.labelStyle,
-  });
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final String label;
-  final TextStyle? labelStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    final ls =
-        labelStyle ??
-        const TextStyle(
-          color: DashboardTokens.labelGrey,
-          fontSize: 9.5,
-          fontWeight: FontWeight.w600,
-          height: 1.15,
-        );
-
-    final row = InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: () => onChanged(!value),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SizedBox(
-              width: 26,
-              height: 26,
-              child: Checkbox(
-                value: value,
-                onChanged: (v) => onChanged(v ?? false),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                side: const BorderSide(color: DashboardTokens.cardBoxBorder),
-                fillColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return DashboardTokens.accent;
-                  }
-                  return null;
-                }),
-                checkColor: DashboardTokens.onMatteEmphasis,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                label,
-                style: ls,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    return Align(
-      alignment: Alignment.center,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(width: 188),
-        child: row,
       ),
     );
   }

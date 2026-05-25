@@ -27,8 +27,10 @@ class CapitalBalanceCard extends StatelessWidget {
     required this.checklistController,
     required this.onOpenChecklist,
     required this.onOpenEtatMental,
+    required this.onOpenPerformance,
     required this.onOpenTrade,
     this.onOpenTradeById,
+    this.onOpenTradeDayKey,
     this.hideTimeframePills = false,
     this.cardDecoration,
     this.webPairStretch = false,
@@ -39,8 +41,10 @@ class CapitalBalanceCard extends StatelessWidget {
   final ChecklistPageController checklistController;
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenEtatMental;
+  final VoidCallback onOpenPerformance;
   final VoidCallback onOpenTrade;
   final ValueChanged<String>? onOpenTradeById;
+  final ValueChanged<String>? onOpenTradeDayKey;
   final bool hideTimeframePills;
   final BoxDecoration? cardDecoration;
 
@@ -215,7 +219,7 @@ class CapitalBalanceCard extends StatelessWidget {
                                     ringColor: PaychekWebTokens.accentMint,
                                     trackColor: trackWeb,
                                     showInnerSecondary: false,
-                                    onTap: onOpenTrade,
+                                    onTap: onOpenPerformance,
                                   ),
                                   caption: l.tradeSummaryWinRate,
                                 ),
@@ -404,7 +408,7 @@ class CapitalBalanceCard extends StatelessWidget {
                                 centerSecondary: l.dashboardRingWin,
                                 size: _ringSize,
                                 strokeWidth: 4,
-                                onTap: onOpenTrade,
+                                onTap: onOpenPerformance,
                               ),
                               const SizedBox(width: 6),
                               DonutRing(
@@ -436,6 +440,7 @@ class CapitalBalanceCard extends StatelessWidget {
                     CapitalEvolutionChartSection(
                       timeframeIndex: timeframeIndex,
                       onOpenTradeById: onOpenTradeById!,
+                      onOpenTradeDayKey: onOpenTradeDayKey,
                     ),
                   ],
                 ],

@@ -1,0 +1,40 @@
+---
+description: Refonte du Help Center Paychek — contenu assets, français uniquement (phase actuelle)
+globs: lib/help_center/**,assets/help_center/**,tool/*help_center*
+alwaysApply: false
+---
+
+# Help Center — refonte
+
+## Objectif
+
+Reconstruire le centre d’aide avec une base propre : contenu éditorial séparé de l’UI. **Phase actuelle : français uniquement** — les traductions viendront une fois tous les articles terminés.
+
+## Architecture cible
+
+- **Chrome page** (titre « Help Center », recherche, toggle mobile/web) → `lib/l10n/*.arb` pour l’instant.
+- **Titres des cartes articles** → constantes françaises dans `help_center_catalog.dart` (`frenchTitle`).
+- **Corps des articles** → `assets/help_center/guides/{slug}/fr.txt` (repli `en.txt` seulement si `fr.txt` absent, legacy).
+- **Catalogue** → `lib/help_center/help_center_catalog.dart` (ordre, slug, images hero).
+- **Chargement** → `HelpCenterGuideAssets.loadBundle()` lit toujours le **français**.
+- **Rendu** → format existant : `1. …`, `- …`, `[img:assets/help_center/…]`.
+
+## Règles de contenu (phase FR)
+
+1. **Écrire en français** dans `fr.txt` — pas de traduction parallèle pour l’instant.
+2. **Un slug = un dossier** sous `assets/help_center/guides/` (snake_case).
+3. **Ne pas** dupliquer les corps longs dans les ARB.
+4. Les fichiers `en.txt` existants = brouillon / legacy ; ne pas les enrichir sauf repli temporaire.
+5. Mobile vs Web : images hero optionnelles dans le catalogue.
+
+## Ajouter ou modifier un article
+
+1. Entrée dans `helpCenterArticles` avec `frenchTitle`.
+2. Créer ou éditer `assets/help_center/guides/{slug}/fr.txt`.
+3. Captures sous `assets/help_center/`.
+4. `flutter analyze lib/help_center`.
+
+## Plus tard (hors scope actuel)
+
+- Traductions EN / DE / ES / PT / KO des corps et titres cartes.
+- Site web help center séparé.

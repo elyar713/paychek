@@ -118,10 +118,10 @@ class _AnalysePageState extends State<AnalysePage> {
   }
 
   /// Un rapport démo figé sous le générateur ; le contrôleur reste vierge (modifiable).
-  void _seedDemoReportOnly(Locale locale) {
+  void _seedDemoReportOnly() {
     _reportEntries = [
       AnalyseStackedReportEntry(
-        snapshot: buildAnalyseDashboardPreviewSnapshot(locale: locale),
+        snapshot: buildAnalyseDashboardPreviewSnapshot(),
         embedKey: _nextReportEmbedKey++,
       ),
     ];
@@ -142,7 +142,7 @@ class _AnalysePageState extends State<AnalysePage> {
       });
       return;
     }
-    setState(() => _seedDemoReportOnly(Localizations.localeOf(context)));
+    setState(_seedDemoReportOnly);
   }
 
   Future<void> _persistCurrentReports() async {

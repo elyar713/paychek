@@ -39,6 +39,22 @@ if ($stripeUrl.Trim().Length -gt 0) {
 & flutter @mainFlutterArgs
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+# Pages marketing / SEO (sinon absentes si le build web ne les recopie pas).
+$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js', 'privacy.html', 'terms.html')
+foreach ($name in $seoFiles) {
+  $src = Join-Path (Get-Location) "web\$name"
+  $dst = Join-Path (Get-Location) "build\web\$name"
+  if (Test-Path $src) {
+    Copy-Item -Force $src $dst
+  }
+}
+$webImages = Join-Path (Get-Location) 'web\images'
+$buildImages = Join-Path (Get-Location) 'build\web\images'
+if (Test-Path $webImages) {
+  New-Item -ItemType Directory -Force -Path $buildImages | Out-Null
+  Copy-Item -Path (Join-Path $webImages '*') -Destination $buildImages -Recurse -Force
+}
+
 $adminDest = Join-Path (Get-Location) 'build\web\admin-hub'
 if (Test-Path $adminDest) {
   Remove-Item -Recurse -Force $adminDest

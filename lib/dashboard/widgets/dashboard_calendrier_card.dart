@@ -20,11 +20,13 @@ class DashboardCalendrierCard extends StatefulWidget {
   const DashboardCalendrierCard({
     super.key,
     this.onOpenTradeById,
+    this.onOpenTradeDayKey,
     this.liteInteractionLocked = false,
     this.onLiteInteractionLockedTap,
   });
 
   final ValueChanged<String>? onOpenTradeById;
+  final ValueChanged<String>? onOpenTradeDayKey;
   final bool liteInteractionLocked;
   final VoidCallback? onLiteInteractionLockedTap;
 
@@ -245,6 +247,7 @@ class _DashboardCalendrierCardState extends State<DashboardCalendrierCard> {
                       height: 96,
                       currencySymbol: sym,
                       onOpenTradeById: widget.onOpenTradeById,
+                      onOpenTradeDayKey: widget.onOpenTradeDayKey,
                     ),
                     const SizedBox(height: 10),
                   ],

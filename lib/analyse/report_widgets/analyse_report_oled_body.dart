@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../analyse_confluence_score.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
@@ -98,9 +99,10 @@ class _ReportThreeColumns extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final s = snapshot;
     final sectionFundamental = _ReportOledSection(
-      title: 'FONDAMENTAL',
+      title: l.analyseReportOledSectionFundamental,
       accent: AnalyseTokens.oledBlue,
       icon: LucideIcons.landmark,
       confidence: s.gaugeContextEnabled ? s.gaugeFeuille : null,
@@ -111,7 +113,7 @@ class _ReportThreeColumns extends StatelessWidget {
 
     final sectionVolume = s.gaugeVolumeProfileEnabled
         ? _ReportOledSection(
-            title: 'VOLUME PROFILE',
+            title: l.analyseReportOledSectionVolumeProfile,
             accent: AnalyseTokens.zinc500,
             icon: LucideIcons.barChart3,
             child: _VolumeBlock(snapshot: s),
@@ -119,7 +121,7 @@ class _ReportThreeColumns extends StatelessWidget {
         : null;
 
     final sectionZone = _ReportOledSection(
-      title: 'ZONE CLÉ',
+      title: l.analyseReportOledSectionKeyZone,
       accent: AnalyseTokens.oledIndigo,
       icon: LucideIcons.layers,
       confidence: s.gaugeStructureEnabled ? s.gaugeStructure : null,
@@ -130,7 +132,7 @@ class _ReportThreeColumns extends StatelessWidget {
 
     final sectionSmc = s.gaugeSmcEnabled
         ? _ReportOledSection(
-            title: 'SMC',
+            title: l.analyseReportOledSectionSmc,
             accent: AnalyseTokens.oledIndigo,
             icon: LucideIcons.box,
             confidence: s.gaugeSmc,
@@ -139,7 +141,7 @@ class _ReportThreeColumns extends StatelessWidget {
         : null;
 
     final sectionEntry = _ReportOledSection(
-      title: 'ENTRÉE',
+      title: l.analyseReportOledSectionEntry,
       accent: AnalyseTokens.oledGreen,
       icon: LucideIcons.activity,
       confidence: s.gaugeIndicatorsEnabled ? s.gaugeIndicators : null,
@@ -204,8 +206,9 @@ class _ReportColumnOff extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Text(
-      'Section masquée',
+      l.analyseReportOledSectionHidden,
       style: GoogleFonts.plusJakartaSans(
         fontSize: 10,
         fontWeight: FontWeight.w600,
@@ -443,14 +446,15 @@ class _FundamentalBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final tfRow = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: 'TIMEFRAME', value: snapshot.contexteTfLine)),
+        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.contexteTfLine)),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: 'TENDANCE', value: snapshot.trendLabel)),
+        Expanded(child: _ReadonlyField(label: l.analyseTrend, value: snapshot.trendLabel)),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: 'PHASE', value: snapshot.phaseLabel)),
+        Expanded(child: _ReadonlyField(label: l.analysePhase, value: snapshot.phaseLabel)),
       ],
     );
 
@@ -460,11 +464,11 @@ class _FundamentalBlock extends StatelessWidget {
         tfRow,
         if (snapshot.noteStructure.trim().isNotEmpty) ...[
           const SizedBox(height: _ReportCompact.gapField),
-          _ReadonlyField(label: 'STRUCTURE', value: snapshot.noteStructure, multiline: true),
+          _ReadonlyField(label: l.analyseStructure, value: snapshot.noteStructure, multiline: true),
         ],
         if (snapshot.noteContexte.trim().isNotEmpty) ...[
           const SizedBox(height: _ReportCompact.gapField),
-          _ReadonlyField(label: 'NOTES MACRO', value: snapshot.noteContexte, multiline: true),
+          _ReadonlyField(label: l.analyseReportOledFieldMacroNotes, value: snapshot.noteContexte, multiline: true),
         ],
       ],
     );
@@ -479,12 +483,13 @@ class _StructureBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final head = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: 'TIMEFRAME', value: snapshot.structureTf)),
+        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.structureTf)),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: 'CHARTISME', value: snapshot.chartisme)),
+        Expanded(child: _ReadonlyField(label: l.analyseReportOledFieldChartism, value: snapshot.chartisme)),
       ],
     );
 
@@ -583,6 +588,7 @@ class _SmcBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final obLines = AnalyseReportOledBody._lines(snapshot.smcOb, snapshot.smcObExtras);
     final fvgLines = AnalyseReportOledBody._lines(snapshot.smcFvg, snapshot.smcFvgExtras);
     final liqLines = AnalyseReportOledBody._lines(snapshot.smcLiq, snapshot.smcLiquidityExtras);
@@ -597,13 +603,13 @@ class _SmcBlock extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SmcFieldGroup(label: 'Order Block (OB)', lines: obLines),
+          _SmcFieldGroup(label: l.analyseOrderBlock, lines: obLines),
           const SizedBox(height: _ReportCompact.gapBlock),
-          _SmcFieldGroup(label: 'Fair Value Gap (FVG)', lines: fvgLines),
+          _SmcFieldGroup(label: l.analyseFvg, lines: fvgLines),
           const SizedBox(height: _ReportCompact.gapBlock),
-          _SmcFieldGroup(label: 'Liquidité', lines: liqLines),
+          _SmcFieldGroup(label: l.analyseReportOledLiquidity, lines: liqLines),
           const SizedBox(height: _ReportCompact.gapBlock),
-          Text('Fibonacci', style: AnalyseTokens.oledSmcFieldLabel),
+          Text(l.analyseFibShort, style: AnalyseTokens.oledSmcFieldLabel),
           const SizedBox(height: 4),
           Row(
             children: [
@@ -661,13 +667,14 @@ class _EntryBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final head = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: 'TIMEFRAME', value: snapshot.indicatorsTf)),
+        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.indicatorsTf)),
         const SizedBox(width: _ReportCompact.gapRow),
         Expanded(
-          child: _ReadonlyField(label: 'SIGNAUX', value: snapshot.indicateursOutils),
+          child: _ReadonlyField(label: l.analyseReportOledFieldSignals, value: snapshot.indicateursOutils),
         ),
       ],
     );
@@ -678,7 +685,7 @@ class _EntryBlock extends StatelessWidget {
         head,
         const SizedBox(height: _ReportCompact.gapField),
         _ReadonlyField(
-          label: "PLAN D'ACTION",
+          label: l.analyseReportOledFieldActionPlan,
           value: snapshot.noteIndicators,
           multiline: true,
         ),

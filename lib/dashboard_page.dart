@@ -116,6 +116,8 @@ class _DashboardPageState extends State<DashboardPage>
     null,
   );
   final ValueNotifier<String?> _openTradeIdNotifier = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> _openTradeDayKeyNotifier =
+      ValueNotifier<String?>(null);
   /// Aperçu accueil : rapport épinglé → sinon 1er rapport stocké → sinon `null` (titre seul).
   AnalyseReportSnapshot? _analyseHomePreview;
 
@@ -406,6 +408,7 @@ class _DashboardPageState extends State<DashboardPage>
     _checklistController.dispose();
     _editTrade.dispose();
     _openTradeIdNotifier.dispose();
+    _openTradeDayKeyNotifier.dispose();
     super.dispose();
   }
 
@@ -528,6 +531,13 @@ class _DashboardPageState extends State<DashboardPage>
           onOpenChecklist: _openChecklistFromHome,
           onOpenAnalyse: _openAnalyseFromHome,
           onOpenEtatMental: _openEtatMentalFromHome,
+          onOpenPerformance: () {
+            if (_liteRestricted) {
+              _showLitePaywallSheet();
+              return;
+            }
+            _openOverlayPage(_overlayPerformance);
+          },
           onOpenStrategie: _openStrategieFromHome,
           onOpenTrade: () {
             if (_liteRestricted) {
@@ -544,6 +554,14 @@ class _DashboardPageState extends State<DashboardPage>
             _openTradeIdNotifier.value = id;
             _applyTabIndex(1);
           },
+          onOpenTradeDayKey: (dayKey) {
+            if (_liteRestricted) {
+              _showLitePaywallSheet();
+              return;
+            }
+            _openTradeDayKeyNotifier.value = dayKey;
+            _applyTabIndex(1);
+          },
         ),
       ),
       ExcludeFocus(
@@ -552,6 +570,7 @@ class _DashboardPageState extends State<DashboardPage>
           key: const ValueKey<String>('tab_trade'),
           checklistController: _checklistController,
           openTradeIdNotifier: _openTradeIdNotifier,
+          openTradeDayKeyNotifier: _openTradeDayKeyNotifier,
           onNavigateToDashboard: () => _applyTabIndex(0),
           onEditTrade: (t) {
             if (_liteRestricted) {

@@ -18,6 +18,7 @@ class CapitalEvolutionChartSection extends StatelessWidget {
     super.key,
     required this.timeframeIndex,
     required this.onOpenTradeById,
+    this.onOpenTradeDayKey,
     this.sparklineHeight = 130,
     this.showTradeExtremes = true,
     this.extremesSpacing = 8,
@@ -25,6 +26,7 @@ class CapitalEvolutionChartSection extends StatelessWidget {
 
   final int timeframeIndex;
   final ValueChanged<String> onOpenTradeById;
+  final ValueChanged<String>? onOpenTradeDayKey;
   final double sparklineHeight;
   final bool showTradeExtremes;
   final double extremesSpacing;
@@ -71,6 +73,7 @@ class CapitalEvolutionChartSection extends StatelessWidget {
               height: sparklineHeight,
               currencySymbol: sym,
               onOpenTradeById: onOpenTradeById,
+              onOpenTradeDayKey: onOpenTradeDayKey,
             ),
             if (!kIsWeb) ...[
               const SizedBox(height: 14),

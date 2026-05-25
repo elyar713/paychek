@@ -48,6 +48,7 @@ class TradePage extends StatefulWidget {
     required this.checklistController,
     required this.onEditTrade,
     this.openTradeIdNotifier,
+    this.openTradeDayKeyNotifier,
     this.onNavigateToDashboard,
   });
 
@@ -56,6 +57,9 @@ class TradePage extends StatefulWidget {
 
   /// Depuis le dashboard (meilleur / pire trade) : ouvre lâ€™onglet puis dÃ©plie ce trade.
   final ValueNotifier<String?>? openTradeIdNotifier;
+
+  /// Sparkline évolution capital : ouvre lâ€™onglet Trade en vue **1J** avec la carte du jour dépliée.
+  final ValueNotifier<String?>? openTradeDayKeyNotifier;
 
   /// Retour vers lâ€™onglet accueil (dashboard).
   final VoidCallback? onNavigateToDashboard;
@@ -92,6 +96,25 @@ class _TradePageState extends State<TradePage> {
     _focusTradeFromExternal(id);
   }
 
+  void _onOpenTradeDayKeyNotifier() {
+    final key = widget.openTradeDayKeyNotifier?.value;
+    if (key == null || key.isEmpty) return;
+    widget.openTradeDayKeyNotifier!.value = null;
+    _focusTradeDayFromExternal(key);
+  }
+
+  void _focusTradeDayFromExternal(String dayKey) {
+    _safeSetState(() {
+      _timeframeIndex = 0;
+      _filterIndex = 0;
+      _pairFilter = null;
+      _expandedDayKey = dayKey;
+      _expandedTradeId = null;
+      _expandedWeekKey = null;
+      _expandedMonthKey = null;
+    });
+  }
+
   void _focusTradeFromExternal(String tradeId) {
     _safeSetState(() {
       _expandedTradeId = tradeId;
@@ -124,6 +147,7 @@ class _TradePageState extends State<TradePage> {
   void initState() {
     super.initState();
     widget.openTradeIdNotifier?.addListener(_onOpenTradeIdNotifier);
+    widget.openTradeDayKeyNotifier?.addListener(_onOpenTradeDayKeyNotifier);
   }
 
   @override
@@ -133,11 +157,16 @@ class _TradePageState extends State<TradePage> {
       oldWidget.openTradeIdNotifier?.removeListener(_onOpenTradeIdNotifier);
       widget.openTradeIdNotifier?.addListener(_onOpenTradeIdNotifier);
     }
+    if (oldWidget.openTradeDayKeyNotifier != widget.openTradeDayKeyNotifier) {
+      oldWidget.openTradeDayKeyNotifier?.removeListener(_onOpenTradeDayKeyNotifier);
+      widget.openTradeDayKeyNotifier?.addListener(_onOpenTradeDayKeyNotifier);
+    }
   }
 
   @override
   void dispose() {
     widget.openTradeIdNotifier?.removeListener(_onOpenTradeIdNotifier);
+    widget.openTradeDayKeyNotifier?.removeListener(_onOpenTradeDayKeyNotifier);
     _scrollController.dispose();
     super.dispose();
   }

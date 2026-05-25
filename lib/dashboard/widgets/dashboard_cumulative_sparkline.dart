@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../calendrier/calendrier_constants.dart';
 import '../../calendrier/calendrier_utils.dart';
 import '../../l10n/app_localizations.dart';
+import '../../trade/trade_week_utils.dart';
 import '../dashboard_tokens.dart';
 import '../evolution_spot.dart';
 import '../evolution_spot_context.dart';
@@ -58,6 +59,7 @@ class DashboardCumulativeSparkline extends StatefulWidget {
     this.height,
     this.currencySymbol = r'$',
     this.onOpenTradeById,
+    this.onOpenTradeDayKey,
     this.onInteractionLockedTap,
   });
 
@@ -73,6 +75,9 @@ class DashboardCumulativeSparkline extends StatefulWidget {
   final double? height;
 
   final ValueChanged<String>? onOpenTradeById;
+
+  /// Ouvre l’onglet Trade en vue **jour** (carte du jour dépliée), pas un seul trade.
+  final ValueChanged<String>? onOpenTradeDayKey;
 
   /// Mode freemium : pas d’ouverture trade, mais rappel paywall au tap.
   final VoidCallback? onInteractionLockedTap;
@@ -117,13 +122,20 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
     final idx = _hoverIndex;
     if (idx == null || widget.spots.isEmpty) return;
 
+    final trades = widget.spotContexts[idx].tradesOnSlice;
+    if (trades.isEmpty) return;
+
+    if (widget.onOpenTradeDayKey != null) {
+      final day = widget.spotContexts[idx].referenceDayLocalMidnight;
+      widget.onOpenTradeDayKey!(tradeDayKeyLocal(day));
+      _clearHover(force: true);
+      return;
+    }
+
     if (widget.onOpenTradeById == null) {
       widget.onInteractionLockedTap?.call();
       return;
     }
-
-    final trades = widget.spotContexts[idx].tradesOnSlice;
-    if (trades.isEmpty) return;
     widget.onOpenTradeById!(trades.first.id);
     _clearHover(force: true);
   }
@@ -206,7 +218,8 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
             currencySymbol: widget.currencySymbol,
             minY: widget.minY,
             maxY: widget.maxY,
-            showOpenHint: widget.onOpenTradeById != null,
+            showOpenHint:
+                widget.onOpenTradeDayKey != null || widget.onOpenTradeById != null,
             l: AppLocalizations.of(context)!,
             chartSize: chartSize,
           ),

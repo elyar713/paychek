@@ -6,7 +6,27 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
       _ajouterTradeCloseCommission(this);
       _ajouterTradeCloseStrategieMenu(this);
       _ajouterTradeCloseTradeDateTimeOverlay(this);
+      if (_hasDisciplineFeedbackDraft()) {
+        _clearDisciplineFeedbackDraft();
+      }
     }
+  }
+
+  bool _hasDisciplineFeedbackDraft() =>
+      _strategieNonRespectIds.isNotEmpty ||
+      _planAnalyseNonRespectIds.isNotEmpty ||
+      _checklistNonRespectIds.isNotEmpty ||
+      _etatMomentNonRespectIds.isNotEmpty;
+
+  void _clearDisciplineFeedbackDraft() {
+    if (!_hasDisciplineFeedbackDraft()) return;
+    setState(() {
+      _strategieNonRespectIds = {};
+      _planAnalyseNonRespectIds = {};
+      _checklistNonRespectIds = {};
+      _etatMomentNonRespectIds = {};
+      _feedbackUiEpoch++;
+    });
   }
 
   /// Lite : principe / feeling / stratégie / plan — tap → paywall (hors bloc capital & gain).

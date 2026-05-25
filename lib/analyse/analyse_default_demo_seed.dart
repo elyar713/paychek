@@ -1,8 +1,23 @@
 import 'package:flutter/widgets.dart';
 
+import '../performance/performance_locale_copy.dart';
 import 'analyse_controller.dart';
 import 'analyse_models.dart';
 import 'analyse_report_snapshot.dart';
+
+/// Contenu texte des rapports démo (Mon analyse, aperçu dashboard) — toujours en anglais.
+const Locale kAnalyseDemoReportContentLocale = Locale('en');
+
+String _demoLocaleStr(
+  Locale locale, {
+  required String fr,
+  required String en,
+  required String es,
+  required String de,
+  required String pt,
+  required String ko,
+}) =>
+    performancePickLocale(locale, fr, en, es, de, pt, ko);
 
 /// Actif attendu pour la fiche démo GOLD (voir [applyAnalyseDefaultGoldBreakoutDemo]).
 bool isAnalyseDefaultGoldDemoAsset(AnalyseReportSnapshot s) {
@@ -74,9 +89,10 @@ int resolvePlanGlobalConfidencePercent(
 }
 
 /// Rapport OLED démo figé (EUR/USD) — **sans** remplir le [AnalyseController] du générateur.
+/// Le contenu (titres, notes, biais…) est toujours en anglais ([kAnalyseDemoReportContentLocale]).
 AnalyseReportSnapshot buildAnalyseDashboardPreviewSnapshot({Locale? locale}) {
   final c = AnalyseController();
-  final loc = locale ?? WidgetsBinding.instance.platformDispatcher.locale;
+  const loc = kAnalyseDemoReportContentLocale;
   applyAnalyseDefaultOledFullDemo(c, locale: loc);
   final snap = AnalyseReportSnapshot.fromController(c, locale: loc);
   c.dispose();
@@ -93,7 +109,6 @@ void applyAnalyseDefaultOledFullDemo(
 }
 
 void _finishOledDemoExtras(AnalyseController c, Locale locale) {
-  final fr = locale.languageCode == 'fr';
   c.contextEnabled = true;
   c.structureEnabled = true;
   c.indicatorsEnabled = true;
@@ -105,23 +120,43 @@ void _finishOledDemoExtras(AnalyseController c, Locale locale) {
   c.confidenceIndicators = 78;
   c.confidenceSmc = 68;
 
-  c.structureDernierPoint = fr ? 'BOS haussier H4' : 'Bullish BOS H4';
-  c.notesStructure = fr
-      ? 'CHoCH validé · structure haussière, creux ascendants'
-      : 'CHoCH confirmed · bullish structure, higher lows';
+  c.structureDernierPoint = _demoLocaleStr(
+    locale,
+    fr: 'BOS haussier H4',
+    en: 'Bullish BOS H4',
+    es: 'BOS alcista H4',
+    de: 'Bullisher BOS H4',
+    pt: 'BOS altista H4',
+    ko: '상승 BOS H4',
+  );
+  c.notesStructure = _demoLocaleStr(
+    locale,
+    fr: 'CHoCH validé · structure haussière, creux ascendants',
+    en: 'CHoCH confirmed · bullish structure, higher lows',
+    es: 'CHoCH confirmado · estructura alcista, mínimos ascendentes',
+    de: 'CHoCH bestätigt · bullische Struktur, höhere Tiefs',
+    pt: 'CHoCH confirmado · estrutura altista, fundos ascendentes',
+    ko: 'CHoCH 확인 · 상승 구조, 고점·저점 상승',
+  );
 
-  c.smcZone = fr
-      ? "Zone d'achat H4 1.0820 - 1.0840"
-      : 'H4 demand zone 1.0820 - 1.0840';
+  c.smcZone = _demoLocaleStr(
+    locale,
+    fr: "Zone d'achat H4 1.0820 - 1.0840",
+    en: 'H4 demand zone 1.0820 - 1.0840',
+    es: 'Zona de demanda H4 1.0820 - 1.0840',
+    de: 'H4-Nachfragezone 1.0820 - 1.0840',
+    pt: 'Zona de demanda H4 1.0820 - 1.0840',
+    ko: 'H4 수요 구간 1.0820 - 1.0840',
+  );
   while (c.smcZoneExtras.isNotEmpty) {
     c.removeSmcZoneExtraAt(c.smcZoneExtras.length - 1);
   }
-  c.addSmcZoneExtra(fr ? 'OB retest 1.08380' : 'OB retest 1.08380');
+  c.addSmcZoneExtra('OB retest 1.08380');
 
   while (c.smcFvgExtras.isNotEmpty) {
     c.removeSmcFvgExtraAt(c.smcFvgExtras.length - 1);
   }
-  c.addSmcFvgExtra(fr ? 'FVG H1 1.08480 - 1.08520' : 'H1 FVG 1.08480 - 1.08520');
+  c.addSmcFvgExtra('FVG H1 1.08480 - 1.08520');
 
   while (c.smcLiquidityExtras.isNotEmpty) {
     c.removeSmcLiquidityExtraAt(c.smcLiquidityExtras.length - 1);
@@ -132,10 +167,15 @@ void _finishOledDemoExtras(AnalyseController c, Locale locale) {
     kAnalyseDefaultEntrySignalLabels.toSet(),
   );
 
-  c.notesIndicators = fr
-      ? 'Entrée : 1.08520 · SL : 1.08180 · TP1 : 1.09200 · TP2 : 1.09500'
-      : 'Entry: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500';
-
+  c.notesIndicators = _demoLocaleStr(
+    locale,
+    fr: 'Entrée : 1.08520 · SL : 1.08180 · TP1 : 1.09200 · TP2 : 1.09500',
+    en: 'Entry: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500',
+    es: 'Entrada: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500',
+    de: 'Einstieg: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500',
+    pt: 'Entrada: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500',
+    ko: '진입: 1.08520 · SL: 1.08180 · TP1: 1.09200 · TP2: 1.09500',
+  );
 }
 
 /// Démo GOLD / XAU/USD — en premier dans la pile par défaut (SMC & volume désactivés).
@@ -168,6 +208,13 @@ void applyAnalyseDefaultGoldBreakoutDemo(
     c.structureDernierPoint = 'Rompimento de linha de tendência';
     c.notesStructure =
         'O preço acabou de romper para cima um canal de baixa em H4. O suporte em 2150.00 serviu de base de repique. O alvo é a resistência psicológica em 2200.00.';
+  } else if (code == 'ko') {
+    c.nomAnalyse = '하락 채널 H4 돌파';
+    c.notesTimeframe =
+        '건전한 조정 이후 금은 일봉에서 상승 지속 신호를 보입니다. 주요 이동평균 테스트 후 모멘텀이 다시 매수 쪽으로 전환되었습니다.';
+    c.structureDernierPoint = '추세선 돌파';
+    c.notesStructure =
+        '가격이 하락 H4 채널 상단을 돌파했습니다. 2150.00 지지가 반등 기반이 되었고, 목표는 심리적 저항 2200.00입니다.';
   } else if (code == 'de') {
     c.nomAnalyse = 'H4-Breakout aus bäischem Kanal';
     c.notesTimeframe =
@@ -250,6 +297,20 @@ void applyAnalyseDefaultEuroUsdWeeklySwingDemo(
         'Plano de entrada ideal na zona OTE (0,618 Fib), alinhado a um FVG não preenchido e um Order Block H4. Os stops dos vendedores (BSL) acima do último topo são o alvo principal.';
     c.notesVolumeProfile =
         'O POC fica logo abaixo da nossa zona de entrada preferida. Se o preço cair ao POC, confirma compradores fortes. A área de valor está definida entre 1.08150 e 1.08700.';
+  } else if (code == 'ko') {
+    c.nomAnalyse = '주간 스윙 플랜';
+    c.notesTimeframe =
+        '가격은 H4 수요 구간에서 반등한 뒤 뚜렷한 상승 임펄스에 있습니다. 조정(풀백) 이후 진입을 찾고 있습니다.';
+    c.structureDernierPoint = 'BOS (Break of Structure)';
+    c.notesStructure =
+        'H4 구조는 분명히 상승입니다. 1.08200 지지가 두 번 유지되었습니다. 다음 유동성 목표는 1.09500 저항입니다.';
+    c.smcZone = 'Bullish OB (수요)';
+    c.smcFvg = '갭 1.08450';
+    c.smcLiquidityPools = 'Buy Side Liquidity (BSL) 1.09500 상단';
+    c.notesSmc =
+        'OTE 구간(0.618 Fib)에서 미체결 FVG와 H4 오더 블록이 겹치는 이상적인 진입 플랜입니다. 이전 고점 위 매도자 스탑(BSL)이 주요 목표입니다.';
+    c.notesVolumeProfile =
+        'POC는 선호 진입 구간 바로 아래에 있습니다. 가격이 POC까지 내려오면 강한 매수세를 확인할 수 있습니다. 밸류 영역은 1.08150~1.08700으로 잘 정의되어 있습니다.';
   } else if (code == 'de') {
     c.nomAnalyse = 'Wöchentlicher Swing-Plan';
     c.notesTimeframe =

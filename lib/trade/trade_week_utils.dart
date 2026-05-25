@@ -1,5 +1,13 @@
 import 'trade_models.dart';
 
+/// Clé jour stable `YYYY-MM-DD` (minuit local) — cartes Trade 1J / sparkline dashboard.
+String tradeDayKeyLocal(DateTime dt) {
+  final d = dt.toLocal();
+  return '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+}
+
 /// Lundi (local) de la semaine contenant [dt] (lundi = début).
 DateTime tradeWeekMondayLocal(DateTime dt) {
   final l = dt.toLocal();

@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
 import '../widgets/paychek_page_header.dart';
+import 'help_center_catalog.dart';
+import 'help_center_embedded_images.dart';
 import 'help_center_guide_assets.dart';
 import 'help_center_launch_links.dart';
 import 'help_center_store_badge_bytes.dart';
@@ -24,16 +26,14 @@ class HelpCenterPage extends StatefulWidget {
 }
 
 class _HelpCenterPageState extends State<HelpCenterPage> {
-  /// Recherche côté UI (texte brut) — le filtre utilise [_filterLowerDebounced].
   final TextEditingController _searchCtrl = TextEditingController();
   Timer? _searchDebounce;
   String _filterLowerDebounced = '';
 
   _HelpCenterVersion _version = _HelpCenterVersion.mobile;
 
-  /// Textes longs (add trade, ma stratégie, performance) chargés depuis les assets par langue.
-  Map<String, String>? _guideBundle;
-  String? _guidesLoadLocale;
+  Map<String, String>? _guideBodies;
+  bool _guidesLoading = false;
 
   static const double _kWebHelpMaxWidth = 480;
 
@@ -44,6 +44,20 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   void initState() {
     super.initState();
     _searchCtrl.addListener(_scheduleSearchDebounced);
+    unawaited(_loadGuides());
+  }
+
+  Future<void> _loadGuides() async {
+    if (_guidesLoading) return;
+    _guidesLoading = true;
+    if (_guideBodies == null && mounted) setState(() {});
+    try {
+      final bodies = await HelpCenterGuideAssets.loadBundle();
+      if (!mounted) return;
+      setState(() => _guideBodies = bodies);
+    } finally {
+      _guidesLoading = false;
+    }
   }
 
   void _scheduleSearchDebounced() {
@@ -64,38 +78,11 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final l10n = AppLocalizations.of(context)!;
-    final localeName = l10n.localeName;
-
-    /// Même locale : ne pas redémarrer un chargement si une requête est déjà en cours ([_guideBundle] encore null).
-    if (_guidesLoadLocale == localeName && _guideBundle != null) return;
-    if (_guidesLoadLocale == localeName && _guideBundle == null) return;
-
-    _guidesLoadLocale = localeName;
-    setState(() => _guideBundle = null);
-
-    HelpCenterGuideAssets.loadBundle(localeName).then(
-      (m) {
-        if (!mounted) return;
-        if (AppLocalizations.of(context)?.localeName != localeName) return;
-        setState(() => _guideBundle = m);
-      },
-      onError: (Object _, StackTrace stackTrace) {
-        if (!mounted) return;
-        if (AppLocalizations.of(context)?.localeName != localeName) return;
-        setState(() => _guideBundle = Map<String, String>.from(
-              HelpCenterGuideAssets.emptyGuideBundle,
-            ));
-      },
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final items = _guideBundle == null ? <_HelpCenterItem>[] : _buildItems(l10n, _guideBundle!);
+    final items = _guideBodies == null
+        ? <_HelpCenterItem>[]
+        : _buildItems(_guideBodies!);
     final q = _filterLowerDebounced;
     final filtered = q.isEmpty
         ? items
@@ -183,7 +170,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         ),
         SizedBox(height: web ? 16 : 10),
         Expanded(
-          child: _guideBundle == null
+          child: _guideBodies == null
               ? Center(
                   child: SizedBox(
                     width: 28,
@@ -268,67 +255,16 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
     );
   }
 
-  List<_HelpCenterItem> _buildItems(
-    AppLocalizations l10n,
-    Map<String, String> guides,
-  ) {
-    const addTradeImagesMobile = <String>[
-      'assets/help_center/add_trade_mobile.png',
-    ];
-    const addTradeImagesWeb = <String>[
-      'assets/help_center/add_trade_web.png',
-    ];
-    final addTrade = guides['addTrade']!;
-    final myStrategy = guides['myStrategy']!;
-    final performance = guides['performance']!;
+  List<_HelpCenterItem> _buildItems(Map<String, String> bodies) {
     return [
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleAddTradeTitle,
-        mobileBody: addTrade,
-        webBody: addTrade,
-        mobileImages: addTradeImagesMobile,
-        webImages: addTradeImagesWeb,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleEditTradeTitle,
-        mobileBody: l10n.helpCenterArticleEditTradeBody,
-        webBody: l10n.helpCenterArticleEditTradeBody,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleChecklistTitle,
-        mobileBody: l10n.helpCenterArticleChecklistBody,
-        webBody: l10n.helpCenterArticleChecklistBody,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleCalendarTitle,
-        mobileBody: l10n.helpCenterArticleCalendarBody,
-        webBody: l10n.helpCenterArticleCalendarBody,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleMentalStateTitle,
-        mobileBody: l10n.helpCenterArticleMentalStateBody,
-        webBody: l10n.helpCenterArticleMentalStateBody,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleMyStrategyTitle,
-        mobileBody: myStrategy,
-        webBody: myStrategy,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleMyAnalysisTitle,
-        mobileBody: l10n.helpCenterArticleMyAnalysisBody,
-        webBody: l10n.helpCenterArticleMyAnalysisBody,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticlePerformanceTitle,
-        mobileBody: performance,
-        webBody: performance,
-      ),
-      _HelpCenterItem(
-        title: l10n.helpCenterArticleExportPdfTitle,
-        mobileBody: l10n.helpCenterArticleExportPdfBody,
-        webBody: l10n.helpCenterArticleExportPdfBody,
-      ),
+      for (final def in helpCenterArticles)
+        _HelpCenterItem(
+          title: def.frenchTitle,
+          mobileBody: bodies[def.slug] ?? '',
+          webBody: bodies[def.slug] ?? '',
+          mobileImages: def.mobileHeroImages,
+          webImages: def.webHeroImages,
+        ),
     ];
   }
 }
@@ -363,6 +299,7 @@ class _HelpCenterItem {
   ) {
     if (title.toLowerCase().contains(qLower)) return true;
     final body = bodyFor(v);
+    if (body.isEmpty) return false;
     if (body.length > maxBodyCharsForSearch) return false;
     return body.toLowerCase().contains(qLower);
   }
@@ -401,7 +338,7 @@ class _HelpCenterCard extends StatelessWidget {
     TextStyle sectionStyle() => GoogleFonts.plusJakartaSans(
           color: DashboardTokens.onMatteEmphasis,
           height: 1.35,
-          fontSize: 15, // +2 vs normal
+          fontSize: 15,
           fontWeight: FontWeight.w800,
         );
 
@@ -412,8 +349,16 @@ class _HelpCenterCard extends StatelessWidget {
           fontWeight: FontWeight.w900,
         );
 
+    TextStyle labeledHeadingStyle() => GoogleFonts.plusJakartaSans(
+          color: Colors.white,
+          height: 1.35,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        );
+
     final sectionHeader = RegExp(r'^\s*\d+\.\s+');
     final guideTitle = RegExp(r'^Guide\s*:', unicode: true);
+    final labeledParagraph = RegExp(r'^([^:\[\]]+) : (.+)$');
 
     for (final rawLine in lines) {
       final line = rawLine.trimRight();
@@ -438,6 +383,39 @@ class _HelpCenterCard extends StatelessWidget {
       final isTitle = isFirstNonEmptyLine || guideTitle.hasMatch(trimmed);
       final isSection = !isTitle && sectionHeader.hasMatch(trimmed);
       final isBullet = !isTitle && !isSection && trimmed.startsWith('- ');
+      final labelMatch = !isTitle &&
+              !isSection &&
+              !isBullet &&
+              !isImageLine
+          ? labeledParagraph.firstMatch(trimmed)
+          : null;
+
+      if (labelMatch != null) {
+        if (isFirstNonEmptyLine) isFirstNonEmptyLine = false;
+        out.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(
+                  style: normalStyle(),
+                  children: [
+                    TextSpan(
+                      text: '${labelMatch.group(1)!} : ',
+                      style: labeledHeadingStyle(),
+                    ),
+                    TextSpan(text: labelMatch.group(2)!),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        continue;
+      }
+
       final style = isTitle
           ? titleStyle()
           : (isSection
@@ -532,94 +510,77 @@ class _HelpCenterCard extends StatelessWidget {
   }
 }
 
-/// Web : chemins servis comme dans [AjouterTradeCsvSection] (`assets/assets/...`).
-/// Autres plateformes : [Image.asset].
-List<String> _helpCenterImageWebUrls(String assetPath) {
-  final b = Uri.base.replace(fragment: '', queryParameters: {});
-  final out = <String>[];
-
-  if (assetPath.startsWith('assets/')) {
-    final rest = assetPath.substring('assets/'.length);
-    out.add(b.resolve('assets/assets/$rest').toString());
-    out.add(b.resolve(assetPath).toString());
-
-    if (b.hasScheme && (b.scheme == 'http' || b.scheme == 'https')) {
-      out.add(
-        Uri(
-          scheme: b.scheme,
-          userInfo: b.userInfo.isEmpty ? null : b.userInfo,
-          host: b.host.isEmpty ? null : b.host,
-          port: b.hasPort ? b.port : null,
-          path: '/assets/assets/$rest',
-        ).toString(),
-      );
-      out.add(
-        Uri(
-          scheme: b.scheme,
-          userInfo: b.userInfo.isEmpty ? null : b.userInfo,
-          host: b.host.isEmpty ? null : b.host,
-          port: b.hasPort ? b.port : null,
-          path: '/$assetPath',
-        ).toString(),
-      );
-    }
-  } else {
-    out.add(b.resolve(assetPath).toString());
-  }
-
-  final seen = <String>{};
-  return out.where(seen.add).toList();
-}
-
 class _HelpCenterBodyImage extends StatelessWidget {
   const _HelpCenterBodyImage({required this.path});
 
   final String path;
 
+  static Future<ByteData?> _loadBytes(String path) async {
+    final embedded = helpCenterEmbeddedImageBytes(path);
+    if (embedded != null && embedded.isNotEmpty) {
+      return ByteData.sublistView(embedded);
+    }
+    try {
+      return await rootBundle.load(path);
+    } catch (_) {}
+    if (path.endsWith('.gif')) {
+      try {
+        return await rootBundle.load('${path.substring(0, path.length - 4)}.png');
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  static Widget _brokenPlaceholder() {
+    return const AspectRatio(
+      aspectRatio: 16 / 9,
+      child: ColoredBox(
+        color: Color(0xFF1A1A1A),
+        child: Center(
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: Color(0xFF666666),
+            size: 40,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: kIsWeb
-          ? _HelpCenterBodyImageWeb(urls: _helpCenterImageWebUrls(path))
-          : Image.asset(
-              path,
-              fit: BoxFit.cover,
-            ),
-    );
-  }
-}
-
-class _HelpCenterBodyImageWeb extends StatelessWidget {
-  const _HelpCenterBodyImageWeb({required this.urls});
-
-  final List<String> urls;
-
-  @override
-  Widget build(BuildContext context) => _frame(0);
-
-  Widget _frame(int index) {
-    if (index >= urls.length) {
-      return const AspectRatio(
-        aspectRatio: 16 / 9,
-        child: ColoredBox(
-          color: Color(0xFF1A1A1A),
-          child: Center(
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: Color(0xFF666666),
-              size: 40,
-            ),
-          ),
-        ),
-      );
-    }
-    return Image.network(
-      urls[index],
-      fit: BoxFit.cover,
-      gaplessPlayback: true,
-      webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-      errorBuilder: (context, error, stackTrace) => _frame(index + 1),
+      child: FutureBuilder<ByteData?>(
+        future: _loadBytes(path),
+        builder: (context, snapshot) {
+          final bytes = snapshot.data;
+          if (bytes != null) {
+            return Image.memory(
+              bytes.buffer.asUint8List(),
+              fit: BoxFit.contain,
+              width: double.infinity,
+              gaplessPlayback: true,
+            );
+          }
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const AspectRatio(
+              aspectRatio: 16 / 9,
+              child: ColoredBox(
+                color: Color(0xFF1A1A1A),
+                child: Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              ),
+            );
+          }
+          return _brokenPlaceholder();
+        },
+      ),
     );
   }
 }
@@ -791,7 +752,6 @@ class _StoreBadgeButton extends StatelessWidget {
   final String semanticLabel;
   final VoidCallback onTap;
 
-  /// Badges « Get it on Google Play » / App Store — hauteur lisible sur mobile et web.
   static double badgeHeight(bool web) => web ? 62 : 54;
 
   @override
@@ -825,4 +785,3 @@ class _StoreBadgeButton extends StatelessWidget {
     );
   }
 }
-

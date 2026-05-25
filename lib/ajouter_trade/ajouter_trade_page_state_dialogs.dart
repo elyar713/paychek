@@ -241,6 +241,7 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
       _planAnalyseNonRespectIds = {};
       _checklistNonRespectIds = {};
       _etatMomentNonRespectIds = {};
+      _feedbackUiEpoch++;
 
       _tradeMindset = 'none';
       _authorizeDisciplineWhenFeeling = false;

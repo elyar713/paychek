@@ -140,6 +140,77 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
   }
 }
 
+/// Ligne case à cocher compacte (Breakeven, news, etc.) — même géométrie partout.
+class AjouterTradeInlineCheckboxRow extends StatelessWidget {
+  const AjouterTradeInlineCheckboxRow({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    required this.label,
+    this.labelStyle,
+  });
+
+  static const double leadingSize = 26;
+  static const double gapAfterLeading = 4;
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final String label;
+  final TextStyle? labelStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final ls =
+        labelStyle ??
+        const TextStyle(
+          color: DashboardTokens.labelGrey,
+          fontSize: 9.5,
+          fontWeight: FontWeight.w600,
+          height: 1.15,
+        );
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => onChanged(!value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: leadingSize,
+              height: leadingSize,
+              child: Checkbox(
+                value: value,
+                onChanged: (v) => onChanged(v ?? false),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+                side: const BorderSide(color: DashboardTokens.cardBoxBorder),
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return DashboardTokens.accent;
+                  }
+                  return null;
+                }),
+                checkColor: DashboardTokens.onMatteEmphasis,
+              ),
+            ),
+            SizedBox(width: gapAfterLeading),
+            Expanded(
+              child: Text(
+                label,
+                style: ls,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Bloc date/heure + case à cocher : espacements et alignement réglables ici.
 class AjouterTradeDateAndCheckboxColumn extends StatelessWidget {
   const AjouterTradeDateAndCheckboxColumn({
@@ -167,9 +238,11 @@ class AjouterTradeDateAndCheckboxColumn extends StatelessWidget {
   static const double checkboxBlockMaxWidth = 188;
 
   /// Même largeur que la case à cocher pour aligner calendrier et checkbox.
-  static const double _leadingControlSize = 26;
+  static const double _leadingControlSize =
+      AjouterTradeInlineCheckboxRow.leadingSize;
 
-  static const double _gapAfterLeading = 4;
+  static const double _gapAfterLeading =
+      AjouterTradeInlineCheckboxRow.gapAfterLeading;
 
   final String dateTimeText;
   final TextStyle? dateStyle;
@@ -224,37 +297,11 @@ class AjouterTradeDateAndCheckboxColumn extends StatelessWidget {
       ),
     );
 
-    final checkboxRow = Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: _leadingControlSize,
-          height: _leadingControlSize,
-          child: Checkbox(
-            value: checkboxValue,
-            onChanged: onCheckboxChanged,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            visualDensity: VisualDensity.compact,
-            side: const BorderSide(color: DashboardTokens.cardBoxBorder),
-            fillColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return DashboardTokens.accent;
-              }
-              return null;
-            }),
-            checkColor: DashboardTokens.onMatteEmphasis,
-          ),
-        ),
-        SizedBox(width: _gapAfterLeading),
-        Expanded(
-          child: Text(
-            checkboxLabel,
-            style: ls,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
+    final checkboxRow = AjouterTradeInlineCheckboxRow(
+      value: checkboxValue,
+      onChanged: (v) => onCheckboxChanged(v),
+      label: checkboxLabel,
+      labelStyle: ls,
     );
 
     final dateRowCore = Row(

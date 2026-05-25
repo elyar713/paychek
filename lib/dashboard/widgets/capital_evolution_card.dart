@@ -22,6 +22,7 @@ class CapitalEvolutionCard extends StatelessWidget {
     required this.timeframeIndex,
     required this.onTimeframeChanged,
     required this.onOpenTradeById,
+    this.onOpenTradeDayKey,
     this.hideTimeframePills = false,
     this.cardDecoration,
     this.webPairStretch = false,
@@ -30,6 +31,7 @@ class CapitalEvolutionCard extends StatelessWidget {
   final int timeframeIndex;
   final ValueChanged<int> onTimeframeChanged;
   final ValueChanged<String> onOpenTradeById;
+  final ValueChanged<String>? onOpenTradeDayKey;
   final bool hideTimeframePills;
   final BoxDecoration? cardDecoration;
 
@@ -92,6 +94,7 @@ class CapitalEvolutionCard extends StatelessWidget {
             final chartSection = CapitalEvolutionChartSection(
               timeframeIndex: timeframeIndex,
               onOpenTradeById: onOpenTradeById,
+              onOpenTradeDayKey: onOpenTradeDayKey,
               sparklineHeight: 122,
               showTradeExtremes: false,
             );
@@ -184,6 +187,7 @@ class CapitalEvolutionCard extends StatelessWidget {
                               return CapitalEvolutionChartSection(
                                 timeframeIndex: timeframeIndex,
                                 onOpenTradeById: onOpenTradeById,
+                                onOpenTradeDayKey: onOpenTradeDayKey,
                                 sparklineHeight: chartH,
                                 showTradeExtremes: false,
                               );
