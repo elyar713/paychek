@@ -5,6 +5,7 @@ import '../performance/performance_journal_adapter.dart';
 import '../performance/performance_paychek_lens.dart';
 import '../performance/performance_period_filter.dart';
 import '../performance/performance_trade_metrics.dart';
+import '../performance/performance_trade_model.dart';
 import '../trade/trade_models.dart';
 import 'coach_ai_performance_summary.dart';
 import 'coach_ai_response_format.dart';

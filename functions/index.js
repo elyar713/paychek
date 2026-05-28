@@ -3566,8 +3566,21 @@ function paychekAiCoachIsTodayCalendarQuestion(question) {
   return /dis.?moi|montre|quelle est|quel est|what is|show me|mon calendrier|my calendar/.test(q);
 }
 
+function paychekAiCoachIsPerformanceLensQuestion(question) {
+  const q = `${question ?? ""}`.toLowerCase();
+  if (/comment|how to|où |ou |where |configurer|modifier|engrenage|⚙/.test(q)) return false;
+  return /paychek lens|\blens\b|score discipline|discipline score|trades non renseign|non renseignés|œil|oeil|\beye\b/.test(q);
+}
+
+function paychekAiCoachIsPerformanceOvertradingQuestion(question) {
+  const q = `${question ?? ""}`.toLowerCase();
+  if (/comment|how to|où |ou |where /.test(q)) return false;
+  return /overtrad|over.?trad|trop de trade|trop trade|volume.{0,25}jour|trades?.{0,12}(par|\/| per ) jour|journée.{0,20}volume|journal.{0,15}volume/.test(q);
+}
+
 function paychekAiCoachIsFocusedTopicFollowUp(question, priorFocus) {
   const allowed = new Set([
+    "performance_overtrading", "performance_lens", "performance_summary",
     "calendar_month", "calendar_today", "strategy_today", "analysis_today",
     "checklist_today", "mental_today", "app_pricing", "coaching_story",
   ]);
@@ -3598,6 +3611,9 @@ function paychekAiCoachResolveFocus(question, priorFocus) {
   if (paychekAiCoachIsTodayStrategyQuestion(question)) return "strategy_today";
   if (paychekAiCoachIsMonthCalendarQuestion(question)) return "calendar_month";
   if (paychekAiCoachIsTodayCalendarQuestion(question)) return "calendar_today";
+  if (paychekAiCoachIsPerformanceLensQuestion(question)) return "performance_lens";
+  if (paychekAiCoachIsPerformanceOvertradingQuestion(question)) return "performance_overtrading";
+  if (paychekAiCoachIsGeneralPerformanceQuestion(question)) return "performance_summary";
   if (paychekAiCoachIsTodayMentalStateQuestion(question)) return "mental_today";
   if (paychekAiCoachShouldUseHelpCenter(question)) return "app_help";
   if (/(combien|nombre|nb|how many).{0,25}trade|trade.{0,25}(combien|nombre|nb|how many)/.test(q)) {
@@ -3615,7 +3631,6 @@ function paychekAiCoachResolveFocus(question, priorFocus) {
   if (/analyse|analysis|plan d.?analyse/.test(q)) return "analysis";
   if (/strat(é|e)gie|strategy/.test(q)) return "strategy";
   if (/état mental|etat mental|mental state/.test(q)) return "mental";
-  if (paychekAiCoachIsGeneralPerformanceQuestion(question)) return "performance_summary";
   if (/performance|bilan|winrate|pnl|rendement/.test(q)) return "full";
   return "coach";
 }
@@ -3775,14 +3790,13 @@ function paychekAiCoachFocusInstructions(locale, focus) {
     trade_list: "FOCUS=liste de trades filtrés (tags psych). Utilise tradeListQuery.trades du JSON : une ligne par trade (paire, date, PnL, tags). " +
       "Ne liste PAS les trades uniquement dans un paragraphe — l'app affiche déjà les cartes. Donne 1-2 phrases max (compte + conseil taguer si vide). " +
       "N'invente pas de trades ; n'associe pas Revenge à TILT sauf si le tag est présent.",
-    performance_summary: "FOCUS=performance globale avec séparation enregistrés / non enregistrés. " +
-      "Utilise performanceSplit: fullyRecordedDiscipline (4 piliers renseignés) vs disciplineIncomplete (au moins un manquant). " +
-      "Structure: 1) Résume d'abord fullyRecordedDiscipline (trades clôturés, winrate, PnL, wins/losses). " +
-      "2) Compare avec disciplineIncomplete — indique si les chiffres diffèrent (meilleur/pire WR ou PnL). " +
-      "3) Mentionne brièvement global seulement en contexte. " +
-      "4) Si disciplineIncomplete.tradesTotal > 0, encourage à compléter checklist/analyse/stratégie/état mental (ton coach, pas sermon). " +
-      "Ne répète pas un paragraphe générique type « sur 70 trades votre PnL est… » sans parler des deux cohortes. " +
-      "Pas de BILAN PAYCHEK 4 piliers, pas de titre audit complet.",
+    performance_summary: "FOCUS=page Performance — split discipline complète vs incomplète. " +
+      "Utilise performanceSummaryContext / performanceSplit + paychekLens. Respecte period/periodLabel. " +
+      "FORMAT: intro + 4 lignes (global, enregistrés, incomplets, conseil). INTERDIT: liste trades, audit X/70, ENREGISTRÉ. Max 170 mots.",
+    performance_lens: "FOCUS=Paychek Lens (page Performance). Utilise performanceLensContext (axes, compositeDisciplinePercent). " +
+      "FORMAT: intro + 4 lignes. INTERDIT: audit global 70 trades. Max 160 mots.",
+    performance_overtrading: "FOCUS=Journée & volume / overtrading (page Performance). Utilise performanceOvertradingContext buckets. " +
+      "FORMAT: intro + 4 lignes avec chiffres des tranches. INTERDIT: sermon sans buckets. Max 160 mots.",
   };
   const en = {
     full: "FOCUS=global audit. Personalized answer from JSON stats. No generic script.",
@@ -3826,9 +3840,11 @@ function paychekAiCoachFocusInstructions(locale, focus) {
       "FORBIDDEN: trade stats, winrate, PnL, discipline lecture. Use appHelpGuide.paychekUiSteps first.",
     trade_count: "FOCUS=trade counts only. Answer only counts/closed/wins/losses/winrate/pnl. No full 4-pillar audit.",
     trade_list: "FOCUS=filtered trade list. Use tradeListQuery.trades from JSON. Max 2 sentences; UI shows one row per trade. Do not invent trades.",
-    performance_summary: "FOCUS=performance with recorded vs incomplete discipline split. " +
-      "Use performanceSplit.fullyRecordedDiscipline vs disciplineIncomplete first; mention global briefly. " +
-      "Do not answer with only global totals. No full 4-pillar BILAN PAYCHEK.",
+    performance_summary: "FOCUS=Performance page — recorded vs incomplete discipline split. " +
+      "Use performanceSummaryContext / performanceSplit + paychekLens. Respect period. FORMAT: intro + 4 lines. " +
+      "FORBIDDEN: trade list, X/70 audit. Max 170 words.",
+    performance_lens: "FOCUS=Paychek Lens. Use performanceLensContext. FORMAT: intro + 4 lines. FORBIDDEN: global 70-trade audit. Max 160 words.",
+    performance_overtrading: "FOCUS=Day & volume / overtrading. Use performanceOvertradingContext buckets with numbers. Max 160 words.",
   };
   const table = locale === "fr" ? fr : en;
   return table[focus] || table.coach;

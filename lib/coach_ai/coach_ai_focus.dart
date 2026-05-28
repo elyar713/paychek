@@ -126,6 +126,16 @@ abstract final class CoachAiFocus {
       return 'psychology_why';
     }
     if (RegExp(r'checklist').hasMatch(q)) return 'checklist';
+    if (RegExp(r'analyse|analysis|plan d.?analyse').hasMatch(q)) return 'analyse';
+    if (RegExp(r'strat(é|e)gie|strategy').hasMatch(q)) return 'strategie';
+    if (RegExp(r'état mental|etat mental|mental state').hasMatch(q)) {
+      return 'mental';
+    }
+    if (RegExp(r'performance|bilan|winrate|pnl|rendement').hasMatch(q)) {
+      return 'full';
+    }
+    return 'coach';
+  }
 
   static String storyFollowUpCardTitle(String languageCode) {
     if (languageCode == 'fr') {

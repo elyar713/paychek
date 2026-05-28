@@ -4,6 +4,9 @@ abstract final class CoachAiConversation {
   static const int maxTurns = 4;
 
   static const _focusedTopicFollowUpPrior = <String>{
+    'performance_overtrading',
+    'performance_lens',
+    'performance_summary',
     'calendar_month',
     'calendar_today',
     'strategy_today',

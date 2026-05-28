@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../trade/trade_journal_scope.dart';
 import '../trade/trade_models.dart';
 import '../widgets/paychek_page_header.dart';
+import 'coach_ai_performance_focus.dart';
 import 'coach_ai_calendar.dart';
 import '../calendrier/calendrier_utils.dart';
 import 'coach_ai_strategy_today.dart';
@@ -565,6 +566,87 @@ class _CoachAiPageState extends State<CoachAiPage> {
           'noTradeJournalAudit': true,
           'maxWords': briefFollowUp ? 90 : 180,
           'format': briefFollowUp ? 'brief_answer_only' : 'intro_then_1_to_5_single_lines',
+        },
+        'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    if (forQuestion != null &&
+        CoachAiFocus.resolve(forQuestion, priorAssistantFocus: priorFocus) ==
+            CoachAiFocus.performanceSummary) {
+      final briefFollowUp =
+          CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
+      final trades = TradeJournalScope.of(context).items;
+      return <String, dynamic>{
+        'questionFocus': CoachAiFocus.performanceSummary,
+        'performanceSummaryContext': await CoachAiPerformanceFocus.summaryContextToJson(
+          trades,
+          languageCode,
+          forQuestion,
+          briefFollowUp: briefFollowUp,
+        ),
+        'conversation': _conversationContextBlock(),
+        'responseRules': <String, dynamic>{
+          'style': briefFollowUp ? 'performance_summary_brief_followup' : 'performance_summary_numbered',
+          'noDisciplineAudit': true,
+          'noTradeJournalAudit': true,
+          'maxWords': briefFollowUp ? 90 : 170,
+          'format': briefFollowUp ? 'brief_answer_only' : 'intro_then_1_to_4_single_lines',
+        },
+        'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    if (forQuestion != null &&
+        CoachAiFocus.resolve(forQuestion, priorAssistantFocus: priorFocus) ==
+            CoachAiFocus.performanceLens) {
+      final briefFollowUp =
+          CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
+      final trades = TradeJournalScope.of(context).items;
+      return <String, dynamic>{
+        'questionFocus': CoachAiFocus.performanceLens,
+        'performanceLensContext': await CoachAiPerformanceFocus.lensContextToJson(
+          trades,
+          languageCode,
+          forQuestion,
+          briefFollowUp: briefFollowUp,
+        ),
+        'conversation': _conversationContextBlock(),
+        'responseRules': <String, dynamic>{
+          'style': briefFollowUp ? 'performance_lens_brief_followup' : 'performance_lens_numbered',
+          'noDisciplineAudit': true,
+          'noTradeJournalAudit': true,
+          'maxWords': briefFollowUp ? 90 : 160,
+          'format': briefFollowUp ? 'brief_answer_only' : 'intro_then_1_to_4_single_lines',
+        },
+        'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    if (forQuestion != null &&
+        CoachAiFocus.resolve(forQuestion, priorAssistantFocus: priorFocus) ==
+            CoachAiFocus.performanceOvertrading) {
+      final briefFollowUp =
+          CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
+      final trades = TradeJournalScope.of(context).items;
+      return <String, dynamic>{
+        'questionFocus': CoachAiFocus.performanceOvertrading,
+        'performanceOvertradingContext':
+            await CoachAiPerformanceFocus.overtradingContextToJson(
+          trades,
+          languageCode,
+          forQuestion,
+          briefFollowUp: briefFollowUp,
+        ),
+        'conversation': _conversationContextBlock(),
+        'responseRules': <String, dynamic>{
+          'style': briefFollowUp
+              ? 'performance_overtrading_brief_followup'
+              : 'performance_overtrading_numbered',
+          'noDisciplineAudit': true,
+          'noTradeJournalAudit': true,
+          'maxWords': briefFollowUp ? 90 : 160,
+          'format': briefFollowUp ? 'brief_answer_only' : 'intro_then_1_to_4_single_lines',
         },
         'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
       };
@@ -3058,9 +3140,166 @@ class _CoachAiPageState extends State<CoachAiPage> {
     );
   }
 
-  Widget _buildPerformanceSummaryCard(_CoachAiMessage m) {
+  Widget _buildPerformanceOvertradingCard(_CoachAiMessage m, String question) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final body = m.text.trim();
+    final trades = TradeJournalScope.of(context).items;
+    final period = CoachAiPerformanceFocus.resolvePeriod(question);
+    final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            margin: const EdgeInsets.only(top: 2, right: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C2D12).withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF9A3412)),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(Icons.speed_rounded, size: 17, color: Color(0xFFFB923C)),
+          ),
+          Flexible(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 780),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0A0A0A),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF1F2937)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lang == 'fr' ? 'Overtrading · $periodLabel' : 'Overtrading · $periodLabel',
+                    style: _coachText(size: 15, color: const Color(0xFFFB923C), weight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 10),
+                  for (final bucket in CoachAiPerformanceFocus.overtradingSnapshots(
+                    trades,
+                    lang,
+                    question,
+                  ))
+                    if (bucket.hasData)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                bucket.label,
+                                style: _coachText(size: 12, color: const Color(0xFF9CA3AF)),
+                              ),
+                            ),
+                            Text(
+                              '${bucket.winratePercent}% WR · ${bucket.tradeCount} trades',
+                              style: _coachText(size: 12, color: const Color(0xFFD1D5DB)),
+                            ),
+                          ],
+                        ),
+                      ),
+                  if (body.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    CoachAiFormattedNarrative(text: body),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPerformanceLensCard(_CoachAiMessage m, String question) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final body = m.text.trim();
+    final trades = TradeJournalScope.of(context).items;
+    final period = CoachAiPerformanceFocus.resolvePeriod(question);
+    final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
+    final composite = CoachAiPerformanceFocus.compositeDisciplinePercent(trades, question);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            margin: const EdgeInsets.only(top: 2, right: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF064E3B).withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF14532D)),
+            ),
+            alignment: Alignment.center,
+            child: const Icon(Icons.visibility_outlined, size: 17, color: Color(0xFF34D399)),
+          ),
+          Flexible(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 780),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0A0A0A),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF1F2937)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Paychek Lens · $periodLabel',
+                          style: _coachText(size: 15, color: const Color(0xFF34D399), weight: FontWeight.w800),
+                        ),
+                      ),
+                      if (composite != null)
+                        Text(
+                          '$composite%',
+                          style: _coachText(size: 14, color: const Color(0xFF34D399), weight: FontWeight.w800),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  for (final axis in CoachAiPerformanceFocus.lensAxisSnapshots(trades, lang, question))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${axis.label} : ${axis.qualifiedCount}/${axis.totalCount}',
+                        style: _coachText(size: 12, color: const Color(0xFF9CA3AF)),
+                      ),
+                    ),
+                  if (body.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    CoachAiFormattedNarrative(text: body),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPerformanceSummaryCard(_CoachAiMessage m, String question) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final period = CoachAiPerformanceFocus.resolvePeriod(question);
+    final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
     final split = CoachAiPerformanceSummary.build(
-      TradeJournalScope.of(context).items,
+      CoachAiPerformanceFocus.filterJournalItems(
+        TradeJournalScope.of(context).items,
+        period,
+      ),
     );
     final recorded = split.fullyRecorded;
     final incomplete = split.disciplineIncomplete;
@@ -3104,7 +3343,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                           style: _coachText(size: 16, color: const Color(0xFF34D399), weight: FontWeight.w800),
                         ),
                         TextSpan(
-                          text: ' · enregistrés vs incomplets',
+                          text: ' · $periodLabel',
                           style: _coachText(size: 16, color: Colors.white, weight: FontWeight.w800),
                         ),
                       ],
@@ -3470,8 +3709,14 @@ class _CoachAiPageState extends State<CoachAiPage> {
         if (focus == 'coaching_story') {
           return _buildCoachingStoryCard(m, q);
         }
-        if (focus == 'performance_summary') {
-          return _buildPerformanceSummaryCard(m);
+        if (focus == CoachAiFocus.performanceOvertrading) {
+          return _buildPerformanceOvertradingCard(m, q);
+        }
+        if (focus == CoachAiFocus.performanceLens) {
+          return _buildPerformanceLensCard(m, q);
+        }
+        if (focus == CoachAiFocus.performanceSummary) {
+          return _buildPerformanceSummaryCard(m, q);
         }
         if (focus == 'story_followup') {
           return _buildStoryFollowUpCard(m, q);
