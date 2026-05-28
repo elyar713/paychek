@@ -3,9 +3,13 @@
 # Fonctionne avec un Apple ID personnel (7 jours) ou compte Développeur validé.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# shellcheck source=_paychek_flutter_env.sh
+source "$(dirname "$0")/_paychek_flutter_env.sh"
+paychek_require_flutter
 
 VERSION_LINE="$(grep -E '^version:' pubspec.yaml | head -1 | awk '{print $2}')"
 echo ">> Paychek iOS sur iPhone — version $VERSION_LINE"
+echo ">> Flutter: $(command -v flutter)"
 echo ""
 
 flutter pub get

@@ -2,6 +2,12 @@
 # Build IPA Paychek pour App Store (à lancer sur macOS avec Xcode + CocoaPods).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# shellcheck source=_paychek_flutter_env.sh
+source "$(dirname "$0")/_paychek_flutter_env.sh"
+paychek_require_flutter
+echo ">> Flutter: $(command -v flutter)"
+flutter --version
+echo ""
 
 VERSION_LINE="$(grep -E '^version:' pubspec.yaml | head -1 | awk '{print $2}')"
 BUILD_NAME="${VERSION_LINE%%+*}"
