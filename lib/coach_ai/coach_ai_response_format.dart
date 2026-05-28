@@ -113,6 +113,62 @@ abstract final class CoachAiResponseFormat {
         'Max 160 mots. Pas d’audit trading.';
   }
 
+  static String performanceSummaryInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=PAYCHEK Performance page summary (recorded vs incomplete discipline split). '
+          'Use performanceSummaryContext / performanceSplit + paychekLens only. '
+          'FORMAT: 1 short intro, then 4 single lines "1."–"4." (global WR/PnL, fullyRecorded vs disciplineIncomplete, key gap, one tip). '
+          'Respect period/periodLabel. FORBIDDEN: trade list, X/70 pillar audit sermon, ENREGISTRÉ blocks. Max 170 words.';
+    }
+    return 'FOCUS=résumé page Performance PAYCHEK (discipline complète vs incomplète). '
+        'Utilise performanceSummaryContext / performanceSplit + paychekLens uniquement. '
+        'FORMAT : 1 intro courte, puis 4 lignes « 1. » à « 4. » (WR/PnL global, enregistrés vs incomplets, écart clé, conseil). '
+        'Respecte period/periodLabel. INTERDIT : liste trades, sermon audit 4 piliers, blocs ENREGISTRÉ. Max 170 mots.';
+  }
+
+  static String performanceSummaryFollowUpInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=brief follow-up after performance_summary. Read priorTurns — max 90 words. No full audit.';
+    }
+    return 'FOCUS=suite brève après performance_summary. Lis priorTurns — max 90 mots. Pas d’audit complet.';
+  }
+
+  static String performanceLensInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=Paychek Lens (Performance page). Use performanceLensContext only. '
+          'FORMAT: 1 intro, then 4 lines (composite score, weakest axis, strongest/missing axis, tip). '
+          'Cite axes qualified/total. FORBIDDEN: global 70-trade audit. Max 160 words.';
+    }
+    return 'FOCUS=Paychek Lens (page Performance). Utilise performanceLensContext uniquement. '
+        'FORMAT : 1 intro, puis 4 lignes (score composite, axe le plus faible, axe manquant, conseil). '
+        'Cite axes qualified/total. INTERDIT : audit global 70 trades. Max 160 mots.';
+  }
+
+  static String performanceLensFollowUpInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=brief follow-up after performance_lens. priorTurns only. Max 90 words.';
+    }
+    return 'FOCUS=suite brève après performance_lens. priorTurns uniquement. Max 90 mots.';
+  }
+
+  static String performanceOvertradingInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=day volume / overtrading (Performance → Day & volume). Use performanceOvertradingContext buckets. '
+          'FORMAT: 1 intro, then 4 lines (best bucket WR, worst bucket WR, pattern insight, tip). '
+          'FORBIDDEN: generic overtrading lecture without bucket numbers. Max 160 words.';
+    }
+    return 'FOCUS=volume journalier / overtrading (Performance → Journée & volume). Utilise buckets du JSON. '
+        'FORMAT : 1 intro, puis 4 lignes (meilleure tranche WR, pire tranche, pattern, conseil). '
+        'INTERDIT : sermon overtrade sans chiffres des tranches. Max 160 mots.';
+  }
+
+  static String performanceOvertradingFollowUpInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=brief follow-up after performance_overtrading. priorTurns only. Max 90 words.';
+    }
+    return 'FOCUS=suite brève après performance_overtrading. priorTurns uniquement. Max 90 mots.';
+  }
+
   static String calendarTodayInstructions(String languageCode) {
     if (languageCode == 'en') {
       return 'FOCUS=today\'s PAYCHEK Calendar synthesis (trades + discipline + month context), NOT global discipline audit. '

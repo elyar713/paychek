@@ -8,6 +8,7 @@ import 'coach_ai_coaching_story.dart';
 import 'coach_ai_conversation.dart';
 import 'coach_ai_mental_analysis.dart';
 import 'coach_ai_non_respect_analysis.dart';
+import 'coach_ai_performance_focus.dart';
 import 'coach_ai_performance_summary.dart';
 import 'coach_ai_psych_analysis.dart';
 import 'coach_ai_trade_list_query.dart';
@@ -54,6 +55,8 @@ abstract final class CoachAiFocus {
   static const String mentalToday = 'mental_today';
   static const String tradeList = 'trade_list';
   static const String tradeCount = 'trade_count';
+  static const String performanceOvertrading = 'performance_overtrading';
+  static const String performanceLens = 'performance_lens';
   static const String performanceSummary = 'performance_summary';
 
   /// Réponses construites entièrement dans l’app (pas d’appel cloud).
@@ -93,6 +96,15 @@ abstract final class CoachAiFocus {
     if (CoachAiAppHelp.isAppHelpQuestion(question)) {
       return appHelp;
     }
+    if (CoachAiPerformanceFocus.isLensQuestion(question)) {
+      return performanceLens;
+    }
+    if (CoachAiPerformanceFocus.isOvertradingQuestion(question)) {
+      return performanceOvertrading;
+    }
+    if (CoachAiPerformanceSummary.isGeneralPerformanceQuestion(question)) {
+      return performanceSummary;
+    }
     if (RegExp(
       r'(combien|nombre|nb|how many).{0,25}trade|trade.{0,25}(combien|nombre|nb|how many)',
     ).hasMatch(q)) {
@@ -114,19 +126,6 @@ abstract final class CoachAiFocus {
       return 'psychology_why';
     }
     if (RegExp(r'checklist').hasMatch(q)) return 'checklist';
-    if (RegExp(r'analyse|analysis|plan d.?analyse').hasMatch(q)) return 'analyse';
-    if (RegExp(r'strat(é|e)gie|strategy').hasMatch(q)) return 'strategie';
-    if (RegExp(r'état mental|etat mental|mental state').hasMatch(q)) {
-      return 'mental';
-    }
-    if (CoachAiPerformanceSummary.isGeneralPerformanceQuestion(question)) {
-      return performanceSummary;
-    }
-    if (RegExp(r'performance|bilan|winrate|pnl|rendement').hasMatch(q)) {
-      return 'full';
-    }
-    return 'coach';
-  }
 
   static String storyFollowUpCardTitle(String languageCode) {
     if (languageCode == 'fr') {
