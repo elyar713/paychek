@@ -3121,6 +3121,111 @@ class AppLocalizationsKo extends AppLocalizations {
   String get analyseReportTitle => '리포트';
 
   @override
+  String get analyseOledSaveButton => '저장';
+
+  @override
+  String get analyseReportEditButton => '수정';
+
+  @override
+  String get analyseOledConfluenceLabel => '컨플루언스';
+
+  @override
+  String get analyseOledConfluenceStatusOptimal => '최적 셋업';
+
+  @override
+  String get analyseOledConfluenceStatusValid => '유효 셋업';
+
+  @override
+  String get analyseOledConfluenceStatusHighRisk => '고위험';
+
+  @override
+  String get analyseOledPlanSavedBannerTitle => '플랜이 터미널에 성공적으로 저장되었습니다!';
+
+  @override
+  String get analyseOledPlanSavedBannerSubtitle => '설정 및 컨플루언스 지표가 업데이트되었습니다.';
+
+  @override
+  String get analyseOledPlanSavedBannerClose => '닫기';
+
+  @override
+  String get analyseOledAssetSymbolLabel => '자산 / 심볼';
+
+  @override
+  String get analyseOledThesisStrategyLabel => '테제 / 전략';
+
+  @override
+  String get analyseOledExecutionDateLabel => '실행일';
+
+  @override
+  String get analyseOledThesisHint => '예: CHoCH + 피보나치 되돌림...';
+
+  @override
+  String get analyseOledSectionKeyZonesSmc => '핵심 구간 & SMC';
+
+  @override
+  String get analyseOledKeyZoneToggle => '핵심 구간';
+
+  @override
+  String get analyseOledSupportsUpper => '지지';
+
+  @override
+  String get analyseOledResistancesUpper => '저항';
+
+  @override
+  String get analyseOledZoneSynthesis => '구간 종합';
+
+  @override
+  String get analyseOledZoneSynthesisHint => '이 구간이 전술적으로 강한 이유는?';
+
+  @override
+  String get analyseOledStructureChartHint => '예: 이중 바닥, BOS, CHoCH...';
+
+  @override
+  String get analyseOledMacroNotesLabel => '매크로 메모 & 관찰';
+
+  @override
+  String get analyseOledMacroNotesHint => '매크로 맥락, 촉매...';
+
+  @override
+  String get analyseOledLiquidityShort => '유동성';
+
+  @override
+  String get analyseOledSmcObHint => '예: H4 매수 구간 1.0820 - 1.0840';
+
+  @override
+  String get analyseOledSmcFvgHint => '일봉 불균형...';
+
+  @override
+  String get analyseOledSmcLiqHint => '주요 저점 아래 스탑...';
+
+  @override
+  String get analyseOledFibPriceHint => '정확한 OTE / 구간 가격...';
+
+  @override
+  String get analyseOledLevelHint => '레벨...';
+
+  @override
+  String get analyseOledSignalsLabel => '시그널';
+
+  @override
+  String get analyseOledAddSignalHint => '시그널 또는 개인 셋업 추가...';
+
+  @override
+  String get analyseOledActionPlanLabel => '실행 계획 / 트리거 전략';
+
+  @override
+  String get analyseOledActionPlanHint => '진입, SL, 목표...';
+
+  @override
+  String get analyseTrendBullish => '상승';
+
+  @override
+  String get analyseTrendBearish => '하락';
+
+  @override
+  String get analyseTrendRange => '횡보';
+
+  @override
   String get analyseReportOledSectionFundamental => '기본 분석';
 
   @override

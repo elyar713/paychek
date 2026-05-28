@@ -1,0 +1,44 @@
+---
+description: Coach AI PAYCHEK — familles d’intention, exemples de référence, interdits UI
+globs: lib/coach_ai/**/*.dart,functions/index.js
+alwaysApply: false
+---
+
+# Coach AI — structure par intention
+
+Toute nouvelle question ou carte doit s’inscrire dans une **famille** ; le routage central est `CoachAiFocus.resolve()` (`lib/coach_ai/coach_ai_focus.dart`), miroir de `paychekAiCoachResolveFocus` dans `functions/index.js`.
+
+## Trois familles
+
+1. **Comment (app)** — `app_help`  
+   Étapes courtes PAYCHEK (checklist, ⚙ discipline, etc.). **Interdit** : winrate, PnL, audit 4 piliers.
+
+2. **Récit (psycho / session)** — `coaching_story` puis éventuellement `story_followup`  
+   L’utilisateur raconte une session ou demande comment régler une psycho **dans le récit**.  
+   **Carte** : thèmes détectés + texte coach. **Interdit** : liste globale des trades tagués, cartes ENREGISTRÉ/NON ENREGISTRÉ, audit discipline.
+
+3. **Données (journal)** — `trade_list`, `performance_summary`, `trade_count`, piliers…  
+   Requête **explicite** sur des chiffres ou une liste filtrée. Une ligne par trade pour `trade_list`.
+
+## Exemples de référence (produit)
+
+| Message utilisateur | Focus | Pas |
+|---------------------|-------|-----|
+| FOMO, sortie peur, « qu’en penses-tu ? » | `coaching_story` | audit analyse |
+| Suite : « comment régler avec PAYCHEK » | `story_followup` | stats globales |
+| SL + renversé contre analyse + « comment régler cette psycho » | `coaching_story` | `trade_list` (7 trades) |
+| « Quels trades TILT » | `trade_list` | coaching long |
+
+## Règles de détection
+
+- `coaching_story` **avant** `trade_list` (éviter faux positifs sur « contre » → `ou`).
+- `trade_list` : verbes de liste explicites (`quels trades`, `montre`, `liste`) + tag optionnel.
+- `isTradeListQuestion` doit retourner `false` si `isCoachingStoryQuestion` est vrai.
+
+## Fichiers par responsabilité
+
+- `coach_ai_focus.dart` — ordre de priorité des focuses
+- `coach_ai_coaching_story.dart` — récits + thèmes
+- `coach_ai_trade_list_query.dart` — listes filtrées
+- `coach_ai_app_help*.dart` — mode d’emploi app
+- `coach_ai_conversation.dart` — `priorTurns`, `story_followup`

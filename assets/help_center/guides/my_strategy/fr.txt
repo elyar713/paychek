@@ -1,1 +1,35 @@
-﻿Contenu a venir.
+﻿Ma Stratégie : Votre système d'audit interne
+La page Stratégie est le cœur technologique de PAYCHEK. Elle permet de décomposer votre méthode de trading en critères objectifs afin de mesurer, avec une précision chirurgicale, ce qui génère vos profits et ce qui alimente vos pertes.
+
+[img:assets/help_center/strategie_golden_rules_risk.gif]
+
+1. Règle d'Or et Risk Management
+Règles d'Or : Définissez vos principes non négociables. Si vous ne les respectez pas lors de la saisie d'un trade, PAYCHEK flaggera immédiatement l'écart.
+
+Risk Management : Définissez vos limites (risque par trade, risque journalier, trades max par jour, ratio minimum).
+
+Audit Automatique : PAYCHEK compare vos trades réels (importés manuellement ou via CSV) à ces limites. Vous saurez instantanément si vous avez "overtradé" ou dépassé votre risque autorisé.
+
+[img:assets/help_center/strategie_sessions.gif]
+
+2. Horaires et Sessions (Trading Sessions)
+Configuration : Définissez vos sessions (Londres, Asie, US).
+
+Analyse de performance : La page Performance corrèlera automatiquement votre Winrate avec vos horaires. Vous découvrirez peut-être que votre Winrate est de 60% sur Londres, mais de 30% sur US. À vous d'ajuster votre planning en conséquence.
+
+[img:assets/help_center/strategie_setups_templates.gif]
+
+3. Setup et Templates (Le cœur de l'analyse)
+Créez vos stratégies point par point : Timeframe, Indicateurs, Patterns, Signaux d'alerte, Entrées, Stop-Loss (ST), Take-Profit (TP) et Breakeven.
+
+Audit de Stratégie : Lors de l'ajout d'un trade, cochez les points que vous avez respectés. La page Performance calculera alors l'impact exact : "Quand vous ignorez le point 'Indicateur X' de votre stratégie, votre Winrate diminue de 15%."
+
+[img:assets/help_center/strategie_calendar.gif]
+
+4. Calendrier Stratégique
+Visualisation : Un calendrier coloré vous montre quelle stratégie a été utilisée chaque jour.
+
+Diagnostic rapide : Cliquez sur une journée pour voir instantanément les éléments de stratégie non respectés. C'est le moyen le plus rapide d'identifier pourquoi une journée a été un succès ou un échec.
+
+5. Rapport PDF Exportable
+Exportez l'intégralité de votre "Manuel de Stratégie" en format papier. Avoir votre plan sous les yeux, sur votre bureau, est le meilleur moyen de rester concentré pendant les périodes de forte volatilité.

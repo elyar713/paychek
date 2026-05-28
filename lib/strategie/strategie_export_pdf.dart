@@ -11,6 +11,7 @@ import 'strategie_export_pdf_icons.dart';
 import 'strategie_feedback_reference.dart';
 import 'strategie_gestion_risque_storage.dart';
 import 'strategie_horaires_sessions_storage.dart';
+import 'strategie_mes_regles_storage.dart';
 import 'strategie_setups_store.dart';
 import 'widgets/strategie_setup_card.dart';
 import 'widgets/strategie_setup_rule_styles.dart';
@@ -222,10 +223,11 @@ Future<Uint8List> buildStrategiePdf(Locale locale) async {
   final l = lookupAppLocalizations(locale);
   final gr = StrategieFeedbackReference.gestionRisque(locale);
   await StrategieSetupsStore.ensureLoaded();
+  await StrategieMesReglesStore.ensureLoaded();
   final gestion = await StrategieGestionRisqueStorage.load();
   final sessions = await StrategieHorairesSessionsStorage.load();
   final setups = List<StrategieSetupCardData>.from(StrategieSetupsStore.notifier.value);
-  final rules = StrategieFeedbackReference.mesReglesDor(locale);
+  final rules = StrategieMesReglesStore.rulesForLocale(locale);
 
   final body = <pw.Widget>[
     pw.Center(

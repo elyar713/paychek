@@ -19,6 +19,7 @@ import '../strategie/strategie_realtime_notifier.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_sections_storage.dart';
 import 'performance_custom_lens_storage.dart';
+import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/strategie_setups_store.dart';
 import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_models.dart';

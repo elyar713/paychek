@@ -7,8 +7,11 @@ const double kDayCellRadius = 7;
 const double kDayCellGap = 4;
 const double kTitleFontSize = 14;
 const double kNavIconSize = 18;
-const double kWeekdayFontSize = 9;
-const double kDayDigitFontSize = 12;
+const double kWeekdayFontSize = 11;
+const double kDayDigitFontSize = 15;
+const double kDayCellTradeCountFontSize = 6.5;
+/// P&L dans une case (sans agrandir la case).
+const double kDayCellPnlFontSize = 8.5;
 const double kCalendarBodyMaxWidth = 400;
 const double kTopInfoCardHeight = 50;
 

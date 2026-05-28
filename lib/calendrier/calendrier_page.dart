@@ -250,7 +250,7 @@ class _CalendrierPageState extends State<CalendrierPage> {
 
         final monthTitleStyle = GoogleFonts.plusJakartaSans(
           color: DashboardTokens.onMatteEmphasis,
-          fontSize: 12,
+          fontSize: kTitleFontSize,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.4,
         );

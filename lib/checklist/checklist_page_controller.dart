@@ -11,6 +11,7 @@ import 'checklist_item_schedule_sort.dart';
 import 'checklist_models.dart';
 import 'checklist_prompts.dart';
 import 'checklist_sections_storage.dart';
+import '../shared/paychek_frame_callbacks.dart';
 import 'widgets/checklist_delete_section_dialog.dart';
 
 /// État et actions de [ChecklistPage] (hors arbre de widgets).
@@ -567,11 +568,21 @@ class ChecklistPageController extends ChangeNotifier {
     if (_hydrated) {
       unawaited(_persistToDiskAndCloud());
     }
+    editingSectionId = null;
+    editingItemId = null;
     itemLabelFocusNode.removeListener(_onItemLabelFocusChange);
-    itemLabelEditController.dispose();
-    itemLabelFocusNode.dispose();
-    sectionTitleEditController.dispose();
-    sectionTitleFocusNode.dispose();
+    itemLabelFocusNode.unfocus();
+    sectionTitleFocusNode.unfocus();
+    final itemCtrl = itemLabelEditController;
+    final sectionCtrl = sectionTitleEditController;
+    final itemFocus = itemLabelFocusNode;
+    final sectionFocus = sectionTitleFocusNode;
+    PaychekFrameCallbacks.disposeAfterFrame(() {
+      itemFocus.dispose();
+      sectionFocus.dispose();
+      itemCtrl.dispose();
+      sectionCtrl.dispose();
+    });
     super.dispose();
   }
 
@@ -613,6 +624,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void commitItemLabelEdit() {
+    if (_disposed) return;
     final id = editingItemId;
     if (id == null) return;
     final t = itemLabelEditController.text.trim();

@@ -1,0 +1,25 @@
+Calendario: Su centro de control mensual
+El calendario de PAYCHEK está diseñado para ofrecerle una visión panorámica de su actividad. No sirve únicamente para consultar fechas, sino para analizar cada etapa de su progresión mensual.
+
+[img:assets/help_center/calendar_objective_kpi.gif]
+
+1. Indicadores clave de rendimiento (KPI)
+Desde que abre el calendario, encuentre sus estadísticas esenciales:
+
+Winrate, Número de trades y P&L mensual: Un vistazo rápido a sus cifras clave.
+
+Objetivos del mes: Utilice la barra de progreso para seguir su avance. Haga clic en el engranaje junto a ella para definir sus objetivos financieros o de disciplina del mes.
+
+2. Navegación inteligente y vista detallada
+Interacción intuitiva: Haga clic en cualquier día del calendario: la tarjeta adyacente muestra al instante todos los trades realizados ese día. Haga clic en un trade para acceder directamente a su ficha detallada.
+
+Sparkline de progresión: Utilice la línea de tendencia dinámica para visualizar la curva de sus resultados del mes. Al igual que con el calendario, hacer clic en un punto de la curva le lleva directamente a los trades correspondientes.
+
+[img:assets/help_center/calendar_cumulative_history.gif]
+
+Historial completo: Navegue fácilmente entre los meses anteriores (febrero, marzo, etc.) mediante la barra de selección para comparar sus rendimientos pasados y ajustar su estrategia.
+
+3. Análisis profundo y síntesis
+Síntesis de extremos: Consulte la tarjeta dedicada para identificar sus "Mejores trades", su "Número total de trades" y su "Mayor pérdida del mes". Esta sección es la mejor herramienta para identificar sus éxitos y sus áreas de mejora.
+
+Tarjeta "Rendimiento Total" (Contraer/Expandir): Utilice esta sección modular para alternar entre una vista sintética y una vista detallada de todos los trades del mes. Es la herramienta ideal para pasar rápidamente del análisis estratégico al detalle técnico de cada posición.

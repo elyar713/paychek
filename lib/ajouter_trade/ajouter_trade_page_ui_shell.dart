@@ -416,13 +416,18 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             ),
             Expanded(
               child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
                   20,
                   16,
                   20,
                   32 + MediaQuery.viewInsetsOf(context).bottom,
                 ),
-                child: Column(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.deferToChild,
+                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Form(
@@ -498,6 +503,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
                       ),
                     ),
                   ],
+                ),
                 ),
               ),
             ),

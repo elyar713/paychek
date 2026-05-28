@@ -1,0 +1,25 @@
+Calendar: Your Monthly Control Center
+The PAYCHEK calendar is designed to give you a panoramic view of your activity. It is not only for checking dates, but for analyzing every step of your monthly progress.
+
+[img:assets/help_center/calendar_objective_kpi.gif]
+
+1. Key Performance Indicators (KPIs)
+As soon as you open the calendar, find your essential statistics:
+
+Winrate, Number of trades, and Monthly P&L: A quick glance at your key figures.
+
+Monthly objectives: Use the progress bar to track your advancement. Click the gear icon next to it to define your financial or discipline objectives for the month.
+
+2. Smart Navigation and Detailed View
+Intuitive interaction: Click on any day in the calendar: the adjacent card instantly displays all trades executed that day. Click on a trade to go directly to its detailed record.
+
+Progress sparkline: Use the dynamic trend line to visualize the curve of your results over the month. As with the calendar, clicking on a point on the curve takes you directly to the corresponding trades.
+
+[img:assets/help_center/calendar_cumulative_history.gif]
+
+Complete history: Easily navigate between previous months (February, March, etc.) via the selection bar to compare your past performance and adjust your strategy.
+
+3. In-Depth Analysis and Summary
+Extremes summary: Consult the dedicated card to identify your "Best trades," your "Total number of trades," and your "Largest loss of the month." This section is the best tool for identifying your successes and areas for improvement.
+
+"Total Performance" Card (Expand/Collapse): Use this modular section to alternate between a summary view and a detailed view of all trades for the month. It is the ideal tool for quickly moving from strategic analysis to the technical detail of each position.

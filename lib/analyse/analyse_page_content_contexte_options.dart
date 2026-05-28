@@ -145,30 +145,9 @@ String ctxLabelTrend(AnalyseLocalTrend t) => switch (t) {
 
 String ctxLabelTrendLocalized(AnalyseLocalTrend t, AppLocalizations l) =>
     switch (t) {
-      AnalyseLocalTrend.haussiere =>
-        l.localeName.startsWith('fr')
-            ? 'Haussi\u00e8re'
-            : (l.localeName.startsWith('es')
-                ? 'Alcista'
-                : (l.localeName.startsWith('de')
-                    ? 'Bullisch'
-                    : (l.localeName.startsWith('pt') ? 'Alta' : 'Bullish'))),
-      AnalyseLocalTrend.baissiere =>
-        l.localeName.startsWith('fr')
-            ? 'Baissi\u00e8re'
-            : (l.localeName.startsWith('es')
-                ? 'Bajista'
-                : (l.localeName.startsWith('de')
-                    ? 'B\u00e4risch'
-                    : (l.localeName.startsWith('pt') ? 'Baixa' : 'Bearish'))),
-      AnalyseLocalTrend.range =>
-        l.localeName.startsWith('fr')
-            ? 'Range'
-            : (l.localeName.startsWith('es')
-                ? 'Rango'
-                : (l.localeName.startsWith('de')
-                    ? 'Seitw\u00e4rts'
-                    : (l.localeName.startsWith('pt') ? 'Lateral' : 'Ranging'))),
+      AnalyseLocalTrend.haussiere => l.analyseTrendBullish,
+      AnalyseLocalTrend.baissiere => l.analyseTrendBearish,
+      AnalyseLocalTrend.range => l.analyseTrendRange,
     };
 
 String ctxLabelPhase(AnalysePhase p, Locale locale) =>

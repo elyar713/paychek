@@ -51,34 +51,72 @@ class DashboardHomeHero extends StatelessWidget {
 
     final isMobileHome = !_showTimeframeStrip;
 
+    final upgrade = onUpgradeTap != null
+        ? PaychekMinimalUpgradeButton(
+            label: l.profileUpgradeLabel,
+            onTap: onUpgradeTap!,
+          )
+        : null;
+
+    final planBadge = DashboardHomePlanLogic.shouldShowPlanBadge(accountPlanIsPro)
+        ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!)
+        : null;
+
+    final hasHeaderExtras = planBadge != null || upgrade != null;
+    final nameFontSize = isMobileHome && hasHeaderExtras ? 16.0 : 20.0;
+
+    final welcomeBlock = _MinimalWelcomeBlock(
+      welcomePrefix: l.webHomeWelcomeBack,
+      displayName: displayName,
+      nameColor: scheme.onSurface,
+      nameFontSize: nameFontSize,
+      planBadge: planBadge,
+    );
+
+    Widget headerBody;
+    if (isMobileHome) {
+      // iOS / Android : Upgrade sous le nom (aligné à droite), pas sur la même ligne.
+      headerBody = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          welcomeBlock,
+          if (upgrade != null) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerRight,
+              child: upgrade,
+            ),
+          ],
+        ],
+      );
+    } else {
+      headerBody = LayoutBuilder(
+        builder: (context, constraints) {
+          final stackUpgrade = constraints.maxWidth < 420;
+          if (stackUpgrade) {
+            return _MinimalWelcomeBlock(
+              welcomePrefix: l.webHomeWelcomeBack,
+              displayName: displayName,
+              nameColor: scheme.onSurface,
+              nameFontSize: nameFontSize,
+              planBadge: planBadge,
+              nameRowTrailing: upgrade,
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: welcomeBlock),
+              ?upgrade,
+            ],
+          );
+        },
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final narrow = constraints.maxWidth < 520;
-        final stackUpgrade = constraints.maxWidth < 420;
-
-        final upgrade = onUpgradeTap != null
-            ? PaychekMinimalUpgradeButton(
-                label: l.profileUpgradeLabel,
-                onTap: onUpgradeTap!,
-              )
-            : null;
-
-        final planBadge = DashboardHomePlanLogic.shouldShowPlanBadge(accountPlanIsPro)
-            ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!)
-            : null;
-
-        final hasHeaderExtras = planBadge != null || upgrade != null;
-        final nameFontSize = isMobileHome && hasHeaderExtras ? 16.0 : 20.0;
-
-        // Étroit (< 420) : Upgrade sur la ligne du nom (pas en dessous à droite).
-        final welcomeBlock = _MinimalWelcomeBlock(
-          welcomePrefix: l.webHomeWelcomeBack,
-          displayName: displayName,
-          nameColor: scheme.onSurface,
-          nameFontSize: nameFontSize,
-          planBadge: planBadge,
-          nameRowTrailing: stackUpgrade ? upgrade : null,
-        );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,15 +129,7 @@ class DashboardHomeHero extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: stackUpgrade
-                    ? welcomeBlock
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(child: welcomeBlock),
-                          ?upgrade,
-                        ],
-                      ),
+                child: headerBody,
               ),
             ),
             if (_showTimeframeStrip) ...[
@@ -148,7 +178,7 @@ class _MinimalWelcomeBlock extends StatelessWidget {
   final Color nameColor;
   final double nameFontSize;
   final Widget? planBadge;
-  /// Sur écran étroit : CTA Upgrade aligné sur la ligne du nom.
+  /// Web étroit : CTA Upgrade sur la ligne du nom.
   final Widget? nameRowTrailing;
 
   @override

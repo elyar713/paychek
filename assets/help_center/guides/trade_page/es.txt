@@ -1,0 +1,53 @@
+Journal de Trade: Su panel operativo
+La página Trade está diseñada para una lectura inmediata y un análisis profundo de su actividad. Todo está estructurado para permitirle pasar de la visión global a los detalles precisos con un clic.
+
+[img:assets/help_center/trade_page_header.gif]
+
+1. Indicadores de rendimiento (Header)
+En la parte superior de la página, encuentre sus tres pilares de seguimiento:
+
+Ganancia/Pérdida global: Su saldo neto, que refleja la salud financiera de su cuenta.
+
+Ring de Winrate: Una representación visual dinámica de su tasa de acierto.
+
+Volumen de actividad: El número total de trades realizados.
+
+2. Vista temporal y progresión
+Barra de rendimiento semanal: Visualice al instante la tendencia de su semana en curso gracias a un indicador visual de progresión.
+
+Selector de periodo (1D / 1W / 1M / ALL): Ajuste su vista para aislar sus rendimientos diarios, semanales, mensuales o para analizar la totalidad de su historial.
+
+3. Clasificación y filtrado
+Gestión de posiciones: Un panel interactivo para clasificar sus trades por estado: Ganancias, Pérdidas, Breakeven o Posiciones abiertas. Puede filtrar estas categorías para identificar rápidamente los trades que impactaron su capital.
+
+Análisis por activos: Una sección dedicada enumera los instrumentos que ha operado (MNQ, Nasdaq, EUR/USD, etc.) con su frecuencia, permitiéndole identificar sus activos más rentables o los que más le cuestan.
+
+Gestión y exportación: Su Journal en acción
+La página Trade no es solo un historial; es una herramienta interactiva que le permite analizar, corregir y exportar su rendimiento en unos segundos.
+
+1. Navegación temporal intuitiva (1D / 1W / 1M / ALL)
+Visualice su progresión a su ritmo:
+
+[img:assets/help_center/trade_page_period_bars.gif]
+
+Vista dinámica: Seleccione 1D, 1W, 1M o ALL. Las barras gráficas se ajustan automáticamente para representar cada periodo.
+
+Acceso rápido: Haga clic en cualquier barra gráfica para aislar y mostrar al instante la lista de trades correspondientes a ese periodo concreto.
+
+2. Alertas de disciplina (El mensaje amarillo)
+PAYCHEK le avisa en tiempo real si su análisis está incompleto:
+
+Notificaciones inteligentes: Aparece un mensaje amarillo en sus trades si faltan elementos críticos (Plan de análisis, Checklist, Estado mental o Estrategia).
+
+Objetivo: No deje ningún trade "huérfano" de análisis. Un trade sin análisis es un dato perdido para su progresión.
+
+3. Gestión y exportación
+Edición y eliminación: Un menú de "3 puntos" está disponible en cada trade. Puede modificar en cualquier momento los detalles de una posición o eliminar una entrada errónea.
+
+Exportación PDF: ¿Necesita un balance en papel o un informe para un mentor? Haga clic en el icono PDF para generar al instante un informe completo que incluye:
+
+El historial detallado de sus trades.
+
+El resumen de sus estadísticas de rendimiento.
+
+Sus gráficos de progresión.

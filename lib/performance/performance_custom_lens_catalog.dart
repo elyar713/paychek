@@ -6,6 +6,7 @@ import '../checklist/checklist_models.dart'
 import '../etat_mental/mental_state_controller.dart';
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_feedback_reference.dart';
+import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/widgets/strategie_setup_cards_content.dart';
 import 'performance_custom_lens_model.dart';
 import 'performance_custom_lens_plan.dart';
@@ -88,7 +89,7 @@ List<PerformanceCustomLensElementOption> performanceCustomLensMasterCatalog({
         }
       }
     case PerformanceCustomLensDimension.strategie:
-      final regles = StrategieFeedbackReference.mesReglesDor(locale);
+      final regles = StrategieMesReglesStore.rulesForLocale(locale);
       for (var i = 0; i < regles.length; i++) {
         ids.add('mes_regles_$i');
       }

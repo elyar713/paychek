@@ -34,3 +34,33 @@ Analyse et contexte :
 
 - Case Analyse : Vous avez travaillé sur un rapport détaillé dans votre page "Mon Analyse" ? Exportez-le en PDF et joignez-le directement à votre trade pour garder une trace de votre réflexion.
 - Case Note : Utilisez cet espace libre pour noter vos ressentis, vos doutes ou toute remarque particulière qui n'apparaît pas dans vos indicateurs. C'est ici que vous construisez votre propre expérience au fil des trades.
+
+La "Boîte Noire" de votre Trading : Performance et Discipline
+Le cœur de PAYCHEK réside dans sa capacité à transformer vos actions quotidiennes en données exploitables pour votre page Performance. Chaque trade est analysé non pas pour son résultat financier, mais pour sa conformité avec votre plan de jeu.
+
+1. Typologie du Trade : Principe vs Feeling
+Lors de l'ajout d'un trade, définissez la nature de votre exécution :
+
+- Principe : Le trade a été pris en respectant scrupuleusement votre stratégie, routine et psychologie.
+- Feeling : Le trade a été pris sous le coup de l'émotion.
+
+[img:assets/help_center/add_trade_discipline_settings.png]
+
+Personnalisation (L'Engrenage) : Cliquez sur l'engrenage à côté de cette section pour ajuster vos préférences. Par défaut, le mode "Feeling" masque les sections d'analyse pour simplifier la saisie, mais vous pouvez les activer ou désactiver à volonté.
+
+Session de jour : Définissez un seuil de trades après lequel votre état passe automatiquement en "Feeling" pour éviter le surengagement.
+
+2. La mesure du Respect de Stratégie (Le Slider)
+Utilisez le slider de pourcentage pour quantifier votre niveau de respect de votre stratégie sur chaque trade. Ce chiffre est envoyé directement à votre page Performance pour corréler votre rigueur à votre rentabilité.
+
+[img:assets/help_center/add_trade_discipline_sections.png]
+
+3. Analyse de non-respect : Checklist, Plan et État Mental
+Pour chaque trade, PAYCHEK vous permet d'identifier les zones de défaillance :
+
+- Stratégie & Analyse : Si vous avez manqué un élément (ex: support/résistance, signal technique), cochez-le dans les listes dynamiques générées par vos pages Stratégie et Mon Analyse.
+- Checklist : Si votre checklist quotidienne n'a pas été respectée, vous en serez informé avant de valider l'enregistrement du trade.
+- État Mental : Visualisez votre état émotionnel actuel (ex: Peur 46%). Cochez les facteurs influents pour que PAYCHEK calcule précisément comment votre psychologie impacte votre Winrate.
+
+4. Tags Emotionnels
+Terminez votre saisie en taguant le trade avec l'émotion dominante : FOMO, Tilt, Revenge, etc. C'est ce tag qui permettra, sur le long terme, de visualiser quels types d'émotions "tuent" le plus rapidement votre capital.

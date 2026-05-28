@@ -1,0 +1,66 @@
+Adicionar uma Operação: Precisão ao serviço da análise
+Adicionar uma operação no PAYCHEK foi concebido para ser o mais rápido possível, capturando ao mesmo tempo os dados cruciais para a sua evolução.
+
+[img:assets/help_center/add_trade.gif]
+
+Registo intuitivo: Selecione em poucos cliques o seu ativo e o seu mercado. Utilize os nossos atalhos de preenchimento rápido para evitar registos manuais repetitivos.
+
+Cálculo automático: Introduza simplesmente os seus preços de entrada e de saída. O PAYCHEK calcula instantaneamente o resultado da sua operação, incluindo as comissões que pode configurar através do ícone de engrenagem junto aos seus cartões de capital.
+
+Domine o seu timing: Recomendamos vivamente que indique as datas e horas precisas de entrada e de saída. Estas informações são o motor das suas futuras análises de desempenho e permitem à aplicação traçar um perfil completo do seu estilo de trading.
+
+Contexto de mercado: Utilize os botões "Antes das notícias" ou "Depois das notícias" para classificar as suas operações. Esta distinção é essencial para compreender como reage à volatilidade do mercado e ajustar a sua estratégia em conformidade.
+
+[img:assets/help_center/add_trade_custom_actif.gif]
+
+Adição manual de ativos: Se o par que opera não aparecer na nossa lista, clique na engrenagem situada junto ao campo "Quantidade". Poderá então adicionar manualmente qualquer ativo, instrumento ou par de moedas.
+
+Personalização duradoura: Uma vez adicionado, esse ativo fica disponível para as suas futuras operações, permitindo-lhe construir a sua própria biblioteca de instrumentos de trading ao longo da sua evolução.
+
+[img:assets/help_center/add_trade_screenshot_csv_note.gif]
+
+Enriqueça o seu diário: Capturas de ecrã, Análises e Notas
+Um bom diário não se limita aos resultados financeiros; documenta todo o processo decisório. Utilize esta secção para arquivar cada detalhe das suas operações.
+
+Prova visual (Captura de ecrã): Não se limite a registar o seu ponto de entrada. Integre diretamente uma captura de ecrã do seu gráfico. Isto permite visualizar instantaneamente o setup e a configuração do mercado no momento da tomada de posição.
+
+Importação CSV universal: Acabaram-se os registos manuais fastidiosos. O PAYCHEK é compatível com 9 plataformas principais:
+
+- MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, Quantower, ATAS e Rithmic.
+
+Importe os seus dados em poucos segundos e recupere todo o histórico das suas sessões instantaneamente.
+
+Análise e contexto:
+
+- Caixa Análise: Trabalhou num relatório detalhado na sua página "A Minha Análise"? Exporte-o em PDF e anexe-o diretamente à sua operação para manter o registo da sua reflexão.
+- Caixa Nota: Utilize este espaço livre para registar as suas sensações, dúvidas ou qualquer observação particular que não apareça nos seus indicadores. É aqui que constrói a sua própria experiência ao longo das operações.
+
+A "Caixa Negra" do seu Trading: Desempenho e Disciplina
+O coração do PAYCHEK reside na sua capacidade de transformar as suas ações diárias em dados exploráveis para a sua página Desempenho. Cada operação é analisada não pelo seu resultado financeiro, mas pela sua conformidade com o seu plano de jogo.
+
+1. Tipologia da operação: Princípio vs Feeling
+Ao adicionar uma operação, defina a natureza da sua execução:
+
+- Princípio: A operação foi tomada respeitando escrupulosamente a sua estratégia, rotina e psicologia.
+- Feeling: A operação foi tomada sob o impulso da emoção.
+
+[img:assets/help_center/add_trade_discipline_settings.png]
+
+Personalização (A engrenagem): Clique na engrenagem junto a esta secção para ajustar as suas preferências. Por defeito, o modo "Feeling" oculta as secções de análise para simplificar o registo, mas pode ativá-las ou desativá-las à vontade.
+
+Sessão do dia: Defina um limiar de operações após o qual o seu estado passa automaticamente para "Feeling" para evitar o sobreengajamento.
+
+2. A medição do respeito da estratégia (O slider)
+Utilize o slider de percentagem para quantificar o seu nível de respeito da estratégia em cada operação. Este valor é enviado diretamente para a sua página Desempenho para correlacionar a sua rigorosidade com a sua rentabilidade.
+
+[img:assets/help_center/add_trade_discipline_sections.png]
+
+3. Análise de incumprimento: Checklist, Plano e Estado Mental
+Para cada operação, o PAYCHEK permite-lhe identificar as zonas de falha:
+
+- Estratégia e Análise: Se faltou um elemento (ex.: suporte/resistência, sinal técnico), assinale-o nas listas dinâmicas geradas pelas suas páginas Estratégia e A Minha Análise.
+- Checklist: Se a sua checklist diária não foi respeitada, será informado antes de validar o registo da operação.
+- Estado Mental: Visualize o seu estado emocional atual (ex.: Medo 46%). Assinale os fatores influentes para que o PAYCHEK calcule com precisão como a sua psicologia impacta a sua taxa de acerto.
+
+4. Tags emocionais
+Termine o seu registo etiquetando a operação com a emoção dominante: FOMO, Tilt, Revenge, etc. É esta etiqueta que permitirá, a longo prazo, visualizar que tipos de emoções "matam" mais rapidamente o seu capital.

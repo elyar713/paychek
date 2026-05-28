@@ -5611,7 +5611,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpCenterArticleEditTradeTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Trade page'**
+  /// **'Page Trade — Journal'**
   String get helpCenterArticleEditTradeTitle;
 
   /// No description provided for @helpCenterArticleEditTradeBody.
@@ -5961,6 +5961,216 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Rapport'**
   String get analyseReportTitle;
+
+  /// No description provided for @analyseOledSaveButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarder'**
+  String get analyseOledSaveButton;
+
+  /// No description provided for @analyseReportEditButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get analyseReportEditButton;
+
+  /// No description provided for @analyseOledConfluenceLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONFLUENCE'**
+  String get analyseOledConfluenceLabel;
+
+  /// No description provided for @analyseOledConfluenceStatusOptimal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Setup Optimal'**
+  String get analyseOledConfluenceStatusOptimal;
+
+  /// No description provided for @analyseOledConfluenceStatusValid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Setup Valide'**
+  String get analyseOledConfluenceStatusValid;
+
+  /// No description provided for @analyseOledConfluenceStatusHighRisk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Risque élevé'**
+  String get analyseOledConfluenceStatusHighRisk;
+
+  /// No description provided for @analyseOledPlanSavedBannerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan enregistré avec succès dans votre terminal !'**
+  String get analyseOledPlanSavedBannerTitle;
+
+  /// No description provided for @analyseOledPlanSavedBannerSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos configurations et indicateurs de confluence ont été mis à jour.'**
+  String get analyseOledPlanSavedBannerSubtitle;
+
+  /// No description provided for @analyseOledPlanSavedBannerClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'FERMER'**
+  String get analyseOledPlanSavedBannerClose;
+
+  /// No description provided for @analyseOledAssetSymbolLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACTIF / SYMBOLE'**
+  String get analyseOledAssetSymbolLabel;
+
+  /// No description provided for @analyseOledThesisStrategyLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'THÈSE / STRATÉGIE'**
+  String get analyseOledThesisStrategyLabel;
+
+  /// No description provided for @analyseOledExecutionDateLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'DATE D\'EXÉCUTION'**
+  String get analyseOledExecutionDateLabel;
+
+  /// No description provided for @analyseOledThesisHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'ex: CHoCH + Retrait Fibonacci...'**
+  String get analyseOledThesisHint;
+
+  /// No description provided for @analyseOledSectionKeyZonesSmc.
+  ///
+  /// In fr, this message translates to:
+  /// **'ZONES CLÉS & SMC'**
+  String get analyseOledSectionKeyZonesSmc;
+
+  /// No description provided for @analyseOledKeyZoneToggle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zone clé'**
+  String get analyseOledKeyZoneToggle;
+
+  /// No description provided for @analyseOledSupportsUpper.
+  ///
+  /// In fr, this message translates to:
+  /// **'SUPPORTS'**
+  String get analyseOledSupportsUpper;
+
+  /// No description provided for @analyseOledResistancesUpper.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSISTANCES'**
+  String get analyseOledResistancesUpper;
+
+  /// No description provided for @analyseOledZoneSynthesis.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synthèse des zones'**
+  String get analyseOledZoneSynthesis;
+
+  /// No description provided for @analyseOledZoneSynthesisHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourquoi cette zone est solide tactiquement ?'**
+  String get analyseOledZoneSynthesisHint;
+
+  /// No description provided for @analyseOledStructureChartHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'ex: Double bottom, BOS, CHoCH...'**
+  String get analyseOledStructureChartHint;
+
+  /// No description provided for @analyseOledMacroNotesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notes & Observations Macro'**
+  String get analyseOledMacroNotesLabel;
+
+  /// No description provided for @analyseOledMacroNotesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contexte macro, catalyseurs...'**
+  String get analyseOledMacroNotesHint;
+
+  /// No description provided for @analyseOledLiquidityShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liquidité'**
+  String get analyseOledLiquidityShort;
+
+  /// No description provided for @analyseOledSmcObHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'ex: Zone d\'achat H4 1.0820 - 1.0840'**
+  String get analyseOledSmcObHint;
+
+  /// No description provided for @analyseOledSmcFvgHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imbalance de bougie Daily...'**
+  String get analyseOledSmcFvgHint;
+
+  /// No description provided for @analyseOledSmcLiqHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stops sous les creux majeurs...'**
+  String get analyseOledSmcLiqHint;
+
+  /// No description provided for @analyseOledFibPriceHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix exact de l\'OTE / Zone...'**
+  String get analyseOledFibPriceHint;
+
+  /// No description provided for @analyseOledLevelHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Niveau...'**
+  String get analyseOledLevelHint;
+
+  /// No description provided for @analyseOledSignalsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signaux'**
+  String get analyseOledSignalsLabel;
+
+  /// No description provided for @analyseOledAddSignalHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un signal, setup personnel...'**
+  String get analyseOledAddSignalHint;
+
+  /// No description provided for @analyseOledActionPlanLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan d\'Action / Stratégie de Trigger'**
+  String get analyseOledActionPlanLabel;
+
+  /// No description provided for @analyseOledActionPlanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée, SL, cibles...'**
+  String get analyseOledActionPlanHint;
+
+  /// No description provided for @analyseTrendBullish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Haussière'**
+  String get analyseTrendBullish;
+
+  /// No description provided for @analyseTrendBearish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Baissière'**
+  String get analyseTrendBearish;
+
+  /// No description provided for @analyseTrendRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Range'**
+  String get analyseTrendRange;
 
   /// No description provided for @analyseReportOledSectionFundamental.
   ///

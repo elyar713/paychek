@@ -1,1 +1,29 @@
-﻿Contenu a venir.
+﻿My Analyse : Votre laboratoire de trading
+La page My Analyse vous permet de formaliser votre réflexion avant même de passer à l'action. En structurant votre pensée selon trois piliers fondamentaux, vous éliminez le doute et renforcez la cohérence de vos décisions.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. Configuration Initiale
+Identifiez votre Actif, nommez votre Thèse et fixez la Date de votre analyse.
+
+Flexibilité totale : Utilisez les boutons ON/OFF pour désactiver les sections inutiles et alléger votre interface selon votre méthodologie.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. Les Trois Piliers de l'Analyse
+Carte Fondamentale : Définissez le contexte (Timeframe, Biais directionnel, Phase de marché : Accumulation/Impulsion/Distribution). Utilisez l'espace "Structure" pour noter vos figures (Double Bottom, BOS, etc.) et le slider de confiance pour auto-évaluer la solidité de votre analyse. Intégrez vos données de Volume Profil (POC, VAH, VAL) pour confirmer vos niveaux.
+
+Carte Zone Clé & SMC : Identifiez vos points de retournement. Ajoutez manuellement vos supports/résistances et cochez vos outils SMC (Order Block, FVG, Liquidité, Niveaux Fibonacci). Complétez avec une note de synthèse pour garder une trace claire de vos zones d'intérêt.
+
+Carte Entrée : Formalisez votre déclencheur (Signal, Indicateur ou Figure chandelier). C'est votre "Trigger" final avant l'exécution.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. Sauvegarde, Export et Sync
+Rapport Centralisé : Une fois le bouton "Sauvegarder" pressé, PAYCHEK génère une fiche récapitulative unique.
+
+Synchro Dashboard : Cette fiche apparaît instantanément sur votre Dashboard.
+
+Export PDF : Transformez votre analyse en document papier pour garder vos plans sous les yeux.
+
+Audit de discipline : Ces données sont automatiquement liées à vos futurs trades. Lors de votre revue de performance, vous verrez en un coup d'œil quels éléments d'analyse ont été respectés ou ignorés, vous permettant d'ajuster votre stratégie avec des preuves statistiques.

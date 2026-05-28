@@ -71,6 +71,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           'stripePublishableKey',
           'stripeSecretKey',
+          'aiAgentApiKey',
           'updatedAt',
         ])
         && (!('stripePublishableKey' in request.resource.data) || (
@@ -88,6 +89,10 @@ service cloud.firestore {
             request.resource.data.stripeSecretKey == ''
             || request.resource.data.stripeSecretKey.matches('^sk_(test|live)_.+')
           )
+        ))
+        && (!('aiAgentApiKey' in request.resource.data) || (
+          request.resource.data.aiAgentApiKey is string
+          && request.resource.data.aiAgentApiKey.size() < 500
         ))
         && (!('updatedAt' in request.resource.data)
           || request.resource.data.updatedAt is timestamp);

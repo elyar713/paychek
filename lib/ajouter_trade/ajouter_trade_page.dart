@@ -30,6 +30,7 @@ import '../analyse/analyse_report_pdf.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_reports_storage.dart';
 import '../etat_mental/mental_state_controller.dart';
+import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/strategie_setups_store.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
 import '../strategie/widgets/strategie_setup_cards_content.dart';

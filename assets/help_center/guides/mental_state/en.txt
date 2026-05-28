@@ -1,0 +1,34 @@
+Mental State: Your Trader "Bio-Data"
+Performance is not only a matter of technique; it is a matter of human balance. The Mental State page is your biological dashboard: it analyzes how your daily habits directly impact your financial results.
+
+[img:assets/help_center/mental_state_impact_settings.gif]
+
+1. Daily Psychology Operation
+Each day, perform your "psycho check-up." Use the sliders to rate your performance pillars:
+
+Customizable routine: Sleep, exercise, meditation, or any other element you consider vital for your personality.
+
+Calibrated impact: Each slider has an impact setting (positive or negative). You define yourself what helps you stay "sharp" in the markets.
+
+Performance ring: Instantly visualize your overall state for the day via a ring chart that aggregates all your personal data.
+
+2. Expert Configuration (The Gear)
+Click the gear icon in the section to define the weight (as a percentage) of each factor in your overall state. If for you sleep accounts for 60% of your success and meditation for 10%, PAYCHEK lets you configure that reality.
+
+3. Performance & Psychology Correlation
+This is where PAYCHEK becomes an exceptional diagnostic tool. Your Mental State data is synchronized in real time with your trades:
+
+[img:assets/help_center/mental_state_calendar.gif]
+
+Visual history: Use the calendar to navigate into the past and see how your mental state evolved.
+
+Automatic correlation analysis: The Performance page now displays cause-and-effect links:
+
+Example: "When your mental state is at 50%, your Winrate drops to 44%." This visibility lets you know exactly which day you should close your trading platform to protect your capital.
+
+4. Customizing Your Sessions
+You are not limited to a standard trading day. PAYCHEK adapts to your life and your market hours.
+
+Session configuration (The Gear): Click the gear icon in the calendar toolbar to define your own trading time slots.
+
+Total flexibility: Whether you trade during the London, New York session, or have offset hours, you are free to choose the hours that make up your "trading day."

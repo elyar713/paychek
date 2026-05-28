@@ -1,0 +1,41 @@
+Performance: Die statistische Wahrheit
+Die Performance-Seite ist der Spiegel Ihrer Aktivität. Sie zählt nicht nur Ihre Gewinne – sie entschlüsselt die Mechanismen, die Ihren Erfolg oder Misserfolg bestimmen.
+
+[img:assets/help_center/performance_overview_kpis.png]
+
+1. Gesamtüberblick (Header & KPIs)
+Wichtige Indikatoren: Sehen Sie sofort das Gesamtvolumen, den Nettosaldo (Gewinn/Verlust/Breakeven) und Ihre Überlebensmetriken (Maximalverlust, durchschnittliche Trade-Dauer).
+
+Disziplin-Index: Ihre Performance wird mit Ihrer Beständigkeit verknüpft. Achtung: Disziplin-Statistiken werden nur gezählt, wenn Checklist und mentaler Zustand vor 23:59 Uhr ausgefüllt sind. Diese tägliche Disziplin ist der Schlüssel zu Ihrer Entwicklung.
+
+2. Disziplin-Diagnose
+Audit der Auslassungen: PAYCHEK listet Ihre „verwaisten“ Trades (ohne Checklist, Strategie oder Analyse). Ein Klick genügt, um sie direkt zu vervollständigen.
+
+Korrelation Disziplin/Winrate: Entdecken Sie die mathematische Wirkung Ihrer Disziplin:
+
+- Winrate mit 100 % Checklist vs. Winrate ohne Checklist.
+- Performance korreliert mit Ihren verschiedenen mentalen Zuständen (Angst, Vertrauen, Müdigkeit usw.).
+
+3. Verhaltens- und Umgebungsanalyse
+Aktivitätsvolumen: Visualisieren Sie Ihre Winrate in Abhängigkeit von der täglichen Trade-Anzahl (z. B. 1–5 Trades vs. 5–10 Trades). Identifizieren Sie Ihre Ermüdungsschwelle.
+
+Zeitliche & technische Analyse:
+
+- Sessions: Wie hoch ist Ihre Winrate in London, Asien oder den US?
+- Positionsdauer: Welches Zeitfenster optimiert Ihre Profitabilität (0–15 Min. vs. >12 Std.)?
+- Märkte: Welches Asset ist Ihre „Cash Cow“ und welches Ihre „Falle“?
+
+[img:assets/help_center/performance_strategic_audit.gif]
+
+4. Strategie- & Ausführungs-Audit
+Audit nach Strategie: Identifizieren Sie für jede definierte Strategie die am häufigsten ignorierten Elemente.
+
+Talent-Balken: Erkennen Sie Trades, die ausschließlich auf „Feeling“ oder „Prinzip“ basieren.
+
+Anpassbares Dashboard: Erstellen Sie eigene Ansichten. Möchten Sie wissen, ob Ihre „Angst“ Ihre Winrate bei EUR/USD senkt? Fügen Sie dieses Segment hinzu und visualisieren Sie den Impact in Echtzeit.
+
+5. Export & Bericht
+PDF-Symbol: Erstellen Sie jederzeit Ihren vollständigen Performance-Bericht. Ideal für wöchentliche Reviews oder um Ihre Historie einem Partner/Mentor zu präsentieren.
+
+Warum das das ultimative Argument ist:
+Sie zwingen den Trader zu erkennen, dass das Problem nicht der Markt ist, sondern die eigene Ausführung. Wenn Sie z. B. zeigen, dass ein Trader 20 % Winrate verliert, sobald er mehr als 5 Trades pro Tag ausführt, geben Sie ihm eine goldene Regel, die er nie wieder ignorieren kann.

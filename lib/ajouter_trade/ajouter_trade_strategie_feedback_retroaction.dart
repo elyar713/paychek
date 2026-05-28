@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
-import '../strategie/strategie_feedback_reference.dart';
+import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
 import '../strategie/widgets/strategie_setup_tag_format.dart';
 
@@ -100,7 +100,7 @@ class AjouterTradeStrategieFeedbackRetroactionBody extends StatelessWidget {
       );
     }
 
-    final regles = StrategieFeedbackReference.mesReglesDor(locale);
+    final regles = StrategieMesReglesStore.rulesForLocale(locale);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

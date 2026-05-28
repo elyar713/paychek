@@ -1,0 +1,34 @@
+Mentaler Zustand: Ihre Trader-„Bio-Daten“
+Performance ist nicht nur eine Frage der Technik – sie ist eine Frage des menschlichen Gleichgewichts. Die Seite Mentaler Zustand ist Ihr biologisches Dashboard: Sie analysiert, wie Ihre täglichen Gewohnheiten Ihre finanziellen Ergebnisse direkt beeinflussen.
+
+[img:assets/help_center/mental_state_impact_settings.gif]
+
+1. Tägliche Psychologie-Operation
+Führen Sie jeden Tag Ihren „Psycho-Check-up“ durch. Nutzen Sie die Slider, um Ihre Performance-Säulen zu bewerten:
+
+Anpassbare Routine: Schlaf, Sport, Meditation oder jedes andere Element, das Sie für Ihre Persönlichkeit als entscheidend erachten.
+
+Kalibrierter Impact: Jeder Slider verfügt über eine Impact-Einstellung (positiv oder negativ). Sie definieren selbst, was Ihnen hilft, an den Märkten „scharf“ zu bleiben.
+
+Performance-Ring: Visualisieren Sie sofort Ihren Gesamtzustand des Tages über ein Ringdiagramm (Ring), das all Ihre persönlichen Daten aggregiert.
+
+2. Experten-Konfiguration (Das Zahnrad)
+Klicken Sie auf das Zahnrad des Bereichs, um das Gewicht (in Prozent) jedes Faktors in Ihrem Gesamtzustand festzulegen. Wenn Schlaf für Sie 60 % Ihres Erfolgs ausmacht und Meditation 10 %, können Sie diese Realität in PAYCHEK parametrieren.
+
+3. Korrelation Performance & Psyche
+Hier wird PAYCHEK zu einem außergewöhnlichen Diagnosewerkzeug. Ihre Daten zum Mentalen Zustand werden in Echtzeit mit Ihren Trades synchronisiert:
+
+[img:assets/help_center/mental_state_calendar.gif]
+
+Visuelle Historie: Nutzen Sie den Kalender, um in der Vergangenheit zu navigieren und zu sehen, wie sich Ihr Psycho-Zustand entwickelt hat.
+
+Automatische Korrelationsanalyse: Die Performance-Seite zeigt nun Ursache-Wirkungs-Zusammenhänge:
+
+Beispiel: „Wenn Ihr mentaler Zustand bei 50 % liegt, fällt Ihre Winrate auf 44 %.“ Diese Transparenz zeigt Ihnen genau, an welchem Tag Sie Ihre Trading-Plattform schließen sollten, um Ihr Kapital zu schützen.
+
+4. Personalisierung Ihrer Sessions
+Sie sind nicht an einen standardisierten Trading-Tag gebunden. PAYCHEK passt sich Ihrem Leben und Ihren Marktzeiten an.
+
+Session-Konfiguration (Das Zahnrad): Klicken Sie auf das Zahnrad in der Kalender-Symbolleiste, um Ihre eigenen Trading-Zeitfenster festzulegen.
+
+Volle Flexibilität: Ob Sie während der London-, New-York-Session traden oder unregelmäßige Zeiten haben – Sie wählen frei die Stunden, die Ihren „Trading-Tag“ ausmachen.

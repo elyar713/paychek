@@ -22,6 +22,7 @@ class PlusMenuActions {
     required VoidCallback onOpenStrategie,
     required VoidCallback onOpenAnalyse,
     required VoidCallback onOpenPerformance,
+    required VoidCallback onOpenCoachAi,
     required VoidCallback onOpenChecklist,
     required VoidCallback onOpenCalculatrice,
     required VoidCallback onOpenReglage,
@@ -85,6 +86,11 @@ class PlusMenuActions {
         icon: Icons.query_stats_outlined,
         label: l10n.plusPerformance,
         onTap: onOpenPerformance,
+      ),
+      (
+        icon: Icons.auto_awesome_outlined,
+        label: 'AI Coach',
+        onTap: () => runLite(onOpenCoachAi, allowedInLite: false),
       ),
       (
         icon: Icons.calculate_outlined,

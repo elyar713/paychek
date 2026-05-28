@@ -1,0 +1,41 @@
+Performance: The Statistical Truth
+The Performance page is the mirror of your activity. It does not just count your gains; it decodes the mechanisms that dictate your success or failure.
+
+[img:assets/help_center/performance_overview_kpis.png]
+
+1. Overview (Header & KPIs)
+Key indicators: Instantly visualize total volume, net balance (Gain/Loss/Breakeven), and your survival metrics (Max loss, Average trade duration).
+
+Rigor Index: Your performance is cross-referenced with your consistency. Note: Discipline statistics are only counted if your checklist and mental state are completed before 11:59 PM. This daily rigor is the key to your progress.
+
+2. Discipline Diagnosis
+Missing data audit: PAYCHEK lists your "orphan" trades (those without checklist, strategy, or analysis). One click is enough to complete them directly.
+
+Discipline/Winrate correlation: Discover the mathematical impact of your rigor:
+
+- Winrate with 100% checklist vs Winrate without checklist.
+- Performance correlated to your different mental states (Fear, Confidence, Fatigue, etc.).
+
+3. Behavioral & Environmental Analysis
+Activity volume: Visualize your Winrate based on the number of daily trades (e.g., 1-5 trades vs 5-10 trades). Identify your fatigue threshold.
+
+Temporal & Technical Analysis:
+
+- Sessions: What is your Winrate on London, Asia, or US?
+- Position duration: Which time window optimizes your profitability (0-15 min vs >12h)?
+- Markets: Which asset is your "cash cow" and which one is your "trap"?
+
+[img:assets/help_center/performance_strategic_audit.gif]
+
+4. Strategic & Execution Audit
+Audit by Strategy: For each defined strategy, identify the elements most often ignored.
+
+Talent Bar: Identify your trades based solely on "Feeling" or "Principle."
+
+Customizable Dashboard: Create your own views. Want to know if your "fear" lowers your Winrate on EUR/USD? Add that segment and visualize the impact in real time.
+
+5. Export & Report
+PDF icon: Generate your complete performance report at any time. Ideal for your weekly reviews or to present your history to a partner/mentor.
+
+Why this is the ultimate argument for June 5:
+You force the trader to realize that the problem is not the market, but their own execution. By showing, for example, that a trader loses 20% of Winrate as soon as they exceed 5 trades per day, you give them a golden rule they can no longer ignore.

@@ -58,12 +58,4 @@ const List<HelpCenterArticleDef> helpCenterArticles = <HelpCenterArticleDef>[
     slug: 'performance',
     frenchTitle: 'Performance — Scanner de trading',
   ),
-  HelpCenterArticleDef(
-    slug: 'export_pdf',
-    frenchTitle: 'Exporter un PDF',
-  ),
-  HelpCenterArticleDef(
-    slug: 'reset_data',
-    frenchTitle: 'Effacer les données locales',
-  ),
 ];

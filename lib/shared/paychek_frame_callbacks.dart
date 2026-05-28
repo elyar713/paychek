@@ -22,6 +22,15 @@ abstract final class PaychekFrameCallbacks {
     return root != null && root.mounted;
   }
 
+  /// Exécute [dispose] au frame suivant (toujours, sans garde de vue).
+  ///
+  /// Utile pour [TextEditingController] / [FocusNode] : évite
+  /// « used after being disposed » si un [TextField] traite encore un geste
+  /// (sélection par glisser) au moment du [State.dispose].
+  static void disposeAfterFrame(void Function() dispose) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => dispose());
+  }
+
   /// Exécute [action] au frame suivant si la génération UI est toujours valide.
   static void runPostFrame(
     VoidCallback action, {

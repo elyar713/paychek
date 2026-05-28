@@ -42,6 +42,13 @@
         "**/.*",
         "**/node_modules/**"
       ],
+      "redirects": [
+        {
+          "source": "/admin-hub.html",
+          "destination": "/admin-hub",
+          "type": 301
+        }
+      ],
       "rewrites": [
         {
           "source": "/admin-hub",

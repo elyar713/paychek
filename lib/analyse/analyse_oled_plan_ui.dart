@@ -31,12 +31,13 @@ class AnalyseOledStickyHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
         final score = computeOledConfluenceScore(controller);
         final color = oledConfluenceColor(score);
-        final status = oledConfluenceStatusLabel(score);
+        final status = oledConfluenceStatusLabel(score, l);
         return Container(
           decoration: BoxDecoration(
             color: AnalyseTokens.headerBg,
@@ -51,7 +52,7 @@ class AnalyseOledStickyHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'CONFLUENCE',
+                    l.analyseOledConfluenceLabel,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 8,
                       fontWeight: FontWeight.w800,
@@ -85,7 +86,7 @@ class AnalyseOledStickyHeader extends StatelessWidget {
                         const Icon(LucideIcons.badgeCheck, size: 14, color: Colors.black),
                         const SizedBox(width: 8),
                         Text(
-                          'Sauvegarder',
+                          l.analyseOledSaveButton,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
@@ -202,6 +203,7 @@ class AnalyseOledSaveBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: AnalyseTokens.sectionCardPadding,
@@ -219,7 +221,7 @@ class AnalyseOledSaveBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Plan enregistré avec succès dans votre terminal !',
+                  l.analyseOledPlanSavedBannerTitle,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -227,7 +229,7 @@ class AnalyseOledSaveBanner extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Vos configurations et indicateurs de confluence ont été mis à jour.',
+                  l.analyseOledPlanSavedBannerSubtitle,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     color: AnalyseTokens.oledGreen,
@@ -239,7 +241,7 @@ class AnalyseOledSaveBanner extends StatelessWidget {
           TextButton(
             onPressed: onDismiss,
             child: Text(
-              'FERMER',
+              l.analyseOledPlanSavedBannerClose,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
@@ -269,6 +271,7 @@ class AnalyseOledMetadataSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -283,20 +286,20 @@ class AnalyseOledMetadataSection extends StatelessWidget {
               final cols = lc.maxWidth >= 720;
               final children = [
                 _metaField(
-                  label: 'ACTIF / SYMBOLE',
+                  label: l.analyseOledAssetSymbolLabel,
                   child: _symbolInput(c),
                 ),
                 _metaField(
-                  label: 'THÈSE / STRATÉGIE',
+                  label: l.analyseOledThesisStrategyLabel,
                   child: _textInput(
                     value: c.nomAnalyse,
-                    hint: 'ex: CHoCH + Retrait Fibonacci...',
+                    hint: l.analyseOledThesisHint,
                     mono: false,
                     onChanged: (v) => c.nomAnalyse = v,
                   ),
                 ),
                 _metaField(
-                  label: "DATE D'EXÉCUTION",
+                  label: l.analyseOledExecutionDateLabel,
                   child: _dateTap(c),
                 ),
               ];
@@ -842,7 +845,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AnalyseOledStepShell(
-          title: 'FONDAMENTAL',
+          title: l.analyseReportOledSectionFundamental,
           topAccent: AnalyseTokens.oledBlue,
           watermarkIcon: LucideIcons.landmark,
           watermarkColor: AnalyseTokens.oledBlue,
@@ -915,12 +918,12 @@ class AnalyseOledHtfSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              oledFieldLabel('Tendance'),
+              oledFieldLabel(l.analyseTrendLabel),
               Row(
                 children: [
                   Expanded(
                     child: OledChipButton(
-                      label: 'Haussière',
+                      label: l.analyseTrendBullish,
                       selected: c.localTrendPick.enumVal == AnalyseLocalTrend.haussiere,
                       activeBorder: AnalyseTokens.oledGreen,
                       activeBg: const Color(0xFF051C15),
@@ -931,7 +934,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: OledChipButton(
-                      label: 'Baissière',
+                      label: l.analyseTrendBearish,
                       selected: c.localTrendPick.enumVal == AnalyseLocalTrend.baissiere,
                       activeBorder: AnalyseTokens.oledRed,
                       activeBg: const Color(0xFF1C090D),
@@ -942,7 +945,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: OledChipButton(
-                      label: 'Range',
+                      label: l.analyseTrendRange,
                       selected: c.localTrendPick.enumVal == AnalyseLocalTrend.range,
                       activeBorder: AnalyseTokens.zinc500,
                       activeBg: AnalyseTokens.zinc700,
@@ -963,8 +966,8 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   initialValue: c.notesStructure,
                   maxLines: 3,
                   style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AnalyseTokens.zinc200),
-                  decoration: const InputDecoration(
-                    hintText: 'ex: Double bottom, BOS, CHoCH...',
+                  decoration: InputDecoration(
+                    hintText: l.analyseOledStructureChartHint,
                     hintStyle: TextStyle(color: AnalyseTokens.zinc600, fontSize: 12),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(12),
@@ -973,15 +976,15 @@ class AnalyseOledHtfSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              oledFieldLabel('Notes & Observations Macro'),
+              oledFieldLabel(l.analyseOledMacroNotesLabel),
               Container(
                 decoration: AnalyseTokens.fieldDecoration,
                 child: TextFormField(
                   initialValue: c.notesTimeframe,
                   maxLines: 3,
                   style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AnalyseTokens.zinc200),
-                  decoration: const InputDecoration(
-                    hintText: 'Contexte macro, catalyseurs...',
+                  decoration: InputDecoration(
+                    hintText: l.analyseOledMacroNotesHint,
                     hintStyle: TextStyle(color: AnalyseTokens.zinc600, fontSize: 12),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(12),
@@ -1019,6 +1022,7 @@ class AnalyseOledVolumeProfileBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -1027,7 +1031,7 @@ class AnalyseOledVolumeProfileBlock extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             oledSectionTitleRow(
-              'VOLUME PROFILE',
+              l.analyseReportOledSectionVolumeProfile,
               enabled: c.volumeProfileEnabled,
               onEnabledChanged: (v) => c.volumeProfileEnabled = v,
             ),
@@ -1062,25 +1066,28 @@ class AnalyseOledVolumeProfileBlock extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _oledVpField(
-                            'POC',
+                            l.analyseVolumePoc,
                             c.volumeProfilePoc,
                             (v) => c.volumeProfilePoc = v,
+                            priceHint: l.analyseHintPriceDots,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _oledVpField(
-                            'VAH',
+                            l.analyseVolumeVah,
                             c.volumeProfileVah,
                             (v) => c.volumeProfileVah = v,
+                            priceHint: l.analyseHintPriceDots,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _oledVpField(
-                            'VAL',
+                            l.analyseVolumeVal,
                             c.volumeProfileVal,
                             (v) => c.volumeProfileVal = v,
+                            priceHint: l.analyseHintPriceDots,
                           ),
                         ),
                       ],
@@ -1115,13 +1122,18 @@ class AnalyseOledVolumeProfileBlock extends StatelessWidget {
   }
 }
 
-Widget _oledVpField(String label, String value, ValueChanged<String> onChanged) {
+Widget _oledVpField(
+  String label,
+  String value,
+  ValueChanged<String> onChanged, {
+  required String priceHint,
+}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label, style: AnalyseTokens.oledMicroLabel.copyWith(color: AnalyseTokens.zinc500)),
       const SizedBox(height: 4),
-      oledDeepInput(value: value, hint: 'Prix', onChanged: onChanged),
+      oledDeepInput(value: value, hint: priceHint, onChanged: onChanged),
     ],
   );
 }
@@ -1218,7 +1230,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
       builder: (context, _) {
         final c = widget.controller;
         return AnalyseOledStepShell(
-          title: 'ZONES CLÉS & SMC',
+          title: l.analyseOledSectionKeyZonesSmc,
           topAccent: AnalyseTokens.oledIndigo,
           watermarkIcon: LucideIcons.layers,
           watermarkColor: AnalyseTokens.oledIndigo,
@@ -1229,7 +1241,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               oledSectionTitleRow(
-                'Zone clé',
+                l.analyseOledKeyZoneToggle,
                 enabled: c.structureEnabled,
                 onEnabledChanged: (v) => c.structureEnabled = v,
               ),
@@ -1253,7 +1265,8 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                   },
                 ),
                 _srLevelPanel(
-                  title: 'SUPPORTS',
+                  title: l.analyseOledSupportsUpper,
+                  levelHint: l.analyseOledLevelHint,
                   titleColor: AnalyseTokens.oledGreen,
                   value: c.structureSupportMaj,
                   onChanged: (v) => c.structureSupportMaj = v,
@@ -1265,7 +1278,8 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                 ),
                 const SizedBox(height: 12),
                 _srLevelPanel(
-                  title: 'RÉSISTANCES',
+                  title: l.analyseOledResistancesUpper,
+                  levelHint: l.analyseOledLevelHint,
                   titleColor: AnalyseTokens.oledRed,
                   value: c.structureResistanceMaj,
                   onChanged: (v) => c.structureResistanceMaj = v,
@@ -1278,7 +1292,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
               ],
               const SizedBox(height: 24),
               oledSectionTitleRow(
-                'SMC',
+                l.analyseReportOledSectionSmc,
                 enabled: c.smcEnabled,
                 onEnabledChanged: (v) => c.smcEnabled = v,
               ),
@@ -1312,9 +1326,9 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _oledSmcFieldBlock(
-                        label: 'Order Block (OB)',
+                        label: l.analyseOrderBlock,
                         value: c.smcZone,
-                        hint: "ex: Zone d'achat H4 1.0820 - 1.0840",
+                        hint: l.analyseOledSmcObHint,
                         onChanged: (v) => c.smcZone = v,
                         extras: c.smcZoneExtras,
                         onExtraChanged: c.setSmcZoneExtraAt,
@@ -1324,9 +1338,9 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                       ),
                       const SizedBox(height: 12),
                       _oledSmcFieldBlock(
-                        label: 'Fair Value Gap (FVG)',
+                        label: l.analyseFvg,
                         value: c.smcFvg,
-                        hint: 'Imbalance de bougie Daily...',
+                        hint: l.analyseOledSmcFvgHint,
                         onChanged: (v) => c.smcFvg = v,
                         extras: c.smcFvgExtras,
                         onExtraChanged: c.setSmcFvgExtraAt,
@@ -1336,9 +1350,9 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                       ),
                       const SizedBox(height: 12),
                       _oledSmcFieldBlock(
-                        label: 'Liquidité',
+                        label: l.analyseOledLiquidityShort,
                         value: c.smcLiquidityPools,
-                        hint: 'Stops sous les creux majeurs...',
+                        hint: l.analyseOledSmcLiqHint,
                         onChanged: (v) => c.smcLiquidityPools = v,
                         extras: c.smcLiquidityExtras,
                         onExtraChanged: c.setSmcLiquidityExtraAt,
@@ -1347,7 +1361,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                         accent: AnalyseTokens.oledIndigo,
                       ),
                       const SizedBox(height: 12),
-                      Text('Fibonacci', style: AnalyseTokens.oledSmcFieldLabel),
+                      Text(l.analyseFibShort, style: AnalyseTokens.oledSmcFieldLabel),
                       const SizedBox(height: 4),
                       AnalyseSmcFibLevelChips(
                         levels: AnalyseSmcFibLevelChips.defaultLevels,
@@ -1357,14 +1371,14 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                       const SizedBox(height: 8),
                       oledDeepInput(
                         value: c.smcFibPrice,
-                        hint: "Prix exact de l'OTE / Zone...",
+                        hint: l.analyseOledFibPriceHint,
                         onChanged: (v) => c.smcFibPrice = v,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                oledFieldLabel('Synthèse des zones'),
+                oledFieldLabel(l.analyseOledZoneSynthesis),
                 Container(
                   decoration: AnalyseTokens.fieldDecoration,
                   child: TextFormField(
@@ -1374,8 +1388,8 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                       fontSize: 12,
                       color: AnalyseTokens.zinc200,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: 'Pourquoi cette zone est solide tactiquement ?',
+                    decoration: InputDecoration(
+                      hintText: l.analyseOledZoneSynthesisHint,
                       hintStyle: TextStyle(
                         color: AnalyseTokens.zinc600,
                         fontSize: 12,
@@ -1434,6 +1448,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
 
   Widget _srLevelPanel({
     required String title,
+    required String levelHint,
     required Color titleColor,
     required String value,
     required ValueChanged<String> onChanged,
@@ -1460,7 +1475,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
           const SizedBox(height: 8),
           oledInputWithPlus(
             value: value,
-            hint: 'Niveau...',
+            hint: levelHint,
             onChanged: onChanged,
             onPlusTap: onAdd,
             accent: accent,
@@ -1471,7 +1486,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
               onLongPress: () => onRemoveExtra(i),
               child: oledDeepInput(
                 value: extras[i].price,
-                hint: 'Niveau...',
+                hint: levelHint,
                 onChanged: (v) => onExtraChanged(i, v),
               ),
             ),
@@ -1510,7 +1525,7 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
       builder: (context, _) {
         final c = widget.controller;
         return AnalyseOledStepShell(
-          title: 'ENTRÉE',
+          title: l.analyseReportOledSectionEntry,
           topAccent: AnalyseTokens.oledGreen,
           watermarkIcon: LucideIcons.activity,
           watermarkColor: AnalyseTokens.oledGreen,
@@ -1543,7 +1558,7 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
                 ),
               ],
               if (!c.indicatorsEnabled) const SizedBox.shrink() else ...[
-              oledFieldLabel('Signaux'),
+              oledFieldLabel(l.analyseOledSignalsLabel),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -1587,8 +1602,8 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
                       child: TextField(
                         controller: _customSetup,
                         style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: 'Ajouter un signal, setup personnel...',
+                        decoration: InputDecoration(
+                          hintText: l.analyseOledAddSignalHint,
                           hintStyle: TextStyle(color: AnalyseTokens.zinc600, fontSize: 12),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1613,20 +1628,23 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
                         side: const BorderSide(color: AnalyseTokens.zinc600),
                       ),
                     ),
-                    child: const Text('+ Ajouter', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                    child: Text(
+                      l.analyseAddShort,
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              oledFieldLabel("Plan d'Action / Stratégie de Trigger"),
+              oledFieldLabel(l.analyseOledActionPlanLabel),
               Container(
                 decoration: AnalyseTokens.fieldDecoration,
                 child: TextFormField(
                   initialValue: c.notesIndicators,
                   maxLines: 3,
                   style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AnalyseTokens.zinc200),
-                  decoration: const InputDecoration(
-                    hintText: 'Entrée, SL, cibles...',
+                  decoration: InputDecoration(
+                    hintText: l.analyseOledActionPlanHint,
                     hintStyle: TextStyle(color: AnalyseTokens.zinc600, fontSize: 12),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(10),

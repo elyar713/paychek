@@ -1,0 +1,29 @@
+A Minha Análise: O seu laboratório de trading
+A página A Minha Análise permite-lhe formalizar a sua reflexão antes mesmo de passar à ação. Ao estruturar o seu pensamento segundo três pilares fundamentais, elimina a dúvida e reforça a coerência das suas decisões.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. Configuração inicial
+Identifique o seu Ativo, dê nome à sua Tese e fixe a Data da sua análise.
+
+Flexibilidade total: Utilize os botões ON/OFF para desativar as secções inúteis e aliviar a sua interface conforme a sua metodologia.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. Os três pilares da análise
+Cartão Fundamental: Defina o contexto (Timeframe, Viés direcional, Fase de mercado: Acumulação/Impulsão/Distribuição). Utilize o espaço "Estrutura" para registar as suas figuras (Double Bottom, BOS, etc.) e o slider de confiança para autoavaliar a solidez da sua análise. Integre os seus dados de Volume Profile (POC, VAH, VAL) para confirmar os seus níveis.
+
+Cartão Zona-chave e SMC: Identifique os seus pontos de reversão. Adicione manualmente os seus suportes/resistências e assinale as suas ferramentas SMC (Order Block, FVG, Liquidez, Níveis de Fibonacci). Complete com uma nota de síntese para manter um registo claro das suas zonas de interesse.
+
+Cartão Entrada: Formalize o seu desencadeador (Sinal, Indicador ou Figura de candlestick). É o seu "trigger" final antes da execução.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. Guardar, exportar e sincronizar
+Relatório centralizado: Assim que prime o botão "Guardar", o PAYCHEK gera uma ficha recapitulativa única.
+
+Sincronização com o Painel: Esta ficha aparece instantaneamente no seu Painel.
+
+Exportação PDF: Transforme a sua análise num documento impresso para manter os seus planos à vista.
+
+Auditoria de disciplina: Estes dados estão automaticamente ligados às suas futuras operações. Na sua revisão de desempenho, verá num relance que elementos de análise foram respeitados ou ignorados, permitindo-lhe ajustar a sua estratégia com provas estatísticas.

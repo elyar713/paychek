@@ -33,12 +33,14 @@ import 'web/web_dashboard_config.dart';
 import 'shared/paychek_frame_callbacks.dart';
 import 'ajouter_trade/ajouter_trade_page.dart';
 import 'calendrier/calendrier_page.dart';
+import 'coach_ai/coach_ai_page.dart';
 import 'help_center/help_center_page.dart';
 import 'l10n/app_localizations.dart';
 import 'onboarding_language_page.dart';
 import 'reglage/paychek_remote_access.dart';
 import 'strategie/strategie_page.dart';
 import 'trade/trade_page.dart';
+import 'strategie/strategie_mes_regles_storage.dart';
 import 'strategie/strategie_setups_store.dart';
 import 'strategie/strategie_starred_setup_storage.dart';
 import 'strategie/widgets/strategie_setup_card.dart';
@@ -83,6 +85,7 @@ class _DashboardPageState extends State<DashboardPage>
   static const int _overlayCgv = 8;
   static const int _overlayPrivacyPolicy = 9;
   static const int _overlaySupportFeedback = 10;
+  static const int _overlayCoachAi = 11;
 
   /// 0 Dashboard, 1 Trade, 2 Ajouter, 3 Calendrier.
   int _bodyIndex = 0;
@@ -126,6 +129,9 @@ class _DashboardPageState extends State<DashboardPage>
 
   bool _remotePaychekAccessValidated = false;
 
+  /// Mobile : paywall essai terminé affiché une fois par session (Android surtout).
+  bool _litePaywallAutoPrompted = false;
+
   /// Compte connecté, après les 7 j d’essai sans Pro : **Lite** (dashboard + calendrier consultables ;
   /// saisie trade sans CSV / screenshot / discipline avancée).
   bool get _liteRestricted {
@@ -151,6 +157,19 @@ class _DashboardPageState extends State<DashboardPage>
   void _showVoluntaryGoldUpgradeSheet() {
     if (!mounted) return;
     unawaited(showPaychekGoldUpgradeSheet(context: context));
+  }
+
+  void _maybeAutoPromptLitePaywall(TrialGateVm gate) {
+    if (kIsWeb || _litePaywallAutoPrompted || !gate.liteFreemiumRestricted) {
+      return;
+    }
+    if (FirebaseAuth.instance.currentUser == null) return;
+    if (gate.anchorUtc == null) return;
+    _litePaywallAutoPrompted = true;
+    PaychekFrameCallbacks.runPostFrame(() {
+      if (!mounted) return;
+      _showLitePaywallSheet();
+    });
   }
 
   void _showLitePaywallSheet() {
@@ -217,6 +236,7 @@ class _DashboardPageState extends State<DashboardPage>
           _shellBodyIndexNotifier?.value = 2;
         }
       });
+      _maybeAutoPromptLitePaywall(pair.gate);
     });
     _bindSubscriberEntitlementListener();
   }
@@ -342,6 +362,7 @@ class _DashboardPageState extends State<DashboardPage>
         _shellBodyIndexNotifier?.value = 2;
       }
     });
+    _maybeAutoPromptLitePaywall(vm);
     return vm.liteFreemiumRestricted;
   }
 
@@ -353,6 +374,7 @@ class _DashboardPageState extends State<DashboardPage>
       return;
     }
     await StrategieSetupsStore.ensureLoaded();
+    await StrategieMesReglesStore.ensureLoaded();
     if (!mounted) return;
     final list = StrategieSetupsStore.notifier.value;
     setState(() {
@@ -729,6 +751,8 @@ class _DashboardPageState extends State<DashboardPage>
                     },
                     onOpenPerformance: () =>
                         _openOverlayPage(_overlayPerformance),
+                    onOpenCoachAi: () =>
+                        _openOverlayPage(_overlayCoachAi),
                     onOpenChecklist: () {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (!mounted) return;
@@ -851,6 +875,7 @@ class _DashboardPageState extends State<DashboardPage>
                       });
                     },
                     onOpenPerformance: () => _openOverlayPage(_overlayPerformance),
+                    onOpenCoachAi: () => _openOverlayPage(_overlayCoachAi),
                     onOpenChecklist: () {
                       closePlus();
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -956,6 +981,12 @@ class _DashboardPageState extends State<DashboardPage>
                           if (!mounted) return;
                           setState(() =>
                               _overlayPage = _overlayHelpCenter);
+                        },
+                      ),
+                    _overlayCoachAi => CoachAiPage(
+                        onCloseInShell: () {
+                          if (!mounted) return;
+                          setState(() => _overlayPage = _overlayNone);
                         },
                       ),
                     _overlayCgv => ReglageCgvTermsPage(

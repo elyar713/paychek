@@ -1,0 +1,29 @@
+내 분석: 트레이딩 연구실
+내 분석 페이지는 실행에 앞서 사고를 체계화할 수 있게 합니다. 세 가지 핵심 기둥으로 생각을 구조화하면 의심을 줄이고 의사결정의 일관성을 높일 수 있습니다.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. 초기 설정
+자산을 지정하고, 논제(Thesis)에 이름을 붙이며, 분석 날짜를 설정하세요.
+
+완전한 유연성: ON/OFF 버튼으로 불필요한 섹션을 비활성화해 본인의 방법론에 맞게 인터페이스를 간소화하세요.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. 분석의 세 기둥
+기본(Fondamentale) 카드: 맥락을 정의하세요(Timeframe, 방향 편향, 시장 단계: Accumulation/Impulsion/Distribution). "Structure" 영역에 패턴(Double Bottom, BOS 등)을 기록하고, 신뢰도 슬라이더로 분석의 견고함을 자가 평가하세요. Volume Profile(POC, VAH, VAL) 데이터를 통합해 레벨을 확인하세요.
+
+핵심 구역 & SMC 카드: 전환 지점을 식별하세요. 지지/저항을 수동으로 추가하고 SMC 도구(Order Block, FVG, 유동성, Fibonacci 레벨)를 체크하세요. 관심 구역을 명확히 남기기 위해 종합 메모를 작성하세요.
+
+진입 카드: 트리거를 공식화하세요(시그널, 지표 또는 캔들 패턴). 실행 직전의 최종 "Trigger"입니다.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. 저장, 내보내기 및 동기화
+중앙 리포트: "저장" 버튼을 누르면 PAYCHEK가 고유한 요약 카드를 생성합니다.
+
+대시보드 동기화: 이 카드가 대시보드에 즉시 표시됩니다.
+
+PDF 내보내기: 분석을 종이 문서로 변환해 플랜을 항상 눈앞에 두세요.
+
+규율 감사: 이 데이터는 향후 거래와 자동으로 연결됩니다. 성과 리뷰 시 어떤 분석 요소를 지켰거나 무시했는지 한눈에 보고, 통계적 근거로 전략을 조정할 수 있습니다.

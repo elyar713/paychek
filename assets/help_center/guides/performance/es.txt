@@ -1,0 +1,41 @@
+Rendimiento: La verdad estadística
+La página Rendimiento es el espejo de su actividad. No se limita a contar sus ganancias; descifra los mecanismos que dictan su éxito o sus fracasos.
+
+[img:assets/help_center/performance_overview_kpis.png]
+
+1. Vista general (Header y KPIs)
+Indicadores clave: Visualice al instante el volumen total, el saldo neto (Ganancia/Pérdida/Breakeven) y sus métricas de supervivencia (Pérdida máx., Duración media de un trade).
+
+Índice de rigor: Sus rendimientos se cruzan con su asiduidad. Atención: Las estadísticas de disciplina solo se contabilizan si su checklist y su estado mental están completados antes de las 23:59. Este rigor diario es la clave de su progresión.
+
+2. Diagnóstico de disciplina
+Auditoría de olvidos: PAYCHEK enumera sus trades "huérfanos" (aquellos sin checklist, estrategia o análisis). Un clic basta para completarlos directamente.
+
+Correlación Disciplina/Winrate: Descubra el impacto matemático de su rigor:
+
+- Winrate con 100% de checklist vs Winrate sin checklist.
+- Rendimiento correlacionado con sus distintos estados mentales (Miedo, Confianza, Fatiga, etc.).
+
+3. Análisis comportamental y ambiental
+Volumen de actividad: Visualice su Winrate en función del número de trades diarios (p. ej.: 1-5 trades vs 5-10 trades). Identifique su umbral de fatiga.
+
+Análisis temporal y técnico:
+
+- Sesiones: ¿Cuál es su Winrate en Londres, Asia o US?
+- Duración de posición: ¿Qué ventana temporal optimiza su rentabilidad (0-15 min vs >12h)?
+- Mercados: ¿Qué activo es su "vaca lechera" y cuál es su "trampa"?
+
+[img:assets/help_center/performance_strategic_audit.gif]
+
+4. Auditoría estratégica y ejecución
+Auditoría por estrategia: Para cada estrategia definida, identifique los elementos más a menudo ignorados.
+
+Barra de talento: Identifique sus trades basados únicamente en "Feeling" o "Principio".
+
+Dashboard personalizable: Cree sus propias vistas. ¿Quiere saber si su "miedo" hace bajar su Winrate en el EUR/USD? Añada ese segmento y visualice el impacto en tiempo real.
+
+5. Exportación e informe
+Icono PDF: Genere en cualquier momento su informe de rendimiento completo. Ideal para sus revisiones semanales o para presentar su historial a un socio/mentor.
+
+Por qué es el argumento definitivo para el 5 de junio:
+Obliga al trader a darse cuenta de que el problema no es el mercado, sino su propia ejecución. Al mostrar, por ejemplo, que un trader pierde un 20% de Winrate en cuanto supera 5 trades al día, le da una regla de oro que ya no podrá ignorar.

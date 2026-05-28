@@ -1,0 +1,53 @@
+Trade Journal: Your Operational Dashboard
+The Trade page is designed for immediate reading and deep analysis of your activity. Everything is structured to let you go from the big picture to precise details in one click.
+
+[img:assets/help_center/trade_page_header.gif]
+
+1. Performance Indicators (Header)
+At the top of the page, find your three tracking pillars:
+
+Gain/Loss overall: Your net balance, reflecting the financial health of your account.
+
+Winrate ring: A dynamic visual representation of your success rate.
+
+Activity volume: The total number of trades executed.
+
+2. Time View and Progress
+Weekly performance bar: Instantly visualize the trend of your current week with a visual progress indicator.
+
+Period selector (1D / 1W / 1M / ALL): Adjust your view to isolate your daily, weekly, monthly performance, or to analyze your entire history.
+
+3. Classification and Filtering
+Position management: An interactive dashboard to classify your trades by status: Wins, Losses, Breakeven, or Open positions. You can filter these categories to quickly identify the trades that impacted your capital.
+
+Analysis by asset: A dedicated section lists the instruments you have traded (MNQ, Nasdaq, EUR/USD, etc.) with their frequency, allowing you to identify your most profitable assets or those that cost you the most.
+
+Management and Export: Your Journal in Action
+The Trade page is not just a history; it is an interactive tool that lets you analyze, correct, and export your performance in seconds.
+
+1. Intuitive Time Navigation (1D / 1W / 1M / ALL)
+Visualize your progress at your own pace:
+
+[img:assets/help_center/trade_page_period_bars.gif]
+
+Dynamic view: Select 1D, 1W, 1M, or ALL. The chart bars automatically adjust to represent each period.
+
+Quick access: Click on any chart bar to isolate and instantly display the list of trades corresponding to that exact period.
+
+2. Discipline Alerts (The Yellow Message)
+PAYCHEK warns you in real time if your analysis is incomplete:
+
+Smart notifications: A yellow message appears on your trades if critical elements are missing (Analysis plan, Checklist, Mental state, or Strategy).
+
+Goal: Do not leave any trade "orphaned" from analysis. A trade without analysis is lost data for your progress.
+
+3. Management and Export
+Edit and Delete: A "3 dots" menu is available on each trade. You can modify the details of a position or delete an incorrect entry at any time.
+
+PDF Export: Need a paper summary or a report for a mentor? Click the PDF icon to instantly generate a complete report including:
+
+Your detailed trade history.
+
+A summary of your performance statistics.
+
+Your progress charts.

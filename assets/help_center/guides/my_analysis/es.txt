@@ -1,0 +1,29 @@
+Mi Análisis: Su laboratorio de trading
+La página Mi Análisis le permite formalizar su reflexión antes incluso de pasar a la acción. Al estructurar su pensamiento según tres pilares fundamentales, elimina la duda y refuerza la coherencia de sus decisiones.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. Configuración inicial
+Identifique su Activo, nombre su Tesis y fije la Fecha de su análisis.
+
+Flexibilidad total: Utilice los botones ON/OFF para desactivar las secciones innecesarias y aligerar su interfaz según su metodología.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. Los tres pilares del análisis
+Tarjeta Fundamental: Defina el contexto (Timeframe, Sesgo direccional, Fase de mercado: Acumulación/Impulso/Distribución). Utilice el espacio "Estructura" para anotar sus figuras (Double Bottom, BOS, etc.) y el slider de confianza para autoevaluar la solidez de su análisis. Integre sus datos de Volume Profile (POC, VAH, VAL) para confirmar sus niveles.
+
+Tarjeta Zona Clave y SMC: Identifique sus puntos de giro. Añada manualmente sus soportes/resistencias y marque sus herramientas SMC (Order Block, FVG, Liquidez, Niveles Fibonacci). Complete con una nota de síntesis para conservar un registro claro de sus zonas de interés.
+
+Tarjeta Entrada: Formalice su disparador (Señal, Indicador o Figura de vela). Es su "Trigger" final antes de la ejecución.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. Guardado, exportación y sincronización
+Informe centralizado: Una vez pulsado el botón "Guardar", PAYCHEK genera una ficha resumen única.
+
+Sincronización con el Dashboard: Esta ficha aparece al instante en su Dashboard.
+
+Exportación PDF: Transforme su análisis en documento papel para mantener sus planes a la vista.
+
+Auditoría de disciplina: Estos datos se vinculan automáticamente a sus futuros trades. Durante su revisión de rendimiento, verá de un vistazo qué elementos de análisis se respetaron o ignoraron, permitiéndole ajustar su estrategia con pruebas estadísticas.

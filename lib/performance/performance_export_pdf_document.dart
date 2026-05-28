@@ -306,7 +306,8 @@ Future<Uint8List> buildPerformancePdf({
                   letterSpacing: 0.4,
                 ),
               ),
-              for (final w in warnings.take(8)) _pdfBulletLine(w, warningStyle: true),
+              for (final w in warnings.take(8))
+                _pdfBulletLine(w.formatForExport(locale), warningStyle: true),
             ],
           ],
         ),

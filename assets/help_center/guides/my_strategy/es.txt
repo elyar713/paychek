@@ -1,0 +1,35 @@
+Mi Estrategia: Su sistema de auditoría interna
+La página Estrategia es el corazón tecnológico de PAYCHEK. Permite descomponer su método de trading en criterios objetivos para medir, con precisión quirúrgica, qué genera sus beneficios y qué alimenta sus pérdidas.
+
+[img:assets/help_center/strategie_golden_rules_risk.gif]
+
+1. Regla de Oro y Risk Management
+Reglas de Oro: Defina sus principios no negociables. Si no los respeta al registrar un trade, PAYCHEK marcará inmediatamente la desviación.
+
+Risk Management: Defina sus límites (riesgo por trade, riesgo diario, trades máximos por día, ratio mínimo).
+
+Auditoría automática: PAYCHEK compara sus trades reales (importados manualmente o vía CSV) con estos límites. Sabrá al instante si ha "overtradado" o superado su riesgo autorizado.
+
+[img:assets/help_center/strategie_sessions.gif]
+
+2. Horarios y sesiones (Trading Sessions)
+Configuración: Defina sus sesiones (Londres, Asia, US).
+
+Análisis de rendimiento: La página Rendimiento correlacionará automáticamente su Winrate con sus horarios. Quizá descubra que su Winrate es del 60% en Londres, pero del 30% en US. Le corresponde a usted ajustar su planificación en consecuencia.
+
+[img:assets/help_center/strategie_setups_templates.gif]
+
+3. Setup y Templates (El corazón del análisis)
+Cree sus estrategias punto por punto: Timeframe, Indicadores, Patterns, Señales de alerta, Entradas, Stop-Loss (ST), Take-Profit (TP) y Breakeven.
+
+Auditoría de estrategia: Al añadir un trade, marque los puntos que respetó. La página Rendimiento calculará entonces el impacto exacto: "Cuando ignora el punto 'Indicador X' de su estrategia, su Winrate disminuye un 15%."
+
+[img:assets/help_center/strategie_calendar.gif]
+
+4. Calendario estratégico
+Visualización: Un calendario en color le muestra qué estrategia se utilizó cada día.
+
+Diagnóstico rápido: Haga clic en un día para ver al instante los elementos de estrategia no respetados. Es la forma más rápida de identificar por qué un día fue un éxito o un fracaso.
+
+5. Informe PDF exportable
+Exporte la totalidad de su "Manual de Estrategia" en formato papel. Tener su plan a la vista, sobre su escritorio, es la mejor forma de mantenerse concentrado durante los periodos de alta volatilidad.

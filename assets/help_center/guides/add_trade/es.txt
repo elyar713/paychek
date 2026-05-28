@@ -1,0 +1,66 @@
+Añadir un Trade: La precisión al servicio del análisis
+Añadir un trade en PAYCHEK está diseñado para ser lo más rápido posible, capturando al mismo tiempo los datos cruciales para su progresión.
+
+[img:assets/help_center/add_trade.gif]
+
+Entrada intuitiva: Seleccione en unos clics su activo y su mercado. Utilice nuestros accesos directos de rellenado rápido para evitar entradas manuales repetitivas.
+
+Cálculo automático: Introduzca simplemente sus precios de entrada y salida. PAYCHEK calcula al instante el resultado de su trade, incluidas las comisiones que puede configurar mediante el icono de engranaje situado junto a sus tarjetas de capital.
+
+Domine su timing: Recomendamos encarecidamente indicar las fechas y horas precisas de entrada y salida. Esta información es el motor de sus futuros análisis de rendimiento y permite a la aplicación elaborar un perfil completo de su estilo de trading.
+
+Contexto de mercado: Utilice los botones "Antes de News" o "Después de News" para clasificar sus trades. Esta distinción es esencial para comprender cómo reacciona a la volatilidad del mercado y ajustar su estrategia en consecuencia.
+
+[img:assets/help_center/add_trade_custom_actif.gif]
+
+Añadir activos manualmente: Si el par que opera no aparece en nuestra lista, haga clic en el engranaje situado justo al lado del campo "Cantidad". Podrá entonces añadir manualmente cualquier activo, instrumento o par de divisas.
+
+Personalización duradera: Una vez añadido, ese activo queda disponible para sus futuros trades, permitiéndole construir su propia biblioteca de instrumentos de trading a medida que progresa.
+
+[img:assets/help_center/add_trade_screenshot_csv_note.gif]
+
+Enriquezca su journal: Capturas de pantalla, Análisis y Notas
+Un buen journal no se limita a los resultados financieros; documenta todo el proceso de decisión. Utilice esta sección para archivar cada detalle de sus trades.
+
+Prueba visual (Captura de pantalla): No se limite a anotar su punto de entrada. Integre directamente una captura de pantalla de su gráfico. Esto permite visualizar al instante el setup y la configuración del mercado en el momento de tomar posición.
+
+Importación CSV universal: Se acabaron las entradas manuales tediosas. PAYCHEK es compatible con 9 plataformas principales:
+
+- MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, Quantower, ATAS y Rithmic.
+
+Importe sus datos en unos segundos y recupere al instante todo el historial de sus sesiones.
+
+Análisis y contexto:
+
+- Casilla Análisis: ¿Ha trabajado en un informe detallado en su página "Mi Análisis"? Expórtelo en PDF y adjúntelo directamente a su trade para conservar un registro de su razonamiento.
+- Casilla Nota: Utilice este espacio libre para anotar sus sensaciones, dudas o cualquier observación particular que no aparezca en sus indicadores. Aquí es donde construye su propia experiencia a lo largo de los trades.
+
+La "Caja Negra" de su Trading: Rendimiento y Disciplina
+El corazón de PAYCHEK reside en su capacidad para transformar sus acciones diarias en datos explotables para su página Rendimiento. Cada trade se analiza no por su resultado financiero, sino por su conformidad con su plan de juego.
+
+1. Tipología del Trade: Principio vs Feeling
+Al añadir un trade, defina la naturaleza de su ejecución:
+
+- Principio: El trade se tomó respetando escrupulosamente su estrategia, rutina y psicología.
+- Feeling: El trade se tomó bajo el impulso de la emoción.
+
+[img:assets/help_center/add_trade_discipline_settings.png]
+
+Personalización (El engranaje): Haga clic en el engranaje junto a esta sección para ajustar sus preferencias. Por defecto, el modo "Feeling" oculta las secciones de análisis para simplificar la entrada, pero puede activarlas o desactivarlas a voluntad.
+
+Sesión del día: Defina un umbral de trades a partir del cual su estado pasa automáticamente a "Feeling" para evitar el sobrecompromiso.
+
+2. La medida del Respeto de Estrategia (El Slider)
+Utilice el slider de porcentaje para cuantificar su nivel de respeto de su estrategia en cada trade. Esta cifra se envía directamente a su página Rendimiento para correlacionar su rigor con su rentabilidad.
+
+[img:assets/help_center/add_trade_discipline_sections.png]
+
+3. Análisis de incumplimiento: Checklist, Plan y Estado Mental
+Para cada trade, PAYCHEK le permite identificar las zonas de fallo:
+
+- Estrategia y Análisis: Si omitió un elemento (p. ej.: soporte/resistencia, señal técnica), márcelo en las listas dinámicas generadas por sus páginas Estrategia y Mi Análisis.
+- Checklist: Si su checklist diaria no se respetó, se le informará antes de validar el registro del trade.
+- Estado Mental: Visualice su estado emocional actual (p. ej.: Miedo 46%). Marque los factores influyentes para que PAYCHEK calcule con precisión cómo su psicología impacta su Winrate.
+
+4. Tags emocionales
+Termine su entrada etiquetando el trade con la emoción dominante: FOMO, Tilt, Revenge, etc. Es esta etiqueta la que permitirá, a largo plazo, visualizar qué tipos de emociones "destruyen" más rápidamente su capital.

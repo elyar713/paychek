@@ -1,1 +1,34 @@
-﻿Contenu a venir.
+﻿État Mental : Votre "Bio-Data" de Trader
+La performance n'est pas qu'une question de technique, c'est une question d'équilibre humain. La page État Mental est votre tableau de bord biologique : elle analyse comment vos habitudes quotidiennes impactent directement vos résultats financiers.
+
+[img:assets/help_center/mental_state_impact_settings.gif]
+
+1. Opération Psychologie Quotidienne
+Chaque jour, effectuez votre "Check-up psycho". Utilisez les curseurs pour noter vos piliers de performance :
+
+Routine Personnalisable : Sommeil, sport, méditation, ou tout autre élément que vous jugez vital pour votre personnalité.
+
+Impact Calibré : Chaque slider dispose d'un réglage d'impact (positif ou négatif). Vous définissez vous-même ce qui vous aide à rester "tranchant" sur les marchés.
+
+Le Ring de Performance : Visualisez instantanément votre état global de la journée via un graphique en anneau (Ring) qui agrège toutes vos données personnelles.
+
+2. Configuration Expert (L'Engrenage)
+Cliquez sur l'engrenage de la section pour définir le poids (en pourcentage) de chaque facteur dans votre état global. Si pour vous, le sommeil compte pour 60% de votre réussite et la méditation pour 10%, PAYCHEK vous permet de paramétrer cette réalité.
+
+3. Corrélation Performance & Psycho
+C'est ici que PAYCHEK devient un outil de diagnostic hors norme. Vos données d'État Mental sont synchronisées en temps réel avec vos trades :
+
+[img:assets/help_center/mental_state_calendar.gif]
+
+Historique visuel : Utilisez le calendrier pour naviguer dans le passé et voir comment votre état psycho a évolué.
+
+Analyse de corrélation automatique : La page Performance affiche désormais les liens de cause à effet :
+
+Exemple : "Quand votre état mental est à 50%, votre Winrate tombe à 44%." Cette visibilité vous permet de savoir exactement quel jour vous devez fermer votre plateforme de trading pour protéger votre capital.
+
+4. Personnalisation de vos Sessions
+Vous n'êtes pas contraint à une journée de trading standard. PAYCHEK s'adapte à votre vie et à vos horaires de marché.
+
+Configuration des sessions (L'Engrenage) : Cliquez sur l'engrenage dans la barre d'outils du calendrier pour définir vos propres créneaux de trading.
+
+Flexibilité totale : Que vous tradiez durant la session de Londres, New York, ou que vous ayez des horaires décalés, vous êtes libre de choisir les heures qui composent votre "journée de trade".

@@ -86,14 +86,18 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   size: 22,
                 ),
               ),
-              IconButton(
-                onPressed: onEdit,
-                style: IconButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
+              Semantics(
+                button: true,
+                label: l.analyseReportEditButton,
+                child: IconButton(
+                  onPressed: onEdit,
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  tooltip: l.analyseReportEditTooltip,
+                  icon: const Icon(Icons.edit_outlined, color: AnalyseTokens.zinc500),
                 ),
-                tooltip: l.analyseReportEditTooltip,
-                icon: const Icon(Icons.edit_outlined, color: AnalyseTokens.zinc500),
               ),
               IconButton(
                 onPressed: onExportPdf,

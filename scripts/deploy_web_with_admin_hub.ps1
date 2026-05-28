@@ -40,7 +40,7 @@ if ($stripeUrl.Trim().Length -gt 0) {
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # Pages marketing / SEO (sinon absentes si le build web ne les recopie pas).
-$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js', 'privacy.html', 'terms.html')
+$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js', 'privacy.html', 'terms.html', 'admin-hub.html')
 foreach ($name in $seoFiles) {
   $src = Join-Path (Get-Location) "web\$name"
   $dst = Join-Path (Get-Location) "build\web\$name"
@@ -77,3 +77,4 @@ firebase deploy --only hosting:paychek-trading
 Write-Host ''
 Write-Host 'Paychek (racine) : build/web'
 Write-Host 'Admin            : build/web/admin-hub/'
+Write-Host 'URL admin        : https://paychek-trading.web.app/admin-hub/  (pas admin-hub.html)'

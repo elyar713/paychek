@@ -8,6 +8,7 @@ import '../reglage/paychek_prefs_scope.dart';
 import '../reglage/paychek_user_firestore.dart';
 import 'strategie_gestion_risque_storage.dart';
 import 'strategie_horaires_sessions_storage.dart';
+import 'strategie_mes_regles_storage.dart';
 import 'strategie_setups_store.dart';
 import 'strategie_setup_storage_codec.dart';
 import 'strategie_setup_usage_store.dart';
@@ -52,6 +53,7 @@ abstract final class StrategieFirestoreSync {
     try {
       await StrategieSetupsStore.ensureLoaded();
       await StrategieSetupUsageStore.ensureLoaded();
+      await StrategieMesReglesStore.ensureLoaded();
 
       final localRev = await _readLocalRev();
       final snap = await _doc(u).get();
@@ -93,6 +95,7 @@ abstract final class StrategieFirestoreSync {
     try {
       await StrategieSetupsStore.ensureLoaded();
       await StrategieSetupUsageStore.ensureLoaded();
+      await StrategieMesReglesStore.ensureLoaded();
       final localRev = await _readLocalRev();
       if (cloudRev <= localRev) return;
       await _applyCloudPayload(data);
@@ -131,11 +134,13 @@ abstract final class StrategieFirestoreSync {
   }) async {
     await StrategieSetupsStore.ensureLoaded();
     await StrategieSetupUsageStore.ensureLoaded();
+    await StrategieMesReglesStore.ensureLoaded();
     final setups = StrategieSetupsStore.notifier.value;
     final usage = StrategieSetupUsageStore.notifier.value;
     final sessions =
         sessionsOverride ?? await StrategieHorairesSessionsStorage.load();
     final risk = riskOverride ?? await StrategieGestionRisqueStorage.load();
+    final goldenRules = StrategieMesReglesStore.notifier.value;
     final starred = await StrategieStarredSetupStorage.load();
 
     final localRev = await _readLocalRev();
@@ -162,6 +167,11 @@ abstract final class StrategieFirestoreSync {
         'lossPct': risk.lossPct,
         'tradesPerDay': risk.tradesPerDay,
         'rrRatio': risk.rrRatio,
+      },
+      'goldenRules': <String, dynamic>{
+        'isCustom': goldenRules.isCustom,
+        'sectionTitle': goldenRules.sectionTitle,
+        'rules': goldenRules.rules,
       },
       if (starred != null) 'starred': encodeStrategieSetupCardData(starred),
       'updatedAt': FieldValue.serverTimestamp(),
@@ -239,6 +249,36 @@ abstract final class StrategieFirestoreSync {
             StrategieGestionRisqueParams.defaults.rrRatio,
       );
       await StrategieGestionRisqueStorage.save(params);
+    }
+
+    final rawGolden = data['goldenRules'];
+    if (rawGolden is Map) {
+      final m = Map<String, dynamic>.from(rawGolden);
+      final isCustom = m['isCustom'] as bool? ?? false;
+      if (isCustom) {
+        final title = (m['sectionTitle'] as String?)?.trim();
+        final rulesRaw = m['rules'];
+        final rules = <String>[];
+        if (rulesRaw is List) {
+          for (final e in rulesRaw) {
+            final t = '$e'.trim();
+            if (t.isNotEmpty) rules.add(t);
+          }
+        }
+        if (title != null && title.isNotEmpty) {
+          await StrategieMesReglesStore.applyFromCloud(
+            sectionTitle: title.toUpperCase(),
+            rules: rules,
+            isCustom: true,
+          );
+        }
+      } else {
+        await StrategieMesReglesStore.applyFromCloud(
+          sectionTitle: '',
+          rules: const [],
+          isCustom: false,
+        );
+      }
     }
 
     if (data.containsKey('starred')) {

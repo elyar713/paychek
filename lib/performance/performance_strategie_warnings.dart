@@ -6,6 +6,81 @@ import '../strategie/strategie_horaires_sessions_storage.dart';
 import '../strategie/strategie_session_locale_format.dart';
 import 'performance_trade_model.dart';
 
+/// Avertissement seuil Stratégie (sessions, risque, etc.) avec stats lisibles.
+class PaychekStrategieWarning {
+  const PaychekStrategieWarning({
+    required this.message,
+    this.tradeCount,
+    this.distinctDayCount,
+    this.distinctMonthCount,
+  });
+
+  final String message;
+  final int? tradeCount;
+  final int? distinctDayCount;
+  final int? distinctMonthCount;
+
+  bool get hasStats =>
+      (tradeCount ?? 0) > 0 ||
+      (distinctDayCount ?? 0) > 0 ||
+      (distinctMonthCount ?? 0) > 0;
+
+  /// Ligne compacte pour export PDF (remplace l’ancien suffixe « ×19 ×7 j »).
+  String? statsLineForLocale(Locale locale) {
+    if (!hasStats) return null;
+    final parts = <String>[];
+    final tc = tradeCount ?? 0;
+    final dj = distinctDayCount ?? 0;
+    final mj = distinctMonthCount ?? 0;
+    if (tc > 0) {
+      parts.add(
+        performancePickLocale(
+          locale,
+          '$tc ${performanceTradeWordPlural(locale.languageCode, tc)}',
+          '$tc ${performanceTradeWordPlural(locale.languageCode, tc)}',
+          '$tc ${performanceTradeWordPlural(locale.languageCode, tc)}',
+          '$tc ${performanceTradeWordPlural(locale.languageCode, tc)}',
+          '$tc ${performanceTradeWordPlural(locale.languageCode, tc)}',
+          '$tc${performanceTradeWordPlural(locale.languageCode, tc)}',
+        ),
+      );
+    }
+    if (dj > 0) {
+      parts.add(
+        performancePickLocale(
+          locale,
+          '$dj ${dj == 1 ? 'jour' : 'jours'}',
+          '$dj ${dj == 1 ? 'day' : 'days'}',
+          '$dj ${dj == 1 ? 'día' : 'días'}',
+          '$dj ${dj == 1 ? 'Tag' : 'Tage'}',
+          '$dj ${dj == 1 ? 'dia' : 'dias'}',
+          '$dj일',
+        ),
+      );
+    }
+    if (mj > 0) {
+      parts.add(
+        performancePickLocale(
+          locale,
+          '$mj ${mj == 1 ? 'mois' : 'mois'}',
+          '$mj ${mj == 1 ? 'month' : 'months'}',
+          '$mj ${mj == 1 ? 'mes' : 'meses'}',
+          '$mj ${mj == 1 ? 'Monat' : 'Monate'}',
+          '$mj ${mj == 1 ? 'mês' : 'meses'}',
+          '$mj개월',
+        ),
+      );
+    }
+    return parts.join(' · ');
+  }
+
+  String formatForExport(Locale locale) {
+    final stats = statsLineForLocale(locale);
+    if (stats == null || stats.isEmpty) return message;
+    return '$message — $stats';
+  }
+}
+
 int? _tradeEntryMinutes(Trade t) {
   final tod = t.timeOfDay;
   if (tod == null || tod.isEmpty) return null;
@@ -163,7 +238,7 @@ HoraireTradingViolationStats computeHoraireTradingViolationStats({
 }
 
 /// Avertissements Paychek Lens : seuils Stratégie + sessions (no trade, hors session autorisée).
-List<String> paychekStrategieWarnings({
+List<PaychekStrategieWarning> paychekStrategieWarnings({
   required List<Trade> trades,
   required StrategieGestionRisqueParams params,
   required List<StrategieSessionPersisted> sessions,
@@ -172,29 +247,8 @@ List<String> paychekStrategieWarnings({
 }) {
   String t(String fr, String en, String es, String de, String pt, String ko) =>
       performancePickLocale(locale, fr, en, es, de, pt, ko);
-  String tradeWord(int n) => performanceTradeWordPlural(locale.languageCode, n);
 
-  String dayAggSuffix(int dj) {
-    final c = locale.languageCode.toLowerCase();
-    if (c.startsWith('fr')) return '×$dj j';
-    if (c.startsWith('es')) return '×$dj d';
-    if (c.startsWith('de')) return '×$dj T';
-    if (c.startsWith('pt')) return '×$dj d';
-    if (c.startsWith('ko')) return '×$dj일';
-    return '×$dj d';
-  }
-
-  String monthAggSuffix(int mj) {
-    final c = locale.languageCode.toLowerCase();
-    if (c.startsWith('fr')) return '×$mj mois';
-    if (c.startsWith('es')) return '×$mj mes';
-    if (c.startsWith('de')) return '×$mj Mo';
-    if (c.startsWith('pt')) return '×$mj meses';
-    if (c.startsWith('ko')) return '×$mj개월';
-    return '×$mj mo';
-  }
-
-  final out = <String>[];
+  final out = <PaychekStrategieWarning>[];
   if (trades.isEmpty) return out;
 
   final scan = _scanStrategieSessions(trades, sessions);
@@ -206,13 +260,16 @@ List<String> paychekStrategieWarnings({
 
   if (sansHeure > 0) {
     out.add(
-      t(
-        '$sansHeure ${tradeWord(sansHeure)} sans heure d’entrée — les contrôles de session ne s’appliquent pas à ces lignes.',
-        '$sansHeure ${tradeWord(sansHeure)} without entry time — session checks do not apply to these rows.',
-        '$sansHeure ${tradeWord(sansHeure)} sin hora de entrada — los controles de sesión no se aplican a estas filas.',
-        '$sansHeure ${tradeWord(sansHeure)} ohne Eintrittszeit — Session-Prüfungen gelten für diese Zeilen nicht.',
-        '$sansHeure ${tradeWord(sansHeure)} sem hora de entrada — as verificações de sessão não se aplicam a essas linhas.',
-        '진입 시각 없음 $sansHeure${tradeWord(sansHeure)} — 세션 검사가 적용되지 않습니다.',
+      PaychekStrategieWarning(
+        message: t(
+          'Sans heure d’entrée — les contrôles de session ne s’appliquent pas à ces lignes.',
+          'Without entry time — session checks do not apply to these rows.',
+          'Sin hora de entrada — los controles de sesión no se aplican a estas filas.',
+          'Ohne Eintrittszeit — Session-Prüfungen gelten für diese Zeilen nicht.',
+          'Sem hora de entrada — as verificações de sessão não se aplicam a essas linhas.',
+          '진입 시각 없음 — 세션 검사가 적용되지 않습니다.',
+        ),
+        tradeCount: sansHeure,
       ),
     );
   }
@@ -227,11 +284,6 @@ List<String> paychekStrategieWarnings({
       }
     }
     final a = e.value;
-    final dj = a.days.length;
-    final mj = a.months.length;
-    final parts = <String>['×${a.tradeCount}', dayAggSuffix(dj)];
-    if (mj >= 2) parts.add(monthAggSuffix(mj));
-    final suffix = ' — ${parts.join(' ')}';
     final displayTitle = sess != null
         ? strategieSessionTitleForLocale(sess, locale)
         : title;
@@ -239,32 +291,39 @@ List<String> paychekStrategieWarnings({
         ? formatStrategieSessionWindow(sess, locale)
         : '—';
     out.add(
-      t(
-        'Session No Trade « $displayTitle » ($displayTime) : ${a.tradeCount} ${tradeWord(a.tradeCount)} pendant la fenêtre interdite$suffix',
-        'No trade zone "$displayTitle" ($displayTime): ${a.tradeCount} ${tradeWord(a.tradeCount)} during forbidden window$suffix',
-        'Zona sin operación "$displayTitle" ($displayTime): ${a.tradeCount} ${tradeWord(a.tradeCount)} durante la ventana prohibida$suffix',
-        'No-Trade-Fenster „$displayTitle“ ($displayTime): ${a.tradeCount} ${tradeWord(a.tradeCount)} im verbotenen Zeitfenster$suffix',
-        'Área sem trade "$displayTitle" ($displayTime): ${a.tradeCount} ${tradeWord(a.tradeCount)} na janela proibida$suffix',
-        '노 트레이드 세션 «$displayTitle» ($displayTime): 금지 구간 중 ${a.tradeCount}${tradeWord(a.tradeCount)}$suffix',
+      PaychekStrategieWarning(
+        message: t(
+          'Session No Trade « $displayTitle » ($displayTime) — trades pendant la fenêtre interdite',
+          'No trade zone "$displayTitle" ($displayTime) — trades during forbidden window',
+          'Zona sin operación "$displayTitle" ($displayTime) — trades durante la ventana prohibida',
+          'No-Trade-Fenster „$displayTitle“ ($displayTime) — Trades im verbotenen Zeitfenster',
+          'Área sem trade "$displayTitle" ($displayTime) — trades na janela proibida',
+          '노 트레이드 세션 «$displayTitle» ($displayTime) — 금지 구간 중 거래',
+        ),
+        tradeCount: a.tradeCount,
+        distinctDayCount: a.days.length,
+        distinctMonthCount:
+            a.months.isNotEmpty ? a.months.length : null,
       ),
     );
   }
 
   if (tradeZones.isNotEmpty && horsSessionAgg.tradeCount > 0) {
     final a = horsSessionAgg;
-    final dj = a.days.length;
-    final mj = a.months.length;
-    final parts = <String>['×${a.tradeCount}', dayAggSuffix(dj)];
-    if (mj >= 2) parts.add(monthAggSuffix(mj));
-    final suffix = ' — ${parts.join(' ')}';
     out.add(
-      t(
-        'Hors session de trading autorisée (horaires Stratégie) : ${a.tradeCount} ${tradeWord(a.tradeCount)} en dehors des créneaux définis$suffix',
-        'Outside allowed trading session (Strategy hours): ${a.tradeCount} ${tradeWord(a.tradeCount)} outside defined windows$suffix',
-        'Fuera de sesión de trading permitida (horarios de Estrategia): ${a.tradeCount} ${tradeWord(a.tradeCount)} fuera de las ventanas definidas$suffix',
-        'Außerhalb der erlaubten Handelssession (Strategie-Zeiten): ${a.tradeCount} ${tradeWord(a.tradeCount)} außerhalb der definierten Fenster$suffix',
-        'Fora da sessão permitida (horários Estratégia): ${a.tradeCount} ${tradeWord(a.tradeCount)} fora das janelas$suffix',
-        '허용 세션 외(전략 시간): 정의된 구간 밖 ${a.tradeCount}${tradeWord(a.tradeCount)}$suffix',
+      PaychekStrategieWarning(
+        message: t(
+          'Hors session de trading autorisée (horaires Stratégie)',
+          'Outside allowed trading session (Strategy hours)',
+          'Fuera de sesión de trading permitida (horarios de Estrategia)',
+          'Außerhalb der erlaubten Handelssession (Strategie-Zeiten)',
+          'Fora da sessão permitida (horários Estratégia)',
+          '허용 세션 외(전략 시간)',
+        ),
+        tradeCount: a.tradeCount,
+        distinctDayCount: a.days.length,
+        distinctMonthCount:
+            a.months.isNotEmpty ? a.months.length : null,
       ),
     );
   }
@@ -281,13 +340,15 @@ List<String> paychekStrategieWarnings({
   }
   if (maxTradesOneDay > params.tradesPerDay) {
     out.add(
-      t(
-        'Jusqu’à $maxTradesOneDay trades sur une même journée — au-dessus de votre limite Stratégie (${params.tradesPerDay} trades / jour).',
-        'Up to $maxTradesOneDay trades on one day — above your Strategy limit (${params.tradesPerDay} trades/day).',
-        'Hasta $maxTradesOneDay trades en un mismo día — por encima de tu límite de Estrategia (${params.tradesPerDay} trades/día).',
-        'Bis zu $maxTradesOneDay Trades an einem Tag — über Ihrem Strategie-Limit (${params.tradesPerDay} Trades/Tag).',
-        'Até $maxTradesOneDay trades em um dia — acima do limite de Estratégia (${params.tradesPerDay} trades/dia).',
-        '하루 최대 $maxTradesOneDay회 — 전략 한도(${params.tradesPerDay}/일) 초과.',
+      PaychekStrategieWarning(
+        message: t(
+          'Jusqu’à $maxTradesOneDay trades sur une même journée — au-dessus de votre limite Stratégie (${params.tradesPerDay} trades / jour).',
+          'Up to $maxTradesOneDay trades on one day — above your Strategy limit (${params.tradesPerDay} trades/day).',
+          'Hasta $maxTradesOneDay trades en un mismo día — por encima de tu límite de Estrategia (${params.tradesPerDay} trades/día).',
+          'Bis zu $maxTradesOneDay Trades an einem Tag — über Ihrem Strategie-Limit (${params.tradesPerDay} Trades/Tag).',
+          'Até $maxTradesOneDay trades em um dia — acima do limite de Estratégia (${params.tradesPerDay} trades/dia).',
+          '하루 최대 $maxTradesOneDay회 — 전략 한도(${params.tradesPerDay}/일) 초과.',
+        ),
       ),
     );
   }
@@ -295,13 +356,15 @@ List<String> paychekStrategieWarnings({
   final cap = capitalAmount;
   if (cap == null || cap <= 0) {
     out.add(
-      t(
-        'Définissez un capital dans le questionnaire pour vérifier perte max / jour et risque max / trade (%).',
-        'Set a capital amount in the questionnaire to validate max daily loss and max trade risk (%).',
-        'Define un capital en el cuestionario para validar pérdida máxima por día y riesgo máximo por trade (%).',
-        'Legen Sie im Fragebogen ein Kapital fest, um max. Tagesverlust und max. Trade-Risiko (%) zu prüfen.',
-        'Defina capital no questionário para validar perda máx./dia e risco máx./trade (%).',
-        '설문에서 자본을 설정하면 일일 최대 손실·트레이드당 최대 리스크(%)를 검증합니다.',
+      PaychekStrategieWarning(
+        message: t(
+          'Définissez un capital dans le questionnaire pour vérifier perte max / jour et risque max / trade (%).',
+          'Set a capital amount in the questionnaire to validate max daily loss and max trade risk (%).',
+          'Define un capital en el cuestionario para validar pérdida máxima por día y riesgo máximo por trade (%).',
+          'Legen Sie im Fragebogen ein Kapital fest, um max. Tagesverlust und max. Trade-Risiko (%) zu prüfen.',
+          'Defina capital no questionário para validar perda máx./dia e risco máx./trade (%).',
+          '설문에서 자본을 설정하면 일일 최대 손실·트레이드당 최대 리스크(%)를 검증합니다.',
+        ),
       ),
     );
     return out;
@@ -320,13 +383,15 @@ List<String> paychekStrategieWarnings({
   }
   if (maxDailyLossPct > params.lossPct + 1e-9) {
     out.add(
-      t(
-        'Perte journalière max observée : ${maxDailyLossPct.toStringAsFixed(1)} % du capital — au-dessus de votre perte max / jour (${params.lossPct} %).',
-        'Max observed daily loss: ${maxDailyLossPct.toStringAsFixed(1)}% of capital — above your max daily loss (${params.lossPct}%).',
-        'Pérdida diaria máxima observada: ${maxDailyLossPct.toStringAsFixed(1)}% del capital — por encima de tu pérdida diaria máxima (${params.lossPct}%).',
-        'Max. beobachteter Tagesverlust: ${maxDailyLossPct.toStringAsFixed(1)} % des Kapitals — über Ihrem max. Tagesverlust (${params.lossPct} %).',
-        'Perda diária máx. observada: ${maxDailyLossPct.toStringAsFixed(1)}% do capital — acima da perda máx./dia (${params.lossPct}%).',
-        '관측 일일 최대 손실: 자본의 ${maxDailyLossPct.toStringAsFixed(1)}% — 일일 최대 손실(${params.lossPct}%) 초과.',
+      PaychekStrategieWarning(
+        message: t(
+          'Perte journalière max observée : ${maxDailyLossPct.toStringAsFixed(1)} % du capital — au-dessus de votre perte max / jour (${params.lossPct} %).',
+          'Max observed daily loss: ${maxDailyLossPct.toStringAsFixed(1)}% of capital — above your max daily loss (${params.lossPct}%).',
+          'Pérdida diaria máxima observada: ${maxDailyLossPct.toStringAsFixed(1)}% del capital — por encima de tu pérdida diaria máxima (${params.lossPct}%).',
+          'Max. beobachteter Tagesverlust: ${maxDailyLossPct.toStringAsFixed(1)} % des Kapitals — über Ihrem max. Tagesverlust (${params.lossPct} %).',
+          'Perda diária máx. observada: ${maxDailyLossPct.toStringAsFixed(1)}% do capital — acima da perda máx./dia (${params.lossPct}%).',
+          '관측 일일 최대 손실: 자본의 ${maxDailyLossPct.toStringAsFixed(1)}% — 일일 최대 손실(${params.lossPct}%) 초과.',
+        ),
       ),
     );
   }
@@ -341,13 +406,15 @@ List<String> paychekStrategieWarnings({
   }
   if (maxTradeLossPct > params.riskPct + 1e-9) {
     out.add(
-      t(
-        'Perte max sur un trade : ${maxTradeLossPct.toStringAsFixed(1)} % du capital — au-dessus du risque max / trade défini (${params.riskPct} %).',
-        'Max loss on one trade: ${maxTradeLossPct.toStringAsFixed(1)}% of capital — above configured max trade risk (${params.riskPct}%).',
-        'Pérdida máxima en un trade: ${maxTradeLossPct.toStringAsFixed(1)}% del capital — por encima del riesgo máximo configurado por trade (${params.riskPct}%).',
-        'Max. Verlust je Trade: ${maxTradeLossPct.toStringAsFixed(1)} % des Kapitals — über dem festgelegten max. Trade-Risiko (${params.riskPct} %).',
-        'Perda máx. em um trade: ${maxTradeLossPct.toStringAsFixed(1)}% do capital — acima do risco máx./trade (${params.riskPct}%).',
-        '단일 트레이드 최대 손실: 자본의 ${maxTradeLossPct.toStringAsFixed(1)}% — 설정 리스크(${params.riskPct}%) 초과.',
+      PaychekStrategieWarning(
+        message: t(
+          'Perte max sur un trade : ${maxTradeLossPct.toStringAsFixed(1)} % du capital — au-dessus du risque max / trade défini (${params.riskPct} %).',
+          'Max loss on one trade: ${maxTradeLossPct.toStringAsFixed(1)}% of capital — above configured max trade risk (${params.riskPct}%).',
+          'Pérdida máxima en un trade: ${maxTradeLossPct.toStringAsFixed(1)}% del capital — por encima del riesgo máximo configurado por trade (${params.riskPct}%).',
+          'Max. Verlust je Trade: ${maxTradeLossPct.toStringAsFixed(1)} % des Kapitals — über dem festgelegten max. Trade-Risiko (${params.riskPct} %).',
+          'Perda máx. em um trade: ${maxTradeLossPct.toStringAsFixed(1)}% do capital — acima do risco máx./trade (${params.riskPct}%).',
+          '단일 트레이드 최대 손실: 자본의 ${maxTradeLossPct.toStringAsFixed(1)}% — 설정 리스크(${params.riskPct}%) 초과.',
+        ),
       ),
     );
   }

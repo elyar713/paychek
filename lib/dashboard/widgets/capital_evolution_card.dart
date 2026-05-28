@@ -80,6 +80,8 @@ class CapitalEvolutionCard extends StatelessWidget {
             Widget amountHeading() {
               return Text(
                 formatMoneyWithCurrencySymbol(data.periodNet, sym),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.plusJakartaSans(
                   color: data.periodNet < 0
                       ? DashboardTokens.negative
@@ -148,15 +150,19 @@ class CapitalEvolutionCard extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  amountHeading(),
-                                  const SizedBox(height: 6),
-                                  tradesLine,
-                                ],
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    amountHeading(),
+                                    const SizedBox(height: 6),
+                                    tradesLine,
+                                  ],
+                                ),
                               ),
                               Expanded(
+                                flex: 3,
                                 child: Align(
                                   alignment: const Alignment(-0.22, 1),
                                   child: WeeklyThisWeekSection(
@@ -166,12 +172,22 @@ class CapitalEvolutionCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              WeeklyThisWeekSection(
-                                compactOnly: true,
-                                compactPart:
-                                    WeeklyThisWeekCompactPart.extremesOnly,
-                                includeTradeExtremes: true,
-                                onOpenTradeById: onOpenTradeById,
+                              Expanded(
+                                flex: 5,
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.bottomRight,
+                                    child: WeeklyThisWeekSection(
+                                      compactOnly: true,
+                                      compactPart: WeeklyThisWeekCompactPart
+                                          .extremesOnly,
+                                      includeTradeExtremes: true,
+                                      onOpenTradeById: onOpenTradeById,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),

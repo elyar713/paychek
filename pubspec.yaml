@@ -121,6 +121,23 @@ flutter:
     - assets/help_center/add_trade.gif
     - assets/help_center/add_trade_custom_actif.gif
     - assets/help_center/add_trade_screenshot_csv_note.gif
+    - assets/help_center/calendar_objective_kpi.gif
+    - assets/help_center/calendar_cumulative_history.gif
+    - assets/help_center/mental_state_impact_settings.gif
+    - assets/help_center/mental_state_calendar.gif
+    - assets/help_center/trade_page_header.gif
+    - assets/help_center/trade_page_period_bars.gif
+    - assets/help_center/checklist_schedule_reminders.gif
+    - assets/help_center/checklist_calendar_history.gif
+    - assets/help_center/strategie_golden_rules_risk.gif
+    - assets/help_center/strategie_sessions.gif
+    - assets/help_center/strategie_setups_templates.gif
+    - assets/help_center/strategie_calendar.gif
+    - assets/help_center/analyse_initial_config.gif
+    - assets/help_center/analyse_three_pillars_impact.gif
+    - assets/help_center/analyse_report_save_sync.gif
+    - assets/help_center/performance_overview_kpis.png
+    - assets/help_center/performance_strategic_audit.gif
     - assets/help_center/guides/add_trade/
     - assets/help_center/guides/calendar/
     - assets/help_center/guides/checklist/

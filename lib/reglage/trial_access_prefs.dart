@@ -46,6 +46,8 @@ Future<
       bool docPro,
       DateTime? subscriptionTierUpdatedAtUtc,
       DateTime? subscriptionCurrentPeriodEndUtc,
+      bool userDocExists,
+      bool fetchSucceeded,
     })> _readPaychekUserTrialBootstrap(
   User u,
 ) async {
@@ -53,7 +55,7 @@ Future<
     final snap = await FirebaseFirestore.instance
         .collection(kPaychekUsersCollection)
         .doc(u.uid)
-        .get();
+        .get(const GetOptions(source: Source.serverAndCache));
     if (!snap.exists) {
       return (
         createdAtUtc: null,
@@ -61,6 +63,8 @@ Future<
         docPro: false,
         subscriptionTierUpdatedAtUtc: null,
         subscriptionCurrentPeriodEndUtc: null,
+        userDocExists: false,
+        fetchSucceeded: true,
       );
     }
     final d = snap.data();
@@ -71,6 +75,8 @@ Future<
         docPro: false,
         subscriptionTierUpdatedAtUtc: null,
         subscriptionCurrentPeriodEndUtc: null,
+        userDocExists: true,
+        fetchSucceeded: true,
       );
     }
     final createdUtc = paychekResolveUserJoinedAtUtc(d);
@@ -96,6 +102,8 @@ Future<
         docPro: true,
         subscriptionTierUpdatedAtUtc: subscriptionTierUpdatedAtUtc,
         subscriptionCurrentPeriodEndUtc: subscriptionCurrentPeriodEndUtc,
+        userDocExists: true,
+        fetchSucceeded: true,
       );
     }
     final tier = d['subscriptionTier']?.toString().trim().toLowerCase();
@@ -106,6 +114,8 @@ Future<
       docPro: pro,
       subscriptionTierUpdatedAtUtc: subscriptionTierUpdatedAtUtc,
       subscriptionCurrentPeriodEndUtc: subscriptionCurrentPeriodEndUtc,
+      userDocExists: true,
+      fetchSucceeded: true,
     );
   } catch (e, st) {
     debugPrint('[Paychek] _readPaychekUserTrialBootstrap: $e\n$st');
@@ -115,6 +125,8 @@ Future<
       docPro: false,
       subscriptionTierUpdatedAtUtc: null,
       subscriptionCurrentPeriodEndUtc: null,
+      userDocExists: false,
+      fetchSucceeded: false,
     );
   }
 }
@@ -131,6 +143,8 @@ DateTime? _resolveProSinceUtc({
     bool docPro,
     DateTime? subscriptionTierUpdatedAtUtc,
     DateTime? subscriptionCurrentPeriodEndUtc,
+    bool userDocExists,
+    bool fetchSucceeded,
   }) row,
 }) {
   if (subRow.active && subRow.proSinceUtc != null) {
@@ -224,7 +238,7 @@ abstract final class TrialAccessPrefs {
       final doc = await FirebaseFirestore.instance
           .collection(kPaychekSubscriberEntitlementsCollection)
           .doc(u.uid)
-          .get();
+          .get(const GetOptions(source: Source.serverAndCache));
 
       final data = doc.data();
       if (data == null) {
@@ -357,6 +371,8 @@ abstract final class TrialAccessPrefs {
           bool docPro,
           DateTime? subscriptionTierUpdatedAtUtc,
           DateTime? subscriptionCurrentPeriodEndUtc,
+          bool userDocExists,
+          bool fetchSucceeded,
         });
     final subRow = parallel[1]
         as ({bool active, DateTime? periodEndUtc, DateTime? proSinceUtc});
@@ -367,9 +383,12 @@ abstract final class TrialAccessPrefs {
         _kTrialStartUtcMs,
         row.createdAtUtc!.millisecondsSinceEpoch,
       );
-    } else {
+    } else if (row.fetchSucceeded && !row.userDocExists) {
+      // Nouveau compte cloud : ancrage local du 1er accès.
       await ensureTrialAnchoredUtc();
     }
+    // Doc existant sans date OU lecture Firestore en échec : ne pas réancrer l’essai
+    // (évite un 2e essai de 7 j sur Android quand le réseau/cache diffère de l’iPhone).
 
     final localSub = p.getBool(_kSubscriberActive) ?? false;
     final ms = p.getInt(_kTrialStartUtcMs);

@@ -13,6 +13,7 @@ const String kPaychekStripeKeysDocId = 'stripe_keys';
 
 const String kFieldStripePublishableKey = 'stripePublishableKey';
 const String kFieldStripeSecretKey = 'stripeSecretKey';
+const String kFieldAiAgentApiKey = 'aiAgentApiKey';
 
 const String kFieldStripeCheckoutUrl = 'stripeCheckoutUrl';
 const String kFieldStripeCheckoutUrlMonthly = 'stripeCheckoutUrlMonthly';

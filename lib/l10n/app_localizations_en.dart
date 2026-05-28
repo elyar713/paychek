@@ -3209,6 +3209,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyseReportTitle => 'Report';
 
   @override
+  String get analyseOledSaveButton => 'Save';
+
+  @override
+  String get analyseReportEditButton => 'Edit';
+
+  @override
+  String get analyseOledConfluenceLabel => 'CONFLUENCE';
+
+  @override
+  String get analyseOledConfluenceStatusOptimal => 'Setup Optimal';
+
+  @override
+  String get analyseOledConfluenceStatusValid => 'Valid Setup';
+
+  @override
+  String get analyseOledConfluenceStatusHighRisk => 'High Risk';
+
+  @override
+  String get analyseOledPlanSavedBannerTitle =>
+      'Plan saved successfully to your workspace!';
+
+  @override
+  String get analyseOledPlanSavedBannerSubtitle =>
+      'Your settings and confluence indicators have been updated.';
+
+  @override
+  String get analyseOledPlanSavedBannerClose => 'CLOSE';
+
+  @override
+  String get analyseOledAssetSymbolLabel => 'ASSET / SYMBOL';
+
+  @override
+  String get analyseOledThesisStrategyLabel => 'THESIS / STRATEGY';
+
+  @override
+  String get analyseOledExecutionDateLabel => 'EXECUTION DATE';
+
+  @override
+  String get analyseOledThesisHint => 'e.g. CHoCH + Fibonacci pullback...';
+
+  @override
+  String get analyseOledSectionKeyZonesSmc => 'KEY ZONES & SMC';
+
+  @override
+  String get analyseOledKeyZoneToggle => 'Key zone';
+
+  @override
+  String get analyseOledSupportsUpper => 'SUPPORTS';
+
+  @override
+  String get analyseOledResistancesUpper => 'RESISTANCES';
+
+  @override
+  String get analyseOledZoneSynthesis => 'Zone synthesis';
+
+  @override
+  String get analyseOledZoneSynthesisHint =>
+      'Why is this zone tactically strong?';
+
+  @override
+  String get analyseOledStructureChartHint =>
+      'e.g. Double bottom, BOS, CHoCH...';
+
+  @override
+  String get analyseOledMacroNotesLabel => 'Macro notes & observations';
+
+  @override
+  String get analyseOledMacroNotesHint => 'Macro context, catalysts...';
+
+  @override
+  String get analyseOledLiquidityShort => 'Liquidity';
+
+  @override
+  String get analyseOledSmcObHint => 'e.g. H4 buy zone 1.0820 - 1.0840';
+
+  @override
+  String get analyseOledSmcFvgHint => 'Daily candle imbalance...';
+
+  @override
+  String get analyseOledSmcLiqHint => 'Stops below major lows...';
+
+  @override
+  String get analyseOledFibPriceHint => 'Exact OTE / zone price...';
+
+  @override
+  String get analyseOledLevelHint => 'Level...';
+
+  @override
+  String get analyseOledSignalsLabel => 'Signals';
+
+  @override
+  String get analyseOledAddSignalHint => 'Add a signal, personal setup...';
+
+  @override
+  String get analyseOledActionPlanLabel => 'Action plan / trigger strategy';
+
+  @override
+  String get analyseOledActionPlanHint => 'Entry, SL, targets...';
+
+  @override
+  String get analyseTrendBullish => 'Bullish';
+
+  @override
+  String get analyseTrendBearish => 'Bearish';
+
+  @override
+  String get analyseTrendRange => 'Range';
+
+  @override
   String get analyseReportOledSectionFundamental => 'FUNDAMENTAL';
 
   @override

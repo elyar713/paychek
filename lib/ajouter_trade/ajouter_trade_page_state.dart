@@ -348,7 +348,8 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     _loadDisciplinePrefsFromStorage();
     _applyNewsFlagsFromChecklist();
     _sortieController.addListener(_onSortieTextChanged);
-    StrategieSetupsStore.ensureLoaded().then((_) {
+    StrategieSetupsStore.ensureLoaded().then((_) async {
+      await StrategieMesReglesStore.ensureLoaded();
       if (!mounted) return;
       final titres = StrategieSetupsStore.notifier.value
           .map((e) => e.title)

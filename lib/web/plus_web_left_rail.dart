@@ -17,6 +17,7 @@ class PlusWebLeftRail extends StatelessWidget {
     required this.onOpenStrategie,
     required this.onOpenAnalyse,
     required this.onOpenPerformance,
+    required this.onOpenCoachAi,
     required this.onOpenChecklist,
     required this.onOpenCalculatrice,
     required this.onOpenHelpCenter,
@@ -37,6 +38,7 @@ class PlusWebLeftRail extends StatelessWidget {
   final VoidCallback onOpenStrategie;
   final VoidCallback onOpenAnalyse;
   final VoidCallback onOpenPerformance;
+  final VoidCallback onOpenCoachAi;
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenCalculatrice;
   final VoidCallback onOpenHelpCenter;
@@ -68,6 +70,7 @@ class PlusWebLeftRail extends StatelessWidget {
       onOpenStrategie: onOpenStrategie,
       onOpenAnalyse: onOpenAnalyse,
       onOpenPerformance: onOpenPerformance,
+      onOpenCoachAi: onOpenCoachAi,
       onOpenChecklist: onOpenChecklist,
       onOpenCalculatrice: onOpenCalculatrice,
       onOpenReglage: onOpenReglage,

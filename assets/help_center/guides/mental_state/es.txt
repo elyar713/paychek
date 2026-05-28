@@ -1,0 +1,34 @@
+Estado Mental: Su "Bio-Data" de Trader
+El rendimiento no es solo cuestión de técnica; es cuestión de equilibrio humano. La página Estado Mental es su panel biológico: analiza cómo sus hábitos diarios impactan directamente sus resultados financieros.
+
+[img:assets/help_center/mental_state_impact_settings.gif]
+
+1. Operación Psicología Diaria
+Cada día, realice su "Check-up psico". Utilice los deslizadores para anotar sus pilares de rendimiento:
+
+Rutina personalizable: Sueño, deporte, meditación u cualquier otro elemento que considere vital para su personalidad.
+
+Impacto calibrado: Cada slider dispone de un ajuste de impacto (positivo o negativo). Usted define qué le ayuda a mantenerse "afilado" en los mercados.
+
+El Ring de Rendimiento: Visualice al instante su estado global del día mediante un gráfico en anillo (Ring) que agrega todos sus datos personales.
+
+2. Configuración experta (El engranaje)
+Haga clic en el engranaje de la sección para definir el peso (en porcentaje) de cada factor en su estado global. Si para usted el sueño representa el 60% de su éxito y la meditación el 10%, PAYCHEK le permite parametrizar esa realidad.
+
+3. Correlación Rendimiento y Psico
+Aquí es donde PAYCHEK se convierte en una herramienta de diagnóstico excepcional. Sus datos de Estado Mental se sincronizan en tiempo real con sus trades:
+
+[img:assets/help_center/mental_state_calendar.gif]
+
+Historial visual: Utilice el calendario para navegar en el pasado y ver cómo evolucionó su estado psico.
+
+Análisis de correlación automático: La página Rendimiento muestra ahora los vínculos de causa y efecto:
+
+Ejemplo: "Cuando su estado mental está al 50%, su Winrate cae al 44%." Esta visibilidad le permite saber exactamente qué día debe cerrar su plataforma de trading para proteger su capital.
+
+4. Personalización de sus sesiones
+No está limitado a una jornada de trading estándar. PAYCHEK se adapta a su vida y a sus horarios de mercado.
+
+Configuración de sesiones (El engranaje): Haga clic en el engranaje en la barra de herramientas del calendario para definir sus propios franjas horarias de trading.
+
+Flexibilidad total: Ya opere durante la sesión de Londres, Nueva York o tenga horarios desplazados, es libre de elegir las horas que componen su "jornada de trade".

@@ -1,1 +1,53 @@
-﻿Contenu a venir.
+﻿Journal de Trade : Votre tableau de bord opérationnel
+La page Trade est conçue pour une lecture immédiate et une analyse profonde de votre activité. Tout est structuré pour vous permettre de passer de la vision globale aux détails précis en un clic.
+
+[img:assets/help_center/trade_page_header.gif]
+
+1. Indicateurs de Performance (Header)
+En haut de page, retrouvez vos trois piliers de suivi :
+
+Gain/Perte global : Votre solde net, reflétant la santé financière de votre compte.
+
+Ring de Winrate : Une représentation visuelle dynamique de votre taux de réussite.
+
+Volume d'activité : Le nombre total de trades effectués.
+
+2. Vue temporelle et progression
+Barre de performance hebdomadaire : Visualisez instantanément la tendance de votre semaine en cours grâce à un indicateur visuel de progression.
+
+Sélecteur de période (1D / 1W / 1M / ALL) : Ajustez votre vue pour isoler vos performances quotidiennes, hebdomadaires, mensuelles ou pour analyser l'intégralité de votre historique.
+
+3. Classification et Filtrage
+Gestion des positions : Un tableau de bord interactif pour classer vos trades par état : Gains, Pertes, Breakeven ou Positions en cours. Vous pouvez filtrer ces catégories pour identifier rapidement les trades qui ont impacté votre capital.
+
+Analyse par actifs : Une section dédiée liste les instruments que vous avez tradés (MNQ, Nasdaq, EUR/USD, etc.) avec leur fréquence, vous permettant d'identifier vos actifs les plus rentables ou ceux qui vous coûtent le plus cher.
+
+Gestion et Exportation : Votre Journal en action
+La page Trade n'est pas seulement un historique, c'est un outil interactif qui vous permet d'analyser, de corriger et d'exporter votre performance en quelques secondes.
+
+1. Navigation temporelle intuitive (1D / 1W / 1M / ALL)
+Visualisez votre progression à votre rythme :
+
+[img:assets/help_center/trade_page_period_bars.gif]
+
+Vue dynamique : Sélectionnez 1D, 1W, 1M ou ALL. Les barres graphiques s'ajustent automatiquement pour représenter chaque période.
+
+Accès rapide : Cliquez sur n'importe quelle barre graphique pour isoler et afficher instantanément la liste des trades correspondants à cette période précise.
+
+2. Alertes de Discipline (Le message jaune)
+PAYCHEK vous avertit en temps réel si votre analyse est incomplète :
+
+Notifications intelligentes : Un message jaune apparaît sur vos trades si des éléments critiques sont manquants (Plan d'analyse, Checklist, État mental ou Stratégie).
+
+Objectif : Ne laissez aucun trade "orphelin" d'analyse. Un trade sans analyse est une donnée perdue pour votre progression.
+
+3. Gestion et Exportation
+Édition et Suppression : Un menu à "3 points" est disponible sur chaque trade. Vous pouvez à tout moment modifier les détails d'une position ou supprimer une saisie erronée.
+
+Exportation PDF : Besoin d'un bilan papier ou d'un compte-rendu pour un mentor ? Cliquez sur l'icône PDF pour générer instantanément un rapport complet incluant :
+
+L'historique détaillé de vos trades.
+
+Le récapitulatif de vos statistiques de performance.
+
+Vos graphiques de progression.

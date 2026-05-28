@@ -1,1 +1,41 @@
-﻿Contenu a venir.
+﻿Performance : La vérité statistique
+La page Performance est le miroir de votre activité. Elle ne se contente pas de compter vos gains, elle décode les mécanismes qui dictent votre réussite ou vos échecs.
+
+[img:assets/help_center/performance_overview_kpis.png]
+
+1. Vue d'ensemble (Header & KPIs)
+Indicateurs clés : Visualisez instantanément le volume total, le solde net (Gain/Perte/Breakeven) et vos métriques de survie (Perte max, Durée moyenne d'un trade).
+
+Index de Rigueur : Vos performances sont croisées avec votre assiduité. Attention : Les statistiques de discipline ne sont comptabilisées que si votre checklist et votre état mental sont remplis avant 23h59. Cette rigueur quotidienne est la clé de votre progression.
+
+2. Diagnostic de Discipline
+Audit des oublis : PAYCHEK liste vos trades "orphelins" (ceux sans checklist, stratégie ou analyse). Un clic suffit pour les compléter directement.
+
+Corrélation Discipline/Winrate : Découvrez l'impact mathématique de votre rigueur :
+
+- Winrate avec 100% de checklist vs Winrate sans checklist.
+- Performance corrélée à vos différents états mentaux (Peur, Confiance, Fatigue, etc.).
+
+3. Analyse Comportementale & Environnementale
+Volume d'activité : Visualisez votre Winrate en fonction du nombre de trades quotidiens (ex: 1-5 trades vs 5-10 trades). Identifiez votre seuil de fatigue.
+
+Analyse Temporelle & Technique :
+
+- Sessions : Quel est votre Winrate sur Londres, Asie ou US ?
+- Durée de position : Quelle fenêtre de temps optimise votre rentabilité (0-15 min vs >12h) ?
+- Marchés : Quel actif est votre "vache à lait" et lequel est votre "piège" ?
+
+[img:assets/help_center/performance_strategic_audit.gif]
+
+4. Audit Stratégique & Exécution
+Audit par Stratégie : Pour chaque stratégie définie, identifiez les éléments les plus souvent ignorés.
+
+Barre de Talent : Identifiez vos trades basés uniquement sur le "Feeling" ou le "Principe".
+
+Dashboard Personnalisable : Créez vos propres vues. Vous voulez savoir si votre "peur" fait baisser votre Winrate sur l'EUR/USD ? Ajoutez ce segment et visualisez l'impact en temps réel.
+
+5. Export & Rapport
+Icône PDF : Générez à tout moment votre rapport de performance complet. Idéal pour vos revues hebdomadaires ou pour présenter votre historique à un partenaire/mentor.
+
+Pourquoi c'est l'argument ultime pour le 5 juin :
+Tu forces le trader à réaliser que le problème n'est pas le marché, mais sa propre exécution. En montrant, par exemple, qu'un trader perd 20% de Winrate dès qu'il dépasse 5 trades par jour, tu lui donnes une règle d'or qu'il ne pourra plus jamais ignorer.

@@ -1,0 +1,89 @@
+The Dashboard: Your Control Center
+The PAYCHEK dashboard is designed to give you an immediate view of your financial and psychological health as a trader.
+
+[img:assets/help_center/dashboard_capital_balance.gif]
+
+1. The "Capital Balance" Card
+This is your primary financial indicator. This section brings together three essential data points for tracking your progress:
+
+- User capital: The current balance of your account.
+- Progress: The percentage change in your capital over the selected period.
+- Gain amount: The net monetary value of your profits or losses.
+
+2. Your Performance Indicators (The Rings)
+To quickly navigate between your technical data and your behavior, use the tracking rings:
+
+- "Winrate" ring: It visually illustrates your efficiency. The more filled the ring is, the higher your trade success rate.
+- "Daily State" ring: A quick indicator of your mental form for the current session, as you declared during your preparation.
+- "Checklist" ring: This circle represents your discipline compliance rate. It reflects the percentage of your checklist criteria that you validated before taking a position.
+
+[img:assets/help_center/dashboard_capital_evolution.gif]
+
+3. The "Capital Evolution" Card: Your Interactive History
+This section lets you visually track the growth of your capital. Beyond the visual, it is a true navigation tool:
+
+- Interactive sparklines: The trend lines are not static. Click directly on any point on the curve to instantly access the trade(s) corresponding to that date.
+- Weekly customization: Adapt the display to your own rhythm. Go to your Settings to choose how your progress bars are displayed: 5 days per week (to track your standard trading activity) or 7 days per week (for a complete view).
+
+4. Performance Indicators (Best & Worst)
+To quickly analyze your extremes, we have integrated two summary cards located below your chart:
+
+- Best Trade: Displays your highest performance. A simple click redirects you to the details of that trade to understand what worked.
+- Largest loss: Identifies your least successful trade. Click on it to analyze your mistakes and avoid repeating them.
+
+5. The "Personal Analysis" Card: Your Custom View
+This section displays the analysis report you have selected as your favorite. It lets you keep the indicators that matter most for your current trading strategy in sight.
+
+[img:assets/help_center/dashboard_personal_analysis.gif]
+
+- Customize your Dashboard: go to the "My Analysis" page and click the star next to the report of your choice.
+- Real-time update: As soon as the star is checked, your dashboard instantly updates to display that priority report.
+- Total flexibility: You can change your favorite report as often as you like, depending on your goals for the week or the period you are analyzing.
+
+6. The Discipline "Checklist": Your Daily Safeguard
+The checklist is the essential tool for avoiding impulsive trading. It is integrated directly into your dashboard to support you before each session.
+
+[img:assets/help_center/dashboard_checklist.gif]
+
+- Quick action from the Dashboard: You can check off your discipline items instantly on the home page. This is the essential first step before placing your orders in the market.
+- Full customization: Your trading rules are not set in stone? No problem. Go to the dedicated "Checklist" page in the side menu to modify, add, or remove criteria from your routine.
+- Instant sync: As soon as you modify a criterion on the "Checklist" page, your dashboard immediately updates to reflect your new trading rules.
+
+7. Tracking Your "Mental State": The Key to Your Psychology
+
+[img:assets/help_center/dashboard_mental_state.gif]
+
+Trading is not only about numbers; it is above all a state of mind. The "Mental State" card on your dashboard lets you instantly visualize your current psychological disposition, a decisive factor for your performance.
+
+- Real-time visibility: This card displays your mental state for the day. It is directly synchronized with your entries to give you a quick overview without having to navigate through menus.
+- Centralized update: Changed your mind or want to correct your entry? Simply go to the dedicated "Mental State" page in your side menu. You can modify all associated elements and settings there.
+- Instant synchronization: As soon as you save your changes on the "Mental State" page, the card on your dashboard updates automatically. You always have reliable information to decide whether you are in the best conditions to trade.
+
+8. The "Strategy" Card: Your Current Focus
+
+[img:assets/help_center/dashboard_strategy.gif]
+
+Trading is a profession of specialization. The "Strategy" card on your dashboard lets you keep your action plan in sight, without any distraction.
+
+- Immediate view: Display at a glance the details of the strategy you are currently working on. No more back-and-forth through menus; your plan is available as soon as you open your journal.
+- Priority selection (The star system): Do you alternate between several strategies or want to focus on just one for a week? Go to the "My Strategy" page, check the star on the plan you want to prioritize, and it will instantly appear on your dashboard.
+- Total flexibility: Changing setup or market? Uncheck the current star and activate a new one. Your dashboard adapts in real time to your evolution.
+
+9. The Calendar: Your Trading History at a Glance
+
+[img:assets/help_center/dashboard_calendar.png]
+
+The calendar on your dashboard is much more than a simple date tool. It is the visual representation of your consistency and activity in the markets.
+
+- Global view of your sessions: Instantly visualize your trading days. Marked dates indicate your active sessions, allowing you to track your weekly and monthly work rhythm.
+- Quick navigation: Want to review a specific session? Click directly on a date in the calendar to filter your data and immediately access the information and trades for that exact day.
+- Tracking your consistency: A quick glance at the calendar is enough to identify your periods of intense activity or, on the contrary, your rest phases, which is crucial for maintaining good trader mental health.
+
+10. Custom Performance Analysis: The Power of Data
+Do not settle for looking at your PnL alone. The "Custom Performance" section lets you cross-reference your data to understand exactly why you are making or losing money.
+
+[img:assets/help_center/dashboard_custom_performance.gif]
+
+- Create your own correlations: Want to know if your winrate is better when your "Mental State" is high? Or if strict compliance with your "Checklist" truly impacts your profitability? You can now build your own reports by combining all the elements of your journal: mental state, checklist, strategies, technical analysis, and much more.
+- Highlighting weaknesses: Thanks to this cross-analysis, discover invisible habits. You may realize that your losses occur mostly during sessions where your mental state was below 50%, or with a specific strategy.
+- Custom dashboard: Once your report is configured, it becomes your best decision-making tool. Like your other reports, you can pin it (via the star) to display it as a priority on your dashboard.

@@ -1,0 +1,34 @@
+Estado Mental: Os seus "bio-dados" de trader
+O desempenho não é apenas uma questão de técnica; é uma questão de equilíbrio humano. A página Estado Mental é o seu painel biológico: analisa como os seus hábitos diários impactam diretamente os seus resultados financeiros.
+
+[img:assets/help_center/mental_state_impact_settings.gif]
+
+1. Operação Psicologia Diária
+Todos os dias, faça o seu "check-up psicológico". Utilize os cursores para avaliar os seus pilares de desempenho:
+
+Rotina personalizável: Sono, desporto, meditação ou qualquer outro elemento que considere vital para a sua personalidade.
+
+Impacto calibrado: Cada slider dispõe de um ajuste de impacto (positivo ou negativo). Define você mesmo o que o ajuda a manter-se "afiado" nos mercados.
+
+O Anel de Desempenho: Visualize instantaneamente o seu estado global do dia através de um gráfico em anel que agrega todos os seus dados pessoais.
+
+2. Configuração avançada (A engrenagem)
+Clique na engrenagem da secção para definir o peso (em percentagem) de cada fator no seu estado global. Se para si o sono representa 60% do seu sucesso e a meditação 10%, o PAYCHEK permite-lhe parametrizar essa realidade.
+
+3. Correlação Desempenho e Psico
+É aqui que o PAYCHEK se torna uma ferramenta de diagnóstico excecional. Os seus dados de Estado Mental estão sincronizados em tempo real com as suas operações:
+
+[img:assets/help_center/mental_state_calendar.gif]
+
+Histórico visual: Utilize o calendário para navegar no passado e ver como o seu estado psicológico evoluiu.
+
+Análise de correlação automática: A página Desempenho apresenta agora as relações de causa e efeito:
+
+Exemplo: "Quando o seu estado mental está a 50%, a sua taxa de acerto desce para 44%." Esta visibilidade permite-lhe saber exatamente em que dia deve fechar a sua plataforma de trading para proteger o seu capital.
+
+4. Personalização das suas sessões
+Não está limitado a um dia de trading padrão. O PAYCHEK adapta-se à sua vida e aos seus horários de mercado.
+
+Configuração das sessões (A engrenagem): Clique na engrenagem na barra de ferramentas do calendário para definir os seus próprios intervalos de trading.
+
+Flexibilidade total: Quer opere durante a sessão de Londres, Nova Iorque ou tenha horários desfasados, é livre de escolher as horas que compõem o seu "dia de trading".

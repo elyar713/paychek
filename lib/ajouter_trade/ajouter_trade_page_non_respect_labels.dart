@@ -2,6 +2,7 @@ import 'dart:ui' show Locale;
 
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_feedback_reference.dart';
+import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
 import '../strategie/widgets/strategie_setup_cards_content.dart';
 import '../strategie/widgets/strategie_setup_tag_format.dart';
@@ -14,7 +15,7 @@ String labelForStrategieNonRespectId(
   required AppLocalizations l,
   required Locale locale,
 }) {
-  final regles = StrategieFeedbackReference.mesReglesDor(locale);
+  final regles = StrategieMesReglesStore.rulesForLocale(locale);
 
   if (id.startsWith('mes_regles_')) {
     final idx = int.tryParse(id.substring('mes_regles_'.length));

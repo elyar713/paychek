@@ -1,0 +1,25 @@
+Checklist: Ihr Vorbereitungsprotokoll
+Die Checklist-Seite ist das Fundament Ihrer Disziplin. Hier definieren Sie Ihre Engagement-Regeln, um Ihr Trading von „reaktiv“ zu „methodisch“ zu transformieren.
+
+[img:assets/help_center/checklist_schedule_reminders.gif]
+
+1. Planung und intelligente Erinnerungen
+Verpassen Sie keine wichtigen Ereignisse mehr (FED-Ankündigungen, Wirtschaftsdaten).
+
+- Vorausplanung: Erstellen Sie Checklists für kommende Tage, Wochen oder Monate.
+- Automatische Benachrichtigung: Wenn Sie eine wichtige Ankündigung für in 2 Wochen notieren, merkt sich PAYCHEK das. Am Tag X erscheint die Checklist automatisch auf Ihrem Dashboard zum richtigen Zeitpunkt, um Sie vor dem Trade vorzubereiten.
+
+2. 100 % anpassbare Bereiche
+Ihr Trading ist einzigartig – Ihre Checklist muss es auch sein.
+
+- Flexible Struktur: Sie können jeden Bereich hinzufügen, entfernen oder umbenennen (Psychologie, Risk Management, Technische Analyse usw.).
+- Dedizierter Bereich „News“: Ein fester Platz, um die entscheidenden wirtschaftlichen Punkte des Tages festzuhalten.
+
+[img:assets/help_center/checklist_calendar_history.gif]
+
+3. Historie und Post-Trade-Analyse
+Der Kalender am Seitenende ist Ihr Werkzeug für die Disziplin-Review:
+
+- Rückblick: Sehen Sie die Historie Ihrer vergangenen Routinen.
+- Details und Korrelationen: Klicken Sie auf ein Datum, um genau zu sehen, welche Elemente an diesem Tag nicht abgehakt wurden.
+- Bezug zur Performance: Vergleichen Sie Tage mit „Checklist nicht eingehalten“ mit Tagen mit „Verlusten“. PAYCHEK hilft Ihnen visuell zu verstehen, wie Nachlässigkeit in Ihrer Routine Ihr Konto direkt beeinflusst.

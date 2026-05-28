@@ -84,6 +84,7 @@ class _PerformancePageState extends State<PerformancePage>
   void initState() {
     super.initState();
     StrategieSetupsStore.ensureLoaded();
+    StrategieMesReglesStore.ensureLoaded();
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),

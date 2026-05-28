@@ -8,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
+import '../shared/paychek_frame_callbacks.dart';
 import '../widgets/paychek_page_header.dart';
+import 'help_center_article_titles.dart';
 import 'help_center_catalog.dart';
 import 'help_center_embedded_images.dart';
 import 'help_center_guide_assets.dart';
@@ -34,6 +36,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
 
   Map<String, String>? _guideBodies;
   bool _guidesLoading = false;
+  String? _loadedLanguageCode;
 
   static const double _kWebHelpMaxWidth = 480;
 
@@ -44,15 +47,26 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   void initState() {
     super.initState();
     _searchCtrl.addListener(_scheduleSearchDebounced);
-    unawaited(_loadGuides());
   }
 
-  Future<void> _loadGuides() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final lang = Localizations.localeOf(context).languageCode;
+    if (_loadedLanguageCode != lang) {
+      _loadedLanguageCode = lang;
+      unawaited(_loadGuides(languageCode: lang));
+    }
+  }
+
+  Future<void> _loadGuides({String? languageCode}) async {
     if (_guidesLoading) return;
     _guidesLoading = true;
     if (_guideBodies == null && mounted) setState(() {});
     try {
-      final bodies = await HelpCenterGuideAssets.loadBundle();
+      final bodies = await HelpCenterGuideAssets.loadBundle(
+        languageCode: languageCode,
+      );
       if (!mounted) return;
       setState(() => _guideBodies = bodies);
     } finally {
@@ -70,10 +84,17 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   }
 
   @override
+  void deactivate() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _searchDebounce?.cancel();
     _searchCtrl.removeListener(_scheduleSearchDebounced);
-    _searchCtrl.dispose();
+    final searchCtrl = _searchCtrl;
+    PaychekFrameCallbacks.disposeAfterFrame(searchCtrl.dispose);
     super.dispose();
   }
 
@@ -82,7 +103,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
     final l10n = AppLocalizations.of(context)!;
     final items = _guideBodies == null
         ? <_HelpCenterItem>[]
-        : _buildItems(_guideBodies!);
+        : _buildItems(_guideBodies!, l10n);
     final q = _filterLowerDebounced;
     final filtered = q.isEmpty
         ? items
@@ -255,11 +276,14 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
     );
   }
 
-  List<_HelpCenterItem> _buildItems(Map<String, String> bodies) {
+  List<_HelpCenterItem> _buildItems(
+    Map<String, String> bodies,
+    AppLocalizations l10n,
+  ) {
     return [
       for (final def in helpCenterArticles)
         _HelpCenterItem(
-          title: def.frenchTitle,
+          title: helpCenterArticleTitle(l10n, def.slug),
           mobileBody: bodies[def.slug] ?? '',
           webBody: bodies[def.slug] ?? '',
           mobileImages: def.mobileHeroImages,

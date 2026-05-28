@@ -1,0 +1,29 @@
+My Analysis: Your Trading Laboratory
+The My Analysis page lets you formalize your thinking before you even take action. By structuring your thought process around three fundamental pillars, you eliminate doubt and strengthen the consistency of your decisions.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. Initial Configuration
+Identify your Asset, name your Thesis, and set the Date of your analysis.
+
+Total flexibility: Use the ON/OFF buttons to disable unnecessary sections and lighten your interface according to your methodology.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. The Three Pillars of Analysis
+Fundamental Card: Define the context (Timeframe, Directional bias, Market phase: Accumulation/Impulse/Distribution). Use the "Structure" space to note your patterns (Double Bottom, BOS, etc.) and the confidence slider to self-assess the strength of your analysis. Integrate your Volume Profile data (POC, VAH, VAL) to confirm your levels.
+
+Key Zone & SMC Card: Identify your reversal points. Manually add your supports/resistances and check your SMC tools (Order Block, FVG, Liquidity, Fibonacci levels). Complete with a summary note to keep a clear record of your areas of interest.
+
+Entry Card: Formalize your trigger (Signal, Indicator, or Candlestick pattern). This is your final "Trigger" before execution.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. Save, Export, and Sync
+Centralized Report: Once the "Save" button is pressed, PAYCHEK generates a single summary sheet.
+
+Dashboard Sync: This sheet instantly appears on your Dashboard.
+
+PDF Export: Turn your analysis into a paper document to keep your plans in sight.
+
+Discipline audit: This data is automatically linked to your future trades. During your performance review, you will see at a glance which analysis elements were respected or ignored, allowing you to adjust your strategy with statistical evidence.

@@ -1,0 +1,89 @@
+El Dashboard: Su centro de control
+El panel de PAYCHEK está diseñado para ofrecerle una visión inmediata de su salud financiera y psicológica como trader.
+
+[img:assets/help_center/dashboard_capital_balance.gif]
+
+1. La tarjeta "Capital Balance"
+Es su indicador financiero principal. Esta sección reúne tres datos esenciales para seguir su evolución:
+
+- Capital de usuario: El saldo actual de su cuenta.
+- Progresión: El porcentaje de variación de su capital en el periodo seleccionado.
+- Importe de ganancia: El valor monetario neto de sus beneficios o pérdidas.
+
+2. Sus indicadores de rendimiento (Los anillos)
+Para navegar rápidamente entre sus datos técnicos y sus comportamientos, utilice los anillos de seguimiento:
+
+- Ring "Winrate": Ilustra visualmente su eficacia. Cuanto más lleno esté el anillo, mayor será su tasa de acierto en los trades.
+- Ring "Estado del día": Un indicador rápido de su forma mental para la sesión en curso, tal como lo declaró durante su preparación.
+- Ring "Checklist": Este círculo representa su tasa de cumplimiento de la disciplina. Refleja el porcentaje de criterios de su checklist que validó antes de tomar posición.
+
+[img:assets/help_center/dashboard_capital_evolution.gif]
+
+3. La tarjeta "Capital Evolution": Su historial interactivo
+Esta sección le permite visualizar gráficamente el crecimiento de su capital. Más allá del aspecto visual, es una auténtica herramienta de navegación:
+
+- Sparklines interactivas: Las líneas de tendencia no son estáticas. Haga clic directamente en cualquier punto de la curva para acceder al instante al trade o trades correspondientes a esa fecha.
+- Personalización semanal: Adapte la visualización a su propio ritmo. Vaya a sus Ajustes para elegir el modo de visualización de sus barras de progreso: 5 días por semana (para seguir su actividad de trading clásica) o 7 días por semana (para una visión completa).
+
+4. Los indicadores de rendimiento (Best & Worst)
+Para analizar rápidamente sus extremos, hemos integrado dos tarjetas de síntesis situadas bajo su gráfico:
+
+- Best Trade: Muestra su mejor rendimiento. Un simple clic le redirige al detalle de ese trade para comprender qué funcionó.
+- Mayor pérdida: Identifica su trade menos rentable. Haga clic para analizar sus errores y evitar repetirlos.
+
+5. La tarjeta "Análisis Personalizado": Su visión a medida
+Esta sección muestra el informe de análisis que ha seleccionado como favorito. Le permite tener a la vista los indicadores que más importan para su estrategia de trading actual.
+
+[img:assets/help_center/dashboard_personal_analysis.gif]
+
+- Personalice su Dashboard: vaya a la página «Mi Análisis» y haga clic en la estrella junto al informe de su elección.
+- Actualización en tiempo real: En cuanto se marca la estrella, su panel se actualiza al instante para mostrar ese informe prioritario.
+- Flexibilidad total: Puede cambiar de informe favorito tan a menudo como desee, según sus objetivos de la semana o del periodo que analice.
+
+6. La "Checklist" de disciplina: Su salvaguarda diaria
+La checklist es la herramienta indispensable para evitar el trading impulsivo. Está integrada directamente en su panel para acompañarle antes de cada sesión.
+
+[img:assets/help_center/dashboard_checklist.gif]
+
+- Acción rápida desde el Dashboard: Puede marcar sus elementos de disciplina al instante en la página de inicio. Es el primer paso esencial antes de lanzar sus órdenes en el mercado.
+- Personalización completa: ¿Sus reglas de trading no están fijas? No hay problema. Vaya a la página "Checklist" dedicada en el menú lateral para modificar, añadir o eliminar los criterios de su rutina.
+- Sincronización instantánea: En cuanto modifica un criterio en la página "Checklist", su panel se actualiza de inmediato para reflejar sus nuevas reglas de trading.
+
+7. Seguimiento de su "Estado Mental": La clave de su psicología
+
+[img:assets/help_center/dashboard_mental_state.gif]
+
+El trading no es solo cuestión de cifras; ante todo, es un estado mental. La tarjeta "Estado Mental" de su panel le permite visualizar al instante su disposición psicológica actual, un factor determinante para su rendimiento.
+
+- Visibilidad en tiempo real: Esta tarjeta muestra su estado mental del día. Está directamente sincronizada con sus entradas para ofrecerle una visión general rápida sin tener que navegar por los menús.
+- Actualización centralizada: ¿Ha cambiado de opinión o desea corregir su entrada? Vaya simplemente a la página dedicada "Estado Mental" en su menú lateral. Allí puede modificar todos los elementos y parámetros asociados.
+- Sincronización instantánea: En cuanto guarda sus modificaciones en la página "Estado Mental", la tarjeta de su panel se actualiza automáticamente. Así dispone siempre de información fiable para decidir si está en las mejores condiciones para operar.
+
+8. La tarjeta "Estrategia": Su foco del momento
+
+[img:assets/help_center/dashboard_strategy.gif]
+
+El trading es un oficio de especialización. La tarjeta "Estrategia" en su panel le permite mantener su plan de acción a la vista, sin ninguna distracción.
+
+- Visión inmediata: Consulte de un vistazo los detalles de la estrategia en la que trabaja actualmente. Se acabaron los idas y venidas por los menús; su plan está disponible desde que abre su journal.
+- Selección prioritaria (El sistema de estrella): ¿Alterna entre varias estrategias o quiere concentrarse en una sola durante una semana? Vaya a la página "Mi Estrategia", marque la estrella en el plan que desee priorizar y aparecerá al instante en su panel.
+- Flexibilidad total: ¿Cambia de setup o de mercado? Desmarque la estrella actual y active una nueva. Su dashboard se adapta en tiempo real a su evolución.
+
+9. El Calendario: Su historial de trading de un vistazo
+
+[img:assets/help_center/dashboard_calendar.png]
+
+El calendario situado en su panel es mucho más que una simple herramienta de fechas. Es la representación visual de su regularidad y de su actividad en los mercados.
+
+- Visión global de sus sesiones: Visualice al instante sus días de trading. Las fechas marcadas indican sus sesiones activas, permitiéndole seguir su ritmo de trabajo semanal y mensual.
+- Navegación rápida: ¿Desea revisar una sesión específica? Haga clic directamente en una fecha del calendario para filtrar sus datos y acceder de inmediato a la información y a los trades de ese día concreto.
+- Seguimiento de su regularidad: Una mirada rápida al calendario basta para identificar sus periodos de actividad intensa o, por el contrario, sus fases de descanso, lo cual es crucial para mantener una buena salud mental como trader.
+
+10. Análisis de rendimiento personalizado: El poder de los datos
+No se limite a consultar su PnL. La sección "Rendimiento Personalizado" le permite cruzar sus datos para comprender exactamente por qué gana o pierde dinero.
+
+[img:assets/help_center/dashboard_custom_performance.gif]
+
+- Cree sus propias correlaciones: ¿Quiere saber si su winrate es mejor cuando su "Estado Mental" es alto? ¿O si el cumplimiento estricto de su "Checklist" impacta realmente su rentabilidad? Ahora puede construir sus propios informes combinando todos los elementos de su journal: estado mental, checklist, estrategias, análisis técnicos y mucho más.
+- Detección de fallos: Gracias a este análisis cruzado, descubra hábitos invisibles. Quizá se dé cuenta de que sus pérdidas ocurren mayoritariamente en sesiones donde su estado mental estaba por debajo del 50%, o con una estrategia concreta.
+- Dashboard a medida: Una vez configurado su informe, se convierte en su mejor herramienta de decisión. Como con sus otros informes, puede fijarlo (mediante la estrella) para mostrarlo con prioridad en su panel.

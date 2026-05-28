@@ -1,0 +1,25 @@
+Calendário: O seu centro de controlo mensal
+O calendário PAYCHEK foi concebido para lhe oferecer uma visão panorâmica da sua atividade. Não serve apenas para consultar datas, mas para analisar cada etapa da sua progressão mensal.
+
+[img:assets/help_center/calendar_objective_kpi.gif]
+
+1. Indicadores-chave de desempenho (KPI)
+Assim que abre o calendário, encontre as suas estatísticas essenciais:
+
+Taxa de acerto, Número de operações e P&L mensal: Um relance rápido sobre os seus números-chave.
+
+Objetivos do mês: Utilize a barra de progressão para acompanhar a sua evolução. Clique na engrenagem ao lado para definir os seus objetivos financeiros ou de disciplina do mês.
+
+2. Navegação inteligente e vista detalhada
+Interação intuitiva: Clique em qualquer dia do calendário: o cartão adjacente apresenta instantaneamente todas as operações realizadas nesse dia. Clique numa operação para aceder diretamente à sua ficha detalhada.
+
+Sparkline de progressão: Utilize a linha de tendência dinâmica para visualizar a curva dos seus resultados ao longo do mês. Tal como no calendário, clicar num ponto da curva redireciona-o diretamente para as operações correspondentes.
+
+[img:assets/help_center/calendar_cumulative_history.gif]
+
+Histórico completo: Navegue facilmente entre os meses anteriores (fevereiro, março, etc.) através da barra de seleção para comparar os seus desempenhos passados e ajustar a sua estratégia.
+
+3. Análise aprofundada e síntese
+Síntese dos extremos: Consulte o cartão dedicado para identificar as suas "Melhores operações", o seu "Número total de operações" e a sua "Maior perda do mês". Esta secção é a melhor ferramenta para identificar os seus sucessos e os seus eixos de melhoria.
+
+Cartão "Desempenho Total" (Expandir/Recolher): Utilize esta secção modular para alternar entre uma vista sintética e uma vista detalhada de todas as operações do mês. É a ferramenta ideal para passar rapidamente da análise estratégica ao detalhe técnico de cada posição.

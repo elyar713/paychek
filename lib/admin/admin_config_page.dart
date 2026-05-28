@@ -34,7 +34,9 @@ class _AdminConfigPageState extends State<AdminConfigPage>
   bool _maintenance = false;
   final _stripePublishableKeyCtrl = TextEditingController();
   final _stripeSecretKeyCtrl = TextEditingController();
+  final _aiAgentApiKeyCtrl = TextEditingController();
   bool _stripeSecretObscured = true;
+  bool _aiAgentApiKeyObscured = true;
   final _stripeCheckoutMonthlyCtrl = TextEditingController();
   final _stripeCheckoutQuarterlyCtrl = TextEditingController();
   final _stripeCheckoutAnnualCtrl = TextEditingController();
@@ -65,6 +67,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
     _syncSpinCtrl.dispose();
     _stripePublishableKeyCtrl.dispose();
     _stripeSecretKeyCtrl.dispose();
+    _aiAgentApiKeyCtrl.dispose();
     _stripeCheckoutMonthlyCtrl.dispose();
     _stripeCheckoutQuarterlyCtrl.dispose();
     _stripeCheckoutAnnualCtrl.dispose();
@@ -219,6 +222,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
             '${k[kFieldStripePublishableKey] ?? ''}'.trim();
         _stripeSecretKeyCtrl.text =
             '${k[kFieldStripeSecretKey] ?? ''}'.trim();
+        _aiAgentApiKeyCtrl.text = '${k[kFieldAiAgentApiKey] ?? ''}'.trim();
       }
     } catch (e) {
       if (mounted) {
@@ -237,6 +241,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
     final annual = _stripeCheckoutAnnualCtrl.text.trim();
     final pk = _stripePublishableKeyCtrl.text.trim();
     final sk = _stripeSecretKeyCtrl.text.trim();
+    final aiAgentApiKey = _aiAgentApiKeyCtrl.text.trim();
     for (final entry in [
       ('Mensuel', monthly),
       ('Trimestriel', quarterly),
@@ -313,6 +318,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
           {
             kFieldStripePublishableKey: pk,
             kFieldStripeSecretKey: sk,
+            kFieldAiAgentApiKey: aiAgentApiKey,
             'updatedAt': now,
           },
           SetOptions(merge: true),
@@ -330,6 +336,38 @@ class _AdminConfigPageState extends State<AdminConfigPage>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erreur enregistrement : $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _stripeBillingSaving = false);
+    }
+  }
+
+  Future<void> _saveAiAgentApiKeyOnly() async {
+    final aiAgentApiKey = _aiAgentApiKeyCtrl.text.trim();
+    setState(() => _stripeBillingSaving = true);
+    try {
+      final col = FirebaseFirestore.instance.collection(
+        kPaychekAppConfigCollection,
+      );
+      await col.doc(kPaychekStripeKeysDocId).set(
+        {
+          kFieldAiAgentApiKey: aiAgentApiKey,
+          'updatedAt': Timestamp.now(),
+        },
+        SetOptions(merge: true),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('API Agent AI enregistrée.'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur enregistrement API AI : $e')),
         );
       }
     } finally {
@@ -639,6 +677,82 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                   ),
                 ),
               ),
+            const SizedBox(height: 18),
+            Text(
+              'Clé API Agent AI',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Stockage admin (Firestore). À utiliser côté Functions, jamais côté client.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (_stripeBillingLoading)
+              const SizedBox(height: 48)
+            else
+              TextField(
+                controller: _aiAgentApiKeyCtrl,
+                enabled: !_stripeBillingSaving,
+                obscureText: _aiAgentApiKeyObscured,
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  color: const Color(0xFFCBD5E1),
+                ),
+                decoration: _monoFieldDecoration(
+                  hint: 'Ex: AIza... / sk-... / clé fournisseur IA',
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    tooltip: _aiAgentApiKeyObscured ? 'Afficher' : 'Masquer',
+                    onPressed: () => setState(
+                      () => _aiAgentApiKeyObscured = !_aiAgentApiKeyObscured,
+                    ),
+                    icon: Icon(
+                      _aiAgentApiKeyObscured
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.white.withValues(alpha: 0.45),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: _stripeBillingSaving
+                    ? null
+                    : () => unawaited(_saveAiAgentApiKeyOnly()),
+                icon: const Icon(Icons.save_outlined, size: 16),
+                label: Text(
+                  'Sauvegarder API AI',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFCBD5E1),
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 22),
             Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
             const SizedBox(height: 22),
@@ -818,7 +932,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                   _ConfigStripeRow(
                     label: 'Clés Firestore',
                     value:
-                        'paychek_app_config/stripe_keys (champs ci-dessus).',
+                        'paychek_app_config/stripe_keys (Stripe + Agent AI).',
                   ),
                   const SizedBox(height: 8),
                   _ConfigStripeRow(

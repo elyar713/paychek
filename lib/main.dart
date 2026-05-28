@@ -38,6 +38,7 @@ import 'auth/post_auth_gate.dart';
 import 'web/web_auth_gate.dart';
 import 'etat_mental/mental_state_controller.dart';
 import 'etat_mental/mental_state_firestore_sync.dart';
+import 'strategie/strategie_mes_regles_storage.dart';
 import 'strategie/strategie_setups_store.dart';
 import 'strategie/strategie_setup_usage_store.dart';
 import 'strategie/strategie_firestore_sync.dart';
@@ -566,6 +567,7 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
       await PaychekFirestorePushGuard.runSuppressed(() async {
         StrategieSetupsStore.resetForAccountChange();
         StrategieSetupUsageStore.resetForAccountChange();
+        StrategieMesReglesStore.resetForAccountChange();
         await widget.capitalStore.load();
         await widget.portfolioStore.load(seedCapital: widget.capitalStore);
         final profileUser = FirebaseAuth.instance.currentUser;

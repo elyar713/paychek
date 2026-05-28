@@ -6,6 +6,17 @@ import 'trade_demo_data.dart';
 import 'trade_journal_scope.dart';
 import 'trade_models.dart';
 
+/// Journal vide sur le portefeuille par défaut → l’app affiche des trades / textes démo.
+bool isPaychekJournalDemoMode(BuildContext context) {
+  final journal = TradeJournalScope.of(context);
+  final portfolios = UserPortfolioScope.of(context);
+  final pid = portfolios.activePortfolioId;
+  if (pid != kDefaultPortfolioId) return false;
+  final raw = journal.itemsForPortfolio(pid);
+  if (raw.isEmpty) return true;
+  return raw.every((t) => t.id.startsWith('demo_'));
+}
+
 /// Trades du portefeuille actif ; **démonstration** pour [kDefaultPortfolioId]
 /// lorsque le journal est encore vide (plan d’analyse, discipline, etc.).
 List<TradeListItem> activeJournalTradesOrDemo(BuildContext context) {

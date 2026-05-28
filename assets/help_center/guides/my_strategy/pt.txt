@@ -1,0 +1,35 @@
+A Minha Estratégia: O seu sistema de auditoria interna
+A página Estratégia é o núcleo tecnológico do PAYCHEK. Permite decompor o seu método de trading em critérios objetivos para medir, com precisão cirúrgica, o que gera os seus lucros e o que alimenta as suas perdas.
+
+[img:assets/help_center/strategie_golden_rules_risk.gif]
+
+1. Regra de Ouro e Gestão de Risco
+Regras de Ouro: Defina os seus princípios inegociáveis. Se não os respeitar ao registar uma operação, o PAYCHEK assinalará imediatamente o desvio.
+
+Gestão de Risco: Defina os seus limites (risco por operação, risco diário, operações máximas por dia, rácio mínimo).
+
+Auditoria automática: O PAYCHEK compara as suas operações reais (importadas manualmente ou via CSV) com estes limites. Saberá instantaneamente se fez overtrading ou ultrapassou o risco autorizado.
+
+[img:assets/help_center/strategie_sessions.gif]
+
+2. Horários e Sessões (Trading Sessions)
+Configuração: Defina as suas sessões (Londres, Ásia, EUA).
+
+Análise de desempenho: A página Desempenho correlacionará automaticamente a sua taxa de acerto com os seus horários. Talvez descubra que a sua taxa de acerto é de 60% em Londres, mas de 30% nos EUA. Cabe-lhe a si ajustar o seu planeamento em conformidade.
+
+[img:assets/help_center/strategie_setups_templates.gif]
+
+3. Setup e Templates (O núcleo da análise)
+Crie as suas estratégias ponto a ponto: Timeframe, Indicadores, Padrões, Sinais de alerta, Entradas, Stop-Loss (SL), Take-Profit (TP) e Breakeven.
+
+Auditoria de Estratégia: Ao adicionar uma operação, assinale os pontos que respeitou. A página Desempenho calculará então o impacto exato: "Quando ignora o ponto 'Indicador X' da sua estratégia, a sua taxa de acerto diminui 15%."
+
+[img:assets/help_center/strategie_calendar.gif]
+
+4. Calendário Estratégico
+Visualização: Um calendário colorido mostra-lhe que estratégia foi utilizada cada dia.
+
+Diagnóstico rápido: Clique num dia para ver instantaneamente os elementos de estratégia não respeitados. É a forma mais rápida de identificar por que um dia foi um sucesso ou um insucesso.
+
+5. Relatório PDF exportável
+Exporte a totalidade do seu "Manual de Estratégia" em formato impresso. Ter o seu plano à vista, na sua secretária, é a melhor forma de se manter concentrado durante os períodos de forte volatilidade.

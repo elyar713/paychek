@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import 'analyse_controller.dart';
 import 'analyse_models.dart';
 import 'analyse_tokens.dart';
@@ -42,8 +43,8 @@ Color oledConfluenceColor(int score) {
   return AnalyseTokens.oledRed;
 }
 
-String oledConfluenceStatusLabel(int score) {
-  if (score > 70) return 'Setup Optimal';
-  if (score > 40) return 'Setup Valide';
-  return 'Risque Élevé';
+String oledConfluenceStatusLabel(int score, AppLocalizations l) {
+  if (score > 70) return l.analyseOledConfluenceStatusOptimal;
+  if (score > 40) return l.analyseOledConfluenceStatusValid;
+  return l.analyseOledConfluenceStatusHighRisk;
 }

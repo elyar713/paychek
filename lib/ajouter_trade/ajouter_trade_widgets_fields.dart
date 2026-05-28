@@ -91,6 +91,7 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
         textAlign: TextAlign.center,
         textAlignVertical: TextAlignVertical.center,
         textInputAction: TextInputAction.done,
+        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         style: centeredStyle,
         cursorColor: DashboardTokens.accent,

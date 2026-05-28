@@ -1,0 +1,29 @@
+Meine Analyse: Ihr Trading-Labor
+Die Seite Meine Analyse ermöglicht es Ihnen, Ihre Überlegungen zu formalisieren, bevor Sie handeln. Indem Sie Ihr Denken in drei grundlegende Säulen strukturieren, beseitigen Sie Zweifel und stärken die Kohärenz Ihrer Entscheidungen.
+
+[img:assets/help_center/analyse_initial_config.gif]
+
+1. Erstkonfiguration
+Identifizieren Sie Ihr Asset, benennen Sie Ihre These und legen Sie das Datum Ihrer Analyse fest.
+
+Volle Flexibilität: Nutzen Sie die ON/OFF-Schaltflächen, um unnötige Bereiche zu deaktivieren und Ihre Oberfläche an Ihre Methodik anzupassen.
+
+[img:assets/help_center/analyse_three_pillars_impact.gif]
+
+2. Die drei Säulen der Analyse
+Karte Fundamentale Analyse: Definieren Sie den Kontext (Timeframe, Richtungsbias, Marktphase: Akkumulation/Impulsion/Distribution). Nutzen Sie den Bereich „Struktur“, um Ihre Formationen zu notieren (Double Bottom, BOS usw.) und den Vertrauens-Slider zur Selbsteinschätzung Ihrer Analyse. Integrieren Sie Volume-Profile-Daten (POC, VAH, VAL), um Ihre Levels zu bestätigen.
+
+Karte Schlüsselzone & SMC: Identifizieren Sie Ihre Wendepunkte. Fügen Sie manuell Supports/Resistances hinzu und haken Sie Ihre SMC-Tools ab (Order Block, FVG, Liquidität, Fibonacci-Levels). Ergänzen Sie eine Synthese-Notiz, um Ihre Interessenszonen klar festzuhalten.
+
+Karte Einstieg: Formalisieren Sie Ihren Auslöser (Signal, Indikator oder Kerzenformation). Das ist Ihr finaler „Trigger“ vor der Ausführung.
+
+[img:assets/help_center/analyse_report_save_sync.gif]
+
+3. Speichern, Export und Sync
+Zentralisierter Bericht: Sobald Sie auf „Speichern“ klicken, erstellt PAYCHEK eine einzigartige Zusammenfassungskarte.
+
+Dashboard-Sync: Diese Karte erscheint sofort auf Ihrem Dashboard.
+
+PDF-Export: Wandeln Sie Ihre Analyse in ein Papierdokument um, um Ihre Pläne griffbereit zu haben.
+
+Disziplin-Audit: Diese Daten sind automatisch mit Ihren künftigen Trades verknüpft. Bei Ihrer Performance-Review sehen Sie auf einen Blick, welche Analyse-Elemente eingehalten oder ignoriert wurden – und passen Ihre Strategie mit statistischen Belegen an.

@@ -95,7 +95,7 @@ class CalendrierDayCell extends StatelessWidget {
                 Text(
                   l.calDayTradesCount(tradeCount),
                   style: GoogleFonts.inter(
-                    fontSize: 6.5,
+                    fontSize: kDayCellTradeCountFontSize,
                     color: digitColor.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w600,
                     height: 1,
@@ -107,7 +107,7 @@ class CalendrierDayCell extends StatelessWidget {
                 Text(
                   formatMoneyWithCurrencySymbol(pnl, capSymbol),
                   style: GoogleFonts.inter(
-                    fontSize: 6.5,
+                    fontSize: kDayCellPnlFontSize,
                     color: digitColor,
                     fontWeight: FontWeight.w700,
                     height: 1,

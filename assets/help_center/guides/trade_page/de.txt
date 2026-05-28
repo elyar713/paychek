@@ -1,0 +1,53 @@
+Trade-Journal: Ihr operatives Dashboard
+Die Trade-Seite ist für sofortiges Lesen und tiefe Analyse Ihrer Aktivität konzipiert. Alles ist strukturiert, damit Sie mit einem Klick von der Gesamtübersicht zu präzisen Details gelangen.
+
+[img:assets/help_center/trade_page_header.gif]
+
+1. Performance-Indikatoren (Header)
+Oben auf der Seite finden Sie Ihre drei Tracking-Säulen:
+
+Gewinn/Verlust gesamt: Ihr Nettosaldo, der die finanzielle Gesundheit Ihres Kontos widerspiegelt.
+
+Winrate-Ring: Eine dynamische visuelle Darstellung Ihrer Erfolgsquote.
+
+Aktivitätsvolumen: Die Gesamtzahl der ausgeführten Trades.
+
+2. Zeitliche Ansicht und Entwicklung
+Wöchentliche Performance-Leiste: Sehen Sie sofort den Trend Ihrer laufenden Woche dank eines visuellen Fortschrittsindikators.
+
+Perioden-Auswahl (1D / 1W / 1M / ALL): Passen Sie Ihre Ansicht an, um tägliche, wöchentliche, monatliche Performance zu isolieren oder Ihre gesamte Historie zu analysieren.
+
+3. Klassifizierung und Filterung
+Positionsverwaltung: Ein interaktives Dashboard, um Ihre Trades nach Status zu sortieren: Gewinne, Verluste, Breakeven oder offene Positionen. Sie können diese Kategorien filtern, um schnell die Trades zu identifizieren, die Ihr Kapital beeinflusst haben.
+
+Analyse nach Assets: Ein dedizierter Bereich listet die von Ihnen gehandelten Instrumente (MNQ, Nasdaq, EUR/USD usw.) mit ihrer Häufigkeit und hilft Ihnen, Ihre profitabelsten Assets oder die kostspieligsten zu erkennen.
+
+Verwaltung und Export: Ihr Journal in Aktion
+Die Trade-Seite ist nicht nur eine Historie – sie ist ein interaktives Werkzeug, mit dem Sie Ihre Performance in wenigen Sekunden analysieren, korrigieren und exportieren können.
+
+1. Intuitive zeitliche Navigation (1D / 1W / 1M / ALL)
+Visualisieren Sie Ihre Entwicklung in Ihrem Tempo:
+
+[img:assets/help_center/trade_page_period_bars.gif]
+
+Dynamische Ansicht: Wählen Sie 1D, 1W, 1M oder ALL. Die Balkendiagramme passen sich automatisch an, um jede Periode darzustellen.
+
+Schnellzugriff: Klicken Sie auf einen beliebigen Balken, um sofort die Liste der Trades für genau diese Periode zu isolieren und anzuzeigen.
+
+2. Disziplin-Warnungen (Die gelbe Meldung)
+PAYCHEK warnt Sie in Echtzeit, wenn Ihre Analyse unvollständig ist:
+
+Intelligente Benachrichtigungen: Eine gelbe Meldung erscheint auf Ihren Trades, wenn kritische Elemente fehlen (Analyseplan, Checklist, Mentaler Zustand oder Strategie).
+
+Ziel: Lassen Sie keinen Trade ohne Analyse „verwaist“. Ein Trade ohne Analyse ist ein verlorener Datensatz für Ihre Entwicklung.
+
+3. Verwaltung und Export
+Bearbeitung und Löschung: Ein „3-Punkte“-Menü ist bei jedem Trade verfügbar. Sie können jederzeit Positionsdetails ändern oder fehlerhafte Eingaben löschen.
+
+PDF-Export: Brauchen Sie eine Papierübersicht oder einen Bericht für einen Mentor? Klicken Sie auf das PDF-Symbol, um sofort einen vollständigen Bericht zu erstellen mit:
+
+Der detaillierten Historie Ihrer Trades.
+
+Der Zusammenfassung Ihrer Performance-Statistiken.
+
+Ihren Entwicklungsdiagrammen.

@@ -1,0 +1,35 @@
+My Strategy: Your Internal Audit System
+The Strategy page is the technological core of PAYCHEK. It lets you break down your trading method into objective criteria to measure, with surgical precision, what generates your profits and what fuels your losses.
+
+[img:assets/help_center/strategie_golden_rules_risk.gif]
+
+1. Golden Rule and Risk Management
+Golden Rules: Define your non-negotiable principles. If you do not respect them when entering a trade, PAYCHEK will immediately flag the deviation.
+
+Risk Management: Define your limits (risk per trade, daily risk, max trades per day, minimum ratio).
+
+Automatic Audit: PAYCHEK compares your actual trades (entered manually or via CSV) against these limits. You will instantly know if you "overtraded" or exceeded your authorized risk.
+
+[img:assets/help_center/strategie_sessions.gif]
+
+2. Hours and Sessions (Trading Sessions)
+Configuration: Define your sessions (London, Asia, US).
+
+Performance analysis: The Performance page will automatically correlate your Winrate with your hours. You may discover that your Winrate is 60% on London, but 30% on US. It is up to you to adjust your schedule accordingly.
+
+[img:assets/help_center/strategie_setups_templates.gif]
+
+3. Setup and Templates (The Core of Analysis)
+Build your strategies point by point: Timeframe, Indicators, Patterns, Alert signals, Entries, Stop-Loss (SL), Take-Profit (TP), and Breakeven.
+
+Strategy Audit: When adding a trade, check the points you respected. The Performance page will then calculate the exact impact: "When you ignore the 'Indicator X' point of your strategy, your Winrate decreases by 15%."
+
+[img:assets/help_center/strategie_calendar.gif]
+
+4. Strategy Calendar
+Visualization: A color-coded calendar shows which strategy was used each day.
+
+Quick diagnosis: Click on a day to instantly see the strategy elements that were not respected. This is the fastest way to identify why a day was a success or a failure.
+
+5. Exportable PDF Report
+Export your entire "Strategy Manual" in paper format. Having your plan in front of you, on your desk, is the best way to stay focused during periods of high volatility.

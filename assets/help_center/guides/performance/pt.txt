@@ -1,0 +1,41 @@
+Desempenho: A verdade estatística
+A página Desempenho é o espelho da sua atividade. Não se limita a contar os seus ganhos; descodifica os mecanismos que ditam o seu sucesso ou os seus insucessos.
+
+[img:assets/help_center/performance_overview_kpis.png]
+
+1. Visão geral (Cabeçalho e KPIs)
+Indicadores-chave: Visualize instantaneamente o volume total, o saldo líquido (Ganho/Perda/Breakeven) e as suas métricas de sobrevivência (Perda máxima, Duração média de uma operação).
+
+Índice de Rigorosidade: Os seus desempenhos são cruzados com a sua assiduidade. Atenção: As estatísticas de disciplina só são contabilizadas se a sua checklist e o seu estado mental estiverem preenchidos antes das 23h59. Esta rigorosidade diária é a chave da sua evolução.
+
+2. Diagnóstico de Disciplina
+Auditoria de esquecimentos: O PAYCHEK lista as suas operações "órfãs" (as que não têm checklist, estratégia ou análise). Um clique basta para as completar diretamente.
+
+Correlação Disciplina/Taxa de acerto: Descubra o impacto matemático da sua rigorosidade:
+
+- Taxa de acerto com 100% de checklist vs taxa de acerto sem checklist.
+- Desempenho correlacionado com os seus diferentes estados mentais (Medo, Confiança, Fadiga, etc.).
+
+3. Análise Comportamental e Ambiental
+Volume de atividade: Visualize a sua taxa de acerto em função do número de operações diárias (ex.: 1-5 operações vs 5-10 operações). Identifique o seu limiar de fadiga.
+
+Análise Temporal e Técnica:
+
+- Sessões: Qual é a sua taxa de acerto em Londres, Ásia ou EUA?
+- Duração da posição: Que janela temporal otimiza a sua rentabilidade (0-15 min vs >12h)?
+- Mercados: Que ativo é a sua "vaca leiteira" e qual é a sua "armadilha"?
+
+[img:assets/help_center/performance_strategic_audit.gif]
+
+4. Auditoria Estratégica e Execução
+Auditoria por Estratégia: Para cada estratégia definida, identifique os elementos mais frequentemente ignorados.
+
+Barra de Talento: Identifique as suas operações baseadas apenas em "Feeling" ou em "Princípio".
+
+Painel personalizável: Crie as suas próprias vistas. Quer saber se o seu "medo" faz descer a sua taxa de acerto no EUR/USD? Adicione esse segmento e visualize o impacto em tempo real.
+
+5. Exportação e relatório
+Ícone PDF: Gere a qualquer momento o seu relatório de desempenho completo. Ideal para as suas revisões semanais ou para apresentar o seu histórico a um parceiro/mentor.
+
+Por que é o argumento definitivo:
+O trader percebe que o problema não é o mercado, mas a sua própria execução. Ao mostrar, por exemplo, que um trader perde 20% de taxa de acerto assim que ultrapassa 5 operações por dia, dá-lhe uma regra de ouro que já não poderá ignorar.

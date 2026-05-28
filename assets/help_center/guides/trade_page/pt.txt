@@ -1,0 +1,53 @@
+Diário de Operações: O seu painel operacional
+A página Operações foi concebida para uma leitura imediata e uma análise profunda da sua atividade. Tudo está estruturado para lhe permitir passar da visão global aos detalhes precisos num clique.
+
+[img:assets/help_center/trade_page_header.gif]
+
+1. Indicadores de desempenho (Cabeçalho)
+No topo da página, encontre os seus três pilares de acompanhamento:
+
+Ganho/Perda global: O seu saldo líquido, refletindo a saúde financeira da sua conta.
+
+Anel de taxa de acerto: Uma representação visual dinâmica da sua taxa de sucesso.
+
+Volume de atividade: O número total de operações realizadas.
+
+2. Vista temporal e progressão
+Barra de desempenho semanal: Visualize instantaneamente a tendência da sua semana em curso através de um indicador visual de progressão.
+
+Seletor de período (1D / 1S / 1M / TUDO): Ajuste a sua vista para isolar os seus desempenhos diários, semanais, mensais ou para analisar a totalidade do seu histórico.
+
+3. Classificação e filtragem
+Gestão de posições: Um painel interativo para classificar as suas operações por estado: Ganhos, Perdas, Breakeven ou Posições em curso. Pode filtrar estas categorias para identificar rapidamente as operações que impactaram o seu capital.
+
+Análise por ativos: Uma secção dedicada lista os instrumentos que operou (MNQ, Nasdaq, EUR/USD, etc.) com a sua frequência, permitindo-lhe identificar os seus ativos mais rentáveis ou os que mais lhe custam.
+
+Gestão e exportação: O seu diário em ação
+A página Operações não é apenas um histórico; é uma ferramenta interativa que lhe permite analisar, corrigir e exportar o seu desempenho em poucos segundos.
+
+1. Navegação temporal intuitiva (1D / 1S / 1M / TUDO)
+Visualize a sua progressão ao seu ritmo:
+
+[img:assets/help_center/trade_page_period_bars.gif]
+
+Vista dinâmica: Selecione 1D, 1S, 1M ou TUDO. As barras gráficas ajustam-se automaticamente para representar cada período.
+
+Acesso rápido: Clique em qualquer barra gráfica para isolar e apresentar instantaneamente a lista das operações correspondentes a esse período preciso.
+
+2. Alertas de disciplina (A mensagem amarela)
+O PAYCHEK avisa-o em tempo real se a sua análise estiver incompleta:
+
+Notificações inteligentes: Uma mensagem amarela aparece nas suas operações se faltarem elementos críticos (Plano de análise, Checklist, Estado mental ou Estratégia).
+
+Objetivo: Não deixe nenhuma operação "órfã" de análise. Uma operação sem análise é um dado perdido para a sua evolução.
+
+3. Gestão e exportação
+Edição e eliminação: Um menu de "3 pontos" está disponível em cada operação. Pode a qualquer momento modificar os detalhes de uma posição ou eliminar um registo incorreto.
+
+Exportação PDF: Precisa de um balanço impresso ou de um relatório para um mentor? Clique no ícone PDF para gerar instantaneamente um relatório completo incluindo:
+
+O histórico detalhado das suas operações.
+
+O resumo das suas estatísticas de desempenho.
+
+Os seus gráficos de progressão.

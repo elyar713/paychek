@@ -1,0 +1,35 @@
+Meine Strategie: Ihr internes Audit-System
+Die Strategie-Seite ist das technologische Herz von PAYCHEK. Sie zerlegt Ihre Trading-Methode in objektive Kriterien, um mit chirurgischer Präzision zu messen, was Ihre Gewinne erzeugt und was Ihre Verluste nährt.
+
+[img:assets/help_center/strategie_golden_rules_risk.gif]
+
+1. Goldene Regel und Risk Management
+Goldene Regeln: Definieren Sie Ihre nicht verhandelbaren Prinzipien. Wenn Sie diese bei der Trade-Eingabe nicht einhalten, markiert PAYCHEK die Abweichung sofort.
+
+Risk Management: Definieren Sie Ihre Limits (Risiko pro Trade, Tagesrisiko, max. Trades pro Tag, Mindest-Ratio).
+
+Automatisches Audit: PAYCHEK vergleicht Ihre tatsächlichen Trades (manuell importiert oder per CSV) mit diesen Limits. Sie erkennen sofort, ob Sie „overtradet“ oder Ihr erlaubtes Risiko überschritten haben.
+
+[img:assets/help_center/strategie_sessions.gif]
+
+2. Zeiten und Sessions (Trading Sessions)
+Konfiguration: Definieren Sie Ihre Sessions (London, Asien, US).
+
+Performance-Analyse: Die Performance-Seite korreliert automatisch Ihre Winrate mit Ihren Handelszeiten. Vielleicht stellen Sie fest, dass Ihre Winrate in London 60 % beträgt, in den US aber nur 30 %. Passen Sie Ihren Zeitplan entsprechend an.
+
+[img:assets/help_center/strategie_setups_templates.gif]
+
+3. Setup und Templates (Das Herz der Analyse)
+Erstellen Sie Ihre Strategien Punkt für Punkt: Timeframe, Indikatoren, Patterns, Alerts, Einstiege, Stop-Loss (SL), Take-Profit (TP) und Breakeven.
+
+Strategie-Audit: Beim Hinzufügen eines Trades haken Sie die eingehaltenen Punkte ab. Die Performance-Seite berechnet dann den genauen Impact: „Wenn Sie den Punkt ‚Indikator X‘ Ihrer Strategie ignorieren, sinkt Ihre Winrate um 15 %.“
+
+[img:assets/help_center/strategie_calendar.gif]
+
+4. Strategie-Kalender
+Visualisierung: Ein farbiger Kalender zeigt, welche Strategie an welchem Tag genutzt wurde.
+
+Schnelle Diagnose: Klicken Sie auf einen Tag, um sofort nicht eingehaltene Strategie-Elemente zu sehen. Der schnellste Weg zu verstehen, warum ein Tag ein Erfolg oder ein Misserfolg war.
+
+5. Exportierbarer PDF-Bericht
+Exportieren Sie Ihr gesamtes „Strategie-Handbuch“ im Papierformat. Ihren Plan auf dem Schreibtisch vor Augen zu haben, ist der beste Weg, in Phasen hoher Volatilität fokussiert zu bleiben.
