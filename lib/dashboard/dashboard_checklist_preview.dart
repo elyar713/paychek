@@ -7,6 +7,7 @@ import '../l10n/checklist_localizations.dart';
 import '../checklist/checklist_item_schedule.dart';
 import '../checklist/checklist_item_schedule_sort.dart';
 import '../checklist/checklist_item_schedule_summary.dart';
+import '../checklist/checklist_news_trade_classifier.dart';
 import '../checklist/checklist_page_controller.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_tokens.dart';
@@ -62,6 +63,7 @@ class DashboardChecklistPreview extends StatelessWidget {
   ) {
     final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
+      if (!checklistSectionIsActive(section)) continue;
       for (final item in section.items) {
         if (!item.checked && item.isDueOnDay()) {
           out.add((sectionId: section.id, item: item));
@@ -77,6 +79,7 @@ class DashboardChecklistPreview extends StatelessWidget {
   ) {
     final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
+      if (!checklistSectionIsActive(section)) continue;
       for (final item in section.items) {
         if (item.checked && item.isDueOnDay()) {
           out.add((sectionId: section.id, item: item));
@@ -85,6 +88,11 @@ class DashboardChecklistPreview extends StatelessWidget {
     }
     sortChecklistPreviewEntriesBySchedule(out);
     return out;
+  }
+
+  /// Bloc checklist accueil : NEWS off → pas d’aperçu (interrupteur page Checklist).
+  static bool shouldShowOnDashboard(List<ChecklistSectionData> sections) {
+    return checklistNewsSectionEnabled(sections);
   }
 
   /// Web : critères du jour — non cochés puis cochés, tri date+heure la plus proche.
@@ -194,6 +202,9 @@ class DashboardChecklistPreview extends StatelessWidget {
       builder: (context, _) {
         final l = AppLocalizations.of(context)!;
         final sections = controller.sections;
+        if (!shouldShowOnDashboard(sections)) {
+          return const SizedBox.shrink();
+        }
         final bg = cardBackgroundColor ?? DashboardTokens.scaffoldMatte;
         final headerTap = liteInteractionLocked
             ? () => onLiteInteractionLockedTap?.call()

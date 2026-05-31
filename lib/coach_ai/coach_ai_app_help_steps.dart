@@ -26,6 +26,7 @@ abstract final class CoachAiAppHelpSteps {
       'checklist_trade' => fr ? _checklistTradeFr : _checklistTradeEn,
       'calendar' => fr ? _calendarFr : _calendarEn,
       'mental_state' => fr ? _mentalStateFr : _mentalStateEn,
+      'mental_trade_workflow' => fr ? _mentalTradeWorkflowFr : _mentalTradeWorkflowEn,
       'my_strategy' => fr ? _strategyFr : _strategyEn,
       'my_analysis' => fr ? _analysisFr : _analysisEn,
       'performance' => fr ? _performanceFr : _performanceEn,
@@ -219,6 +220,19 @@ abstract final class CoachAiAppHelpSteps {
     'More → Calendar: monthly PnL/discipline.',
     'Monthly goals: ⚙ to set.',
     'Tap a day for detail.',
+  ];
+
+  static const _mentalTradeWorkflowFr = <String>[
+    'Plus (⋯) → État mental : une fois par jour de trading — focus, sommeil, peur, émotions (avant ou après la session).',
+    'Trade → + : à chaque position — actif, entrée/sortie, quantité, capital, puis Enregistrer.',
+    'Sur le formulaire : TAG psych (FOMO, TILT…) pour le Coach « mes trades FOMO » ; bloc État si tu veux la discipline sur ce trade.',
+    'Le jour d’entrée du trade : l’État mental du calendrier compte déjà pour ce trade, même sans retoucher le bloc État.',
+  ];
+  static const _mentalTradeWorkflowEn = <String>[
+    'More (⋯) → Mental state: once per trading day — focus, sleep, fear, emotions.',
+    'Trade → +: every position — symbol, entry/exit, qty, capital, then Save.',
+    'On the form: psych TAG (FOMO, TILT…) for filtered trade lists; State block optional per trade.',
+    'On the trade’s entry day, that day’s Mental state already links to the trade.',
   ];
 
   static const _mentalStateFr = <String>[

@@ -1,11 +1,35 @@
 import '../help_center/help_center_catalog.dart';
 import '../help_center/help_center_guide_assets.dart';
 import 'coach_ai_app_help_steps.dart';
+import 'coach_ai_query_text.dart';
 
 /// Questions d’utilisation PAYCHEK → étapes UI locales (toute l’app) + Help Center.
 abstract final class CoachAiAppHelp {
+  /// « État mental sur la page ou sur Ajouter trade ? » — explication + pas seulement des étapes.
+  static bool isMentalTradeWorkflowQuestion(String question) {
+    final q = CoachAiQueryText.forMatching(question);
+    final hasMental = RegExp(r'état mental|etat mental|mental state|page mental').hasMatch(q);
+    final hasTrade = RegExp(
+      r'ajouter trade|add trade|formulaire trade|onglet trade|sur le trade|dans le trade',
+    ).hasMatch(q) ||
+        (RegExp(r'\btrade\b').hasMatch(q) && RegExp(r'ajouter|enregistr|saisir|remplir').hasMatch(q));
+    final asksWhere = RegExp(
+      r'\bou\b|où|ou faut|dois.?je|faut.?il|quel endroit|quelle page|les deux|'
+      r'point|renseigner|remplir|faire un|comment je',
+    ).hasMatch(q);
+    if (hasMental && hasTrade && asksWhere) return true;
+    if (hasMental &&
+        RegExp(
+          r'dois.?je|faut.?il|où (je )?(remplir|faire|pointer|mettre)|comment (faire|renseigner)',
+        ).hasMatch(q)) {
+      return true;
+    }
+    return false;
+  }
+
   static bool isAppHelpQuestion(String question) {
-    final q = question.toLowerCase();
+    if (isMentalTradeWorkflowQuestion(question)) return true;
+    final q = CoachAiQueryText.forMatching(question);
     if (q.isEmpty) return false;
     if (RegExp(
       r'help\s*center|comment utiliser|comment faire|où se trouve|ou se trouve|'
@@ -35,7 +59,9 @@ abstract final class CoachAiAppHelp {
 
   /// Identifiant interne (priorité : cas précis → page Help Center).
   static String resolveTopicId(String question) {
-    final q = question.toLowerCase();
+    final q = CoachAiQueryText.forMatching(question);
+
+    if (isMentalTradeWorkflowQuestion(question)) return 'mental_trade_workflow';
 
     if (RegExp(r'engrenage|engrenage|⚙').hasMatch(q)) {
       if (RegExp(r'capital|commission|gain').hasMatch(q)) return 'capital_gear';
@@ -129,6 +155,8 @@ abstract final class CoachAiAppHelp {
       'principe_feeling' => fr ? 'Principe & Feeling' : 'Principle & Feeling',
       'plus_menu' => fr ? 'Menu Plus (⋯)' : 'Plus menu (⋯)',
       'coach_ai' => fr ? 'Coach AI' : 'Coach AI',
+      'mental_trade_workflow' =>
+          fr ? 'État mental · où renseigner ?' : 'Mental state · where to fill in?',
       'app_overview' => fr ? 'Navigation PAYCHEK' : 'PAYCHEK navigation',
       _ => null,
     };
@@ -144,6 +172,54 @@ abstract final class CoachAiAppHelp {
   /// Toujours une liste d’étapes pour une question app_help reconnue.
   static List<String> uiStepsForQuestion(String question, String languageCode) {
     return CoachAiAppHelpSteps.forTopic(resolveTopicId(question), languageCode);
+  }
+
+  /// Texte coach (pourquoi les deux endroits) — affiché avant les étapes numérotées.
+  static String workflowCoachIntro(String languageCode) {
+    return switch (languageCode) {
+      'en' =>
+        'Both matter, but for different things.\n\n'
+            '• More → Mental state: your DAY (focus, sleep, emotions). The Coach uses this to compare '
+            '"low mental" vs "high mental" days and your win rate.\n\n'
+            '• Trade → Add trade: each POSITION — save the trade, discipline blocks, psych TAGs (FOMO, TILT…).\n\n'
+            'Simple routine: fill Mental state once on trading days, then Trade → + for every position. '
+            'If you only pick one for mental ↔ performance: prioritize Mental state on days you trade.',
+      'de' =>
+        'Beides zählt, aber für unterschiedliche Zwecke.\n\n'
+            '• Mehr → Mentalzustand: dein TAG (Fokus, Schlaf, Emotionen) — für Coach-Vergleiche.\n\n'
+            '• Trade → Trade hinzufügen: jede POSITION — Disziplin, psych-TAGs.\n\n'
+            'Routine: Mentalzustand am Handelstag, dann jeden Trade erfassen.',
+      _ =>
+        'Les deux comptent, mais pas pour la même chose.\n\n'
+            '• Plus → État mental : ton JOUR (focus, sommeil, émotions). C’est ce que le Coach utilise pour comparer '
+            '« mental bas » vs « mental haut » et ton winrate.\n\n'
+            '• Trade → Ajouter trade : chaque POSITION — enregistrer le trade, discipline (checklist, plan, stratégie, état), '
+            'TAG psych (FOMO, TILT…).\n\n'
+            'Routine simple : État mental une fois les jours où tu trades, puis Trade → + à chaque position. '
+            'Si tu ne fais qu’un choix pour le lien mental ↔ performance : priorise la page État mental.',
+    };
+  }
+
+  static bool usesHybridHelpLayout(String question) =>
+      resolveTopicId(question) == 'mental_trade_workflow';
+
+  static String formatHybridHelpAnswer({
+    required String intro,
+    required List<String> steps,
+    required String languageCode,
+    String? title,
+  }) {
+    final buf = StringBuffer();
+    if (title != null && title.isNotEmpty) {
+      buf.writeln('$title\n');
+    }
+    buf.writeln(intro.trim());
+    buf.writeln();
+    buf.writeln(languageCode == 'fr' ? 'Où cliquer dans l’app :' : 'Where to tap in the app:');
+    for (var i = 0; i < steps.length; i++) {
+      buf.writeln('${i + 1}. ${steps[i]}');
+    }
+    return buf.toString().trim();
   }
 
   static String formatStepsAnswer(

@@ -373,7 +373,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradeImportTradovatePickOrdersCsv.
   ///
   /// In fr, this message translates to:
-  /// **'Tradovate : choisis un fichier Orders.csv.'**
+  /// **'Tradovate : choisis Orders.csv ou Performance.csv (export Reports).'**
   String get tradeImportTradovatePickOrdersCsv;
 
   /// No description provided for @tradeImportNinjaGridCsv.
@@ -475,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradeImportEmptyTradovate.
   ///
   /// In fr, this message translates to:
-  /// **'Tradovate CSV : aucun round-trip (entrée/sortie) détecté.'**
+  /// **'Tradovate CSV : aucun round-trip détecté. Exporte depuis Reports → Orders (pas Performance), avec des achats ET ventes sur la période, colonnes Filled Qty / Avg Fill Price.'**
   String get tradeImportEmptyTradovate;
 
   /// No description provided for @tradeImportEmptyNinjaTrader.

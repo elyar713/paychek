@@ -3293,6 +3293,46 @@ function paychekNormalizeCoachLocale(raw) {
   return "en";
 }
 
+/** Fautes fréquentes (miroir Flutter coach_ai_query_text.dart). */
+function paychekAiCoachNormalizeQuestion(question) {
+  let q = `${question ?? ""}`.toLowerCase().trim();
+  if (!q) return q;
+  q = q.replace(/['`´]/g, "'");
+  const reps = {
+    chekliste: "checklist",
+    cheklist: "checklist",
+    checklit: "checklist",
+    checlist: "checklist",
+    someil: "sommeil",
+    sommeill: "sommeil",
+    sommei: "sommeil",
+    somil: "sommeil",
+    dimlinue: "diminue",
+    diminiu: "diminue",
+    performence: "performance",
+    perfomance: "performance",
+    pyscho: "psycho",
+    psyhco: "psycho",
+    winrat: "winrate",
+    winrte: "winrate",
+    aujourdhui: "aujourd'hui",
+    ajourdhui: "aujourd'hui",
+    regler: "régler",
+    regle: "régler",
+    strategie: "stratégie",
+    ameliore: "améliorer",
+    ameliorer: "améliorer",
+    audti: "audit",
+    audite: "audit",
+    trede: "trade",
+    impatien: "impatience",
+  };
+  for (const [from, to] of Object.entries(reps)) {
+    q = q.replace(new RegExp(`\\b${from}\\b`, "g"), to);
+  }
+  return q;
+}
+
 function paychekAiCoachHelpCenterKnowledge(locale) {
   const fr =
     "REFERENTIEL HELP CENTER PAYCHEK:\n" +
@@ -3347,7 +3387,7 @@ function paychekAiCoachShouldUseHelpCenter(question) {
 }
 
 function paychekAiCoachExtractMentalQuery(question) {
-  const q = `${question ?? ""}`.toLowerCase();
+  const q = paychekAiCoachNormalizeQuestion(question);
   const stop = new Set([
     "quelle", "quel", "quoi", "comment", "combien", "quand", "performance",
     "rendement", "winrate", "bilan", "trade", "trades", "mon", "ma", "mes",
@@ -3357,7 +3397,7 @@ function paychekAiCoachExtractMentalQuery(question) {
   const polarity = low && !high ? "low" : (high && !low ? "high" : "neutral");
 
   const metricKeys = [
-    "sommeil", "sleep", "focus", "confiance", "confidence", "peur", "fear",
+    "sommeil", "someil", "sommeill", "sleep", "dormi", "focus", "confiance", "confidence", "peur", "fear",
     "stress", "fatigue", "fomo", "tilt", "cupidité", "cupidite", "greed",
     "énergie", "energie", "émotionnel", "emotionnel", "méditation", "meditation",
   ];
@@ -3399,7 +3439,17 @@ function paychekAiCoachIsPsychologyWhyQuestion(question) {
   return /fomo|tilt|revenge|peur|fear|frustr|cupidit|greed|stress|overtrade|émotion|emotion/.test(q);
 }
 
+function paychekAiCoachIsMetricPerformanceLinkQuestion(question) {
+  const q = `${question ?? ""}`.toLowerCase();
+  const hasMetric = /sommeil|someil|sommeill|sleep|dormi|\bnuit\b|focus|confiance|peur|fear|énergie|energie|stress|fatigue/.test(q);
+  const hasPerf = /winrate|wr\b|pnl|rendement|performance|diminu|baisse|monte|gagn|perd/.test(q);
+  const hasWhen = /\bquand\b|\bwhen\b/.test(q);
+  const hasPolarity = /moins|plus|faible|bas\b|peu de|beaucoup|élevé|eleve/.test(q);
+  return hasMetric && hasPerf && (hasWhen || hasPolarity);
+}
+
 function paychekAiCoachIsMentalPerformanceQuestion(question) {
+  if (paychekAiCoachIsMetricPerformanceLinkQuestion(question)) return true;
   if (!paychekAiCoachExtractMentalQuery(question)) return false;
   const q = `${question ?? ""}`.toLowerCase();
   const coachingOnly = /comment\s+(améliorer|ameliorer|mieux|travailler|booster|renforcer)|conseil|astuce|tip|how\s+to\s+improve/.test(q);
@@ -3430,10 +3480,15 @@ function paychekAiCoachResolveFocusFromContext(contextData, question) {
 
 function paychekAiCoachIsCoachingStoryQuestion(question) {
   const q = `${question ?? ""}`.toLowerCase();
-  if (/c.?est quoi|c quoi|quelle psycho|quel psycho|quoi comme psycho|what.{0,16}psycho/.test(q)) {
-    if (/trade|tp\b|take profit|gagnant|gain|perte|clotur|position|retourn|lacher|lâcher/.test(q)) {
-      return q.length >= 50;
+  if (/c.?est quoi|c quoi|quelle psycho|quel psycho|quoi comme psycho|what.{0,16}psycho|quel(le)?\s+probl[eè]me|what.{0,12}problem/.test(q)) {
+    if (/trade|tp\b|take profit|gagnant|gain|perte|clotur|position|retourn|lacher|lâcher|attendre|patience|impatien|fomo|niveau|prix|marché|marche|psycho|émotion|emotion/.test(q)) {
+      return q.length >= 40;
     }
+  }
+  if (/aujourd'hui|aujourdhui|today/.test(q) &&
+      /attendre|patience|impatien|niveau|fomo|trop t[oô]t|prix/.test(q) &&
+      /probl[eè]me|pourquoi|pas r[eé]ussir|n.arrive pas|difficile/.test(q)) {
+    return true;
   }
   if (/comment (je peux |tu peux )?(régler|regler|régle|regle|gérer|gerer|maitriser|maîtriser|éviter|eviter)/.test(q)) {
     if (/psycho|pyscho|fomo|tilt|revenge|renvers|émotion|emotion|inquiétude|inquietude/.test(q)) {
@@ -3456,11 +3511,27 @@ function paychekAiCoachIsCoachingStoryQuestion(question) {
   return signals >= 3 && q.length > 140;
 }
 
+function paychekAiCoachMentionsChecklistTerm(q) {
+  return /che?ck\s*list|checklist|checkliste|cheklist|chekliste/.test(q);
+}
+
+function paychekAiCoachIsChecklistTradesAuditQuestion(question) {
+  const q = `${question ?? ""}`.toLowerCase();
+  if (!paychekAiCoachMentionsChecklistTerm(q)) return false;
+  if (!/\btrades?\b|journal/.test(q)) return false;
+  if (/audit|bilan|discipline|enregistr|non.?respect|respect|manquant|couverture|combien|taux|pourcent/.test(q)) {
+    return true;
+  }
+  return /peux|possible|tu peux|faire un|faire une/.test(q) && /audit|bilan|analys/.test(q);
+}
+
 function paychekAiCoachIsTradeListQuestion(question) {
   const q = `${question ?? ""}`.toLowerCase();
   if (/pourquoi|why|comment se fait|d'où vient|d'ou vient|what caused/.test(q)) return false;
   if (paychekAiCoachIsCoachingStoryQuestion(question)) return false;
-  if (/quel(le)?s?\s+trade|quels\s+trades|montre.{0,30}trade|liste.{0,30}trade|affiche.{0,30}trade|donne.{0,30}trade|voir.{0,30}trade|quels trades.{0,20}(tag|fomo|tilt|revenge|psycho)/.test(q)) {
+  if (paychekAiCoachIsChecklistTradesAuditQuestion(question)) return false;
+  if (paychekAiCoachMentionsChecklistTerm(q)) return false;
+  if (/quel(le)?s?\s+trade|quels\s+trades|montre.{0,30}trade|affiche.{0,30}trade|donne.{0,30}trade|voir.{0,30}trade|quels trades.{0,20}(tag|fomo|tilt|revenge|psycho)|(?:^|\s)liste.{0,30}trade/.test(q)) {
     return true;
   }
   if (/\btrade/.test(q) && /fomo|tilt|revenge|peur|fear|frustr|cupidit|greed|stress|overtrade/.test(q)) {
@@ -3471,7 +3542,11 @@ function paychekAiCoachIsTradeListQuestion(question) {
 
 function paychekAiCoachIsGeneralPerformanceQuestion(question) {
   const q = `${question ?? ""}`.toLowerCase();
-  if (/checklist|analyse|analysis|plan d.?analyse|strat(é|e)gie|strategy|état mental|etat mental|mental state|fomo|tilt|peur|sommeil|non.?respect/.test(q)) {
+  if (/checklist|analyse|analysis|plan d.?analyse|strat(é|e)gie|strategy|état mental|etat mental|mental state|fomo|tilt|peur|sommeil|someil|sleep|non.?respect/.test(q)) {
+    return false;
+  }
+  if (/\bquand\b/.test(q) && /winrate|pnl|rendement|diminu|baisse/.test(q) &&
+      /moins|plus|faible|bas\b|peu de|someil|sommeil|sleep|focus|peur|stress|fatigue/.test(q)) {
     return false;
   }
   return /dit moi.{0,30}(ma |mon )?performance|(ma|mon)\s+performance|quel.*performance|quelle.*performance|performance\s+(actuelle|globale|générale|generale)|mon\s+(winrate|pnl|rendement)|comment.*performance/.test(q);
@@ -3533,17 +3608,18 @@ function paychekAiCoachIsTodayAnalysisQuestion(question) {
 }
 
 function paychekAiCoachIsTodayStrategyQuestion(question) {
-  const q = `${question ?? ""}`.toLowerCase();
+  if (paychekAiCoachIsPillarImprovementQuestion(question)) return false;
+  const q = paychekAiCoachNormalizeQuestion(question);
   if (!/strat(é|e)gie|strategy|\bsetup\b|mon setup|ma stratégie|ma strategie|my strategy/.test(q)) {
     return false;
   }
-  if (/performance|winrate|pnl|bilan|non.?respect|enregistr|audit|combien|sur mes trades|discipline/.test(q)) {
+  if (/performance|winrate|pnl|bilan|non.?respect|enregistr|audit|combien|sur mes trades|discipline|améliorer|ameliorer|ameliore|solution|conseil|proposes?/.test(q)) {
     return false;
   }
   if (/aujourd'hui|aujourdhui|today|du jour|ce matin|this morning|this evening/.test(q)) {
     return true;
   }
-  return /dis.?moi|montre|quelle est|quel est|what is|show me|ma stratégie|ma strategie|mon setup|my strategy|la stratégie|la strategie/.test(q);
+  return /dis.?moi|montre|quelle est ma strat|quel est ma strat|what is my strategy|show me my|mon setup|my setup|la stratégie du jour|la strategie du jour/.test(q);
 }
 
 function paychekAiCoachIsMonthCalendarQuestion(question) {
@@ -3602,10 +3678,89 @@ function paychekAiCoachIsTodayMentalStateQuestion(question) {
   return /dis.?moi|tu peux me dire|quel est|quelle est|what is my|tell me|comment suis|comment je suis/.test(q);
 }
 
+function paychekAiCoachIsConversationalFollowUp(question, lastFocus) {
+  if (!lastFocus) return false;
+  if (lastFocus === "trade_list" || lastFocus === "app_help" || lastFocus === "app_help_hybrid") {
+    return true;
+  }
+  const q = `${question ?? ""}`.toLowerCase().trim();
+  if (!q || q.length > 200) return false;
+  if (paychekAiCoachHasExplicitNewTopic(question) && q.length > 80) return false;
+  if (paychekAiCoachIsStoryFollowUpQuestion(question)) return false;
+  if (paychekAiCoachIsFocusedTopicFollowUp(question, lastFocus)) return false;
+  if (/^(et |aussi |oui|non|ok|d.accord|donc|sinon|puis|ensuite|alors |pour |concernant |par contre |du coup )/.test(q)) {
+    return true;
+  }
+  if (/\b(ça|ca|celui|celle|ta réponse|tu as dit|avant|précédent|precedent|comme tu dis)\b/.test(q)) {
+    return true;
+  }
+  return q.length < 95 && /\?/.test(q);
+}
+
+function paychekAiCoachHasExplicitNewTopic(question) {
+  const q = `${question ?? ""}`.toLowerCase().trim();
+  if (q.length > 220) return true;
+  if (/quel(le)?s?\s+trade|quels\s+trades|montre.{0,30}trade|liste.{0,30}trade|affiche.{0,30}trade|combien de trade|audit|bilan/.test(q)) {
+    return true;
+  }
+  if (/checklist|analyse|strat(é|e)gie|strategy|état mental|etat mental|mental|fomo|tilt|revenge|performance|winrate|pnl|non.?respect/.test(q) &&
+      !/du jour|today|aujourd'hui|aujourdhui/.test(q)) {
+    return true;
+  }
+  if (/comment (faire|utiliser|modifier|ajouter)|où se trouve|help center|mode d.emploi/.test(q)) {
+    return true;
+  }
+  return false;
+}
+
+function paychekAiCoachIsPillarReinforcementQuestion(question) {
+  const q = paychekAiCoachNormalizeQuestion(question);
+  return /quels? points?|quel(le)?s? points?|quelle point|point.{0,35}renforcer|renforcer|renforce|faiblesse|travail.{0,30}renforcer|priorit|what.{0,25}strengthen|what.{0,25}focus on|ou concentrer|sur quoi me concentrer/.test(q);
+}
+
+function paychekAiCoachIsPillarImprovementQuestion(question) {
+  if (paychekAiCoachIsPillarReinforcementQuestion(question)) return true;
+  const q = paychekAiCoachNormalizeQuestion(question);
+  if (!q) return false;
+  if (/dis.?moi|montre|quelle est|quel est|what is|show me|la stratégie du jour|la strategie du jour|today.?s strategy/.test(q)) {
+    return false;
+  }
+  if (/où\s+(est|se trouve)|where\s+is|comment\s+(modifier|ajouter|créer|creer|configurer|accéder|acceder)/.test(q) &&
+      /page|onglet|menu|bouton|engrenage|⚙/.test(q)) {
+    return false;
+  }
+  const hasTopic =
+    /strat(é|e)gie|strategy|setup|playbook|checklist|analyse|analysis|plan|état mental|etat mental|mental state|discipline|respect|pilier/.test(q);
+  if (!hasTopic) return false;
+  return (
+    /dit.?moi.{0,30}(astuce|conseil|solution)|\bastuces?\b/.test(q) ||
+    /comment\s+(j.?)?\s*(améliorer|ameliorer|ameliore|mieux|travailler|booster|renforcer|optimiser|atteindre|viser|passer|monter|augmenter)/.test(q) ||
+    /je\s+veux\s+(améliorer|ameliorer|ameliore|mieux|travailler|booster|renforcer|optimiser)/.test(q) ||
+    /j'?aimerais\s+(améliorer|ameliorer|ameliore)/.test(q) ||
+    /how\s+(can\s+)?i\s+improve|how\s+to\s+improve|what\s+should\s+i\s+do/.test(q) ||
+    /conseils?\s+pour|plan\s+pour|roadmap/.test(q) ||
+    /quelle(s)?\s+solution/.test(q) ||
+    /(solution|conseil|astuce).{0,35}(améliorer|ameliorer|ameliore|mieux)/.test(q) ||
+    /(améliorer|ameliorer|ameliore).{0,35}(solution|conseil|astuce)/.test(q) ||
+    /donne[\s-]?moi.{0,40}(solution|conseil|astuce)/.test(q) ||
+    /give\s+me.{0,40}(solution|tip|advice)/.test(q) ||
+    /(que\s+(me\s+)?|tu\s+(me\s+)?)proposes?/.test(q) ||
+    /que\s+faire\s+pour/.test(q) ||
+    /aide[\s-]?moi\s+(à|a)\s+(améliorer|ameliorer|ameliore)/.test(q) ||
+    /besoin\s+d.?aide\s+(sur|pour).{0,20}(strat|checklist|analyse|mental|discipline)/.test(q)
+  );
+}
+
 function paychekAiCoachResolveFocus(question, priorFocus) {
-  const q = `${question ?? ""}`.toLowerCase();
+  question = paychekAiCoachNormalizeQuestion(question);
+  const q = question;
   if (paychekAiCoachIsFocusedTopicFollowUp(question, priorFocus)) return priorFocus;
+  if (priorFocus && paychekAiCoachIsConversationalFollowUp(question, priorFocus) &&
+      !paychekAiCoachHasExplicitNewTopic(question)) {
+    return "conversation_followup";
+  }
   if (paychekAiCoachIsPricingQuestion(question)) return "app_pricing";
+  if (paychekAiCoachIsPillarImprovementQuestion(question)) return "pillar_improvement";
   if (paychekAiCoachIsTodayChecklistQuestion(question)) return "checklist_today";
   if (paychekAiCoachIsTodayAnalysisQuestion(question)) return "analysis_today";
   if (paychekAiCoachIsTodayStrategyQuestion(question)) return "strategy_today";
@@ -3613,6 +3768,7 @@ function paychekAiCoachResolveFocus(question, priorFocus) {
   if (paychekAiCoachIsTodayCalendarQuestion(question)) return "calendar_today";
   if (paychekAiCoachIsPerformanceLensQuestion(question)) return "performance_lens";
   if (paychekAiCoachIsPerformanceOvertradingQuestion(question)) return "performance_overtrading";
+  if (paychekAiCoachIsMentalPerformanceQuestion(question)) return "mental_emotion";
   if (paychekAiCoachIsGeneralPerformanceQuestion(question)) return "performance_summary";
   if (paychekAiCoachIsTodayMentalStateQuestion(question)) return "mental_today";
   if (paychekAiCoachShouldUseHelpCenter(question)) return "app_help";
@@ -3620,9 +3776,9 @@ function paychekAiCoachResolveFocus(question, priorFocus) {
     return "trade_count";
   }
   if (paychekAiCoachIsCoachingStoryQuestion(question)) return "coaching_story";
+  if (paychekAiCoachIsChecklistTradesAuditQuestion(question)) return "checklist";
   if (paychekAiCoachIsTradeListQuestion(question)) return "trade_list";
   if (paychekAiCoachIsStoryFollowUpQuestion(question)) return "story_followup";
-  if (paychekAiCoachIsMentalPerformanceQuestion(question)) return "mental_emotion";
   if (/(non.?respect|non respect|pas respect|point.{0,20}respect|respect.{0,30}(perte|perd|loss)|(perte|perd|loss).{0,30}respect|violation)/.test(q)) {
     return "non_respect";
   }
@@ -3729,26 +3885,33 @@ function paychekAiCoachFocusInstructions(locale, focus) {
     mental: "FOCUS=état mental uniquement. Réponds seulement sur l'état mental. " +
       "Ne fais pas un audit complet des 4 piliers. Pas de titre BILAN PAYCHEK. " +
       "Ton coach direct, 120-220 mots.",
-    mental_emotion: "FOCUS=performance liée à un curseur/émotion de l'état mental PAYCHEK. " +
-      "Utilise mentalEmotionFocus + mentalStateCoverage (tradesWithEtatMental, split médiane). " +
-      "onEmotionDays = trades niveau bas (ou émotion matchée), otherEtatDays = niveau haut. " +
-      "Si onEmotionDays.trades=0 mais tradesWithEtatMental>0, explique-le clairement (seuil médiane, curseur manquant) " +
-      "et analyse quand même otherEtatDays + couverture. Réponse complète, naturelle, coach réaliste. " +
-      "Pas de BILAN PAYCHEK global.",
+    mental_emotion: "FOCUS=lien curseur/émotion état mental ↔ winrate/PnL (ex. sommeil bas vs haut). " +
+      "Réponds DIRECTEMENT à la question (ex. « quand j'ai moins de sommeil, mon winrate baisse ») en 1 phrase chiffrée. " +
+      "Utilise mentalEmotionFocus.onEmotionDays vs otherEtatDays (WR %, PnL, nb trades). " +
+      "INTERDIT: audit discipline ENREGISTRÉS/NON ENREGISTRÉS, performanceSplit global, sermon 70 trades — sauf si mentalEmotionFocus absent. " +
+      "Si onEmotionDays.trades=0: explique seuil médiane + invite État mental sur jours de trade.",
     coach: "FOCUS=coaching libre (conseils, amélioration, mindset). " +
-      "Réponse naturelle et complète. Si mentalEmotionFocus est dans le JSON, appuie-toi dessus. " +
+      "Réponse naturelle et complète. Si conversation.priorTurns existe, continue le fil avant le focus. " +
+      "Si mentalEmotionFocus est dans le JSON, appuie-toi dessus. " +
       "Pas de template rigide, pas de BILAN PAYCHEK automatique.",
+    conversation_followup: "FOCUS=suite de conversation. Lis conversation.priorTurns en premier : " +
+      "la question actuelle prolonge l'échange précédent. Réponds dans ce contexte puis selon questionFocus. Max 200 mots.",
     non_respect: "FOCUS=non-respect et pertes. Utilise nonRespectImpact.topViolations (label, pillar, count, lossRateWhenViolatedPercent, pnlSumWhenViolated). " +
       "Liste les 3-6 points les plus liés aux pertes avec chiffres. Pour chaque point, explique en 1-2 phrases la psychologie trader typique (FOMO, revenge, fatigue, etc.) — hypothèse coach, pas diagnostic médical. " +
       "Réponse complète, naturelle, priorise stratégie/analyse/checklist/mental selon les chiffres. Pas de BILAN PAYCHEK global.",
     story_followup: "FOCUS=suite après coaching_story — comment gérer la psycho du récit (revenge, FOMO, etc.). " +
       storyFollowFmt +
       "Lis conversation.priorTurns + paychekUiSteps. 5 actions PAYCHEK personnalisées (TAG Revenge/TILT si pertinent, Checklist, État mental, ⚙ Session, revue trades tagués). Pas d'audit discipline.",
-    coaching_story: "FOCUS=récit de trade / session + coaching psycho (gain virtuel, TP non touché, refus de couper, FOMO, revenge, etc.). " +
+    coaching_story: "FOCUS=récit de trade / session + coaching psycho (gain virtuel, TP non touché, refus de couper, FOMO, revenge, impatience, etc.). " +
       narrativeFmt +
       "Utilise coachingStoryFocus.themes + coachingStoryFocus.coachInstructions. " +
-      "INTERDIT: liste trades journal (paire/date/PnL), audit discipline, ENREGISTRÉ/NON ENREGISTRÉ, winrate global. " +
-      "Tag Revenge/Cupidité: une phrase max si pertinent.",
+      "INTERDIT: liste trades journal dans le texte (paire/date/PnL) — l'app affiche relatedTradesPreview en bas. " +
+      "INTERDIT: audit discipline, ENREGISTRÉ/NON ENREGISTRÉ, winrate global. Au plus 1 chiffre si relatedTradesPreview. " +
+      "Tag FOMO/Impatience: une phrase max si pertinent.",
+    pillar_improvement: "FOCUS=plan d’action pour améliorer UN pilier discipline vers un objectif (ex. 60 % stratégie). " +
+      "Utilise pillarImprovementContext (recordedCount, missingCount, nonRespectCount, targetPercent). " +
+      "FORMAT: intro 1-2 phrases + 5 lignes « 1. » à « 5. » (habitudes Add Trade, réduire non-respect, revue règles/setups, métrique hebdo, délai réaliste). " +
+      "INTERDIT: sermon ENREGISTRÉ/NON ENREGISTRÉ, audit 4 piliers, cartes Diagnostic performance. Max 200 mots.",
     psychology_why: "FOCUS=pourquoi une émotion/tag (ex. FOMO). " + narrativeFmt +
       "Intro + question, puis 4 causes numérotées. Si psychologyWhyFocus.tagStats: 1 phrase chiffres (WR, PnL). " +
       "Sinon taguer sur Ajouter trade. Ligne 5. optionnelle « Entraînement PAYCHEK » modeste (routine 4 semaines). " +
@@ -3807,16 +3970,22 @@ function paychekAiCoachFocusInstructions(locale, focus) {
     strategy: "FOCUS=strategy on TRADES (recorded/non-respect), NOT today's Strategy page. No full 4-pillar audit. " +
       "FORBIDDEN: generic strategy template unless strategyTodayContext is present.",
     mental: "FOCUS=mental state only. No full audit template.",
-    mental_emotion: "FOCUS=targeted mental state question (emotion or slider: focus, sleep, fear). " +
-      "Use mentalEmotionFocus JSON (kind, polarity, onEmotionDays vs otherEtatDays). " +
-      "Friendly coach tone. Do not refuse if mentalEmotionFocus exists. No full audit template.",
-    coach: "FOCUS=free coaching. Natural human-like answer, no fixed template.",
+    mental_emotion: "FOCUS=mental metric ↔ winrate/PnL (e.g. low sleep). Answer the question directly with onEmotionDays vs otherEtatDays numbers. " +
+      "FORBIDDEN: recorded/incomplete discipline audit unless mentalEmotionFocus is missing. Friendly coach tone.",
+    coach: "FOCUS=free coaching. Natural human-like answer, no fixed template. " +
+      "If conversation.priorTurns exists, continue the thread before applying focus.",
+    conversation_followup: "FOCUS=conversation follow-up. Read conversation.priorTurns first; " +
+      "the current question continues the previous exchange. Answer the new question in that context. " +
+      "Use questionFocus JSON for data angle. Max 200 words.",
     non_respect: "FOCUS=rule violations vs losses. Use nonRespectImpact JSON. List top items with stats and trader psychology insight. No full audit template.",
     story_followup: "FOCUS=after coaching_story — how to manage THEIR psycho (revenge, FOMO…) with PAYCHEK. " +
       storyFollowFmt +
       "Read priorTurns + paychekUiSteps. 5 personalized PAYCHEK actions on single lines. No discipline audit.",
     coaching_story: "FOCUS=user trade story + psycho coaching. " + narrativeFmt +
-      "Use coachingStoryFocus.themes. No journal trade list, no discipline audit.",
+      "Use coachingStoryFocus.themes. Do not list trades in prose — UI shows relatedTradesPreview. No discipline audit.",
+    pillar_improvement: "FOCUS=action plan to improve ONE discipline pillar toward a target (e.g. 60% strategy). " +
+      "Use pillarImprovementContext. FORMAT: intro + 5 lines \"1.\"–\"5.\" (Add Trade habit, fewer violations, review rules/setups, weekly metric, timeline). " +
+      "FORBIDDEN: ENREGISTRÉ lecture, 4-pillar audit, Diagnostic performance cards. Max 200 words.",
     psychology_why: "FOCUS=why emotion/tag (e.g. FOMO). " + narrativeFmt +
       "Use tagStats if present. Optional line 5. modest PAYCHEK training. No full audit.",
     app_pricing: "FOCUS=PAYCHEK app pricing (not trade prices). " + pricingFmt +
@@ -3973,8 +4142,10 @@ async function paychekAiCoachGenerate({
         text:
           "CONTEXTE APP PAYCHEK (JSON, peut être partiel):\n" +
           contextJson +
-          "\n\nInstruction: réponds selon questionFocus du JSON et la question utilisateur. " +
-          "Ne répète pas un script fixe. Utilise uniquement les champs pertinents au focus.",
+          "\n\nInstruction: si conversation.priorTurns est non vide, lis d'abord le fil — " +
+          "la question actuelle est la suite (ne réponds pas comme si c'était le 1er message). " +
+          "Puis réponds selon questionFocus du JSON et la question utilisateur. " +
+          "Ne répète pas un script fixe. Utilise les champs pertinents au focus.",
       }],
     });
   }
@@ -4125,6 +4296,7 @@ exports.paychekAiCoach = onCall(
       }
 
       const locale = paychekNormalizeCoachLocale(request.data?.locale);
+      question = paychekAiCoachNormalizeQuestion(question);
       const modelRaw = `${request.data?.model ?? "gemini-2.5-flash"}`.trim();
       const model = modelRaw.startsWith("gemini-") ? modelRaw : "gemini-2.5-flash";
       const contextData = request.data?.context;
@@ -4133,8 +4305,11 @@ exports.paychekAiCoach = onCall(
           JSON.stringify(contextData).slice(0, 7000) :
           "";
       const clientFocus = paychekAiCoachNormalizeFocus(contextData?.questionFocus);
+      const priorFromCtx = paychekAiCoachNormalizeFocus(
+          contextData?.conversation?.priorAssistantFocus);
       const contextFollowUp = paychekAiCoachResolveFocusFromContext(contextData, question);
-      const focus = clientFocus || contextFollowUp || paychekAiCoachResolveFocus(question);
+      const focus = clientFocus || contextFollowUp ||
+        paychekAiCoachResolveFocus(question, priorFromCtx || "");
       const useHelpCenter = focus === "app_help";
       const systemPrompt = paychekAiCoachSystemPrompt(locale, {
         includeHelpCenter: useHelpCenter,

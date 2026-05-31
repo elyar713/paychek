@@ -1,4 +1,5 @@
 import '../trade/trade_models.dart';
+import 'coach_ai_query_text.dart';
 import '../trade/trade_plan_analysis.dart';
 
 class CoachPerformanceBucket {
@@ -38,7 +39,7 @@ class CoachPerformanceSplit {
 abstract final class CoachAiPerformanceSummary {
   /// « dit moi ma performance », « quel est mon rendement », etc.
   static bool isGeneralPerformanceQuestion(String question) {
-    final q = question.toLowerCase();
+    final q = CoachAiQueryText.forMatching(question);
     if (CoachAiPerformanceSummary._isSpecificPillar(q)) return false;
     return RegExp(
       r'dit moi.{0,30}(ma |mon )?performance|'
@@ -56,7 +57,15 @@ abstract final class CoachAiPerformanceSummary {
     if (RegExp(r'analyse|analysis|plan d.?analyse').hasMatch(q)) return true;
     if (RegExp(r'strat(é|e)gie|strategy').hasMatch(q)) return true;
     if (RegExp(r'état mental|etat mental|mental state').hasMatch(q)) return true;
-    if (RegExp(r'fomo|tilt|peur|sommeil|focus|émotion|emotion').hasMatch(q)) return true;
+    if (RegExp(r'fomo|tilt|peur|sommeil|someil|sleep|dormi|focus|émotion|emotion|fatigue|stress')
+        .hasMatch(q)) {
+      return true;
+    }
+    if (RegExp(r'\bquand\b').hasMatch(q) &&
+        RegExp(r'winrate|pnl|rendement|diminu|baisse').hasMatch(q) &&
+        RegExp(r'moins|plus|faible|bas\b|peu de').hasMatch(q)) {
+      return true;
+    }
     if (RegExp(r'non.?respect').hasMatch(q)) return true;
     return false;
   }

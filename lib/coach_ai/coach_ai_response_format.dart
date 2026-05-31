@@ -307,4 +307,19 @@ abstract final class CoachAiResponseFormat {
         'Si hasDataToday=false : inviter fillHintPath — pas de stats inventées. '
         'INTERDIT : winrate global, ENREGISTRÉ/NON ENREGISTRÉ, audit X/70 trades. Max 180 mots.';
   }
+
+  static String pillarImprovementInstructions(String languageCode) {
+    if (languageCode == 'en') {
+      return 'FOCUS=action plan to improve ONE discipline pillar toward a target (e.g. 60% strategy compliance). '
+          'Use pillarImprovementContext numbers briefly (recorded/missing/non-respect/winrate) — do NOT lecture on ENREGISTRÉ vs NON ENREGISTRÉ blocks. '
+          'FORMAT: 1-2 sentence intro linking their goal to the gap, then exactly 5 lines "1."–"5." (daily habit on Add Trade, reduce non-respect, review setups/rules, weekly metric, realistic timeline to targetPercent). '
+          'If targetPercent is set, explain what it means (completion % on trades, not guaranteed winrate unless they said winrate). '
+          'FORBIDDEN: full 4-pillar audit, Diagnostic performance cards, generic PAYCHEK marketing. Max 200 words.';
+    }
+    return 'FOCUS=plan d’action pour améliorer UN pilier discipline vers un objectif (ex. 60 % sur la stratégie). '
+        'Utilise brièvement pillarImprovementContext (enregistrés/manquants/non-respect/winrate) — INTERDIT le sermon ENREGISTRÉ/NON ENREGISTRÉ. '
+        'FORMAT : intro 1-2 phrases (objectif + écart actuel), puis 5 lignes « 1. » à « 5. » (habitude Add Trade, réduire non-respect, revoir setups/règles, métrique hebdo, délai réaliste vers targetPercent). '
+        'Si targetPercent est défini : préciser de quoi il s’agit (% trades renseignés / respect, pas winrate garanti sauf si la question parle de winrate). '
+        'INTERDIT : audit 4 piliers, cartes Diagnostic performance, discours marketing générique. Max 200 mots.';
+  }
 }

@@ -111,6 +111,11 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           webPairStretch: webPairStretch,
         );
       case DashboardHomeLayoutKeys.checklist:
+        if (!DashboardChecklistPreview.shouldShowOnDashboard(
+          widget.checklistController.sections,
+        )) {
+          return const SizedBox.shrink();
+        }
         return DashboardChecklistPreview(
           controller: widget.checklistController,
           onOpenChecklist: widget.onOpenChecklist,
@@ -196,45 +201,50 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
 
   static const _analyseChecklistPairGap = 12.0;
 
-  /// Mobile / app native : Mon analyse au-dessus, checklist en dessous (jamais côte à côte).
-  Widget _buildMobileAnalyseChecklistPair({
-    required bool hasAnalyse,
-    required bool hasCheck,
-  }) {
+  /// Mobile : checklist puis analyse (ordre par défaut), ou selon [orderedIds].
+  Widget _buildMobileAnalyseChecklistPair(List<String> orderedIds) {
     const analyseId = DashboardHomeLayoutKeys.analyse;
     const checkId = DashboardHomeLayoutKeys.checklist;
 
+    final hasAnalyse = orderedIds.contains(analyseId);
+    final hasCheck = orderedIds.contains(checkId) &&
+        DashboardChecklistPreview.shouldShowOnDashboard(
+          widget.checklistController.sections,
+        );
     if (!hasAnalyse && !hasCheck) return const SizedBox.shrink();
 
-    if (hasAnalyse && hasCheck) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _sectionForId(analyseId),
-          const SizedBox(height: _analyseChecklistPairGap),
-          _sectionForId(checkId),
-        ],
-      );
-    }
+    final analyseIdx = orderedIds.indexOf(analyseId);
+    final checkIdx = orderedIds.indexOf(checkId);
+    final firstId = !hasAnalyse
+        ? checkId
+        : !hasCheck
+            ? analyseId
+            : (checkIdx < analyseIdx ? checkId : analyseId);
+    final secondId = hasAnalyse && hasCheck
+        ? (firstId == checkId ? analyseId : checkId)
+        : null;
 
-    if (hasAnalyse) return _sectionForId(analyseId);
-    return _sectionForId(checkId);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _sectionForId(firstId),
+        if (secondId != null) ...[
+          const SizedBox(height: _analyseChecklistPairGap),
+          _sectionForId(secondId),
+        ],
+      ],
+    );
   }
 
-  /// Accueil mobile : capital puis paire analyse / checklist, puis le reste.
+  /// Accueil mobile : respecte l’ordre Réglages → Dashboard (glisser + on/off).
   Widget _buildMobileHomeSections(List<String> orderedVisibleIds) {
-    const capId = DashboardHomeLayoutKeys.capitalBalance;
     const checkId = DashboardHomeLayoutKeys.checklist;
     const analyseId = DashboardHomeLayoutKeys.analyse;
 
     final ids = _mobileHomeSectionOrder(orderedVisibleIds);
-    final hasCap = ids.contains(capId);
-    final hasAnalyse = ids.contains(analyseId);
-    final hasCheck = ids.contains(checkId);
-    final showCheckAnalysePair = hasAnalyse || hasCheck;
-
     final children = <Widget>[];
     var needsGap = false;
+    var analyseChecklistPairDone = false;
 
     void addGap() {
       if (needsGap) {
@@ -244,35 +254,24 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     }
 
     for (final id in ids) {
-      if (id == analyseId || id == checkId) continue;
-
-      if (id == capId) {
-        addGap();
-        children.add(_sectionForId(capId));
-        if (showCheckAnalysePair) {
-          children.add(const SizedBox(height: 16));
-          children.add(
-            _buildMobileAnalyseChecklistPair(
-              hasAnalyse: hasAnalyse,
-              hasCheck: hasCheck,
-            ),
-          );
+      if (id == analyseId || id == checkId) {
+        if (!analyseChecklistPairDone) {
+          final hasVisiblePair = ids.contains(analyseId) ||
+              (ids.contains(checkId) &&
+                  DashboardChecklistPreview.shouldShowOnDashboard(
+                    widget.checklistController.sections,
+                  ));
+          if (hasVisiblePair) {
+            addGap();
+            children.add(_buildMobileAnalyseChecklistPair(ids));
+          }
+          analyseChecklistPairDone = true;
         }
         continue;
       }
 
       addGap();
       children.add(_sectionForId(id));
-    }
-
-    if (!hasCap && showCheckAnalysePair) {
-      children.insert(
-        0,
-        _buildMobileAnalyseChecklistPair(
-          hasAnalyse: hasAnalyse,
-          hasCheck: hasCheck,
-        ),
-      );
     }
 
     return Column(

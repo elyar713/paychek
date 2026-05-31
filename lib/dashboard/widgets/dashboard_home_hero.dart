@@ -71,24 +71,12 @@ class DashboardHomeHero extends StatelessWidget {
       nameColor: scheme.onSurface,
       nameFontSize: nameFontSize,
       planBadge: planBadge,
+      nameRowTrailing: isMobileHome ? upgrade : null,
     );
 
     Widget headerBody;
     if (isMobileHome) {
-      // iOS / Android : Upgrade sous le nom (aligné à droite), pas sur la même ligne.
-      headerBody = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          welcomeBlock,
-          if (upgrade != null) ...[
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerRight,
-              child: upgrade,
-            ),
-          ],
-        ],
-      );
+      headerBody = welcomeBlock;
     } else {
       headerBody = LayoutBuilder(
         builder: (context, constraints) {

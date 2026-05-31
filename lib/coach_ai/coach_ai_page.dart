@@ -23,10 +23,13 @@ import '../help_center/help_center_catalog.dart';
 import 'coach_ai_app_help.dart';
 import 'coach_ai_app_pricing.dart';
 import 'coach_ai_coaching_story.dart';
+import 'coach_ai_pillar_coaching.dart';
 import 'coach_ai_focus.dart';
 import 'coach_ai_conversation.dart';
+import 'coach_ai_query_text.dart';
 import 'coach_ai_response_format.dart';
 import 'coach_ai_trade_journal_context.dart';
+import 'coach_ai_related_trades.dart';
 import 'coach_ai_trade_list_query.dart';
 
 class CoachAiPage extends StatefulWidget {
@@ -88,6 +91,7 @@ class _CoachDisciplinePillar {
 class _CoachAiPageState extends State<CoachAiPage> {
   final TextEditingController _questionCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
+  final FocusNode _questionFocus = FocusNode();
 
   final List<_CoachAiMessage> _messages = <_CoachAiMessage>[];
   bool _sending = false;
@@ -97,12 +101,27 @@ class _CoachAiPageState extends State<CoachAiPage> {
   @override
   void initState() {
     super.initState();
+    _questionFocus.addListener(_onQuestionFocusChange);
     _messages.add(
       const _CoachAiMessage(
         text: 'Bonjour, je suis ton AI Coach. Pose-moi une question sur ton trading, ta discipline, ta stratégie ou l’utilisation de PAYCHEK.',
         isUser: false,
       ),
     );
+  }
+
+  void _onQuestionFocusChange() {
+    if (!_questionFocus.hasFocus) return;
+    _scrollToBottom();
+  }
+
+  @override
+  void dispose() {
+    _questionFocus.removeListener(_onQuestionFocusChange);
+    _questionFocus.dispose();
+    _questionCtrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
   }
 
   String _friendlyError(String? code, String? message) {
@@ -115,16 +134,116 @@ class _CoachAiPageState extends State<CoachAiPage> {
     if (code == 'permission-denied') {
       return 'AI Coach est réservé à l’essai actif ou au plan Pro.';
     }
+    if (code == 'internal') {
+      final detail = message?.trim();
+      if (detail != null && detail.isNotEmpty && detail.toUpperCase() != 'INTERNAL') {
+        return detail;
+      }
+      return 'Coach cloud momentanément indisponible. Une réponse locale a été utilisée si possible.';
+    }
     return message ?? 'Erreur AI Coach';
+  }
+
+  Future<String> _buildPillarLocalAnswer({
+    required String question,
+    required String languageCode,
+  }) async {
+    final snap = _computeAuditSnapshot();
+    final pillarId = CoachAiPillarCoaching.resolvePillarId(question);
+    final pillar = switch (pillarId) {
+      'checklist' => snap.disciplinePillars[0],
+      'analysis' => snap.disciplinePillars[1],
+      'mental' => snap.disciplinePillars[3],
+      _ => snap.disciplinePillars[2],
+    };
+    final pillarStats = CoachAiPillarCoaching.statsFromPillars(
+      tradesTotal: snap.tradesTotal,
+      pillars: [
+        for (final i in [0, 1, 2, 3])
+          (
+            id: switch (i) {
+              0 => 'checklist',
+              1 => 'analysis',
+              2 => 'strategy',
+              _ => 'mental',
+            },
+            title: snap.disciplinePillars[i].title,
+            recorded: snap.disciplinePillars[i].recorded,
+            nonRespect: snap.disciplinePillars[i].nonRespect,
+            winrateRecorded: snap.disciplinePillars[i].winrateRecorded,
+            pnlRecorded: snap.disciplinePillars[i].pnlRecorded,
+          ),
+      ],
+    );
+    final strategyPillar = pillarStats.firstWhere((p) => p.id == 'strategy');
+    if (CoachAiPillarCoaching.isTrainingSystemQuestion(question) ||
+        (pillarId == 'strategy' &&
+            CoachAiPillarCoaching.isImprovementQuestion(question))) {
+      return CoachAiPillarCoaching.buildLocalAnswer(
+        pillarId: pillarId,
+        pillarTitle: CoachAiPillarCoaching.pillarTitle(pillarId, languageCode),
+        tradesTotal: snap.tradesTotal,
+        recorded: pillar.recorded,
+        missing: pillar.missing,
+        nonRespect: pillar.nonRespect,
+        winrateRecorded: pillar.winrateRecorded,
+        pnlRecorded: pillar.pnlRecorded,
+        targetPercent: CoachAiPillarCoaching.extractTargetPercent(question),
+        languageCode: languageCode,
+      );
+    }
+    if (CoachAiPillarCoaching.isStrategyOpinionQuestion(question)) {
+      final setupSnap = await CoachAiStrategyToday.buildTodaySnapshot();
+      return CoachAiPillarCoaching.buildLocalStrategyOpinionAnswer(
+        hasSetup: setupSnap.hasData,
+        setupTitle: setupSnap.setupTitle,
+        patternHint: setupSnap.pattern.trim(),
+        strategy: strategyPillar,
+        languageCode: languageCode,
+      );
+    }
+    if (CoachAiPillarCoaching.isReinforcementQuestion(question)) {
+      return CoachAiPillarCoaching.buildLocalReinforcementAnswer(
+        pillars: pillarStats,
+        highlightPillarId: pillarId,
+        languageCode: languageCode,
+        topViolationLabels: _strategyViolationLabels(),
+      );
+    }
+    return CoachAiPillarCoaching.buildLocalAnswer(
+      pillarId: pillarId,
+      pillarTitle: CoachAiPillarCoaching.pillarTitle(pillarId, languageCode),
+      tradesTotal: snap.tradesTotal,
+      recorded: pillar.recorded,
+      missing: pillar.missing,
+      nonRespect: pillar.nonRespect,
+      winrateRecorded: pillar.winrateRecorded,
+      pnlRecorded: pillar.pnlRecorded,
+      targetPercent: CoachAiPillarCoaching.extractTargetPercent(question),
+      languageCode: languageCode,
+    );
+  }
+
+  List<String> _strategyViolationLabels() {
+    final report = CoachAiNonRespectAnalysis.buildReport(
+      context,
+      TradeJournalScope.of(context).items,
+    );
+    if (report == null) return const [];
+    return [
+      for (final item in report.topItems)
+        if (item.pillar == 'strategy') item.label,
+    ].take(3).toList();
   }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtrl.hasClients) return;
+      final target = _scrollCtrl.position.maxScrollExtent + 120;
       _scrollCtrl.animateTo(
-        _scrollCtrl.position.maxScrollExtent + 120,
+        target,
         duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
+        curve: Curves.easeOutCubic,
       );
     });
   }
@@ -137,35 +256,121 @@ class _CoachAiPageState extends State<CoachAiPage> {
     return null;
   }
 
-  Map<String, dynamic> _conversationContextBlock() {
+  Map<String, dynamic> _conversationContextBlock({String? priorAssistantFocus}) {
     if (_messages.isEmpty) return const {};
+    final priorTurns = CoachAiConversation.priorTurnsToJson(
+      texts: _messages.map((m) => m.text).toList(),
+      isUserFlags: _messages.map((m) => m.isUser).toList(),
+      isErrorFlags: _messages.map((m) => m.isError).toList(),
+      responseFocuses: _messages.map((m) => m.responseFocus).toList(),
+      excludeLastCount: 1,
+    );
+    final threadMode = priorTurns.isNotEmpty &&
+        priorAssistantFocus != null &&
+        priorAssistantFocus != 'trade_list' &&
+        priorAssistantFocus != 'app_help' &&
+        priorAssistantFocus != 'app_help_hybrid';
     return <String, dynamic>{
-      'priorTurns': CoachAiConversation.priorTurnsToJson(
-        texts: _messages.map((m) => m.text).toList(),
-        isUserFlags: _messages.map((m) => m.isUser).toList(),
-        isErrorFlags: _messages.map((m) => m.isError).toList(),
-        responseFocuses: _messages.map((m) => m.responseFocus).toList(),
-        excludeLastCount: 1,
-      ),
+      'priorTurns': priorTurns,
+      'priorAssistantFocus': ?priorAssistantFocus,
+      if (threadMode) 'threadMode': true,
     };
   }
 
+  Future<void> _emitLocalCoachingStoryAnswer({
+    required String rawQuestion,
+    required String languageCode,
+  }) async {
+    final trades = TradeJournalScope.of(context).items;
+    final localAnswer = CoachAiCoachingStory.buildLocalAnswer(
+      question: rawQuestion,
+      languageCode: languageCode,
+      trades: trades,
+    );
+    if (!mounted) return;
+    setState(() {
+      _sending = false;
+      _messages.add(
+        _CoachAiMessage(
+          text: localAnswer,
+          isUser: false,
+          relatedUserQuestion: rawQuestion,
+          responseFocus: CoachAiFocus.coachingStory,
+        ),
+      );
+    });
+    _scrollToBottom();
+  }
+
+  Future<void> _emitLocalPillarAnswer({
+    required String rawQuestion,
+    required String languageCode,
+  }) async {
+    String localAnswer;
+    try {
+      localAnswer = await _buildPillarLocalAnswer(
+        question: rawQuestion,
+        languageCode: languageCode,
+      );
+    } catch (_) {
+      localAnswer = CoachAiPillarCoaching.buildEmergencyFallback(languageCode);
+    }
+    if (!mounted) return;
+    setState(() {
+      _sending = false;
+      _messages.add(
+        _CoachAiMessage(
+          text: localAnswer,
+          isUser: false,
+          relatedUserQuestion: rawQuestion,
+          responseFocus: CoachAiFocus.pillarImprovement,
+        ),
+      );
+    });
+    _scrollToBottom();
+  }
+
   Future<void> _askCoach() async {
-    final question = _questionCtrl.text.trim();
-    if (question.isEmpty || _sending) return;
+    final rawQuestion = _questionCtrl.text.trim();
+    if (rawQuestion.isEmpty || _sending) return;
+    final question = CoachAiQueryText.forMatching(rawQuestion);
     _questionCtrl.clear();
     setState(() {
       _sending = true;
-      _messages.add(_CoachAiMessage(text: question, isUser: true));
+      _messages.add(_CoachAiMessage(text: rawQuestion, isUser: true));
     });
     _scrollToBottom();
 
     final locale = Localizations.localeOf(context);
     final lang = locale.languageCode;
     final priorFocus = _lastAssistantFocus();
-    final focus = CoachAiFocus.resolve(question, priorAssistantFocus: priorFocus);
 
-    if (focus == 'trade_list') {
+    // Récit psycho / feeling : local (pas cloud).
+    if (CoachAiCoachingStory.isCoachingStoryQuestion(rawQuestion)) {
+      await _emitLocalCoachingStoryAnswer(
+        rawQuestion: rawQuestion,
+        languageCode: lang,
+      );
+      return;
+    }
+
+    // Coaching stratégie : toujours local en premier (pas d’appel cloud / pas d’audit).
+    if (CoachAiPillarCoaching.shouldAnswerLocally(
+      rawQuestion,
+      priorFocus: priorFocus,
+    )) {
+      await _emitLocalPillarAnswer(rawQuestion: rawQuestion, languageCode: lang);
+      return;
+    }
+
+    final focus = CoachAiFocus.resolve(rawQuestion, priorAssistantFocus: priorFocus);
+    final preferCloudThread = CoachAiConversation.shouldPreferCloudWithThread(
+      question: question,
+      priorAssistantFocus: priorFocus,
+      resolvedFocus: focus,
+    );
+
+    if (focus == 'trade_list' && !preferCloudThread) {
       final report = CoachAiTradeListQuery.build(
         TradeJournalScope.of(context).items,
         question,
@@ -186,7 +391,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
       return;
     }
 
-    if (focus == 'app_help') {
+    if (focus == 'app_help' && !preferCloudThread) {
       final steps = CoachAiAppHelp.uiStepsForQuestion(question, lang);
       final title = CoachAiAppHelp.localCardTitle(question, lang) ??
           () {
@@ -197,19 +402,28 @@ class _CoachAiPageState extends State<CoachAiPage> {
                 .map((a) => a.frenchTitle)
                 .firstOrNull;
           }();
+      final hybrid = CoachAiAppHelp.usesHybridHelpLayout(question);
+      final answerText = hybrid
+          ? CoachAiAppHelp.formatHybridHelpAnswer(
+              intro: CoachAiAppHelp.workflowCoachIntro(lang),
+              steps: steps,
+              languageCode: lang,
+              title: title,
+            )
+          : CoachAiAppHelp.formatStepsAnswer(
+              steps,
+              languageCode: lang,
+              title: title,
+            );
       if (!mounted) return;
       setState(() {
         _sending = false;
         _messages.add(
           _CoachAiMessage(
-            text: CoachAiAppHelp.formatStepsAnswer(
-              steps,
-              languageCode: lang,
-              title: title,
-            ),
+            text: answerText,
             isUser: false,
             relatedUserQuestion: question,
-            responseFocus: 'app_help',
+            responseFocus: hybrid ? 'app_help_hybrid' : 'app_help',
           ),
         );
       });
@@ -217,27 +431,82 @@ class _CoachAiPageState extends State<CoachAiPage> {
       return;
     }
 
+    if (focus == CoachAiFocus.pillarImprovement) {
+      await _emitLocalPillarAnswer(rawQuestion: rawQuestion, languageCode: lang);
+      return;
+    }
+
+    if (focus == CoachAiFocus.coachingStory) {
+      await _emitLocalCoachingStoryAnswer(
+        rawQuestion: rawQuestion,
+        languageCode: lang,
+      );
+      return;
+    }
+
     final auditContext = await _buildAuditContextAsync(
       forQuestion: question,
       languageCode: lang,
+      priorAssistantFocus: priorFocus,
     );
     final res = await PaychekAiCoachCloud.ask(
-      question: question,
+      question: rawQuestion,
       locale: locale,
       context: auditContext,
     );
     if (!mounted) return;
+
+    String? localFallback;
+    final wantsLocalStory = focus == CoachAiFocus.coachingStory ||
+        CoachAiCoachingStory.isCoachingStoryQuestion(rawQuestion);
+    final wantsLocalPillar = CoachAiPillarCoaching.shouldAnswerLocally(
+          rawQuestion,
+          priorFocus: priorFocus,
+        ) ||
+        focus == CoachAiFocus.pillarImprovement ||
+        (focus == 'strategie' &&
+            CoachAiPillarCoaching.looksLikeStrategyCoaching(
+              rawQuestion,
+              priorFocus: priorFocus,
+            ));
+    if (!res.ok && wantsLocalStory) {
+      localFallback = CoachAiCoachingStory.buildLocalAnswer(
+        question: rawQuestion,
+        languageCode: lang,
+        trades: TradeJournalScope.of(context).items,
+      );
+    } else if (!res.ok && wantsLocalPillar) {
+      try {
+        localFallback = await _buildPillarLocalAnswer(
+          question: rawQuestion,
+          languageCode: lang,
+        );
+      } catch (_) {
+        localFallback = CoachAiPillarCoaching.buildEmergencyFallback(lang);
+      }
+    }
+
     setState(() {
       _sending = false;
       _quotaUsed = res.quotaUsed;
       _quotaLimit = res.quotaLimit;
+      final cloudText = res.ok ? res.answer?.trim() : null;
+      final answer = cloudText != null && cloudText.isNotEmpty
+          ? cloudText
+          : (localFallback ?? _friendlyError(res.code, res.message));
       _messages.add(
         _CoachAiMessage(
-          text: res.ok ? (res.answer ?? '') : _friendlyError(res.code, res.message),
+          text: answer,
           isUser: false,
-          isError: !res.ok,
-          relatedUserQuestion: question,
-          responseFocus: focus,
+          isError: !res.ok && localFallback == null,
+          relatedUserQuestion: rawQuestion,
+          responseFocus: focus == 'conversation_followup'
+              ? (priorFocus ?? focus)
+              : (wantsLocalStory && localFallback != null
+                  ? CoachAiFocus.coachingStory
+                  : (wantsLocalPillar && localFallback != null
+                      ? CoachAiFocus.pillarImprovement
+                      : focus)),
         ),
       );
     });
@@ -375,21 +644,91 @@ class _CoachAiPageState extends State<CoachAiPage> {
   Future<Map<String, dynamic>> _buildAuditContextAsync({
     String? forQuestion,
     required String languageCode,
+    String? priorAssistantFocus,
   }) async {
-    final priorFocus = _messages.length >= 2 ? _lastAssistantFocus() : null;
+    final priorFocus = priorAssistantFocus ??
+        (_messages.length >= 2 ? _lastAssistantFocus() : null);
+    final resolvedFocus = forQuestion == null
+        ? 'coach'
+        : CoachAiFocus.resolve(forQuestion, priorAssistantFocus: priorFocus);
+
+    if (forQuestion != null &&
+        resolvedFocus == 'conversation_followup' &&
+        priorFocus != null) {
+      final threaded = _buildAuditContext(
+        forQuestion: forQuestion,
+        languageCode: languageCode,
+        priorAssistantFocus: priorFocus,
+        questionFocusOverride: priorFocus,
+      );
+      threaded['conversation'] = _conversationContextBlock(
+        priorAssistantFocus: priorFocus,
+      );
+      threaded['responseRules'] = <String, dynamic>{
+        ...(threaded['responseRules'] as Map<String, dynamic>? ?? {}),
+        'style': 'thread_continuation',
+        'threadContinuation': true,
+        'maxWords': 200,
+      };
+      threaded['coachInstructions'] = languageCode == 'fr'
+          ? 'FOCUS=suite de conversation. Lis conversation.priorTurns : la question actuelle prolonge ou précise le message précédent. '
+              'Ne réponds pas comme si c’était la première question. Réutilise le sujet du fil puis apporte la nouvelle réponse.'
+          : 'FOCUS=conversation follow-up. Read conversation.priorTurns; the current question continues the thread. '
+              'Do not answer as if it were the first message.';
+      return threaded;
+    }
 
     if (forQuestion != null &&
         CoachAiConversation.isStoryFollowUp(forQuestion, priorFocus)) {
       return <String, dynamic>{
         'questionFocus': 'story_followup',
         'paychekUiSteps': CoachAiConversation.storyFollowUpSteps(languageCode),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'coachInstructions': CoachAiResponseFormat.storyFollowUpInstructions(languageCode),
         'responseRules': <String, dynamic>{
           'style': 'story_followup_numbered',
           'linksToPriorCoachingStory': true,
           'noDisciplineAudit': true,
           'maxWords': 180,
+          'format': 'intro_then_1_to_5_single_lines',
+        },
+        'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
+      };
+    }
+
+    if (forQuestion != null &&
+        CoachAiFocus.resolve(forQuestion, priorAssistantFocus: priorFocus) ==
+            CoachAiFocus.pillarImprovement) {
+      final snap = _computeAuditSnapshot();
+      final pillarId = CoachAiPillarCoaching.resolvePillarId(forQuestion);
+      final pillar = switch (pillarId) {
+        'checklist' => snap.disciplinePillars[0],
+        'analysis' => snap.disciplinePillars[1],
+        'mental' => snap.disciplinePillars[3],
+        _ => snap.disciplinePillars[2],
+      };
+      final lang = languageCode;
+      return <String, dynamic>{
+        'questionFocus': CoachAiFocus.pillarImprovement,
+        'pillarImprovementContext': CoachAiPillarCoaching.contextToJson(
+          pillarId: pillarId,
+          pillarTitle: CoachAiPillarCoaching.pillarTitle(pillarId, lang),
+          tradesTotal: snap.tradesTotal,
+          recorded: pillar.recorded,
+          missing: pillar.missing,
+          nonRespect: pillar.nonRespect,
+          winrateRecorded: pillar.winrateRecorded,
+          pnlRecorded: pillar.pnlRecorded,
+          targetPercent: CoachAiPillarCoaching.extractTargetPercent(forQuestion),
+          languageCode: lang,
+        ),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
+        'responseRules': <String, dynamic>{
+          'style': 'pillar_improvement_numbered',
+          'noDisciplineAudit': true,
+          'noPillarStats': true,
+          'noTradeJournalAudit': true,
+          'maxWords': 200,
           'format': 'intro_then_1_to_5_single_lines',
         },
         'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
@@ -408,7 +747,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             story,
             languageCode: languageCode,
           ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': 'empathic_coach_numbered',
           'noDisciplineAudit': true,
@@ -431,7 +770,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           TradeJournalScope.of(context).items,
           languageCode,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus)
               ? 'mental_today_brief_followup'
@@ -458,7 +797,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           languageCode,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'checklist_today_brief_followup' : 'checklist_today_numbered',
           'noDisciplineAudit': true,
@@ -482,7 +821,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           languageCode,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'analysis_today_brief_followup' : 'analysis_today_numbered',
           'noDisciplineAudit': true,
@@ -506,7 +845,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           languageCode,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'strategy_today_brief_followup' : 'strategy_today_numbered',
           'noDisciplineAudit': true,
@@ -532,7 +871,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           languageCode,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'calendar_today_brief_followup' : 'calendar_today_numbered',
           'noDisciplineAudit': true,
@@ -558,7 +897,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           languageCode,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'calendar_month_brief_followup' : 'calendar_month_numbered',
           'noDisciplineAudit': true,
@@ -585,7 +924,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           forQuestion,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'performance_summary_brief_followup' : 'performance_summary_numbered',
           'noDisciplineAudit': true,
@@ -611,7 +950,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           forQuestion,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp ? 'performance_lens_brief_followup' : 'performance_lens_numbered',
           'noDisciplineAudit': true,
@@ -638,7 +977,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
           forQuestion,
           briefFollowUp: briefFollowUp,
         ),
-        'conversation': _conversationContextBlock(),
+        'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
         'responseRules': <String, dynamic>{
           'style': briefFollowUp
               ? 'performance_overtrading_brief_followup'
@@ -692,8 +1031,17 @@ class _CoachAiPageState extends State<CoachAiPage> {
     final base = _buildAuditContext(
       forQuestion: forQuestion,
       languageCode: languageCode,
+      priorAssistantFocus: priorFocus,
     );
-    base['conversation'] = _conversationContextBlock();
+    base['conversation'] = _conversationContextBlock(priorAssistantFocus: priorFocus);
+    if (forQuestion != null &&
+        priorFocus != null &&
+        CoachAiConversation.isConversationalFollowUp(forQuestion, priorFocus)) {
+      base['responseRules'] = <String, dynamic>{
+        ...(base['responseRules'] as Map<String, dynamic>? ?? {}),
+        'threadContinuation': true,
+      };
+    }
     if (forQuestion == null) return base;
     final guide = await CoachAiAppHelp.guideContextForQuestion(
       forQuestion,
@@ -708,9 +1056,20 @@ class _CoachAiPageState extends State<CoachAiPage> {
   Map<String, dynamic> _buildAuditContext({
     String? forQuestion,
     String languageCode = 'fr',
+    String? priorAssistantFocus,
+    String? questionFocusOverride,
   }) {
     final snap = _computeAuditSnapshot();
-    final focus = forQuestion == null ? 'coach' : CoachAiFocus.resolve(forQuestion);
+    final matchQ = forQuestion == null
+        ? ''
+        : CoachAiQueryText.forMatching(forQuestion);
+    final focus = questionFocusOverride ??
+        (forQuestion == null
+            ? 'coach'
+            : CoachAiFocus.resolve(
+                matchQ,
+                priorAssistantFocus: priorAssistantFocus,
+              ));
     final mentalQuery =
         forQuestion == null ? null : CoachAiMentalAnalysis.extractMentalQuery(forQuestion);
     final emotionStats = mentalQuery == null
@@ -735,6 +1094,15 @@ class _CoachAiPageState extends State<CoachAiPage> {
     final storyFocus = forQuestion == null
         ? null
         : CoachAiCoachingStory.buildFocus(trades, forQuestion);
+    final relatedTradesPreview = storyFocus != null &&
+            focus == 'coaching_story' &&
+            forQuestion != null
+        ? CoachAiRelatedTrades.build(
+            trades,
+            forQuestion,
+            themes: storyFocus.themes,
+          )
+        : null;
     final missing = <String, dynamic>{};
     final recorded = <String, dynamic>{};
     for (final p in snap.disciplinePillars) {
@@ -768,6 +1136,22 @@ class _CoachAiPageState extends State<CoachAiPage> {
           storyFocus,
           languageCode: languageCode,
         ),
+      if (relatedTradesPreview != null)
+        'relatedTradesPreview': <String, dynamic>{
+          'title': relatedTradesPreview.title,
+          'subtitle': relatedTradesPreview.subtitle,
+          'journalTotal': relatedTradesPreview.journalTotal,
+          'count': relatedTradesPreview.rows.length,
+          'trades': [
+            for (final row in relatedTradesPreview.rows)
+              <String, dynamic>{
+                'pair': row.pair,
+                'date': row.dateLabel,
+                'pnl': row.pnl,
+                'psychTags': row.psychTags,
+              },
+          ],
+        },
       'tradesTotal': snap.tradesTotal,
       'tradesClosed': snap.tradesClosed,
       'wins': snap.wins,
@@ -787,13 +1171,6 @@ class _CoachAiPageState extends State<CoachAiPage> {
       'tradeJournal': CoachAiTradeJournalContext.build(trades),
       'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
     };
-  }
-
-  @override
-  void dispose() {
-    _questionCtrl.dispose();
-    _scrollCtrl.dispose();
-    super.dispose();
   }
 
   String _extractSectionBody(String text, String sectionNumber) {
@@ -2333,6 +2710,153 @@ class _CoachAiPageState extends State<CoachAiPage> {
     );
   }
 
+  Widget _buildPillarImprovementCard(_CoachAiMessage m, String question) {
+    final snap = _computeAuditSnapshot();
+    final pillarId = CoachAiPillarCoaching.resolvePillarId(question);
+    final pillar = switch (pillarId) {
+      'checklist' => snap.disciplinePillars[0],
+      'analysis' => snap.disciplinePillars[1],
+      'mental' => snap.disciplinePillars[3],
+      _ => snap.disciplinePillars[2],
+    };
+    final lang = Localizations.localeOf(context).languageCode;
+    final title = CoachAiPillarCoaching.pillarTitle(pillarId, lang);
+    final target = CoachAiPillarCoaching.extractTargetPercent(question);
+    final targetLabel = target != null ? '$target %' : null;
+    final isReinforcement = CoachAiPillarCoaching.isReinforcementQuestion(question) ||
+        CoachAiPillarCoaching.isStrategyOpinionQuestion(question);
+    final completionPercent = snap.tradesTotal > 0
+        ? ((pillar.recorded * 100) / snap.tradesTotal).round()
+        : 0;
+    final hasTrainingPlan = CoachAiPillarCoaching.shouldIncludeTrainingSystem(
+      pillarId: pillarId,
+      completionPercent: completionPercent,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            margin: const EdgeInsets.only(top: 2, right: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF064E3B).withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFF14532D)),
+            ),
+            alignment: Alignment.center,
+            child: Icon(pillar.icon, size: 17, color: const Color(0xFF34D399)),
+          ),
+          Flexible(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 780),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0A0A0A),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF1F2937)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          isReinforcement
+                              ? (lang == 'fr' ? 'Coach · $title' : 'Coach · $title')
+                              : (hasTrainingPlan
+                                  ? (lang == 'fr'
+                                      ? 'Plan · $title · 4 sem.'
+                                      : 'Plan · $title · 4 wk')
+                                  : (lang == 'fr' ? 'Plan · $title' : 'Plan · $title')),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 27 / 2,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (targetLabel != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF422006).withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.5)),
+                          ),
+                          child: Text(
+                            targetLabel,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              color: const Color(0xFFF59E0B),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    isReinforcement
+                        ? (lang == 'fr'
+                            ? (CoachAiPillarCoaching.isStrategyOpinionQuestion(question)
+                                ? 'Mon avis sur ta stratégie (pas un audit ENREGISTRÉ).'
+                                : 'Réponse directe à ta question (les chiffres servent le conseil, pas un audit).')
+                            : (CoachAiPillarCoaching.isStrategyOpinionQuestion(question)
+                                ? 'My view on your strategy (not a recorded-trade audit).'
+                                : 'Direct answer to your question (numbers support advice, not an audit).'))
+                        : (hasTrainingPlan
+                            ? (lang == 'fr'
+                                ? 'Plan d’action + entraînement 4 semaines (pas audit ENREGISTRÉ).'
+                                : 'Action plan + 4-week training (not recorded-trade audit).')
+                            : (lang == 'fr'
+                                ? 'Coaching actionnable (pas audit ENREGISTRÉ / NON ENREGISTRÉ).'
+                                : 'Actionable coaching (not recorded vs missing audit).')),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      color: const Color(0xFF9CA3AF),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (!isReinforcement) ...[
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _performanceMetricChip(
+                          lang == 'fr' ? 'Renseignés' : 'Logged',
+                          '${pillar.recorded}/${pillar.total}',
+                        ),
+                        _performanceMetricChip(
+                          lang == 'fr' ? 'Non-respect' : 'Violations',
+                          '${pillar.nonRespect}',
+                        ),
+                        if (pillar.recordedClosed > 0)
+                          _performanceMetricChip(
+                            'Winrate',
+                            '${pillar.winrateRecorded.toStringAsFixed(0)}%',
+                          ),
+                      ],
+                    ),
+                  ],
+                  if (m.text.trim().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _CoachExpandableInsight(text: m.text),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCoachingStoryCard(_CoachAiMessage m, String question) {
     final focus = CoachAiCoachingStory.buildFocus(
       TradeJournalScope.of(context).items,
@@ -2415,6 +2939,38 @@ class _CoachAiPageState extends State<CoachAiPage> {
                     const SizedBox(height: 10),
                     _CoachExpandableInsight(text: m.text),
                   ],
+                  ...() {
+                    final related = CoachAiRelatedTrades.build(
+                      TradeJournalScope.of(context).items,
+                      question,
+                      themes: themes,
+                    );
+                    if (related == null || related.rows.isEmpty) {
+                      return <Widget>[];
+                    }
+                    return [
+                      const SizedBox(height: 14),
+                      Text(
+                        related.title,
+                        style: _coachText(
+                          size: 13,
+                          color: const Color(0xFFA78BFA),
+                          weight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        related.subtitle,
+                        style: _coachText(
+                          size: 11.5,
+                          color: const Color(0xFF6B7280),
+                          weight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ..._buildCoachTradeRowTiles(related.rows),
+                    ];
+                  }(),
                 ],
               ),
             ),
@@ -2422,6 +2978,101 @@ class _CoachAiPageState extends State<CoachAiPage> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildCoachTradeRowTiles(List<CoachTradeListRow> rows) {
+    return [
+      for (final row in rows)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF1F2937)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        row.pair,
+                        style: _coachText(size: 14, color: Colors.white, weight: FontWeight.w800),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      row.sideLabel,
+                      style: _coachText(size: 10, color: const Color(0xFF6B7280), weight: FontWeight.w700),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      row.isClosed
+                          ? '${row.pnl >= 0 ? '+' : ''}${row.pnl}'
+                          : 'Ouvert',
+                      style: _coachText(
+                        size: 13,
+                        color: row.isClosed
+                            ? (row.pnl >= 0
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFFF87171))
+                            : const Color(0xFFF59E0B),
+                        weight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  row.dateLabel,
+                  style: _coachText(size: 13, color: const Color(0xFF9CA3AF), weight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (row.psychTags.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final t in row.psychTags)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: row.matchedTags.any((m) => m.toLowerCase() == t.toLowerCase())
+                                ? const Color(0xFF4C1D95).withValues(alpha: 0.45)
+                                : const Color(0xFF1F2937),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: row.matchedTags.any((m) => m.toLowerCase() == t.toLowerCase())
+                                  ? const Color(0xFFA78BFA)
+                                  : const Color(0xFF374151),
+                            ),
+                          ),
+                          child: Text(
+                            t,
+                            style: _coachText(
+                              size: 10,
+                              color: row.matchedTags.any((m) => m.toLowerCase() == t.toLowerCase())
+                                  ? const Color(0xFFE9D5FF)
+                                  : const Color(0xFF9CA3AF),
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+    ];
   }
 
   Widget _buildPsychWhyCard(_CoachAiMessage m, String question) {
@@ -2772,99 +3423,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                   ],
                   if (report.rows.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    for (final row in report.rows)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.35),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF1F2937)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      row.pair,
-                                      style: _coachText(size: 14, color: Colors.white, weight: FontWeight.w800),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Text(
-                                    row.sideLabel,
-                                    style: _coachText(size: 10, color: const Color(0xFF6B7280), weight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    row.isClosed
-                                        ? '${row.pnl >= 0 ? '+' : ''}${row.pnl}'
-                                        : 'Ouvert',
-                                    style: _coachText(
-                                      size: 13,
-                                      color: row.isClosed
-                                          ? (row.pnl >= 0
-                                              ? const Color(0xFF34D399)
-                                              : const Color(0xFFF87171))
-                                          : const Color(0xFFF59E0B),
-                                      weight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                row.dateLabel,
-                                style: _coachText(size: 13, color: const Color(0xFF9CA3AF), weight: FontWeight.w500),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (row.psychTags.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: [
-                                    for (final t in row.psychTags)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: row.matchedTags
-                                                  .any((m) => m.toLowerCase() == t.toLowerCase())
-                                              ? const Color(0xFF4C1D95).withValues(alpha: 0.45)
-                                              : const Color(0xFF1F2937),
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: row.matchedTags
-                                                    .any((m) => m.toLowerCase() == t.toLowerCase())
-                                                ? const Color(0xFFA78BFA)
-                                                : const Color(0xFF374151),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          t,
-                                          style: _coachText(
-                                            size: 10,
-                                            color: row.matchedTags
-                                                    .any((m) => m.toLowerCase() == t.toLowerCase())
-                                                ? const Color(0xFFE9D5FF)
-                                                : const Color(0xFF9CA3AF),
-                                            weight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
+                    ..._buildCoachTradeRowTiles(report.rows),
                   ],
                   if (report.hint.isNotEmpty && report.rows.isNotEmpty) ...[
                     const SizedBox(height: 4),
@@ -3042,6 +3601,8 @@ class _CoachAiPageState extends State<CoachAiPage> {
     final lang = Localizations.localeOf(context).languageCode;
     final steps = CoachAiAppHelp.uiStepsForQuestion(question, lang);
     final slug = CoachAiAppHelp.resolveGuideSlug(question);
+    final hybrid = focus == 'app_help_hybrid' || CoachAiAppHelp.usesHybridHelpLayout(question);
+    final intro = hybrid ? CoachAiAppHelp.workflowCoachIntro(lang) : null;
     final title = CoachAiAppHelp.localCardTitle(question, lang) ??
         (slug == null
             ? 'Aide PAYCHEK'
@@ -3050,6 +3611,9 @@ class _CoachAiPageState extends State<CoachAiPage> {
                 .map((a) => a.frenchTitle)
                 .firstOrNull ??
                 'Aide PAYCHEK');
+    final subtitle = hybrid
+        ? (lang == 'fr' ? ' · explication + mode d’emploi' : ' · guide + how-to')
+        : (lang == 'fr' ? ' · mode d’emploi' : ' · how-to');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -3088,14 +3652,47 @@ class _CoachAiPageState extends State<CoachAiPage> {
                           style: _coachText(size: 15, color: const Color(0xFF34D399), weight: FontWeight.w800),
                         ),
                         TextSpan(
-                          text: ' · mode d’emploi',
+                          text: subtitle,
                           style: _coachText(size: 15, color: Colors.white, weight: FontWeight.w800),
                         ),
                       ],
                     ),
                   ),
+                  if (intro != null && intro.trim().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF422006).withValues(alpha: 0.28),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.35)),
+                      ),
+                      child: Text(
+                        intro,
+                        style: _coachText(
+                          size: 13.5,
+                          height: 1.5,
+                          color: const Color(0xFFFDE68A),
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (steps.isNotEmpty) ...[
                     const SizedBox(height: 12),
+                    if (hybrid)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          lang == 'fr' ? 'Où cliquer dans l’app' : 'Where to tap in the app',
+                          style: _coachText(
+                            size: 12,
+                            color: const Color(0xFF9CA3AF),
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     for (var i = 0; i < steps.length; i++)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -3709,6 +4306,9 @@ class _CoachAiPageState extends State<CoachAiPage> {
         if (focus == 'coaching_story') {
           return _buildCoachingStoryCard(m, q);
         }
+        if (focus == CoachAiFocus.pillarImprovement) {
+          return _buildPillarImprovementCard(m, q);
+        }
         if (focus == CoachAiFocus.performanceOvertrading) {
           return _buildPerformanceOvertradingCard(m, q);
         }
@@ -3724,7 +4324,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
         if (focus == CoachAiFocus.appPricing) {
           return _buildAppPricingCard(m);
         }
-        if (focus == 'app_help') {
+        if (focus == 'app_help' || focus == 'app_help_hybrid') {
           return _buildAppHelpCard(m, q, focus: focus);
         }
         if (focus == 'trade_list') {
@@ -3793,6 +4393,8 @@ class _CoachAiPageState extends State<CoachAiPage> {
         ),
       );
     }
+
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Material(
       color: const Color(0xFF050505),
@@ -3879,7 +4481,11 @@ class _CoachAiPageState extends State<CoachAiPage> {
                     ),
                   ),
                 ),
-                Container(
+                AnimatedPadding(
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOutCubic,
+                  padding: EdgeInsets.only(bottom: keyboardInset),
+                  child: Container(
                   padding: EdgeInsets.fromLTRB(hPad, 10, hPad, 14),
                   decoration: BoxDecoration(
                     color: const Color(0xFF050505),
@@ -3912,6 +4518,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                                 Expanded(
                                   child: TextField(
                                     controller: _questionCtrl,
+                                    focusNode: _questionFocus,
                                     enabled: !_sending,
                                     minLines: 1,
                                     maxLines: 5,
@@ -3980,6 +4587,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                       ),
                     ),
                   ),
+                ),
                 ),
               ],
             );

@@ -143,7 +143,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
             );
             return;
           }
-          parsedRows = parseTradovateOrdersCsv(html!);
+          parsedRows = parseTradovateImportCsv(html!);
           break;
         case 'NinjaTrader':
           if (isXlsx) {

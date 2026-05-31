@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
 
 import '../trade/trade_models.dart';
+import 'coach_ai_checklist_trades_audit.dart';
+import 'coach_ai_query_text.dart';
 import 'coach_ai_coaching_story.dart';
 import 'coach_ai_psych_analysis.dart';
 
@@ -47,12 +49,16 @@ abstract final class CoachAiTradeListQuery {
   static bool isTradeListQuestion(String question) {
     if (CoachAiPsychAnalysis.isPsychologyWhyQuestion(question)) return false;
     if (CoachAiCoachingStory.isCoachingStoryQuestion(question)) return false;
-    final q = question.toLowerCase();
+    if (CoachAiChecklistTradesAudit.isAuditQuestion(question)) return false;
+    final q = CoachAiQueryText.forMatching(question);
+    // Pas « chekliste avec mes trades » (faux positif sur liste…trade).
+    if (CoachAiChecklistTradesAudit.mentionsChecklist(q)) return false;
     // Liste explicite uniquement — pas « trade contre mon analyse » (faux positif sur « ou »).
     if (RegExp(
-      r'quel(le)?s?\s+trade|quels\s+trades|montre.{0,30}trade|liste.{0,30}trade|'
+      r'quel(le)?s?\s+trade|quels\s+trades|montre.{0,30}trade|'
       r'affiche.{0,30}trade|donne.{0,30}trade|voir.{0,30}trade|'
-      r'quels trades.{0,20}(tag|fomo|tilt|revenge|psycho)',
+      r'quels trades.{0,20}(tag|fomo|tilt|revenge|psycho)|'
+      r'(?:^|\s)liste.{0,30}trade',
     ).hasMatch(q)) {
       return true;
     }
@@ -97,9 +103,9 @@ abstract final class CoachAiTradeListQuery {
 
     final matchedTrades = <(TradeListItem t, List<String> matched)>[];
     for (final t in trades) {
-      if (t.psychTags.isEmpty) continue;
       final matched = <String>[];
       if (tagFilter != null) {
+        if (t.psychTags.isEmpty) continue;
         for (final raw in t.psychTags) {
           if (_tagMatchesFilter(raw, tagFilter)) {
             matched.add(_normTag(raw));
@@ -112,6 +118,9 @@ abstract final class CoachAiTradeListQuery {
       matchedTrades.add((t, matched.toSet().toList()));
     }
     matchedTrades.sort((a, b) => b.$1.entreeAt.compareTo(a.$1.entreeAt));
+    if (tagFilter == null && matchedTrades.length > 25) {
+      matchedTrades.removeRange(25, matchedTrades.length);
+    }
     final rows = [
       for (final e in matchedTrades)
         CoachTradeListRow(
@@ -159,12 +168,17 @@ abstract final class CoachAiTradeListQuery {
         hint = '';
       }
     } else {
+      final total = trades.length;
       headline = count == 0
-          ? 'Aucun trade avec tag psychologique'
-          : (count == 1 ? '1 trade tagué' : '$count trades tagués');
+          ? 'Aucun trade dans le journal'
+          : (count == 1
+              ? '1 trade récent (sur $total)'
+              : '$count trades récents (sur $total au journal)');
       hint = count == 0
-          ? 'Ajoute un tag psych sur Ajouter trade après chaque session.'
-          : '';
+          ? 'Enregistre des trades dans l’onglet Trade pour les voir ici.'
+          : (count < total
+              ? 'Liste des plus récents — tag psych optionnel sur Ajouter trade.'
+              : '');
     }
 
     return CoachTradeListReport(

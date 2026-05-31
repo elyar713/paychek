@@ -170,7 +170,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tradeImportTradovatePickOrdersCsv =>
-      'Tradovate: choose an Orders.csv file.';
+      'Tradovate: choose Orders.csv or Performance.csv (Reports export).';
 
   @override
   String get tradeImportNinjaGridCsv =>
@@ -237,7 +237,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tradeImportEmptyTradovate =>
-      'Tradovate CSV: no round-trip (entry/exit) detected.';
+      'Tradovate CSV: no round-trip detected. Export from Reports → Orders (not Performance), with both buys and sells in the range, and Filled Qty / Avg Fill Price columns.';
 
   @override
   String get tradeImportEmptyNinjaTrader =>

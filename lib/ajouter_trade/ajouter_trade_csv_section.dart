@@ -22,7 +22,7 @@ const kCsvSoftwareImportGuidance = <String, String>{
   'MT4': 'Terminal -> Account History -> Save as Detailed report',
   'MT5': 'Toolbox -> History -> Report -> Open XML or HTML',
   'TradingView': 'Trading panel (bottom) -> Export date -> Order history',
-  'Tradovate': 'Icone (+) -> Report -> Date -> Go -> Download',
+  'Tradovate': 'Reports → Orders.csv ou Performance.csv → Download',
   'cTrader': 'Trading panel -> History -> Create a statement',
   'NinjaTrader': 'Control Center -> New -> Account Date -> Export',
   'Quantower':

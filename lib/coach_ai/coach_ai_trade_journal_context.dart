@@ -3,7 +3,7 @@ import '../trade/trade_plan_analysis.dart';
 
 /// Résumé compact du journal Trade pour le contexte JSON du Coach AI.
 abstract final class CoachAiTradeJournalContext {
-  static const int maxRecentTrades = 20;
+  static const int maxRecentTrades = 30;
 
   static Map<String, dynamic> build(Iterable<TradeListItem> trades) {
     final all = trades.toList();

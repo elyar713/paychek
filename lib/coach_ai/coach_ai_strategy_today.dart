@@ -4,6 +4,7 @@ import '../strategie/strategie_mes_regles_storage.dart';
 import '../strategie/strategie_setups_store.dart';
 import '../strategie/strategie_starred_setup_storage.dart';
 import '../strategie/widgets/strategie_setup_card.dart';
+import 'coach_ai_pillar_coaching.dart';
 import 'coach_ai_response_format.dart';
 
 class StrategyTodayRule {
@@ -101,6 +102,8 @@ class StrategyTodaySnapshot {
 /// Stratégie du jour (page Stratégie PAYCHEK), pas l’audit discipline des trades.
 abstract final class CoachAiStrategyToday {
   static bool isTodayStrategyQuestion(String question) {
+    if (CoachAiPillarCoaching.isImprovementQuestion(question)) return false;
+    if (CoachAiPillarCoaching.isStrategyOpinionQuestion(question)) return false;
     final q = question.toLowerCase();
     if (!RegExp(
       r'strat(é|e)gie|strategy|\bsetup\b|mon setup|ma stratégie|ma strategie|my strategy',
@@ -108,7 +111,8 @@ abstract final class CoachAiStrategyToday {
       return false;
     }
     if (RegExp(
-      r'performance|winrate|pnl|bilan|non.?respect|enregistr|audit|combien|sur mes trades|discipline',
+      r'performance|winrate|pnl|bilan|non.?respect|enregistr|audit|combien|sur mes trades|discipline|'
+      r'améliorer|ameliorer|ameliore|solution|conseil|proposes?',
     ).hasMatch(q)) {
       return false;
     }
@@ -118,7 +122,8 @@ abstract final class CoachAiStrategyToday {
       return true;
     }
     return RegExp(
-      r"dis.?moi|montre|quelle est|quel est|what is|show me|ma stratégie|ma strategie|mon setup|my strategy|la stratégie|la strategie",
+      r"dis.?moi|montre|quelle est ma strat|quel est ma strat|what is my strategy|show me my|"
+      r"mon setup|my setup|la stratégie du jour|la strategie du jour",
     ).hasMatch(q);
   }
 

@@ -133,6 +133,68 @@ int? _csvColumnIndexNorm(List<String> header, List<String> candidates) {
   return null;
 }
 
+/// Toutes les colonnes correspondant (ex. Tradovate : `avgPrice` vide + `Avg Fill Price` rempli).
+List<int> _csvAllColumnIndicesNorm(
+  List<String> header,
+  List<String> candidates,
+) {
+  final lowered =
+      header.map((e) => e.trim().toLowerCase().replaceAll(' ', '')).toList();
+  final keys = candidates
+      .map((c) => c.trim().toLowerCase().replaceAll(' ', ''))
+      .toSet();
+  final out = <int>[];
+  for (var i = 0; i < lowered.length; i++) {
+    if (keys.contains(lowered[i])) out.add(i);
+  }
+  return out;
+}
+
+double? _csvFirstPositiveNumber(List<String> cols, List<int> indices) {
+  for (final idx in indices) {
+    final n = _parseMtNumber(_csvAt(cols, idx));
+    if (n != null && n > 0) return n;
+  }
+  return null;
+}
+
+String _csvFirstNonEmptyCell(List<String> cols, List<int> indices) {
+  for (final idx in indices) {
+    final v = _csvAt(cols, idx).trim();
+    if (v.isNotEmpty) return v;
+  }
+  return '';
+}
+
+/// PnL Tradovate Performance : `$24.50` ou `$(73.50)`.
+double? _parseTradovatePnl(String raw) {
+  final s = raw.trim();
+  if (s.isEmpty) return null;
+  final negative = s.contains('(') && s.contains(')');
+  final n = _parseMtNumber(s.replaceAll(RegExp(r'[\$\(\)]'), ''));
+  if (n == null) return null;
+  return negative ? -n.abs() : n;
+}
+
+TradeSide? _parseTradovateSide(String raw) {
+  final sideRaw = raw.trim().toLowerCase();
+  if (sideRaw == 'buy' ||
+      sideRaw.startsWith('buy') ||
+      sideRaw == 'b' ||
+      sideRaw == 'long' ||
+      sideRaw.startsWith('long')) {
+    return TradeSide.achat;
+  }
+  if (sideRaw == 'sell' ||
+      sideRaw.startsWith('sell') ||
+      sideRaw == 's' ||
+      sideRaw == 'short' ||
+      sideRaw.startsWith('short')) {
+    return TradeSide.vente;
+  }
+  return null;
+}
+
 /// Dates type export Tradovateâ€¯: `MM/dd/yyyy HH:mm:ss`.
 DateTime? _parseTradovateCsvDateTime(String raw) {
   final s = raw.trim().replaceAll('\u00A0', ' ');

@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../trade/trade_discipline_day_snapshot.dart';
 import '../trade/trade_models.dart';
 import '../trade/trade_plan_analysis.dart';
+import 'coach_ai_query_text.dart';
 import 'coach_ai_response_format.dart';
 
 /// Question ciblée sur l'état mental (émotion ou curseur du jour).
@@ -136,6 +137,10 @@ class CoachAiMentalAnalysis {
     'emotionnel': 'emotion',
     'emotion': 'emotion',
     'sommeil': 'sleep',
+    'someil': 'sleep',
+    'sommeill': 'sleep',
+    'sommei': 'sleep',
+    'dormi': 'sleep',
     'sleep': 'sleep',
     'méditation': 'meditation',
     'meditation': 'meditation',
@@ -263,10 +268,26 @@ class CoachAiMentalAnalysis {
     };
   }
 
+  /// « Quand j'ai moins de sommeil, mon winrate baisse » (typos someil, etc.).
+  static bool isMetricPerformanceLinkQuestion(String question) {
+    final q = CoachAiQueryText.forMatching(question);
+    final hasMetric = RegExp(
+      r'sommeil|someil|sommeill|sleep|dormi|\bnuit\b|focus|confiance|peur|fear|'
+      r'énergie|energie|stress|fatigue',
+    ).hasMatch(q);
+    final hasPerf = RegExp(
+      r'winrate|wr\b|pnl|rendement|performance|diminu|baisse|monte|gagn|perd',
+    ).hasMatch(q);
+    final hasWhen = RegExp(r'\bquand\b|\bwhen\b').hasMatch(q);
+    final hasPolarity = RegExp(r'moins|plus|faible|bas\b|peu de|beaucoup|élevé|eleve').hasMatch(q);
+    return hasMetric && hasPerf && (hasWhen || hasPolarity);
+  }
+
   /// Performance liée à un curseur/émotion (pas les conseils « comment améliorer »).
   static bool isMentalPerformanceQuestion(String question) {
+    if (isMetricPerformanceLinkQuestion(question)) return true;
     if (extractMentalQuery(question) == null) return false;
-    final q = question.toLowerCase();
+    final q = CoachAiQueryText.forMatching(question);
     final coachingOnly = RegExp(
       r'comment\s+(améliorer|ameliorer|mieux|travailler|booster|renforcer)|'
       r'conseil|astuce|tip|how\s+to\s+improve',
@@ -284,7 +305,7 @@ class CoachAiMentalAnalysis {
   }
 
   static CoachMentalQuery? extractMentalQuery(String question) {
-    final q = question.toLowerCase();
+    final q = CoachAiQueryText.forMatching(question);
     final polarity = _detectPolarity(q);
     final controller = MentalStateController.instance;
 
@@ -365,6 +386,16 @@ class CoachAiMentalAnalysis {
       return CoachMentalQuery(
         kind: 'emotion',
         label: match.isNotEmpty ? match.first : entry.value,
+        polarity: polarity,
+      );
+    }
+
+    if (RegExp(r'sommeil|someil|sommeill|dormi|sleep|\bnuit\b').hasMatch(q)) {
+      final metric = _metricById(controller, 'sleep');
+      return CoachMentalQuery(
+        kind: 'metric',
+        label: metric?.label.trim().isNotEmpty == true ? metric!.label.trim() : 'Sommeil',
+        metricId: 'sleep',
         polarity: polarity,
       );
     }

@@ -1,9 +1,11 @@
+import 'coach_ai_query_text.dart';
 import 'coach_ai_calendar.dart';
 import 'coach_ai_strategy_today.dart';
 import 'coach_ai_analysis_today.dart';
 import 'coach_ai_app_help.dart';
 import 'coach_ai_app_pricing.dart';
 import 'coach_ai_checklist_today.dart';
+import 'coach_ai_checklist_trades_audit.dart';
 import 'coach_ai_coaching_story.dart';
 import 'coach_ai_conversation.dart';
 import 'coach_ai_mental_analysis.dart';
@@ -11,6 +13,7 @@ import 'coach_ai_non_respect_analysis.dart';
 import 'coach_ai_performance_focus.dart';
 import 'coach_ai_performance_summary.dart';
 import 'coach_ai_psych_analysis.dart';
+import 'coach_ai_pillar_coaching.dart';
 import 'coach_ai_trade_list_query.dart';
 
 /// Routage des intentions Coach AI — source unique côté Flutter.
@@ -58,22 +61,37 @@ abstract final class CoachAiFocus {
   static const String performanceOvertrading = 'performance_overtrading';
   static const String performanceLens = 'performance_lens';
   static const String performanceSummary = 'performance_summary';
+  static const String pillarImprovement = CoachAiPillarCoaching.focus;
 
   /// Réponses construites entièrement dans l’app (pas d’appel cloud).
   static bool isLocalOnly(String focus) =>
-      focus == appHelp || focus == storyFollowUp || focus == tradeList;
+      focus == appHelp ||
+      focus == 'app_help_hybrid' ||
+      focus == storyFollowUp ||
+      focus == tradeList ||
+      focus == pillarImprovement ||
+      focus == coachingStory;
 
   /// Ordre de priorité : conversation → comment → récit → données explicites → piliers.
   static String resolve(String question, {String? priorAssistantFocus}) {
-    final q = question.toLowerCase();
+    final q = CoachAiQueryText.forMatching(question);
     if (CoachAiConversation.isStoryFollowUp(question, priorAssistantFocus)) {
       return storyFollowUp;
+    }
+    if (CoachAiAppPricing.isPricingQuestion(question)) {
+      return appPricing;
+    }
+    // Coaching stratégie / renforcement : local uniquement (pas cloud).
+    if (CoachAiPillarCoaching.shouldAnswerLocally(question, priorFocus: priorAssistantFocus)) {
+      return pillarImprovement;
     }
     if (CoachAiConversation.isFocusedTopicFollowUp(question, priorAssistantFocus)) {
       return priorAssistantFocus!;
     }
-    if (CoachAiAppPricing.isPricingQuestion(question)) {
-      return appPricing;
+    if (priorAssistantFocus != null &&
+        CoachAiConversation.isConversationalFollowUp(question, priorAssistantFocus) &&
+        !CoachAiConversation.hasExplicitNewTopic(question)) {
+      return 'conversation_followup';
     }
     if (CoachAiChecklistToday.isTodayChecklistQuestion(question)) {
       return checklistToday;
@@ -102,6 +120,9 @@ abstract final class CoachAiFocus {
     if (CoachAiPerformanceFocus.isOvertradingQuestion(question)) {
       return performanceOvertrading;
     }
+    if (CoachAiMentalAnalysis.isMentalPerformanceQuestion(question)) {
+      return 'mental_emotion';
+    }
     if (CoachAiPerformanceSummary.isGeneralPerformanceQuestion(question)) {
       return performanceSummary;
     }
@@ -113,11 +134,14 @@ abstract final class CoachAiFocus {
     if (CoachAiCoachingStory.isCoachingStoryQuestion(question)) {
       return coachingStory;
     }
+    if (CoachAiPillarCoaching.isStrategyDisciplineStruggle(question)) {
+      return pillarImprovement;
+    }
+    if (CoachAiChecklistTradesAudit.isAuditQuestion(question)) {
+      return 'checklist';
+    }
     if (CoachAiTradeListQuery.isTradeListQuestion(question)) {
       return tradeList;
-    }
-    if (CoachAiMentalAnalysis.isMentalPerformanceQuestion(question)) {
-      return 'mental_emotion';
     }
     if (CoachAiNonRespectAnalysis.isNonRespectQuestion(question)) {
       return 'non_respect';
@@ -125,13 +149,24 @@ abstract final class CoachAiFocus {
     if (CoachAiPsychAnalysis.isPsychologyWhyQuestion(question)) {
       return 'psychology_why';
     }
-    if (RegExp(r'checklist').hasMatch(q)) return 'checklist';
+    if (CoachAiChecklistTradesAudit.mentionsChecklist(q)) return 'checklist';
     if (RegExp(r'analyse|analysis|plan d.?analyse').hasMatch(q)) return 'analyse';
-    if (RegExp(r'strat(é|e)gie|strategy').hasMatch(q)) return 'strategie';
+    if (RegExp(r'strat(é|e)gie|strategy').hasMatch(q)) {
+      if (CoachAiPillarCoaching.shouldAnswerLocally(
+        question,
+        priorFocus: priorAssistantFocus,
+      )) {
+        return pillarImprovement;
+      }
+      return 'strategie';
+    }
     if (RegExp(r'état mental|etat mental|mental state').hasMatch(q)) {
       return 'mental';
     }
     if (RegExp(r'performance|bilan|winrate|pnl|rendement').hasMatch(q)) {
+      if (CoachAiMentalAnalysis.isMentalPerformanceQuestion(question)) {
+        return 'mental_emotion';
+      }
       return 'full';
     }
     return 'coach';
