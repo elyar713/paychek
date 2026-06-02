@@ -6,6 +6,7 @@ enum PaychekSubscriptionFlowKind {
   cancelled,
   signInRequired,
   stripeUrlMissing,
+  iosWebRequiresNativeApp,
   appleStoreUnavailable,
   appleProductsUnavailable,
   appleVerificationFailed,

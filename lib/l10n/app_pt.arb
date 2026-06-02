@@ -1123,6 +1123,8 @@
   "paywallAppleProductsUnavailable": "Subscrições App Store não encontradas. Cria no App Store Connect Paychek.monthly, Paychek.quarterly e Paychek.annual, ativa compras integradas no Xcode e reinstala num iPhone real com conta Sandbox.",
   "paywallAppleVerificationFailed": "Compra recebida mas a validação no servidor falhou. Tenta de novo ou contacta o suporte.",
   "paywallApplePurchaseError": "A compra na App Store não foi concluída. Tenta de novo dentro de instantes.",
+  "paywallIosWebRequiresNativeApp": "No iPhone, subscreve na app Paychek (App Store), não no Safari. Instala a app via TestFlight ou App Store.",
+  "paywallLegalFooterApple": "Pagamento via App Store • Cancela quando quiseres • Termos de serviço",
   "paywallRestoreNothingFound": "Ainda bloqueado: assinatura ativa não encontrada.",
   "paywallLegalFooter": "Pagamento seguro via Stripe • Cancele quando quiser • Termos de serviço",
   "paywallGoldPremiumPill": "Acesso premium",

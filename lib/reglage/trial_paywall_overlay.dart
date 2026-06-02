@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,6 +11,7 @@ import 'paychek_apple_iap_service.dart';
 import 'stripe_entitlement_sync.dart';
 import 'paywall_subscription_feedback.dart';
 import 'paychek_subscription_flow_result.dart';
+import 'paychek_subscription_platform.dart';
 import 'subscription_launch_helper.dart';
 
 const Color _kEmerald500 = Color(0xFF10B981);
@@ -186,15 +186,16 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
         TextButton(
           onPressed: () async {
             _setBanner(null);
-            if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+            if (paychekUsesNativeAppleIap) {
               final restored = await restoreProOnMobileStore();
               if (restored == PaychekAppleIapPurchaseOutcome.success) {
                 final stillLite = await widget.onReloadTrialGate();
                 if (!context.mounted) return;
                 if (!stillLite) return;
               }
+            } else if (!paychekIsIosWeb) {
+              await PaychekStripeEntitlementSync.syncFromStripe(maxAttempts: 3);
             }
-            await PaychekStripeEntitlementSync.syncFromStripe(maxAttempts: 3);
             final stillLite = await widget.onReloadTrialGate();
             if (!context.mounted) return;
             if (stillLite) {
@@ -233,12 +234,12 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _trialFooterActions(context, l10n),
-        if (kIsWeb) ...[
+        if (kIsWeb || paychekUsesNativeAppleIap) ...[
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              l10n.paywallLegalFooter.toUpperCase(),
+              paychekPaywallLegalFooterLabel(l10n).toUpperCase(),
               textAlign: TextAlign.center,
               style: _font(
                 size: 9,

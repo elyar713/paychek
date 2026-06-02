@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+    show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb;
 import 'paychek_apple_iap_checkout.dart';
 import 'paychek_apple_iap_service.dart';
 import 'paychek_billing_plan.dart';
 import 'paychek_billing_remote.dart';
 import 'paychek_checkout_launch.dart';
 import 'paychek_subscription_flow_result.dart';
+import 'paychek_subscription_platform.dart';
 import 'trial_paywall_config.dart';
 
 Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
@@ -15,6 +16,38 @@ Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
   final user = FirebaseAuth.instance.currentUser;
   final email = user?.email;
   final uid = user?.uid;
+
+  // iOS natif : App Store uniquement (jamais Stripe).
+  if (paychekUsesNativeAppleIap) {
+    if (user == null) {
+      return const PaychekSubscriptionFlowResult(
+        PaychekSubscriptionFlowKind.signInRequired,
+      );
+    }
+    await PaychekAppleIapService.ensureInitialized();
+    final outcome = await purchaseProOnMobileStore(cycle: cycle);
+    if (outcome == null) {
+      debugPrint(
+        '[Paychek] IAP iOS: purchaseProOnMobileStore null '
+        '(kIsWeb=$kIsWeb, platform=$defaultTargetPlatform)',
+      );
+      return const PaychekSubscriptionFlowResult(
+        PaychekSubscriptionFlowKind.appleStoreUnavailable,
+      );
+    }
+    final result = PaychekSubscriptionFlowResult.fromAppleOutcome(outcome);
+    if (!result.ok) {
+      debugPrint('[Paychek] IAP iOS outcome: $outcome');
+    }
+    return result;
+  }
+
+  // Safari / web sur iPhone : pas de Stripe in-app.
+  if (paychekIsIosWeb) {
+    return const PaychekSubscriptionFlowResult(
+      PaychekSubscriptionFlowKind.iosWebRequiresNativeApp,
+    );
+  }
 
   if (kIsWeb) {
     PaychekBillingRemote.invalidateCache();
@@ -38,32 +71,14 @@ Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
   }
 
   switch (defaultTargetPlatform) {
-    case TargetPlatform.iOS:
-      if (user == null) {
-        return const PaychekSubscriptionFlowResult(
-          PaychekSubscriptionFlowKind.signInRequired,
-        );
-      }
-      if (!PaychekAppleIapService.isSupported) {
-        return const PaychekSubscriptionFlowResult(
-          PaychekSubscriptionFlowKind.appleStoreUnavailable,
-        );
-      }
-      final outcome = await purchaseProOnMobileStore(cycle: cycle);
-      if (outcome == null) {
-        return const PaychekSubscriptionFlowResult(
-          PaychekSubscriptionFlowKind.appleStoreUnavailable,
-        );
-      }
-      return PaychekSubscriptionFlowResult.fromAppleOutcome(outcome);
     case TargetPlatform.android:
       final launched = await launchPaychekCheckoutUri(
         Uri.parse('https://play.google.com/store/account/subscriptions'),
       );
       return PaychekSubscriptionFlowResult(
         launched
-            ? PaychekSubscriptionFlowKind.success
-            : PaychekSubscriptionFlowKind.launchFailed,
+          ? PaychekSubscriptionFlowKind.success
+          : PaychekSubscriptionFlowKind.launchFailed,
       );
     default:
       PaychekBillingRemote.invalidateCache();

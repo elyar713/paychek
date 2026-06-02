@@ -2863,6 +2863,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'App-Store-Kauf nicht abgeschlossen. Bitte gleich erneut versuchen.';
 
   @override
+  String get paywallIosWebRequiresNativeApp =>
+      'Auf dem iPhone abonnierst du in der Paychek-App (App Store), nicht in Safari. App über TestFlight oder App Store installieren.';
+
+  @override
+  String get paywallLegalFooterApple =>
+      'Abrechnung über App Store • Jederzeit kündbar • Nutzungsbedingungen';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Noch gesperrt: kein aktives Abonnement erkannt.';
 

@@ -5242,6 +5242,18 @@ abstract class AppLocalizations {
   /// **'L’achat App Store n’a pas abouti. Réessaie dans un instant.'**
   String get paywallApplePurchaseError;
 
+  /// No description provided for @paywallIosWebRequiresNativeApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur iPhone, l’abonnement se fait dans l’app Paychek (App Store), pas dans Safari. Installe l’app via TestFlight ou l’App Store.'**
+  String get paywallIosWebRequiresNativeApp;
+
+  /// No description provided for @paywallLegalFooterApple.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement via App Store • Annulable à tout moment • Conditions d’utilisation'**
+  String get paywallLegalFooterApple;
+
   /// No description provided for @paywallRestoreNothingFound.
   ///
   /// In fr, this message translates to:

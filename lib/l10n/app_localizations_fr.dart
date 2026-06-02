@@ -2866,6 +2866,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'L’achat App Store n’a pas abouti. Réessaie dans un instant.';
 
   @override
+  String get paywallIosWebRequiresNativeApp =>
+      'Sur iPhone, l’abonnement se fait dans l’app Paychek (App Store), pas dans Safari. Installe l’app via TestFlight ou l’App Store.';
+
+  @override
+  String get paywallLegalFooterApple =>
+      'Paiement via App Store • Annulable à tout moment • Conditions d’utilisation';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Toujours bloqué : aucun abonnement détecté. Termine l’achat ou réessaie.';
 

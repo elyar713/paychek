@@ -52,6 +52,23 @@ Le bundle iOS utilisé pour la validation est fixé dans le code : `pro.paychek.
 3. L’app appelle `verifyPaychekApplePurchase` → Firestore `subscriptionTier: pro`, `paymentMethod: apple_iap`
 4. **Restaurer les achats** : bouton du paywall (même flux de validation)
 
+### TestFlight (Mac in Cloud)
+
+> **Important :** une build TestFlight **antérieure au commit `7c30a33`** (avril 2026) appelait encore **Stripe** sur iPhone — message *« Lien Stripe introuvable… »*. Il faut **re-uploader** une build avec le code IAP récent (`git pull`, puis archive).
+
+Checklist avant de tester sur iPhone :
+
+1. **Code à jour** : `git pull` → commit ≥ `11f4fc2` (messages App Store, pas Stripe sur échec IAP)
+2. **Numéro de build** : incrémenter `version:` dans `pubspec.yaml` (ex. `1.2.1+6`) avant chaque upload TestFlight
+3. **Xcode** : Runner → **Signing & Capabilities** → **In-App Purchase** activé
+4. **App Store Connect** : produits `Paychek.monthly` / `.quarterly` / `.annual` créés et liés à la version soumise
+5. **Sandbox** : compte test créé dans App Store Connect (pas sur le Mac — sur le site)
+6. Sur l’iPhone : app **TestFlight** (icône Paychek), **compte Firebase connecté** dans l’app, puis paywall
+
+Si le bandeau parle encore de **Stripe** dans TestFlight → la build installée est **trop ancienne** (refaire upload + installer la nouvelle build dans TestFlight).
+
+Si le message parle d’**App Store introuvable** → produits Connect ou capability IAP manquante.
+
 ## 5. IDs produits personnalisés (optionnel)
 
 Build avec `--dart-define` :

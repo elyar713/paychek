@@ -2834,6 +2834,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'App Store purchase did not complete. Try again in a moment.';
 
   @override
+  String get paywallIosWebRequiresNativeApp =>
+      'On iPhone, subscribe in the Paychek app (App Store), not in Safari. Install the app from TestFlight or the App Store.';
+
+  @override
+  String get paywallLegalFooterApple =>
+      'Billed via App Store • Cancel anytime • Terms of Service';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Still locked: no subscription detected yet. Finish purchase or try again.';
 

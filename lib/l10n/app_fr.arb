@@ -1130,6 +1130,8 @@
   "paywallAppleProductsUnavailable": "Abonnements App Store introuvables. Vérifie dans App Store Connect les produits Paychek.monthly, Paychek.quarterly et Paychek.annual (état « Prêt à soumettre »), ajoute la capacité Achats intégrés dans Xcode, puis réinstalle l’app sur un iPhone réel avec un compte Sandbox.",
   "paywallAppleVerificationFailed": "Achat reçu mais la validation serveur a échoué. Réessaie ou contacte le support.",
   "paywallApplePurchaseError": "L’achat App Store n’a pas abouti. Réessaie dans un instant.",
+  "paywallIosWebRequiresNativeApp": "Sur iPhone, l’abonnement se fait dans l’app Paychek (App Store), pas dans Safari. Installe l’app via TestFlight ou l’App Store.",
+  "paywallLegalFooterApple": "Paiement via App Store • Annulable à tout moment • Conditions d’utilisation",
   "paywallRestoreNothingFound": "Toujours bloqué : aucun abonnement détecté. Termine l’achat ou réessaie.",
   "paywallLegalFooter": "Paiement sécurisé par Stripe • Annulable à tout moment • Conditions d’utilisation",
   "paywallGoldPremiumPill": "Accès Premium",

@@ -11,6 +11,8 @@ String paywallMessageForSubscriptionResult(
     PaychekSubscriptionFlowKind.cancelled => '',
     PaychekSubscriptionFlowKind.signInRequired => l.paywallSignInRequired,
     PaychekSubscriptionFlowKind.stripeUrlMissing => l.paywallStoreNotConfigured,
+    PaychekSubscriptionFlowKind.iosWebRequiresNativeApp =>
+      l.paywallIosWebRequiresNativeApp,
     PaychekSubscriptionFlowKind.appleStoreUnavailable =>
       l.paywallAppleStoreUnavailable,
     PaychekSubscriptionFlowKind.appleProductsUnavailable =>

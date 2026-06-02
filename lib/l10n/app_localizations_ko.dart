@@ -2756,6 +2756,13 @@ class AppLocalizationsKo extends AppLocalizations {
       'App Store 구매가 완료되지 않았습니다. 잠시 후 다시 시도하세요.';
 
   @override
+  String get paywallIosWebRequiresNativeApp =>
+      'iPhone에서는 Safari가 아닌 Paychek 앱(App Store)에서 구독하세요. TestFlight 또는 App Store에서 앱을 설치하세요.';
+
+  @override
+  String get paywallLegalFooterApple => 'App Store 결제 • 언제든 해지 • 서비스 약관';
+
+  @override
   String get paywallRestoreNothingFound => '계속 차단됨: 활성 구독이 감지되지 않았습니다.';
 
   @override
