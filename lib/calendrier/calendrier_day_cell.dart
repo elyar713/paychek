@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
+import 'calendrier_compact_money_text.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_utils.dart';
 
@@ -104,8 +105,9 @@ class CalendrierDayCell extends StatelessWidget {
               ],
               if (pnl != null) ...[
                 const SizedBox(height: 0.5),
-                Text(
-                  formatMoneyWithCurrencySymbol(pnl, capSymbol),
+                CalendrierCompactMoneyText(
+                  amount: pnl,
+                  currencySymbol: capSymbol,
                   style: GoogleFonts.inter(
                     fontSize: kDayCellPnlFontSize,
                     color: digitColor,

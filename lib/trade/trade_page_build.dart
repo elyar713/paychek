@@ -255,12 +255,20 @@ extension _TradePageBuild on _TradePageState {
                           checklistController: widget.checklistController,
                           onToggle: () {
                             _safeSetState(() {
-                              _expandedTradeId =
-                                  _expandedTradeId == item.id ? null : item.id;
+                              final willExpand = _expandedTradeId != item.id;
+                              _expandedTradeId = willExpand ? item.id : null;
+                              if (willExpand) {
+                                _ignoreTradeOutsideCollapseUntilMs =
+                                    DateTime.now().millisecondsSinceEpoch + 400;
+                              }
                             });
                           },
                           onTapOutsideWhenExpanded: () {
                             if (_expandedTradeId != item.id) return;
+                            if (DateTime.now().millisecondsSinceEpoch <
+                                _ignoreTradeOutsideCollapseUntilMs) {
+                              return;
+                            }
                             _safeSetState(() => _expandedTradeId = null);
                           },
                           onEdit: () => widget.onEditTrade(item),

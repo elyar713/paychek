@@ -216,23 +216,39 @@ class _CalendrierMonthPillsState extends State<CalendrierMonthPills> {
   }
 
   Widget _buildInfoRow(String label, String value, Color valueColor) {
+    final valueStyle = GoogleFonts.inter(
+      color: valueColor,
+      fontSize: 9,
+      fontWeight: FontWeight.w800,
+    );
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            color: kWeekdayColor,
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
+        Flexible(
+          flex: 2,
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.inter(
+              color: kWeekdayColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            color: valueColor,
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
+        const SizedBox(width: 6),
+        Flexible(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Text(
+              value,
+              maxLines: 1,
+              softWrap: false,
+              textAlign: TextAlign.end,
+              style: valueStyle,
+            ),
           ),
         ),
       ],

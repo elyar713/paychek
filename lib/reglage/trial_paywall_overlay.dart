@@ -1,18 +1,17 @@
-import 'dart:async' show unawaited;
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import 'paychek_billing_plan.dart';
-import 'paychek_billing_remote.dart';
-import 'paychek_checkout_launch.dart';
 import 'paywall/mobile/paychek_mobile_upgrade_paywall.dart';
 import 'paywall/mobile/paywall_mobile_tokens.dart';
+import 'paychek_apple_iap_checkout.dart';
+import 'paychek_apple_iap_service.dart';
 import 'stripe_entitlement_sync.dart';
-import 'trial_paywall_config.dart';
+import 'subscription_launch_helper.dart';
 
 const Color _kEmerald500 = Color(0xFF10B981);
 const Color _kSlate500 = Color(0xFF64748B);
@@ -42,29 +41,6 @@ class TrialPaywallOverlay extends StatefulWidget {
 
 class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
   String? _feedbackBanner;
-  PaychekBillingCycle _prefetchCycle = PaychekBillingCycle.annual;
-  Uri? _prefetchedCheckoutUri;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_prefetchCheckoutUri(_prefetchCycle));
-  }
-
-  Future<void> _prefetchCheckoutUri(PaychekBillingCycle cycle) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    final uri = await buildPaywallSubscribeUriAsync(
-      cycle: cycle,
-      firebaseEmail: user.email,
-      firebaseUid: user.uid,
-    );
-    if (!mounted) return;
-    setState(() {
-      _prefetchCycle = cycle;
-      _prefetchedCheckoutUri = uri;
-    });
-  }
 
   void _setBanner(String? text) {
     if (!mounted) return;
@@ -191,33 +167,18 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     PaychekBillingCycle cycle,
   ) async {
     _setBanner(null);
-    if (_prefetchCycle != cycle) {
-      unawaited(_prefetchCheckoutUri(cycle));
-    }
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       _setBanner(l10n.paywallStoreNotConfigured);
       return;
     }
-    var uri = _prefetchCycle == cycle ? _prefetchedCheckoutUri : null;
-    if (uri == null) {
-      PaychekBillingRemote.invalidateCache();
-      uri = await buildPaywallSubscribeUriAsync(
-        cycle: cycle,
-        firebaseEmail: user.email,
-        firebaseUid: user.uid,
-      );
-    }
-    if (uri == null) {
-      _setBanner(l10n.paywallStoreNotConfigured);
+    final ok = await openPaychekSubscriptionFlow(cycle: cycle);
+    if (!context.mounted) return;
+    if (ok) {
+      await widget.onReloadTrialGate();
       return;
     }
-    debugLogPaychekCheckoutUri(uri);
-    final ok = await launchPaychekCheckoutUri(uri);
-    if (!context.mounted) return;
-    if (!ok) {
-      _setBanner(l10n.paywallStoreNotConfigured);
-    }
+    _setBanner(l10n.paywallStoreNotConfigured);
   }
 
   Widget _trialFooterActions(BuildContext context, AppLocalizations l10n) {
@@ -227,6 +188,14 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
         TextButton(
           onPressed: () async {
             _setBanner(null);
+            if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+              final restored = await restoreProOnMobileStore();
+              if (restored == PaychekAppleIapPurchaseOutcome.success) {
+                final stillLite = await widget.onReloadTrialGate();
+                if (!context.mounted) return;
+                if (!stillLite) return;
+              }
+            }
             await PaychekStripeEntitlementSync.syncFromStripe(maxAttempts: 3);
             final stillLite = await widget.onReloadTrialGate();
             if (!context.mounted) return;

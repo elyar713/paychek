@@ -22,6 +22,7 @@ class ChecklistItemRow extends StatelessWidget {
     this.labelEditController,
     this.labelFocusNode,
     this.onLabelSubmitted,
+    this.onLabelChanged,
     this.onAddLineAfter,
     this.onTapEditLabel,
     this.onSectionEditInteract,
@@ -49,6 +50,7 @@ class ChecklistItemRow extends StatelessWidget {
   final TextEditingController? labelEditController;
   final FocusNode? labelFocusNode;
   final VoidCallback? onLabelSubmitted;
+  final ValueChanged<String>? onLabelChanged;
 
   /// En mode Â« Modifier Â» : bouton + sur la **derniÃ¨re** ligne pour ajouter une ligne.
   final VoidCallback? onAddLineAfter;
@@ -112,6 +114,7 @@ class ChecklistItemRow extends StatelessWidget {
                         color: const Color(0xFF6A6A6A),
                       ),
                     ),
+                    onChanged: onLabelChanged,
                     onSubmitted: (_) => onLabelSubmitted?.call(),
                   )
               : _buildStaticLabel(lineStyle),

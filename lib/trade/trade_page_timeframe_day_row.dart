@@ -279,28 +279,29 @@ extension _TradePageTimeframeDayRow on _TradePageState {
           : const SizedBox.shrink(),
     );
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _safeSetState(() {
-          _expandedDayKey = _expandedDayKey == dayKey ? null : dayKey;
-        }),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: TradeTokens.cardBg,
         borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: TradeTokens.cardBg,
-            borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
-            border: Border.all(color: TradeTokens.cardBorder),
+        border: Border.all(color: TradeTokens.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _safeSetState(() {
+                _expandedDayKey =
+                    _expandedDayKey == dayKey ? null : dayKey;
+              }),
+              borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
+              child: header,
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              header,
-              expanded,
-            ],
-          ),
-        ),
+          expanded,
+        ],
       ),
     );
   }

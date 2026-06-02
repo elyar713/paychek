@@ -81,6 +81,7 @@ class ChecklistPageView extends StatelessWidget {
           labelEditController: c.itemLabelEditController,
           labelFocusNode: c.itemLabelFocusNode,
           onLabelSubmitted: c.commitItemLabelEdit,
+          onLabelChanged: c.onChecklistItemLabelChanged,
           onTapEditLabel: c.editingItemId == item.id
               ? null
               : () => c.startEditItemLabel(section.id, item.id),

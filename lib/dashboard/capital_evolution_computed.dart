@@ -73,7 +73,7 @@ class CapitalEvolutionComputed {
       case 0:
         return _oneDay(allTrades, today);
       case 1:
-        return _oneWeek(allTrades, today, tradingDaysPerWeek);
+        return forTradingWeek(allTrades, tradingDaysPerWeek);
       case 2:
         return forFocusedCalendarMonth(allTrades, today);
       default:
@@ -123,12 +123,15 @@ class CapitalEvolutionComputed {
     );
   }
 
-  static CapitalEvolutionComputed _oneWeek(
+  /// Courbe cumulée sur la semaine **courante** (lun→…), **5** ou **7** jours selon réglages.
+  static CapitalEvolutionComputed forTradingWeek(
     List<TradeListItem> allTrades,
-    DateTime today,
     int tradingDaysPerWeek,
   ) {
-    final days = tradeCurrentWeekDaysLocal(tradingDaysPerWeek: tradingDaysPerWeek);
+    assert(tradingDaysPerWeek == 5 || tradingDaysPerWeek == 7);
+    final days = tradeCurrentWeekDaysLocal(
+      tradingDaysPerWeek: tradingDaysPerWeek,
+    );
     final daily = tradeDailyNetForDays(allTrades, days);
     var cum = 0.0;
     final spots = <EvolutionSpot>[];

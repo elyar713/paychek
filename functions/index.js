@@ -3131,6 +3131,9 @@ async function paychekGrantProEntitlement(db, uid, opts) {
     stripeCustomerId = null,
     stripeMode = null,
     stripeSubscriptionId = null,
+    appleTransactionId = null,
+    appleOriginalTransactionId = null,
+    appleProductId = null,
     proSinceUtc,
     currentPeriodEnd = null,
     provider = "stripe",
@@ -3145,6 +3148,17 @@ async function paychekGrantProEntitlement(db, uid, opts) {
       prev.exists &&
       prev.data() &&
       prev.data().stripeCheckoutSessionId === stripeCheckoutSessionId
+    ) {
+      return false;
+    }
+  }
+  if (appleTransactionId) {
+    const prev = await entRef.get();
+    prevSnapForMerge = prevSnapForMerge || prev;
+    if (
+      prev.exists &&
+      prev.data() &&
+      prev.data().appleTransactionId === appleTransactionId
     ) {
       return false;
     }
@@ -3189,6 +3203,11 @@ async function paychekGrantProEntitlement(db, uid, opts) {
         ...(stripeCustomerId ? {stripeCustomerId} : {}),
         ...(stripeMode ? {stripeMode} : {}),
         ...(stripeSubscriptionId ? {stripeSubscriptionId} : {}),
+        ...(appleTransactionId ? {appleTransactionId} : {}),
+        ...(appleOriginalTransactionId ?
+          {appleOriginalTransactionId} :
+          {}),
+        ...(appleProductId ? {appleProductId} : {}),
         ...(mergedPeriodEnd ? {currentPeriodEnd: mergedPeriodEnd} : {}),
       },
       {merge: true},
@@ -3210,6 +3229,8 @@ async function paychekGrantProEntitlement(db, uid, opts) {
   }
   if (provider === "stripe") {
     userPatch.paymentMethod = "stripe";
+  } else if (provider === "apple_iap" || provider === "apple") {
+    userPatch.paymentMethod = "apple_iap";
   }
   if (stripeCustomerId) {
     userPatch.stripeCustomerId = stripeCustomerId;
@@ -5304,4 +5325,16 @@ exports.paychekStripeWebhook = onRequest(
       invoker: "public",
     },
     paychekStripeWebhookApp,
+);
+
+const appleIap = require("./apple_iap");
+Object.assign(
+    exports,
+    appleIap.createAppleIapExports({
+      onCall,
+      HttpsError,
+      admin,
+      paychekGrantProEntitlement,
+      paychekApplyTrialRemainderToPeriodEnd,
+    }),
 );

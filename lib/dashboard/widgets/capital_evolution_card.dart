@@ -56,11 +56,14 @@ class CapitalEvolutionCard extends StatelessWidget {
               l.dashboardTfAll,
             ];
             final allRaw = activeJournalTradesOrDemo(context);
-            final data = CapitalEvolutionComputed.fromTrades(
-              allRaw,
-              timeframeIndex,
-              tradingDaysPerWeek: tradingWeek.tradingDaysPerWeek,
-            );
+            final daysPerWeek = tradingWeek.tradingDaysPerWeek;
+            final data = timeframeIndex == 1
+                ? CapitalEvolutionComputed.forTradingWeek(allRaw, daysPerWeek)
+                : CapitalEvolutionComputed.fromTrades(
+                    allRaw,
+                    timeframeIndex,
+                    tradingDaysPerWeek: daysPerWeek,
+                  );
             final sym = pf.effectiveCurrencySymbol(capStore);
 
             final tradesLine = Text(

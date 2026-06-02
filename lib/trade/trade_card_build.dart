@@ -41,15 +41,18 @@ extension _TradeCardBuild on TradeCard {
         ),
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            onTap: onToggle,
-            borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                InkWell(
+                  onTap: onToggle,
+                  borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
@@ -177,10 +180,13 @@ extension _TradeCardBuild on TradeCard {
                       );
                     },
                   ),
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 180),
-                    curve: Curves.easeOut,
-                    child: !expanded
+                    ],
+                  ),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  child: !expanded
                         ? const SizedBox.shrink()
                         : Padding(
                             padding: const EdgeInsets.only(top: 12),
@@ -634,9 +640,8 @@ extension _TradeCardBuild on TradeCard {
                               ],
                             ),
                           ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

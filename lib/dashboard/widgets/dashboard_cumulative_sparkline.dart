@@ -61,6 +61,7 @@ class DashboardCumulativeSparkline extends StatefulWidget {
     this.onOpenTradeById,
     this.onOpenTradeDayKey,
     this.onInteractionLockedTap,
+    this.weekDayLabels,
   });
 
   final List<EvolutionSpot> spots;
@@ -81,6 +82,9 @@ class DashboardCumulativeSparkline extends StatefulWidget {
 
   /// Mode freemium : pas d’ouverture trade, mais rappel paywall au tap.
   final VoidCallback? onInteractionLockedTap;
+
+  /// Libellés L–D sous la courbe (vue **1S** : 5 ou 7 selon réglage semaine).
+  final List<String>? weekDayLabels;
 
   static const double _defaultHeight = 120;
 
@@ -233,19 +237,49 @@ class _DashboardCumulativeSparklineState extends State<DashboardCumulativeSparkl
 
     final hPx = _chartHeightPx();
 
+    final labels = widget.weekDayLabels;
+    final showWeekLabels = labels != null && labels.isNotEmpty;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: ColoredBox(
         color: DashboardTokens.cardBoxBg,
-        child: SizedBox(
-          height: hPx,
-          width: double.infinity,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final chartSize = Size(constraints.maxWidth, hPx);
-              return _buildChartStack(chartSize);
-            },
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: hPx,
+              width: double.infinity,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final chartSize = Size(constraints.maxWidth, hPx);
+                  return _buildChartStack(chartSize);
+                },
+              ),
+            ),
+            if (showWeekLabels) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: List.generate(labels.length, (i) {
+                  return Expanded(
+                    child: Text(
+                      labels[i],
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: DashboardTokens.muted.withValues(alpha: 0.9),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ],
         ),
       ),
     );

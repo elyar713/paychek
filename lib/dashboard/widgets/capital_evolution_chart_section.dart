@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../questionnaire/user_capital_scope.dart';
 import '../../reglage/trading_week_scope.dart';
 import '../../reglage/user_portfolio_scope.dart';
+import '../../l10n/app_localizations.dart';
 import '../../trade/trade_journal_helper.dart';
 import '../../trade/trade_journal_scope.dart';
 import '../capital_evolution_computed.dart';
@@ -42,12 +43,18 @@ class CapitalEvolutionChartSection extends StatelessWidget {
       listenable: Listenable.merge([tradeStore, capStore, pf, tradingWeek]),
       builder: (context, _) {
         final allRaw = activeJournalTradesOrDemo(context);
-        final data = CapitalEvolutionComputed.fromTrades(
-          allRaw,
-          timeframeIndex,
-          tradingDaysPerWeek: tradingWeek.tradingDaysPerWeek,
-        );
+        final daysPerWeek = tradingWeek.tradingDaysPerWeek;
+        final data = timeframeIndex == 1
+            ? CapitalEvolutionComputed.forTradingWeek(allRaw, daysPerWeek)
+            : CapitalEvolutionComputed.fromTrades(
+                allRaw,
+                timeframeIndex,
+                tradingDaysPerWeek: daysPerWeek,
+              );
         final sym = pf.effectiveCurrencySymbol(capStore);
+        final weekDayLabels = timeframeIndex == 1
+            ? _weekDayShortLabels(context, daysPerWeek)
+            : null;
 
         final extremesRow = showTradeExtremes
             ? DashboardTradeExtremesRow(
@@ -72,6 +79,7 @@ class CapitalEvolutionChartSection extends StatelessWidget {
               maxY: data.maxY,
               height: sparklineHeight,
               currencySymbol: sym,
+              weekDayLabels: weekDayLabels,
               onOpenTradeById: onOpenTradeById,
               onOpenTradeDayKey: onOpenTradeDayKey,
             ),
@@ -93,6 +101,20 @@ class CapitalEvolutionChartSection extends StatelessWidget {
       },
     );
   }
+}
+
+List<String> _weekDayShortLabels(BuildContext context, int tradingDaysPerWeek) {
+  final l = AppLocalizations.of(context)!;
+  final all = [
+    l.dashboardWeekdayShortMon,
+    l.dashboardWeekdayShortTue,
+    l.dashboardWeekdayShortWed,
+    l.dashboardWeekdayShortThu,
+    l.dashboardWeekdayShortFri,
+    l.dashboardWeekdayShortSat,
+    l.dashboardWeekdayShortSun,
+  ];
+  return all.sublist(0, tradingDaysPerWeek);
 }
 
 /// Séparateur léger entre solde capital et courbe (mobile).

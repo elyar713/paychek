@@ -152,10 +152,10 @@ String formatMoneyLocal(double v) {
   return '$sign${_asciiGroupIntPart(intPart)},$frac';
 }
 
-/// [`formatMoneyLocal`] + devise : **espace normal** avant la devise (toujours visible, pas de fines Unicode).
+/// [`formatMoneyLocal`] + devise. Espaces insécables pour éviter un retour à la ligne entre montant et $/€/£.
 String formatMoneyWithCurrencySymbol(double v, String currencySymbol) {
   final amt = formatMoneyLocal(v);
   final sym = currencySymbol.trim();
   if (sym.isEmpty) return amt;
-  return '$amt $sym';
+  return '${amt.replaceAll(' ', '\u00A0')}\u00A0$sym';
 }

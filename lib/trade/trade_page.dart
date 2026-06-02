@@ -77,6 +77,7 @@ class _TradePageState extends State<TradePage> {
   final Map<String, int?> _weekSelectedDayIndexByKey = {};
   String? _expandedMonthKey; // 'YYYY-MM-01' (1er jour du mois)
   String? _expandedTradeId;
+  int _ignoreTradeOutsideCollapseUntilMs = 0;
   String? _expandedOpenPositionId;
   String? _pairFilter;
   final ScrollController _scrollController = ScrollController();

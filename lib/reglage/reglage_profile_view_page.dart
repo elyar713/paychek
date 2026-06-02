@@ -15,6 +15,7 @@ import '../widgets/paychek_minimal_upgrade_button.dart';
 import '../web/paychek_web_tokens.dart';
 import 'paychek_change_password_dialog.dart';
 import 'paychek_gold_upgrade_sheet.dart';
+import 'subscription_launch_helper.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_prefs.dart';
 import 'trial_access_prefs.dart'
@@ -992,7 +993,11 @@ class _SubscriptionActionButton extends StatelessWidget {
 
     return FilledButton(
       onPressed: () async {
-        await onNonProSubscribe();
+        if (isPro) {
+          await openPaychekSubscriptionManagement();
+        } else {
+          await onNonProSubscribe();
+        }
       },
       style: FilledButton.styleFrom(
         backgroundColor: ctaBg,

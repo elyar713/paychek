@@ -6,6 +6,7 @@ import '../trade/trade_models.dart';
 import '../trade/trade_stats.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
+import 'calendrier_compact_money_text.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_utils.dart';
 
@@ -242,9 +243,10 @@ class CalendrierMonthInfo extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 2),
-            Text(
-              formatMoneyWithCurrencySymbol(net, capSymbol),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            CalendrierCompactMoneyText(
+              amount: net,
+              currencySymbol: capSymbol,
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
                     color: net < 0
                         ? kLossText
                         : (net == 0 ? kBreakevenText : kGainText),
@@ -303,15 +305,24 @@ class CalendrierMonthInfo extends StatelessWidget {
                   ),
             ),
             const Spacer(),
-            Text(
-              monthlyObjective != null
-                  ? '${formatMoneyWithCurrencySymbol(net, capSymbol)} / ${formatMoneyWithCurrencySymbol(monthlyObjective!, capSymbol)}'
-                  : '${formatMoneyWithCurrencySymbol(net, capSymbol)} / \u2014',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: net < 0 ? kLossText : Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11,
-                  ),
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  monthlyObjective != null
+                      ? '${formatMoneyWithCurrencySymbol(net, capSymbol)} / ${formatMoneyWithCurrencySymbol(monthlyObjective!, capSymbol)}'
+                      : '${formatMoneyWithCurrencySymbol(net, capSymbol)} / \u2014',
+                  maxLines: 1,
+                  softWrap: false,
+                  textAlign: TextAlign.end,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: net < 0 ? kLossText : Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                ),
+              ),
             ),
           ],
         ),

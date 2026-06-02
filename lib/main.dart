@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
+import 'reglage/paychek_apple_iap_service.dart';
 import 'reglage/social_auth_config.dart';
 import 'reglage/social_auth_service.dart';
 import 'reglage/app_locale_scope.dart';
@@ -95,6 +96,10 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  if (!kIsWeb) {
+    unawaited(PaychekAppleIapService.ensureInitialized());
+  }
 
   // Windows : persistance SQLite + threads natifs → plantages / codec (ex. type 142) signalés côté FlutterFire.
   // Désactivation avant le 1er accès Firestore (obligatoire pour que [settings] soit prise en compte).

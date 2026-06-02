@@ -7,6 +7,7 @@ import '../../../../checklist/checklist_progress_ring.dart';
 import '../../../../etat_mental/mental_state_controller.dart';
 import '../../../../etat_mental/mental_state_tokens.dart';
 import '../../../../questionnaire/user_capital_scope.dart';
+import '../../../../reglage/trading_week_scope.dart';
 import '../../../../reglage/user_portfolio_scope.dart';
 import '../../../../trade/trade_journal_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -73,8 +74,9 @@ class CapitalBalanceCard extends StatelessWidget {
 
     final store = UserCapitalScope.of(context);
     final portfolioStore = UserPortfolioScope.of(context);
+    final tradingWeek = TradingWeekScope.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([store, portfolioStore]),
+      listenable: Listenable.merge([store, portfolioStore, tradingWeek]),
       builder: (context, _) {
         final baseCapital = portfolioStore.effectiveCapitalAmount(store);
         final sym = portfolioStore.effectiveCurrencySymbol(store);

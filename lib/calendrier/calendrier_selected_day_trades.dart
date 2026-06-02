@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import '../trade/trade_models.dart';
+import 'calendrier_compact_money_text.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_utils.dart';
 
@@ -124,12 +125,17 @@ class _CalendrierSelectedDayTradesPanelState
                       ),
                     ),
                     if (dayTrades.isNotEmpty) ...[
-                      Text(
-                        formatMoneyWithCurrencySymbol(dayNet, widget.capSymbol),
-                        style: GoogleFonts.inter(
-                          color: netColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
+                      Flexible(
+                        child: CalendrierCompactMoneyText(
+                          amount: dayNet,
+                          currencySymbol: widget.capSymbol,
+                          textAlign: TextAlign.end,
+                          alignment: Alignment.centerRight,
+                          style: GoogleFonts.inter(
+                            color: netColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -204,15 +210,17 @@ class _CalendrierSelectedDayTradesPanelState
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    formatMoneyWithCurrencySymbol(
-                                      gain,
-                                      widget.capSymbol,
-                                    ),
-                                    style: GoogleFonts.inter(
-                                      color: gainColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
+                                  Flexible(
+                                    child: CalendrierCompactMoneyText(
+                                      amount: gain,
+                                      currencySymbol: widget.capSymbol,
+                                      textAlign: TextAlign.end,
+                                      alignment: Alignment.centerRight,
+                                      style: GoogleFonts.inter(
+                                        color: gainColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
                                   ),
                                   if (open != null) ...[
