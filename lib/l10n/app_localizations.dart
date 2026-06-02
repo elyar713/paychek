@@ -5212,6 +5212,36 @@ abstract class AppLocalizations {
   /// **'Lien Stripe introuvable. Console admin → Config → URL Payment Link (https://…), interrupteur activé, puis réessaie (compte connecté).'**
   String get paywallStoreNotConfigured;
 
+  /// No description provided for @paywallSignInRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecte-toi à ton compte Paychek avant de t’abonner.'**
+  String get paywallSignInRequired;
+
+  /// No description provided for @paywallAppleStoreUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'App Store indisponible. Utilise l’app Paychek sur iPhone (pas Safari) avec une connexion réseau, puis réessaie.'**
+  String get paywallAppleStoreUnavailable;
+
+  /// No description provided for @paywallAppleProductsUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements App Store introuvables. Vérifie dans App Store Connect les produits Paychek.monthly, Paychek.quarterly et Paychek.annual (état « Prêt à soumettre »), ajoute la capacité Achats intégrés dans Xcode, puis réinstalle l’app sur un iPhone réel avec un compte Sandbox.'**
+  String get paywallAppleProductsUnavailable;
+
+  /// No description provided for @paywallAppleVerificationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Achat reçu mais la validation serveur a échoué. Réessaie ou contacte le support.'**
+  String get paywallAppleVerificationFailed;
+
+  /// No description provided for @paywallApplePurchaseError.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’achat App Store n’a pas abouti. Réessaie dans un instant.'**
+  String get paywallApplePurchaseError;
+
   /// No description provided for @paywallRestoreNothingFound.
   ///
   /// In fr, this message translates to:

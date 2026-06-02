@@ -12,12 +12,14 @@ extension _TradePageBuild on _TradePageState {
         final l = AppLocalizations.of(context)!;
         final allRaw = activeJournalTradesOrDemo(context);
         final items = _visibleItems.toList();
-        for (final it in items) {
+        for (final it in allRaw) {
           _tradeKeysById.putIfAbsent(it.id, GlobalKey.new);
         }
-        _tradeKeysById.removeWhere((id, _) => !items.any((e) => e.id == id));
+        _tradeKeysById.removeWhere(
+          (id, _) => !allRaw.any((e) => e.id == id),
+        );
         final tradeKeys = <String, GlobalKey>{
-          for (final it in items) it.id: _tradeKeysById[it.id]!,
+          for (final it in allRaw) it.id: _tradeKeysById[it.id]!,
         };
 
         // Bandeau du haut : même périmètre que les compteurs W/L/B/O (filtre paire
@@ -246,77 +248,11 @@ extension _TradePageBuild on _TradePageState {
                   if (_timeframeIndex == 2) ..._buildMonthCards(allRaw, tradeKeys),
                   if (_timeframeIndex != 0 && _timeframeIndex != 2)
                     for (final item in items)
-                      Container(
-                        key: tradeKeys[item.id],
-                        child: TradeCard(
-                          item: item,
-                          expanded: _expandedTradeId == item.id,
-                          tradeNumberOfDay: _tradeNumberOfDay(item, allRaw),
-                          checklistController: widget.checklistController,
-                          onToggle: () {
-                            _safeSetState(() {
-                              final willExpand = _expandedTradeId != item.id;
-                              _expandedTradeId = willExpand ? item.id : null;
-                              if (willExpand) {
-                                _ignoreTradeOutsideCollapseUntilMs =
-                                    DateTime.now().millisecondsSinceEpoch + 400;
-                              }
-                            });
-                          },
-                          onTapOutsideWhenExpanded: () {
-                            if (_expandedTradeId != item.id) return;
-                            if (DateTime.now().millisecondsSinceEpoch <
-                                _ignoreTradeOutsideCollapseUntilMs) {
-                              return;
-                            }
-                            _safeSetState(() => _expandedTradeId = null);
-                          },
-                          onEdit: () => widget.onEditTrade(item),
-                          onExportPdf: () => exportTradePdf(
-                            context,
-                            item,
-                            checklistController: widget.checklistController,
-                          ),
-                          onDelete: () async {
-                            final ok = await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) {
-                                final l = AppLocalizations.of(ctx)!;
-                                return AlertDialog(
-                                  backgroundColor: TradeTokens.cardBg,
-                                  title: Text(
-                                    l.tradeDeleteConfirmTitle,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  content: Text(
-                                    l.tradeDeleteConfirmBody,
-                                    style: TextStyle(
-                                      color: TradeTokens.textSecondary,
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(ctx, false),
-                                      child: Text(l.cancel),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(ctx, true),
-                                      child: Text(
-                                        l.delete,
-                                        style: TextStyle(
-                                          color: TradeTokens.lossNeon,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                            if (ok != true) return;
-                            if (!context.mounted) return;
-                            TradeJournalScope.of(context).removeById(item.id);
-                          },
-                        ),
+                      _buildExpandableTradeCard(
+                        context,
+                        item,
+                        tradeKeys,
+                        allRaw,
                       ),
                 ],
                               ),

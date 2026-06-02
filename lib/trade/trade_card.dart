@@ -27,7 +27,6 @@ class TradeCard extends StatelessWidget {
     required this.item,
     required this.expanded,
     required this.onToggle,
-    required this.onTapOutsideWhenExpanded,
     required this.tradeNumberOfDay,
     required this.checklistController,
     required this.onEdit,
@@ -38,7 +37,6 @@ class TradeCard extends StatelessWidget {
   final TradeListItem item;
   final bool expanded;
   final VoidCallback onToggle;
-  final VoidCallback onTapOutsideWhenExpanded;
   final int tradeNumberOfDay;
   final ChecklistPageController checklistController;
   final VoidCallback onEdit;

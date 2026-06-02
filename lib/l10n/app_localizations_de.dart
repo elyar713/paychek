@@ -2843,6 +2843,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Stripe-Checkout-URL fehlt. Admin → Config → Payment-Link (https://…), Abrechnung aktivieren, angemeldet bleiben, erneut versuchen.';
 
   @override
+  String get paywallSignInRequired =>
+      'Melde dich bei deinem Paychek-Konto an, bevor du abonnierst.';
+
+  @override
+  String get paywallAppleStoreUnavailable =>
+      'App Store nicht verfügbar. Nutze die Paychek-iOS-App (nicht Safari), prüfe die Verbindung und versuche es erneut.';
+
+  @override
+  String get paywallAppleProductsUnavailable =>
+      'App-Store-Abos nicht gefunden. Erstelle in App Store Connect Paychek.monthly, Paychek.quarterly und Paychek.annual, aktiviere In-App Purchase in Xcode und installiere die App auf einem echten iPhone mit Sandbox-Konto.';
+
+  @override
+  String get paywallAppleVerificationFailed =>
+      'Kauf erhalten, Servervalidierung fehlgeschlagen. Erneut versuchen oder Support kontaktieren.';
+
+  @override
+  String get paywallApplePurchaseError =>
+      'App-Store-Kauf nicht abgeschlossen. Bitte gleich erneut versuchen.';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Noch gesperrt: kein aktives Abonnement erkannt.';
 

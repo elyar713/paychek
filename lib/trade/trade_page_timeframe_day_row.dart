@@ -5,6 +5,7 @@ extension _TradePageTimeframeDayRow on _TradePageState {
     BuildContext context,
     DateTime day,
     List<TradeListItem> dayTrades, {
+    required List<TradeListItem> allRaw,
     required Map<String, GlobalKey> tradeKeys,
   }) {
     final dLocal = day.toLocal();
@@ -131,116 +132,6 @@ extension _TradePageTimeframeDayRow on _TradePageState {
     );
 
 
-    Widget dayTradeRow(
-      TradeListItem t, {
-      required VoidCallback onTap,
-    }) {
-      final rowL = AppLocalizations.of(context)!;
-      final sideLabel = t.breakeven
-          ? rowL.tradeSideBreakevenShort
-          : (t.side == TradeSide.achat
-              ? rowL.tradeSideBuyShort
-              : rowL.tradeSideSellShort);
-      final sideColor = t.breakeven
-          ? TradeTokens.textSecondary
-          : (t.side == TradeSide.achat
-              ? TradeTokens.profitNeon
-              : TradeTokens.lossNeon);
-      final gainColor = t.gainAmount < 0
-          ? TradeTokens.lossNeon
-          : (t.gainAmount == 0 ? Colors.white : TradeTokens.profitNeon);
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: TradeTokens.pillInactiveBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: TradeTokens.cardBorder),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            t.pair,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 12,
-                                ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: sideColor.withValues(alpha: 0.16),
-                              borderRadius: BorderRadius.circular(
-                                TradeTokens.radiusSideBadge,
-                              ),
-                            ),
-                            child: Text(
-                              sideLabel,
-                              style: TextStyle(
-                                color: sideColor.withValues(alpha: 0.95),
-                                fontWeight: FontWeight.w900,
-                                fontSize: 9,
-                                letterSpacing: 0.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _formatTradeRowWhenLine(
-                          context,
-                          t.entreeAt,
-                          sessionLabel: tradeSessionLabel(
-                            rowL,
-                            tradeSessionBucketId(t.entreeAt),
-                          ),
-                        ),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: TradeTokens.textDate,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 10,
-                            ),
-                      ),
-                      buildTradePsychTagsRow(t),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '${_formatMoney(t.gainAmount)}\$',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: gainColor,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     final expanded = AnimatedSize(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
@@ -262,18 +153,11 @@ extension _TradePageTimeframeDayRow on _TradePageState {
               maxCount: maxCount,
               dayTrades: dayTrades,
               ringCell: ringCell,
-              tradeRowFor: (t) => dayTradeRow(
+              tradeRowFor: (t) => _buildExpandableTradeCard(
+                    context,
                     t,
-                    onTap: () {
-                      _safeSetState(() {
-                        _timeframeIndex = 3; // ALL
-                        _expandedTradeId = t.id;
-                        _expandedDayKey = null;
-                      });
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _scrollToTrade(t.id, tradeKeys);
-                      });
-                    },
+                    tradeKeys,
+                    allRaw,
                   ),
             )
           : const SizedBox.shrink(),
@@ -293,8 +177,14 @@ extension _TradePageTimeframeDayRow on _TradePageState {
             color: Colors.transparent,
             child: InkWell(
               onTap: () => _safeSetState(() {
-                _expandedDayKey =
-                    _expandedDayKey == dayKey ? null : dayKey;
+                if (_expandedDayKey == dayKey) {
+                  _expandedDayKey = null;
+                  if (dayTrades.any((t) => t.id == _expandedTradeId)) {
+                    _expandedTradeId = null;
+                  }
+                } else {
+                  _expandedDayKey = dayKey;
+                }
               }),
               borderRadius: BorderRadius.circular(TradeTokens.radiusLg),
               child: header,

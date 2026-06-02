@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
@@ -11,6 +10,8 @@ import 'paywall/mobile/paywall_mobile_tokens.dart';
 import 'paychek_apple_iap_checkout.dart';
 import 'paychek_apple_iap_service.dart';
 import 'stripe_entitlement_sync.dart';
+import 'paywall_subscription_feedback.dart';
+import 'paychek_subscription_flow_result.dart';
 import 'subscription_launch_helper.dart';
 
 const Color _kEmerald500 = Color(0xFF10B981);
@@ -167,18 +168,15 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     PaychekBillingCycle cycle,
   ) async {
     _setBanner(null);
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      _setBanner(l10n.paywallStoreNotConfigured);
-      return;
-    }
-    final ok = await openPaychekSubscriptionFlow(cycle: cycle);
+    final result = await openPaychekSubscriptionFlow(cycle: cycle);
     if (!context.mounted) return;
-    if (ok) {
+    if (result.ok) {
       await widget.onReloadTrialGate();
       return;
     }
-    _setBanner(l10n.paywallStoreNotConfigured);
+    if (result.kind == PaychekSubscriptionFlowKind.cancelled) return;
+    final message = paywallMessageForSubscriptionResult(l10n, result);
+    if (message.isNotEmpty) _setBanner(message);
   }
 
   Widget _trialFooterActions(BuildContext context, AppLocalizations l10n) {

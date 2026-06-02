@@ -28,11 +28,7 @@ extension _TradeCardBuild on TradeCard {
 
     final duration = item.sortieAt?.difference(item.entreeAt);
 
-    return TapRegion(
-      onTapOutside: (event) {
-        if (expanded) onTapOutsideWhenExpanded();
-      },
-      child: Container(
+    return Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: TradeTokens.cardBg,
@@ -645,7 +641,6 @@ extension _TradeCardBuild on TradeCard {
             ),
           ),
         ),
-      ),
     );
   }
 }

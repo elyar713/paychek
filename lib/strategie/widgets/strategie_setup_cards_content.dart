@@ -106,16 +106,42 @@ List<StrategieSetupCardData> strategieSetupDefaultCardDataList() {
   ];
 }
 
+/// Titre setup (insensible à la casse / espaces).
+bool strategieSetupTitleEquals(String a, String b) =>
+    a.trim().toLowerCase() == b.trim().toLowerCase();
+
 /// Carte dont [title] correspond au titre affiché, sinon `null`.
 StrategieSetupCardData? strategieSetupCardDataPourTitre(String title) {
+  final q = title.trim();
+  if (q.isEmpty) return null;
   final live = StrategieSetupsStore.notifier.value;
   for (final d in live) {
-    if (d.title == title) return d;
+    if (strategieSetupTitleEquals(d.title, q)) return d;
   }
   for (final d in strategieSetupDefaultCardDataList()) {
-    if (d.title == title) return d;
+    if (strategieSetupTitleEquals(d.title, q)) return d;
   }
   return null;
+}
+
+/// Tous les setups connus (live + défauts non dupliqués par titre).
+List<StrategieSetupCardData> strategieSetupCardDataAllKnown() {
+  final out = <StrategieSetupCardData>[];
+  final seen = <String>{};
+  void add(StrategieSetupCardData d) {
+    final k = d.title.trim().toLowerCase();
+    if (k.isEmpty || seen.contains(k)) return;
+    seen.add(k);
+    out.add(d);
+  }
+
+  for (final d in StrategieSetupsStore.notifier.value) {
+    add(d);
+  }
+  for (final d in strategieSetupDefaultCardDataList()) {
+    add(d);
+  }
+  return out;
 }
 
 /// Cartes « Setups & modèles » — affichage seul (sans menu ⋮ section).

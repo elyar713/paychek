@@ -2737,6 +2737,25 @@ class AppLocalizationsKo extends AppLocalizations {
       'Stripe 결제 링크가 없습니다. Admin → Config → Payment Link(https://…) 설정, 결제 활성화 후 로그인 상태에서 다시 시도하세요.';
 
   @override
+  String get paywallSignInRequired => '구독 전에 Paychek 계정에 로그인하세요.';
+
+  @override
+  String get paywallAppleStoreUnavailable =>
+      'App Store를 사용할 수 없습니다. Safari가 아닌 Paychek iOS 앱에서 네트워크를 확인한 뒤 다시 시도하세요.';
+
+  @override
+  String get paywallAppleProductsUnavailable =>
+      'App Store 구독 상품을 찾을 수 없습니다. App Store Connect에서 Paychek.monthly, Paychek.quarterly, Paychek.annual을 만들고 Xcode에서 인앱 구매를 활성화한 뒤 Sandbox 계정으로 실제 iPhone에 다시 설치하세요.';
+
+  @override
+  String get paywallAppleVerificationFailed =>
+      '구매는 되었지만 서버 검증에 실패했습니다. 다시 시도하거나 지원팀에 문의하세요.';
+
+  @override
+  String get paywallApplePurchaseError =>
+      'App Store 구매가 완료되지 않았습니다. 잠시 후 다시 시도하세요.';
+
+  @override
   String get paywallRestoreNothingFound => '계속 차단됨: 활성 구독이 감지되지 않았습니다.';
 
   @override

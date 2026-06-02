@@ -2814,6 +2814,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Stripe checkout URL missing. Set it in Admin → Config → Stripe payment link (https://…), enable billing, stay signed in, then retry.';
 
   @override
+  String get paywallSignInRequired =>
+      'Sign in to your Paychek account before subscribing.';
+
+  @override
+  String get paywallAppleStoreUnavailable =>
+      'App Store is unavailable. Use the Paychek iOS app (not Safari), check your connection, then try again.';
+
+  @override
+  String get paywallAppleProductsUnavailable =>
+      'App Store subscriptions not found. In App Store Connect, create products Paychek.monthly, Paychek.quarterly, and Paychek.annual (Ready to Submit), enable In-App Purchase in Xcode, then reinstall on a real iPhone with a Sandbox account.';
+
+  @override
+  String get paywallAppleVerificationFailed =>
+      'Purchase received but server validation failed. Try again or contact support.';
+
+  @override
+  String get paywallApplePurchaseError =>
+      'App Store purchase did not complete. Try again in a moment.';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Still locked: no subscription detected yet. Finish purchase or try again.';
 

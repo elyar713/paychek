@@ -294,9 +294,13 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                           if (setups.isEmpty) {
                                             return const SizedBox.shrink();
                                           }
-                                          if (!titres.contains(
-                                            _strategieChoisie,
-                                          )) {
+                                          final choisiIndex = setups.indexWhere(
+                                            (e) => strategieSetupTitleEquals(
+                                              e.title,
+                                              _strategieChoisie,
+                                            ),
+                                          );
+                                          if (choisiIndex < 0) {
                                             WidgetsBinding.instance
                                                 .addPostFrameCallback((_) {
                                                   if (!mounted) return;
@@ -306,9 +310,8 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                                   );
                                                 });
                                           }
-                                          final value =
-                                              titres.contains(_strategieChoisie)
-                                              ? _strategieChoisie
+                                          final value = choisiIndex >= 0
+                                              ? setups[choisiIndex].title
                                               : titres.first;
 
                                           if (ajouterTradeUseMobileStrategiePicker(
@@ -324,7 +327,12 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                           }
 
                                           final selected = setups
-                                              .where((e) => e.title == value)
+                                              .where(
+                                                (e) => strategieSetupTitleEquals(
+                                                  e.title,
+                                                  value,
+                                                ),
+                                              )
                                               .toList();
                                           final dotColor = selected.isNotEmpty
                                               ? selected.first.dotColor

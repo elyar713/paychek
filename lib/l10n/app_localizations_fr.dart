@@ -2846,6 +2846,26 @@ class AppLocalizationsFr extends AppLocalizations {
       'Lien Stripe introuvable. Console admin → Config → URL Payment Link (https://…), interrupteur activé, puis réessaie (compte connecté).';
 
   @override
+  String get paywallSignInRequired =>
+      'Connecte-toi à ton compte Paychek avant de t’abonner.';
+
+  @override
+  String get paywallAppleStoreUnavailable =>
+      'App Store indisponible. Utilise l’app Paychek sur iPhone (pas Safari) avec une connexion réseau, puis réessaie.';
+
+  @override
+  String get paywallAppleProductsUnavailable =>
+      'Abonnements App Store introuvables. Vérifie dans App Store Connect les produits Paychek.monthly, Paychek.quarterly et Paychek.annual (état « Prêt à soumettre »), ajoute la capacité Achats intégrés dans Xcode, puis réinstalle l’app sur un iPhone réel avec un compte Sandbox.';
+
+  @override
+  String get paywallAppleVerificationFailed =>
+      'Achat reçu mais la validation serveur a échoué. Réessaie ou contacte le support.';
+
+  @override
+  String get paywallApplePurchaseError =>
+      'L’achat App Store n’a pas abouti. Réessaie dans un instant.';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Toujours bloqué : aucun abonnement détecté. Termine l’achat ou réessaie.';
 

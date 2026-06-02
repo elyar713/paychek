@@ -84,6 +84,16 @@ class _StrategieSetupModelesSectionState
     });
     widget.visibleSetupIndex.addListener(_onVisibleSetupIndexChanged);
     StrategieRealtimeNotifier.tick.addListener(_onStrategieRemoteTick);
+    StrategieSetupsStore.notifier.addListener(_onSetupsStoreChanged);
+  }
+
+  void _onSetupsStoreChanged() {
+    if (!mounted || _editMode) return;
+    setState(() {
+      _cards = List<StrategieSetupCardData>.from(StrategieSetupsStore.notifier.value);
+      _syncCardKeysLength();
+      _ensureVisibleSetupIndex();
+    });
   }
 
   void _onStrategieRemoteTick() {
@@ -127,6 +137,7 @@ class _StrategieSetupModelesSectionState
   @override
   void dispose() {
     StrategieRealtimeNotifier.tick.removeListener(_onStrategieRemoteTick);
+    StrategieSetupsStore.notifier.removeListener(_onSetupsStoreChanged);
     widget.visibleSetupIndex.removeListener(_onVisibleSetupIndexChanged);
     _quickPickScrollControllerImpl?.dispose();
     final n = widget.editNotifier;

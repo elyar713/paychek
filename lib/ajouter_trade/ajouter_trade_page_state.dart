@@ -366,7 +366,10 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
           .map((e) => e.title)
           .toList();
       if (titres.isEmpty) return;
-      if (!titres.contains(_strategieChoisie)) {
+      final match = StrategieSetupsStore.notifier.value.any(
+        (e) => strategieSetupTitleEquals(e.title, _strategieChoisie),
+      );
+      if (!match) {
         setState(() => _strategieChoisie = titres.first);
       }
     });

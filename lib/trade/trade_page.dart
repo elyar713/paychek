@@ -12,6 +12,7 @@ import '../dashboard/widgets/donut_ring.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/trading_week_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
+import '../strategie/strategie_setups_store.dart';
 import '../shared/month_pdf_helper.dart';
 import 'trade_journal_helper.dart';
 import 'trade_journal_scope.dart';
@@ -22,7 +23,6 @@ import 'trade_export_pdf.dart';
 import 'trade_filter_pills.dart';
 import 'trade_models.dart';
 import 'trade_plan_analysis.dart';
-import 'trade_psych_tags_chips.dart';
 import 'trade_summary_bar.dart';
 import 'trade_stats.dart';
 import 'trade_tokens.dart';
@@ -31,6 +31,7 @@ import 'trade_week_utils.dart';
 part 'trade_page_build.dart';
 part 'trade_page_build_cards.dart';
 part 'trade_page_core.dart';
+part 'trade_page_expandable_trade_card.dart';
 part 'trade_page_misc_widgets.dart';
 part 'trade_page_timeframe_helpers.dart';
 part 'trade_page_timeframe_day_ui.dart';
@@ -49,6 +50,7 @@ class TradePage extends StatefulWidget {
     required this.onEditTrade,
     this.openTradeIdNotifier,
     this.openTradeDayKeyNotifier,
+    this.shellBodyIndex,
     this.onNavigateToDashboard,
   });
 
@@ -60,6 +62,9 @@ class TradePage extends StatefulWidget {
 
   /// Sparkline évolution capital : ouvre lâ€™onglet Trade en vue **1J** avec la carte du jour dépliée.
   final ValueNotifier<String?>? openTradeDayKeyNotifier;
+
+  /// Index du corps dashboard (0 accueil, 1 trade, …) — replie les cartes en quittant l’onglet.
+  final ValueNotifier<int>? shellBodyIndex;
 
   /// Retour vers lâ€™onglet accueil (dashboard).
   final VoidCallback? onNavigateToDashboard;
@@ -77,8 +82,9 @@ class _TradePageState extends State<TradePage> {
   final Map<String, int?> _weekSelectedDayIndexByKey = {};
   String? _expandedMonthKey; // 'YYYY-MM-01' (1er jour du mois)
   String? _expandedTradeId;
-  int _ignoreTradeOutsideCollapseUntilMs = 0;
   String? _expandedOpenPositionId;
+
+  static const int _kTradeTabBodyIndex = 1;
   String? _pairFilter;
   final ScrollController _scrollController = ScrollController();
 
@@ -116,6 +122,30 @@ class _TradePageState extends State<TradePage> {
     });
   }
 
+  void _collapseAllTradeExpansions() {
+    if (_expandedTradeId == null &&
+        _expandedDayKey == null &&
+        _expandedWeekKey == null &&
+        _expandedMonthKey == null &&
+        _expandedOpenPositionId == null) {
+      return;
+    }
+    _safeSetState(() {
+      _expandedTradeId = null;
+      _expandedDayKey = null;
+      _expandedWeekKey = null;
+      _expandedMonthKey = null;
+      _expandedOpenPositionId = null;
+    });
+  }
+
+  void _onShellBodyIndexChanged() {
+    final idx = widget.shellBodyIndex?.value;
+    if (idx != null && idx != _kTradeTabBodyIndex) {
+      _collapseAllTradeExpansions();
+    }
+  }
+
   void _focusTradeFromExternal(String tradeId) {
     _safeSetState(() {
       _expandedTradeId = tradeId;
@@ -149,6 +179,8 @@ class _TradePageState extends State<TradePage> {
     super.initState();
     widget.openTradeIdNotifier?.addListener(_onOpenTradeIdNotifier);
     widget.openTradeDayKeyNotifier?.addListener(_onOpenTradeDayKeyNotifier);
+    widget.shellBodyIndex?.addListener(_onShellBodyIndexChanged);
+    StrategieSetupsStore.ensureLoaded();
   }
 
   @override
@@ -162,12 +194,17 @@ class _TradePageState extends State<TradePage> {
       oldWidget.openTradeDayKeyNotifier?.removeListener(_onOpenTradeDayKeyNotifier);
       widget.openTradeDayKeyNotifier?.addListener(_onOpenTradeDayKeyNotifier);
     }
+    if (oldWidget.shellBodyIndex != widget.shellBodyIndex) {
+      oldWidget.shellBodyIndex?.removeListener(_onShellBodyIndexChanged);
+      widget.shellBodyIndex?.addListener(_onShellBodyIndexChanged);
+    }
   }
 
   @override
   void dispose() {
     widget.openTradeIdNotifier?.removeListener(_onOpenTradeIdNotifier);
     widget.openTradeDayKeyNotifier?.removeListener(_onOpenTradeDayKeyNotifier);
+    widget.shellBodyIndex?.removeListener(_onShellBodyIndexChanged);
     _scrollController.dispose();
     super.dispose();
   }

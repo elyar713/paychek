@@ -613,6 +613,7 @@ class _DashboardPageState extends State<DashboardPage>
           checklistController: _checklistController,
           openTradeIdNotifier: _openTradeIdNotifier,
           openTradeDayKeyNotifier: _openTradeDayKeyNotifier,
+          shellBodyIndex: _shellBodyIndex,
           onNavigateToDashboard: () => _applyTabIndex(0),
           onEditTrade: (t) {
             if (_liteRestricted) {

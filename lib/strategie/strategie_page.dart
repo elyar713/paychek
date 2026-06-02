@@ -16,6 +16,8 @@ import 'sections/strategie_setup_modeles_section.dart';
 import 'widgets/strategie_day_violations_card.dart';
 import '../analyse/analyse_tokens.dart';
 import 'strategie_export_pdf.dart';
+import 'strategie_setups_store.dart';
+import 'strategie_mes_regles_storage.dart';
 import 'strategie_tokens.dart';
 
 /// Page « Ma Stratégie » — sections modulaires (maquettes).
@@ -63,6 +65,8 @@ class _StrategiePageState extends State<StrategiePage> {
     super.initState();
     _visibleSetupIndex = ValueNotifier<int>(0);
     _selectedCalendarDay = ValueNotifier<DateTime?>(DateTime.now());
+    StrategieSetupsStore.ensureLoaded();
+    StrategieMesReglesStore.ensureLoaded();
   }
 
   @override

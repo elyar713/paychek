@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../l10n/app_localizations.dart';
 import 'gold_upgrade/gold_upgrade_embed.dart';
 import 'paychek_billing_plan.dart';
+import 'paychek_subscription_flow_result.dart';
+import 'paywall_subscription_feedback.dart';
 import 'subscription_launch_helper.dart';
 
 /// Paywall **marketing** — mobile : maquette or ; web : feuille + legacy.
@@ -17,12 +19,15 @@ Future<void> showPaychekGoldUpgradeSheet({required BuildContext context}) {
     builder: (sheetContext) {
       Future<void> runSubscribe(PaychekBillingCycle cycle) async {
         final l10n = AppLocalizations.of(sheetContext)!;
-        final ok = await openPaychekSubscriptionFlow(cycle: cycle);
+        final result = await openPaychekSubscriptionFlow(cycle: cycle);
         if (!sheetContext.mounted) return;
-        if (!ok) {
+        if (result.kind == PaychekSubscriptionFlowKind.cancelled) return;
+        if (!result.ok) {
+          final message = paywallMessageForSubscriptionResult(l10n, result);
+          if (message.isEmpty) return;
           ScaffoldMessenger.of(sheetContext).showSnackBar(
             SnackBar(
-              content: Text(l10n.paywallStoreNotConfigured),
+              content: Text(message),
               behavior: SnackBarBehavior.floating,
               backgroundColor: const Color(0xFF2A2A2A),
             ),
