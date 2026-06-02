@@ -4762,6 +4762,24 @@ abstract class AppLocalizations {
   /// **'Compte créé'**
   String get accountAuthSignupSuccess;
 
+  /// No description provided for @journalDemoNoticeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Données de démonstration'**
+  String get journalDemoNoticeTitle;
+
+  /// No description provided for @journalDemoNoticeBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tant que vous n’avez enregistré aucun trade, Paychek affiche des exemples (dashboard, journal, statistiques). Dès votre premier trade enregistré, toutes ces données démo disparaissent et seules vos données réelles sont affichées.'**
+  String get journalDemoNoticeBody;
+
+  /// No description provided for @journalDemoNoticeButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'J’ai compris'**
+  String get journalDemoNoticeButton;
+
   /// No description provided for @accountAuthLoginSuccess.
   ///
   /// In fr, this message translates to:

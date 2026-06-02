@@ -211,6 +211,9 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
       ];
   String? _selectedCsvSoftware;
   String? _lastImportedFileName;
+  /// Résumé dernier import (trades / doublons) — affiché sous le bouton CSV.
+  String? _lastCsvImportFeedback;
+  bool _lastCsvImportFeedbackIsError = false;
   String? _editingTradeId;
   String? _editingPortfolioId;
 
@@ -292,9 +295,12 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   }
 
   Future<void> _refreshPlanAnalyseFromStorage() async {
-    final stored = await AnalyseReportsStorage.loadAll();
+    final storedRaw = await AnalyseReportsStorage.loadAll();
+    final stored = await analyseReportsForDisplay(storedRaw);
     if (!mounted) return;
     final locale = Localizations.localeOf(context);
+    final eurGraduated = await PaychekDemoGraduationPrefs.isAnalyseEurGraduated();
+    if (!mounted) return;
     setState(() {
       _planAnalyseStoredReports = stored;
       var sel = _planAnalyseSelectedReport;
@@ -307,7 +313,12 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
         }
         _planAnalyseSelectedReport = sel;
       } else if (sel == null) {
-        _planAnalyseSelectedReport = _draftDefaultPlanAnalyseSnapshot(locale);
+        final demos = ajouterTradePlanAnalyseDemosVisibleSync(
+          locale,
+          eurDemoGraduated: eurGraduated,
+        );
+        _planAnalyseSelectedReport =
+            demos.isEmpty ? null : demos.first;
       }
     });
   }
@@ -517,7 +528,3 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   }
 }
 
-AnalyseReportSnapshot? _draftDefaultPlanAnalyseSnapshot(Locale locale) {
-  final list = ajouterTradePlanAnalyseDemoSnapshotsSync(locale);
-  return list.isEmpty ? null : list.first;
-}

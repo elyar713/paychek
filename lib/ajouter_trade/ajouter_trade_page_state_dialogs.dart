@@ -259,6 +259,8 @@ extension _AjouterTradePageStateDialogs on _AjouterTradePageState {
       _tradeNoteController.clear();
       _selectedCsvSoftware = null;
       _lastImportedFileName = null;
+      _lastCsvImportFeedback = null;
+      _lastCsvImportFeedbackIsError = false;
       _clearPerfLitePreserve();
     });
 

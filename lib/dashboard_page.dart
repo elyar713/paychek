@@ -12,6 +12,9 @@ import 'analyse/analyse_report_snapshot_codec.dart';
 import 'analyse/analyse_reports_storage.dart';
 import 'analyse/analyse_starred_report_storage.dart';
 import 'analyse/analyse_default_demo_seed.dart';
+import 'analyse/analyse_reports_demo_filter.dart';
+import 'ajouter_trade/ajouter_trade_plan_analyse_menu.dart';
+import 'shared/paychek_demo_graduation_prefs.dart';
 import 'analyse/analyse_realtime_notifier.dart';
 import 'strategie/strategie_realtime_notifier.dart';
 import 'checklist/checklist_page_controller.dart';
@@ -44,6 +47,7 @@ import 'strategie/strategie_mes_regles_storage.dart';
 import 'strategie/strategie_setups_store.dart';
 import 'strategie/strategie_starred_setup_storage.dart';
 import 'strategie/widgets/strategie_setup_card.dart';
+import 'trade/journal_demo_notice_dialog.dart';
 import 'trade/trade_journal_checklist_etat_migration.dart';
 import 'trade/trade_journal_scope.dart';
 import 'trade/trade_models.dart';
@@ -219,6 +223,9 @@ class _DashboardPageState extends State<DashboardPage>
       await _checklistController.hydrateFromStorage();
       if (mounted) _reconcileJournalDisciplineFromCalendar();
       if (mounted) _checkPaychekRemoteAccessGate();
+      if (mounted) {
+        await showJournalDemoNoticeAfterSignupIfNeeded(context);
+      }
     });
     _reloadAnalyseHomePreview();
     _reloadStrategieHomePreview();
@@ -384,7 +391,9 @@ class _DashboardPageState extends State<DashboardPage>
 
   Future<void> _reloadAnalyseHomePreview() async {
     final starred = await AnalyseStarredReportStorage.load();
-    final stored = await AnalyseReportsStorage.loadAll();
+    final storedRaw = await AnalyseReportsStorage.loadAll();
+    final stored = await analyseReportsForDisplay(storedRaw);
+    final eurGraduated = await PaychekDemoGraduationPrefs.isAnalyseEurGraduated();
     if (!mounted) return;
 
     // 1) Rapport étoilé : priorité sur le dashboard.
@@ -406,13 +415,24 @@ class _DashboardPageState extends State<DashboardPage>
       return;
     }
 
-    // 3) Nouveau compte : aperçu rapport démo (générateur vierge sur la page Analyse).
+    // 3) Nouveau compte : aperçu rapport démo (EUR tant que non diplômé).
     final locale = mounted
         ? Localizations.localeOf(context)
         : WidgetsBinding.instance.platformDispatcher.locale;
+    if (!eurGraduated) {
+      setState(
+        () => _analyseHomePreview =
+            buildAnalyseDashboardPreviewSnapshot(locale: locale),
+      );
+      return;
+    }
+    final goldDemos = ajouterTradePlanAnalyseDemosVisibleSync(
+      locale,
+      eurDemoGraduated: true,
+    );
     setState(
       () => _analyseHomePreview =
-          buildAnalyseDashboardPreviewSnapshot(locale: locale),
+          goldDemos.isNotEmpty ? goldDemos.first : null,
     );
   }
 

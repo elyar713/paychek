@@ -2591,6 +2591,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accountAuthSignupSuccess => 'Konto erstellt';
 
   @override
+  String get journalDemoNoticeTitle => 'Demo-Daten';
+
+  @override
+  String get journalDemoNoticeBody =>
+      'Solange Sie keinen Trade gespeichert haben, zeigt Paychek Beispieldaten (Dashboard, Journal, Statistiken). Sobald Sie Ihren ersten Trade erfassen, verschwinden alle Demo-Daten und nur Ihre echten Daten werden angezeigt.';
+
+  @override
+  String get journalDemoNoticeButton => 'Verstanden';
+
+  @override
   String get accountAuthLoginSuccess => 'Angemeldet';
 
   @override

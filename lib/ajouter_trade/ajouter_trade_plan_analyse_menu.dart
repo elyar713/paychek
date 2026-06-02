@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../analyse/analyse_controller.dart';
 import '../analyse/analyse_default_demo_seed.dart';
 import '../analyse/analyse_report_snapshot.dart';
+import '../analyse/analyse_reports_demo_filter.dart';
 import '../analyse/analyse_reports_storage.dart';
+import '../shared/paychek_demo_graduation_prefs.dart';
 import '../analyse/analyse_tokens.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
@@ -20,6 +22,16 @@ List<AnalyseReportSnapshot> ajouterTradePlanAnalyseDemoSnapshotsSync(
   final eur = AnalyseReportSnapshot.fromController(c, locale: locale);
   c.dispose();
   return [gold, eur];
+}
+
+/// Démos visibles dans le menu (EUR masqué après premier rapport validé).
+List<AnalyseReportSnapshot> ajouterTradePlanAnalyseDemosVisibleSync(
+  Locale locale, {
+  required bool eurDemoGraduated,
+}) {
+  final demos = ajouterTradePlanAnalyseDemoSnapshotsSync(locale);
+  if (!eurDemoGraduated) return demos;
+  return analyseReportsWithoutEurDemo(demos);
 }
 
 /// Bloc "Plan d'analyse" — copie visuelle du dropdown Stratégie.
@@ -112,9 +124,19 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
   Future<void> _reloadReports(Locale locale) async {
     if (!widget.showDemoReports) return;
     final stored = await AnalyseReportsStorage.loadAll();
-    final next = stored.isNotEmpty
-        ? stored
-        : ajouterTradePlanAnalyseDemoSnapshotsSync(locale);
+    final visible = await analyseReportsForDisplay(stored);
+    final eurGraduated = await PaychekDemoGraduationPrefs.isAnalyseEurGraduated();
+    final List<AnalyseReportSnapshot> next;
+    if (visible.isNotEmpty) {
+      next = visible;
+    } else if (!eurGraduated) {
+      next = ajouterTradePlanAnalyseDemosVisibleSync(
+        locale,
+        eurDemoGraduated: false,
+      );
+    } else {
+      next = const [];
+    }
     if (!mounted) return;
     setState(() {
       _reports = next;

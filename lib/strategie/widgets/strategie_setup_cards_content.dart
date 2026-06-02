@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../strategie_tokens.dart';
 import '../strategie_setups_store.dart';
+import '../strategie_tokens.dart';
 import 'strategie_setup_card.dart';
 import 'strategie_setup_rule_styles.dart';
 
@@ -124,7 +124,16 @@ class StrategieSetupCardsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cards = strategieSetupDefaultCardDataList();
+    return ListenableBuilder(
+      listenable: StrategieSetupsStore.notifier,
+      builder: (context, _) {
+        final cards = StrategieSetupsStore.notifier.value;
+        return _buildCardsColumn(cards);
+      },
+    );
+  }
+
+  Widget _buildCardsColumn(List<StrategieSetupCardData> cards) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

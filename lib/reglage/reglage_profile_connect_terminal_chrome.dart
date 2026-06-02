@@ -223,6 +223,7 @@ class PaychekTerminalGlassTextField extends StatefulWidget {
     this.autofillHints,
     this.textCapitalization = TextCapitalization.none,
     this.prefixIcon,
+    this.suffixIcon,
   });
 
   final String label;
@@ -236,6 +237,7 @@ class PaychekTerminalGlassTextField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final TextCapitalization textCapitalization;
   final IconData? prefixIcon;
+  final Widget? suffixIcon;
 
   @override
   State<PaychekTerminalGlassTextField> createState() =>
@@ -339,6 +341,7 @@ class _PaychekTerminalGlassTextFieldState extends State<PaychekTerminalGlassText
                           size: 16,
                           color: PaychekTerminalAuthColors.zinc500,
                         ),
+                  suffixIcon: widget.suffixIcon,
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),

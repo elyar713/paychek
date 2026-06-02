@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import '../shared/paychek_demo_graduation_prefs.dart';
 import 'strategie_realtime_notifier.dart';
 import 'strategie_tokens.dart';
 
@@ -105,9 +106,13 @@ abstract final class StrategieHorairesSessionsStorage {
       ];
 
   static Future<List<StrategieSessionPersisted>> load() async {
+    final goldenGraduated =
+        await PaychekDemoGraduationPrefs.isGoldenRulesGraduated();
     final p = await SharedPreferences.getInstance();
     final raw = p.getString(_k);
-    if (raw == null || raw.isEmpty) return defaultSessions();
+    if (raw == null || raw.isEmpty) {
+      return goldenGraduated ? [] : defaultSessions();
+    }
     try {
       final list = jsonDecode(raw) as List<dynamic>;
       final out = <StrategieSessionPersisted>[];
@@ -120,9 +125,12 @@ abstract final class StrategieHorairesSessionsStorage {
           if (s != null) out.add(s);
         }
       }
-      return out.isEmpty ? defaultSessions() : out;
+      if (out.isEmpty) {
+        return goldenGraduated ? [] : defaultSessions();
+      }
+      return out;
     } catch (_) {
-      return defaultSessions();
+      return goldenGraduated ? [] : defaultSessions();
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
 import '../reglage/paychek_prefs_scope.dart';
+import '../shared/paychek_demo_graduation_prefs.dart';
 import 'strategie_feedback_reference.dart';
 import 'strategie_firestore_sync.dart';
 import 'strategie_realtime_notifier.dart';
@@ -29,6 +30,11 @@ abstract final class StrategieMesReglesStore {
   static String get _key => paychekScopedPrefsKey(_kBase);
 
   static bool _loadedOnce = false;
+  static bool _goldenRulesGraduatedCache = false;
+
+  static void setGoldenRulesGraduatedCache(bool value) {
+    _goldenRulesGraduatedCache = value;
+  }
 
   static StrategieMesReglesPersisted _defaultsFor(Locale locale) {
     final l = lookupAppLocalizations(locale);
@@ -47,12 +53,27 @@ abstract final class StrategieMesReglesStore {
   static Future<void> ensureLoaded() async {
     if (_loadedOnce) return;
     _loadedOnce = true;
+    _goldenRulesGraduatedCache =
+        await PaychekDemoGraduationPrefs.isGoldenRulesGraduated();
     final p = await SharedPreferences.getInstance();
     final raw = p.getString(_key);
-    if (raw == null || raw.isEmpty) return;
+    if (raw == null || raw.isEmpty) {
+      if (_goldenRulesGraduatedCache) {
+        notifier.value = StrategieMesReglesPersisted(
+          sectionTitle: _defaultsFor(const Locale('fr')).sectionTitle,
+          rules: const [],
+          isCustom: true,
+        );
+      }
+      return;
+    }
     final decoded = _decode(raw);
     if (decoded != null) {
       notifier.value = decoded;
+      if (decoded.isCustom) {
+        await PaychekDemoGraduationPrefs.markGoldenRulesGraduated();
+        _goldenRulesGraduatedCache = true;
+      }
       return;
     }
     await p.remove(_key);
@@ -65,12 +86,14 @@ abstract final class StrategieMesReglesStore {
 
   static void resetForAccountChange() {
     _loadedOnce = false;
+    _goldenRulesGraduatedCache = false;
     notifier.value = _defaultsFor(const Locale('fr'));
   }
 
   static List<String> rulesForLocale(Locale locale) {
     final v = notifier.value;
     if (v.isCustom) return List<String>.from(v.rules);
+    if (_goldenRulesGraduatedCache) return const [];
     return StrategieFeedbackReference.mesReglesDor(locale);
   }
 
@@ -123,6 +146,16 @@ abstract final class StrategieMesReglesStore {
         isStockGoldenRules(trimmed) &&
         title.isNotEmpty &&
         isStockGoldenTitle(title)) {
+      if (_goldenRulesGraduatedCache ||
+          await PaychekDemoGraduationPrefs.isGoldenRulesGraduated()) {
+        _goldenRulesGraduatedCache = true;
+        await save(
+          sectionTitle: title.toUpperCase(),
+          rules: const [],
+          markGraduated: false,
+        );
+        return;
+      }
       await revertToDefaults();
       return;
     }
@@ -130,6 +163,17 @@ abstract final class StrategieMesReglesStore {
   }
 
   static Future<void> revertToDefaults() async {
+    if (_goldenRulesGraduatedCache ||
+        await PaychekDemoGraduationPrefs.isGoldenRulesGraduated()) {
+      _goldenRulesGraduatedCache = true;
+      final title = _defaultsFor(const Locale('fr')).sectionTitle;
+      await save(
+        sectionTitle: title,
+        rules: const [],
+        markGraduated: false,
+      );
+      return;
+    }
     notifier.value = StrategieMesReglesPersisted(
       sectionTitle: _defaultsFor(const Locale('fr')).sectionTitle,
       rules: List<String>.from(StrategieFeedbackReference.mesReglesDorDefautFr),
@@ -144,6 +188,7 @@ abstract final class StrategieMesReglesStore {
   static Future<void> save({
     required String sectionTitle,
     required List<String> rules,
+    bool markGraduated = true,
   }) async {
     final trimmed = rules
         .map((r) => r.trim())
@@ -167,6 +212,10 @@ abstract final class StrategieMesReglesStore {
         'rules': data.rules,
       }),
     );
+    if (markGraduated) {
+      await PaychekDemoGraduationPrefs.markGoldenRulesGraduated();
+      _goldenRulesGraduatedCache = true;
+    }
     StrategieRealtimeNotifier.bump();
     await StrategieFirestoreSync.pushIfSignedIn();
   }
@@ -187,6 +236,10 @@ abstract final class StrategieMesReglesStore {
       rules: List<String>.from(rules),
       isCustom: true,
     );
+    if (isCustom) {
+      await PaychekDemoGraduationPrefs.markGoldenRulesGraduated();
+      _goldenRulesGraduatedCache = true;
+    }
     await p.setString(
       _key,
       jsonEncode(<String, dynamic>{

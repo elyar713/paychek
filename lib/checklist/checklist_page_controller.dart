@@ -11,6 +11,8 @@ import 'checklist_item_schedule_sort.dart';
 import 'checklist_models.dart';
 import 'checklist_prompts.dart';
 import 'checklist_sections_storage.dart';
+import 'checklist_demo_graduation.dart';
+import '../shared/paychek_demo_graduation_prefs.dart';
 import '../shared/paychek_frame_callbacks.dart';
 import 'widgets/checklist_delete_section_dialog.dart';
 
@@ -44,6 +46,7 @@ class ChecklistPageController extends ChangeNotifier {
 
   Timer? _saveDebounce;
   bool _hydrated = false;
+  bool _checklistDemoGraduated = false;
   Map<int, ChecklistDailyDaySnapshot> _snapshotsByDay = {};
 
   /// Dernier jour calendaire traité (clôture 23:59 → snapshot).
@@ -72,7 +75,10 @@ class ChecklistPageController extends ChangeNotifier {
 
   /// Charge l’état persisté ; à appeler une fois au démarrage (ex. [DashboardPage]).
   Future<void> hydrateFromStorage() async {
-    final data = await ChecklistSectionsStorage.load();
+    _checklistDemoGraduated =
+        await PaychekDemoGraduationPrefs.isChecklistGraduated();
+    final raw = await ChecklistSectionsStorage.load();
+    final data = await checklistSectionsAfterGraduationFilter(raw);
     if (data != null && data.isNotEmpty) {
       _sections = checklistEnsureProtectedSections(data);
     }
@@ -90,6 +96,15 @@ class ChecklistPageController extends ChangeNotifier {
     _saveDebounce = Timer(const Duration(milliseconds: 350), () {
       unawaited(_persistToDiskAndCloud());
     });
+  }
+
+  /// Retire les lignes démo au premier geste utilisateur (pas à la création du compte).
+  void _onFirstChecklistUserInteraction() {
+    if (_checklistDemoGraduated) return;
+    _checklistDemoGraduated = true;
+    _sections = checklistSectionsWithoutDemoContent(_sections);
+    _sections = checklistEnsureProtectedSections(_sections);
+    unawaited(checklistPersistGraduationIfNeeded(_sections));
   }
 
   Future<void> _persistToDiskAndCloud() async {
@@ -523,7 +538,8 @@ class ChecklistPageController extends ChangeNotifier {
 
   Future<void> _applyReloadFromStorage() async {
     _reloadDeferred = false;
-    final data = await ChecklistSectionsStorage.load();
+    final raw = await ChecklistSectionsStorage.load();
+    final data = await checklistSectionsAfterGraduationFilter(raw);
     editingSectionId = null;
     sectionEditSnapshot = null;
     sectionEditInteraction = false;
@@ -625,6 +641,7 @@ class ChecklistPageController extends ChangeNotifier {
 
   void commitItemLabelEdit() {
     if (_disposed) return;
+    _onFirstChecklistUserInteraction();
     final id = editingItemId;
     if (id == null) return;
     final t = itemLabelEditController.text.trim();
@@ -709,6 +726,7 @@ class ChecklistPageController extends ChangeNotifier {
     String itemId,
     ChecklistItemSchedule schedule,
   ) {
+    _onFirstChecklistUserInteraction();
     _sections = _sections.map((section) {
       if (section.id != sectionId) return section;
       final nextItems = section.items.map((item) {
@@ -728,6 +746,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void toggleItem(String sectionId, String itemId, bool value) {
+    _onFirstChecklistUserInteraction();
     final section = _sections.where((s) => s.id == sectionId).toList();
     if (section.isEmpty || !checklistSectionIsActive(section.first)) return;
     final now = DateTime.now();
@@ -749,6 +768,7 @@ class ChecklistPageController extends ChangeNotifier {
 
   void setSectionEnabled(String sectionId, bool enabled) {
     if (!checklistSectionHasEnableToggle(sectionId)) return;
+    _onFirstChecklistUserInteraction();
     _sections = _sections
         .map(
           (s) => s.id == sectionId ? s.copyWith(enabled: enabled) : s,
@@ -792,6 +812,7 @@ class ChecklistPageController extends ChangeNotifier {
     if (editingItemId != null) {
       commitItemLabelEdit();
     }
+    _onFirstChecklistUserInteraction();
     final id = editingSectionId;
     if (id == null) return;
     final t = sectionTitleEditController.text.trim();
@@ -860,6 +881,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void removeItemFromSection(String sectionId, String itemId) {
+    _onFirstChecklistUserInteraction();
     for (final s in _sections) {
       if (s.id != sectionId) continue;
       for (final i in s.items) {
@@ -896,6 +918,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void addLineToSection(String sectionId) {
+    _onFirstChecklistUserInteraction();
     if (editingSectionId == sectionId) {
       sectionEditInteraction = true;
     }
@@ -933,6 +956,7 @@ class ChecklistPageController extends ChangeNotifier {
       builder: (ctx) => const ChecklistDeleteSectionDialog(),
     );
     if (ok == true && context.mounted) {
+      _onFirstChecklistUserInteraction();
       for (final s in _sections) {
         if (s.id != sectionId) continue;
         for (final i in s.items) {
@@ -952,6 +976,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void addSection(String defaultNewSectionTitle) {
+    _onFirstChecklistUserInteraction();
     final ts = DateTime.now().millisecondsSinceEpoch;
     final id = 'sect_$ts';
     _sections.add(

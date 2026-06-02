@@ -5,8 +5,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../checklist/widgets/checklist_delete_section_dialog.dart';
 import '../../l10n/app_localizations.dart';
+import '../strategie_mes_regles_demo_graduation.dart';
 import '../strategie_mes_regles_storage.dart';
 import '../strategie_realtime_notifier.dart';
+import '../../shared/paychek_demo_graduation_prefs.dart';
 import '../strategie_tokens.dart';
 import '../strategie_feedback_reference.dart';
 import '../widgets/strategie_mes_regles_widgets.dart';
@@ -38,6 +40,8 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   /// Dernière langue pour laquelle les textes des règles par défaut ont été alignés.
   String? _rulesSyncedLang;
 
+  bool _goldenRulesDemoGraduated = false;
+
   @override
   void initState() {
     super.initState();
@@ -59,15 +63,16 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
         .toList(growable: true);
     _rulesSyncedLang = null;
     _draftFocus = FocusNode()..addListener(_onDraftFocusChanged);
-    unawaited(
-      StrategieMesReglesStore.ensureLoaded().then((_) {
-        if (!mounted) return;
-        _hydrateFromPersisted(
-          StrategieMesReglesStore.notifier.value,
-          Localizations.localeOf(context),
-        );
-      }),
-    );
+    unawaited(() async {
+      await StrategieMesReglesStore.ensureLoaded();
+      _goldenRulesDemoGraduated =
+          await PaychekDemoGraduationPrefs.isGoldenRulesGraduated();
+      if (!mounted) return;
+      _hydrateFromPersisted(
+        StrategieMesReglesStore.notifier.value,
+        Localizations.localeOf(context),
+      );
+    }());
     StrategieRealtimeNotifier.tick.addListener(_onStrategieRemoteTick);
   }
 
@@ -79,10 +84,27 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
     );
   }
 
+  void _onFirstGoldenRulesUserInteraction() {
+    if (_goldenRulesDemoGraduated) return;
+    _goldenRulesDemoGraduated = true;
+    final locale = Localizations.localeOf(context);
+    unawaited(() async {
+      await strategieGraduateGoldenRulesOnFirstUse(locale: locale);
+      if (!mounted) return;
+      _hydrateFromPersisted(
+        StrategieMesReglesStore.notifier.value,
+        locale,
+      );
+    }());
+  }
+
   void _hydrateFromPersisted(StrategieMesReglesPersisted data, Locale locale) {
+    final showStockDemo = !data.isCustom && !_goldenRulesDemoGraduated;
     final rules = data.isCustom
         ? data.rules
-        : StrategieFeedbackReference.mesReglesDor(locale);
+        : showStockDemo
+            ? StrategieFeedbackReference.mesReglesDor(locale)
+            : const <String>[];
     final title = data.isCustom
         ? data.sectionTitle
         : StrategieMesReglesStore.sectionTitleForLocale(locale);
@@ -108,6 +130,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   }
 
   void _applyLocalizedGoldenRules(Locale appLocale) {
+    if (_goldenRulesDemoGraduated) return;
     if (StrategieMesReglesStore.notifier.value.isCustom) return;
 
     final lang = appLocale.languageCode;
@@ -146,7 +169,8 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final appLoc = Localizations.localeOf(context);
-    if (!StrategieMesReglesStore.notifier.value.isCustom) {
+    if (!_goldenRulesDemoGraduated &&
+        !StrategieMesReglesStore.notifier.value.isCustom) {
       final target = AppLocalizations.of(context)!
           .ajouterTradeStrategieGoldRules
           .toUpperCase();
@@ -231,6 +255,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   }
 
   void _startMenuEdit() {
+    _onFirstGoldenRulesUserInteraction();
     _discardDraftIfAny();
     setState(() {
       _snapTitle = _sectionTitle;
@@ -271,6 +296,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
 
   void _commitMenuEdit() {
     if (!_menuEditMode) return;
+    _onFirstGoldenRulesUserInteraction();
     _commitTitleFromField();
     if (_draftAdd != null) {
       final t = _draftAdd!.text.trim();
@@ -305,6 +331,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
       builder: (ctx) => const ChecklistDeleteSectionDialog(),
     );
     if (ok != true || !mounted) return;
+    _onFirstGoldenRulesUserInteraction();
     setState(() {
       for (final c in _ruleControllers) {
         c.dispose();
@@ -319,6 +346,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   }
 
   void _addRuleDraft() {
+    _onFirstGoldenRulesUserInteraction();
     if (_draftAdd != null) return;
     setState(() {
       _draftAdd = TextEditingController();
@@ -331,6 +359,7 @@ class _StrategieMesReglesSectionState extends State<StrategieMesReglesSection> {
   }
 
   void _removeRuleAt(int index) {
+    _onFirstGoldenRulesUserInteraction();
     setState(() {
       _ruleControllers[index].dispose();
       _ruleControllers.removeAt(index);

@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/questionnaire_completion_prefs.dart';
+import '../trade/journal_demo_notice_prefs.dart';
 import '../paychek_brand_links.dart';
 import '../web/web_landing_password_reset_dialog.dart';
 import 'paychek_user_firestore.dart';
@@ -79,6 +80,9 @@ class ReglageProfileAuthPanel extends StatefulWidget {
 
 class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
   late _AuthTab _tab;
+  bool _obscureLoginPassword = true;
+  bool _obscureSignPassword = true;
+  bool _obscureSignConfirm = true;
 
   final TextEditingController _loginEmail = TextEditingController();
   final TextEditingController _loginPassword = TextEditingController();
@@ -350,7 +354,9 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
 
   Future<void> _markQuestionnaireIfNewUser(UserCredential cred) async {
     if (cred.additionalUserInfo?.isNewUser == true && cred.user != null) {
-      await QuestionnaireCompletionPrefs.markIncomplete(cred.user!.uid);
+      final uid = cred.user!.uid;
+      await QuestionnaireCompletionPrefs.markIncomplete(uid);
+      await JournalDemoNoticePrefs.markPendingAfterSignup(uid);
     }
   }
 
@@ -665,6 +671,10 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
             ReglageProfileLoginForm(
               loginEmail: _loginEmail,
               loginPassword: _loginPassword,
+              obscureLoginPassword: _obscureLoginPassword,
+              onToggleLoginPasswordVisibility: () {
+                setState(() => _obscureLoginPassword = !_obscureLoginPassword);
+              },
               fieldDecoration: _activeFieldDecoration,
               premiumTerminalChrome: true,
               primaryButtonLabel: l10n.authTerminalCtaLogin,
@@ -682,6 +692,14 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
               signEmail: _signEmail,
               signPassword: _signPassword,
               signConfirm: _signConfirm,
+              obscureSignPassword: _obscureSignPassword,
+              obscureSignConfirm: _obscureSignConfirm,
+              onToggleSignPasswordVisibility: () {
+                setState(() => _obscureSignPassword = !_obscureSignPassword);
+              },
+              onToggleSignConfirmVisibility: () {
+                setState(() => _obscureSignConfirm = !_obscureSignConfirm);
+              },
               fieldDecoration: _activeFieldDecoration,
               signupNamesSideBySide: true,
               premiumTerminalChrome: true,
@@ -795,6 +813,10 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
           ReglageProfileLoginForm(
             loginEmail: _loginEmail,
             loginPassword: _loginPassword,
+            obscureLoginPassword: _obscureLoginPassword,
+            onToggleLoginPasswordVisibility: () {
+              setState(() => _obscureLoginPassword = !_obscureLoginPassword);
+            },
             fieldDecoration: _activeFieldDecoration,
             fieldTextStyle:
                 widget.landingPillStyle ? _kLandingFieldTextStyle : null,
@@ -829,6 +851,14 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
             signEmail: _signEmail,
             signPassword: _signPassword,
             signConfirm: _signConfirm,
+            obscureSignPassword: _obscureSignPassword,
+            obscureSignConfirm: _obscureSignConfirm,
+            onToggleSignPasswordVisibility: () {
+              setState(() => _obscureSignPassword = !_obscureSignPassword);
+            },
+            onToggleSignConfirmVisibility: () {
+              setState(() => _obscureSignConfirm = !_obscureSignConfirm);
+            },
             fieldDecoration: _activeFieldDecoration,
             signupNamesSideBySide: widget.landingPillStyle,
             fieldTextStyle:

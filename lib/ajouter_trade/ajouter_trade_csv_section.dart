@@ -54,6 +54,8 @@ class AjouterTradeCsvSection extends StatelessWidget {
     required this.onSourceChanged,
     required this.onImportTap,
     this.importedFileName,
+    this.importFeedbackMessage,
+    this.importFeedbackIsError = false,
     this.cardDecoration,
     this.sectionTitleColor,
   });
@@ -65,6 +67,8 @@ class AjouterTradeCsvSection extends StatelessWidget {
   final ValueChanged<String?> onSourceChanged;
   final VoidCallback onImportTap;
   final String? importedFileName;
+  final String? importFeedbackMessage;
+  final bool importFeedbackIsError;
   final BoxDecoration? cardDecoration;
   final Color? sectionTitleColor;
 
@@ -157,6 +161,21 @@ class AjouterTradeCsvSection extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
             ),
           ),
+          if (importFeedbackMessage != null &&
+              importFeedbackMessage!.trim().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              importFeedbackMessage!.trim(),
+              style: TextStyle(
+                color: importFeedbackIsError
+                    ? const Color(0xFFE57373)
+                    : DashboardTokens.labelGrey,
+                fontSize: 11,
+                height: 1.4,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
           if (importedFileName != null && importedFileName!.trim().isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(

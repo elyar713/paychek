@@ -362,9 +362,14 @@ async function sendPaychekMailOutbound(mailOptions, passRaw, logCtx) {
   const id = paychekSmtpIdentity();
   const smtpReady = Boolean(id.host && id.user && pass);
 
+  const outbound = {...mailOptions};
+  if (typeof outbound.html === "string" && outbound.html.trim()) {
+    outbound.html = paychekApplyEmailIosDarkModeFix(outbound.html);
+  }
+
   if (resendKey) {
     try {
-      await sendPaychekMailViaResend(resendKey, mailOptions, logCtx);
+      await sendPaychekMailViaResend(resendKey, outbound, logCtx);
       return; // Sortir après l'envoi réussi via Resend
     } catch (resendErr) {
       console.warn("sendPaychekMail: Resend failed", logCtx || "", resendErr);
@@ -381,7 +386,7 @@ async function sendPaychekMailOutbound(mailOptions, passRaw, logCtx) {
 
   // Si Resend n'était pas configuré, ou s'il a échoué et que SMTP est prêt.
   if (smtpReady) {
-    await sendPaychekMailWithOptionalFallback(mailOptions, pass, logCtx);
+    await sendPaychekMailWithOptionalFallback(outbound, pass, logCtx);
     return; // Sortir après l'envoi réussi via SMTP
   }
 
@@ -711,6 +716,127 @@ function paychekNormalizeWelcomeTemplateTokens(html) {
   return h;
 }
 
+/**
+ * Mail iOS en thème sombre : recolorise les e-mails sombres (fond/texte grisés).
+ * `light only` force le rendu tel que conçu (comme Outlook / webmail).
+ */
+function paychekEmailIosDarkModeHeadTags() {
+  return [
+    "<meta name=\"color-scheme\" content=\"light only\">",
+    "<meta name=\"supported-color-schemes\" content=\"light\">",
+  ].join("\n    ");
+}
+
+function paychekEmailIosDarkModeCss() {
+  return `
+        :root { color-scheme: light only; supported-color-schemes: light; }
+        @media (prefers-color-scheme: dark) {
+          body, .container { background-color: #000000 !important; }
+          .content, h1, .brand-logo, .welcome-badge, .success-badge,
+          .trial-days, .receipt-value, .feature-title {
+            color: #ffffff !important;
+          }
+          p, .feature-desc, .quote-box { color: #bbbbbb !important; }
+          .trial-box, .receipt-card { background-color: #0a0a0a !important; }
+        }
+  `.trim();
+}
+
+/**
+ * @param {string} html
+ * @return {string}
+ */
+function paychekApplyEmailIosDarkModeFix(html) {
+  let h = `${html}`.trim();
+  if (!h) return h;
+  if (/color-scheme/i.test(h)) return h;
+  const tags = paychekEmailIosDarkModeHeadTags();
+  const cssBlock =
+    `<style type="text/css">\n${paychekEmailIosDarkModeCss()}\n    </style>`;
+  if (/<head[\s>]/i.test(h)) {
+    h = h.replace(/<head([^>]*)>/i, `<head$1>\n    ${tags}\n    ${cssBlock}\n`);
+  } else {
+    h = `${tags}\n${cssBlock}\n${h}`;
+  }
+  return h;
+}
+
+/**
+ * Réserve l’envoi une seule fois (transaction) — évite 2–3 e-mails quand
+ * `paychek_users/{uid}` est mis à jour plusieurs fois à l’inscription.
+ * @param {FirebaseFirestore.DocumentReference} ref
+ * @return {Promise<boolean>}
+ */
+async function paychekTryClaimWelcomeSignupEmail(ref) {
+  return admin.firestore().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return false;
+    const data = snap.data() ?? {};
+    if (data.welcomeSignupEmailSentAt) return false;
+    tx.set(
+        ref,
+        {
+          welcomeSignupEmailSentAt:
+            admin.firestore.FieldValue.serverTimestamp(),
+        },
+        {merge: true},
+    );
+    return true;
+  });
+}
+
+/**
+ * @param {FirebaseFirestore.DocumentReference} docRef
+ * @param {string} fieldName
+ * @return {Promise<boolean>}
+ */
+async function paychekTryClaimOutboundEmailFlag(docRef, fieldName) {
+  const field = `${fieldName ?? ""}`.trim();
+  if (!field) return false;
+  return admin.firestore().runTransaction(async (tx) => {
+    const snap = await tx.get(docRef);
+    if (!snap.exists) return false;
+    const data = snap.data() ?? {};
+    if (data[field]) return false;
+    tx.set(
+        docRef,
+        {[field]: admin.firestore.FieldValue.serverTimestamp()},
+        {merge: true},
+    );
+    return true;
+  });
+}
+
+/**
+ * Un seul e-mail « Accès Pro confirmé » par session Stripe (webhook / retry).
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {string} sessionId
+ * @return {Promise<boolean>}
+ */
+async function paychekTryClaimProAccessConfirmedEmail(db, uid, sessionId) {
+  const sid = `${sessionId ?? ""}`.trim();
+  if (!sid) return false;
+  const ref = db.collection("subscriber_entitlements").doc(uid);
+  return admin.firestore().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() ?? {} : {};
+    const sentMap = data.proAccessConfirmedEmailBySession ?? {};
+    if (sentMap[sid]) return false;
+    tx.set(
+        ref,
+        {
+          proAccessConfirmedEmailBySession: {
+            ...sentMap,
+            [sid]: admin.firestore.FieldValue.serverTimestamp(),
+          },
+        },
+        {merge: true},
+    );
+    return true;
+  });
+}
+
 function paychekApplyLegacyMaquetteTokens(out, vars) {
   let o = paychekNormalizeWelcomeTemplateTokens(out);
   const prenom =
@@ -754,10 +880,34 @@ function paychekApplyLegacyMaquetteTokens(out, vars) {
     o = o.split("[Date de fin]").join(periodEnd);
     o = o.split("[Date de renouvellement]").join(periodEnd);
     o = o.split("[Date anniversaire]").join(periodEnd);
+    o = o.split("[DATE_ANNIVERSAIRE]").join(periodEnd);
+    o = o.split("[DATE ANNIVERSAIRE]").join(periodEnd);
+    o = o.split("[DATE DE FIN]").join(periodEnd);
+    o = o.split("[DATE_DE_FIN]").join(periodEnd);
+    o = o.split("[DATE_DE_RENOUVELLEMENT]").join(periodEnd);
     o = o.split("[Valide jusqu'au]").join(periodEnd);
     o = o.split("[Valide jusqu’au]").join(periodEnd);
+    o = o.split("[VALIDE JUSQU'AU]").join(periodEnd);
+    o = o.split("[VALIDE JUSQU_AU]").join(periodEnd);
   }
   return o;
+}
+
+/**
+ * Résout la locale d'e-mail PRO en priorisant le checkout Stripe,
+ * puis le profil utilisateur Firebase.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {Record<string, unknown>} userData
+ * @param {import("stripe").Stripe.Checkout.Session} session
+ * @return {Promise<string>}
+ */
+async function paychekResolveProEmailLocale(db, uid, userData, session) {
+  const fromSession = `${session?.locale ?? ""}`.trim().toLowerCase();
+  if (fromSession && fromSession !== "auto") {
+    return emailI18n.normalizePaychekEmailLocale(fromSession);
+  }
+  return emailI18n.paychekResolveEmailLocale(db, uid, userData);
 }
 
 /**
@@ -929,7 +1079,11 @@ async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels, local
   } catch (e) {
     console.warn("resolveUserAcknowledgmentHtml: lecture Firestore", e);
   }
-  if (!custom) return buildUserAcknowledgmentHtml(ticketData, ticketLabels, loc);
+  if (!custom) {
+    return paychekApplyEmailIosDarkModeFix(
+        buildUserAcknowledgmentHtml(ticketData, ticketLabels, loc),
+    );
+  }
 
   const supportHrefEsc = escapeHtml(
       KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
@@ -949,7 +1103,9 @@ async function resolveUserAcknowledgmentHtml(db, ticketData, ticketLabels, local
     supportHref: supportHrefEsc,
     followTicketHref: supportHrefEsc,
   };
-  return paychekApplyEmailPlaceholders(custom, vars);
+  return paychekApplyEmailIosDarkModeFix(
+      paychekApplyEmailPlaceholders(custom, vars),
+  );
 }
 
 async function resolveStaffSupportReplyHtml(db, opts) {
@@ -972,17 +1128,19 @@ async function resolveStaffSupportReplyHtml(db, opts) {
   const mailFromForCsat = `${opts.mailFromForCsat}`;
 
   if (!custom) {
-    return buildStaffSupportReplyHtml({
-      ticketLabel,
-      nomUtilisateur,
-      sujetTicketPlain,
-      messageBodyPlain,
-      initialesAgent,
-      nomAgent,
-      attachmentShownFileName,
-      mailFromForCsat,
-      locale: loc,
-    });
+    return paychekApplyEmailIosDarkModeFix(
+        buildStaffSupportReplyHtml({
+          ticketLabel,
+          nomUtilisateur,
+          sujetTicketPlain,
+          messageBodyPlain,
+          initialesAgent,
+          nomAgent,
+          attachmentShownFileName,
+          mailFromForCsat,
+          locale: loc,
+        }),
+    );
   }
 
   const safeLabel = escapeHtml(ticketLabel);
@@ -1005,22 +1163,24 @@ async function resolveStaffSupportReplyHtml(db, opts) {
   const journalHrefEsc = supportHrefEsc;
   const ticketStatusLabel = escapeHtml(emailI18n.pack(loc).ticketStatusPending);
 
-  return paychekApplyEmailPlaceholders(custom, {
-    ticketLabel: safeLabel,
-    nomUtilisateur: safeNom,
-    sujet: safeSujet,
-    messageHtml,
-    pjBlock,
-    initialesAgent: safeInit,
-    nomAgent: safeAgent,
-    csatPoor,
-    csatOk,
-    csatGood,
-    csatGreat,
-    supportHref: supportHrefEsc,
-    journalHref: journalHrefEsc,
-    ticketStatusLabel,
-  });
+  return paychekApplyEmailIosDarkModeFix(
+      paychekApplyEmailPlaceholders(custom, {
+        ticketLabel: safeLabel,
+        nomUtilisateur: safeNom,
+        sujet: safeSujet,
+        messageHtml,
+        pjBlock,
+        initialesAgent: safeInit,
+        nomAgent: safeAgent,
+        csatPoor,
+        csatOk,
+        csatGood,
+        csatGreat,
+        supportHref: supportHrefEsc,
+        journalHref: journalHrefEsc,
+        ticketStatusLabel,
+      }),
+  );
 }
 
 /**
@@ -1543,6 +1703,7 @@ exports.notifyStaffOnSupportTicketCreated = onDocumentCreated(
 
     const t = snapshot.data();
     const ticketId = event.params.ticketId;
+    const ticketRef = snapshot.ref;
     const replyEmail = `${t.replyEmail ?? ""}`.trim();
     const uid = `${t.userId ?? ""}`.trim();
     const kind = `${t.kind ?? "other"}`.trim() || "other";
@@ -1573,24 +1734,46 @@ exports.notifyStaffOnSupportTicketCreated = onDocumentCreated(
       `${preview || "(vide)"}\n\n` +
       "Répondre via le back-office Support (ticket lié).\n";
 
-    try {
-      await sendPaychekMailOutbound(
-          {
-            from: `"Paychek — nouveau ticket" <${id.mailFrom}>`,
-            to: id.mailBcc,
-            subject: `Paychek — Nouveau ticket · ${kind} (#${label})`,
-            text: textBody,
-            replyTo: replyEmail.includes("@") ? replyEmail : id.mailFrom,
-          },
-          rawPass,
-          JSON.stringify({flow: "staffNotify", ticketId}),
-      );
-    } catch (err) {
-      console.error("notifyStaffOnSupportTicketCreated: échec SMTP (équipe)", err);
+    const staffClaimed = await paychekTryClaimOutboundEmailFlag(
+        ticketRef,
+        "supportTicketStaffNotifyEmailSentAt",
+    );
+    if (staffClaimed) {
+      try {
+        await sendPaychekMailOutbound(
+            {
+              from: `"Paychek — nouveau ticket" <${id.mailFrom}>`,
+              to: id.mailBcc,
+              subject: `Paychek — Nouveau ticket · ${kind} (#${label})`,
+              text: textBody,
+              replyTo: replyEmail.includes("@") ? replyEmail : id.mailFrom,
+            },
+            rawPass,
+            JSON.stringify({flow: "staffNotify", ticketId}),
+        );
+      } catch (err) {
+        console.error("notifyStaffOnSupportTicketCreated: échec SMTP (équipe)", err);
+        try {
+          await ticketRef.set(
+              {supportTicketStaffNotifyEmailSentAt: admin.firestore.FieldValue.delete()},
+              {merge: true},
+          );
+        } catch (rollbackErr) {
+          console.error(
+              "notifyStaffOnSupportTicketCreated: rollback staff notify flag",
+              rollbackErr,
+          );
+        }
+      }
     }
 
     // Accusé de réception — utilisateur (To) + copie équipe (Bcc).
     if (replyEmail.includes("@")) {
+      const ackClaimed = await paychekTryClaimOutboundEmailFlag(
+          ticketRef,
+          "supportTicketUserAckEmailSentAt",
+      );
+      if (!ackClaimed) return;
       try {
         const db = admin.firestore();
         const locale = await emailI18n.paychekResolveEmailLocale(db, uid, t);
@@ -1633,6 +1816,17 @@ exports.notifyStaffOnSupportTicketCreated = onDocumentCreated(
           "notifyStaffOnSupportTicketCreated: échec SMTP (accusé utilisateur)",
           err,
         );
+        try {
+          await ticketRef.set(
+              {supportTicketUserAckEmailSentAt: admin.firestore.FieldValue.delete()},
+              {merge: true},
+          );
+        } catch (rollbackErr) {
+          console.error(
+              "notifyStaffOnSupportTicketCreated: rollback user ack flag",
+              rollbackErr,
+          );
+        }
       }
     }
   },
@@ -1951,11 +2145,13 @@ function buildProAccessConfirmedHtml(v, locale) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    ${paychekEmailIosDarkModeHeadTags()}
     <title>${escapeHtml(s.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; }
+        ${paychekEmailIosDarkModeCss()}
 
         body {
             background-color: #000000;
@@ -2181,7 +2377,7 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
     clientLine = to.split("@")[0] || "Client";
   }
 
-  const locale = await emailI18n.paychekResolveEmailLocale(db, uid, u);
+  const locale = await paychekResolveProEmailLocale(db, uid, u, session);
   const periodEndFr = emailI18n.paychekFormatPeriodEndDate(locale, periodEndTs);
   const txnSuffix = paychekProMailTxnSuffix(session);
 
@@ -2207,6 +2403,8 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
     periodEndFr: safeEnd,
     periodEnd: safeEnd,
     validUntil: safeEnd,
+    DATE_ANNIVERSAIRE: safeEnd,
+    dateAnniversaire: safeEnd,
     dateFin: safeEnd,
     dateFinAbonnement: safeEnd,
     txnSuffix: safeTxn,
@@ -2214,13 +2412,15 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
     privacyHref: privacyHrefEsc,
   };
 
-  const html = customHtml ?
-    paychekApplyEmailPlaceholders(customHtml, placeholderVars) :
-    buildProAccessConfirmedHtml({
-      clientName: safeClient,
-      periodEndFr: safeEnd,
-      txnSuffix: safeTxn,
-    }, locale);
+  const html = paychekApplyEmailIosDarkModeFix(
+      customHtml ?
+        paychekApplyEmailPlaceholders(customHtml, placeholderVars) :
+        buildProAccessConfirmedHtml({
+          clientName: safeClient,
+          periodEndFr: safeEnd,
+          txnSuffix: safeTxn,
+        }, locale),
+  );
 
   const text = emailI18n.pack(locale).pro.text(
       clientLine,
@@ -2293,11 +2493,13 @@ function buildWelcomeSignupHtml(v, locale) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    ${paychekEmailIosDarkModeHeadTags()}
     <title>${escapeHtml(s.htmlTitle)}</title>
     <style>
         body, table, td, a { text-decoration: none; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; }
+        ${paychekEmailIosDarkModeCss()}
         
         body {
             background-color: #000000;
@@ -2522,7 +2724,7 @@ async function resolveWelcomeSignupHtml(db, varsRaw, locale) {
   );
   const privacyHrefEsc = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
 
-  return customHtml ?
+  const rawHtml = customHtml ?
     paychekApplyEmailPlaceholders(
         paychekNormalizeWelcomeTemplateTokens(customHtml),
         {
@@ -2539,6 +2741,7 @@ async function resolveWelcomeSignupHtml(db, varsRaw, locale) {
       supportHref: supportHrefEsc,
       privacyHref: privacyHrefEsc,
     }, loc);
+  return paychekApplyEmailIosDarkModeFix(rawHtml);
 }
 
 /**
@@ -2618,7 +2821,6 @@ exports.paychekWelcomeEmailOnSignup = onDocumentWritten(
     if (!uid) return;
 
     const fsData = after.data() ?? {};
-    if (fsData.welcomeSignupEmailSentAt) return;
 
     const rawPass = paychekSmtpPassword.value();
     const pass = normalizeSmtpPassword(rawPass);
@@ -2653,6 +2855,14 @@ exports.paychekWelcomeEmailOnSignup = onDocumentWritten(
     const authDn = `${authUser.displayName ?? ""}`.trim();
     const before = event.data?.before;
     const isCreate = !before?.exists;
+    // Sur update, n'autoriser le welcome que juste après une vraie création de compte.
+    // Evite d'envoyer "Bienvenue" à d'anciens utilisateurs lors d'une édition profil.
+    const createdMs = Date.parse(`${authUser.metadata?.creationTime ?? ""}`);
+    const ageMs = Number.isFinite(createdMs) ? Date.now() - createdMs : Number.POSITIVE_INFINITY;
+    const isRecentSignup = ageMs >= 0 && ageMs <= 6 * 60 * 60 * 1000;
+    if (!isCreate && !isRecentSignup) {
+      return;
+    }
     if (isCreate && !fsFirst && !fsDn && !authDn) {
       return;
     }
@@ -2668,6 +2878,9 @@ exports.paychekWelcomeEmailOnSignup = onDocumentWritten(
     const firstName = greetingFirstNameWelcome(freshData, authUser);
     const db = admin.firestore();
 
+    const claimed = await paychekTryClaimWelcomeSignupEmail(after.ref);
+    if (!claimed) return;
+
     try {
       await paychekSendWelcomeSignupEmail(db, rawPass, {
         uid,
@@ -2675,12 +2888,19 @@ exports.paychekWelcomeEmailOnSignup = onDocumentWritten(
         firstName,
         trialDays: PAYCHEK_WELCOME_TRIAL_DAYS,
       });
-      await after.ref.set(
-          {welcomeSignupEmailSentAt: admin.firestore.FieldValue.serverTimestamp()},
-          {merge: true},
-      );
     } catch (err) {
       console.error("paychekWelcomeEmailOnSignup: envoi", err);
+      try {
+        await after.ref.set(
+            {welcomeSignupEmailSentAt: admin.firestore.FieldValue.delete()},
+            {merge: true},
+        );
+      } catch (rollbackErr) {
+        console.error(
+            "paychekWelcomeEmailOnSignup: rollback welcomeSignupEmailSentAt",
+            rollbackErr,
+        );
+      }
     }
   },
 );
@@ -3272,6 +3492,13 @@ async function paychekHandleStripeEvent(stripe, event, passRaw) {
   const granted = await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
   if (!granted) return;
 
+  const proEmailClaimed = await paychekTryClaimProAccessConfirmedEmail(
+      db,
+      uid,
+      session.id,
+  );
+  if (!proEmailClaimed) return;
+
   try {
     const uSnap = await db.collection("paychek_users").doc(uid).get();
     const periodEnd = await paychekResolveProEmailPeriodEndTs(
@@ -3284,6 +3511,26 @@ async function paychekHandleStripeEvent(stripe, event, passRaw) {
     await paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, periodEnd);
   } catch (e) {
     console.warn("paychekStripeWebhook: e-mail accès Pro", e);
+    try {
+      const entRef = db.collection("subscriber_entitlements").doc(uid);
+      const entSnap = await entRef.get();
+      const sentMap =
+        entSnap.exists ? entSnap.data()?.proAccessConfirmedEmailBySession ?? {} : {};
+      const sid = `${session.id ?? ""}`.trim();
+      if (sid && sentMap[sid]) {
+        const next = {...sentMap};
+        delete next[sid];
+        await entRef.set(
+            {proAccessConfirmedEmailBySession: next},
+            {merge: true},
+        );
+      }
+    } catch (rollbackErr) {
+      console.warn(
+          "paychekStripeWebhook: rollback pro email session flag",
+          rollbackErr,
+      );
+    }
   }
 }
 
@@ -4773,13 +5020,15 @@ async function paychekSendRefundNotifyEmail(
   const privacyHref = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
   const refundDelay = emailI18n.pack(locale).refundDelay;
 
-  const html = buildRefundConfirmedHtml({
-    firstName: fn,
-    amountDisplay,
-    approvalDateFr,
-    supportHref,
-    privacyHref,
-  }, locale);
+  const html = paychekApplyEmailIosDarkModeFix(
+      buildRefundConfirmedHtml({
+        firstName: fn,
+        amountDisplay,
+        approvalDateFr,
+        supportHref,
+        privacyHref,
+      }, locale),
+  );
 
   const text = emailI18n.pack(locale).refund.text(
       firstNameRaw,

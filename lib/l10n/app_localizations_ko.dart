@@ -2488,6 +2488,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get accountAuthSignupSuccess => '계정이 생성되었습니다';
 
   @override
+  String get journalDemoNoticeTitle => '데모 데이터';
+
+  @override
+  String get journalDemoNoticeBody =>
+      '첫 트레이드를 저장하기 전까지 Paychek은 예시 데이터(대시보드, 일지, 통계)를 표시합니다. 첫 트레이드를 기록하는 순간 모든 데모 데이터가 사라지고 실제 데이터만 표시됩니다.';
+
+  @override
+  String get journalDemoNoticeButton => '확인';
+
+  @override
   String get accountAuthLoginSuccess => '로그인되었습니다';
 
   @override

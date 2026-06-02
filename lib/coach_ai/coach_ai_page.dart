@@ -485,6 +485,9 @@ class _CoachAiPageState extends State<CoachAiPage> {
         localFallback = CoachAiPillarCoaching.buildEmergencyFallback(lang);
       }
     }
+    if (!res.ok && (localFallback == null || localFallback.trim().isEmpty)) {
+      localFallback = CoachAiPillarCoaching.buildEmergencyFallback(lang);
+    }
 
     setState(() {
       _sending = false;

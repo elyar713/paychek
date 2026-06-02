@@ -51,7 +51,11 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       if (!context.mounted || picked == null || picked.files.isEmpty) return;
 
       final file = picked.files.first;
-      setState(() => _lastImportedFileName = file.name);
+      setState(() {
+        _lastImportedFileName = file.name;
+        _lastCsvImportFeedback = null;
+        _lastCsvImportFeedbackIsError = false;
+      });
       final fileNameLower = file.name.toLowerCase();
       final isXlsx = fileNameLower.endsWith('.xlsx');
       String? html;
@@ -361,9 +365,10 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         summary +=
             ' ${l10n.ajouterTradeLiteMonthlyLimitImportSkipped(skippedLiteMonthlyCap, TradeLiteMonthlyLimit.maxTradesPerCalendarMonthNonPro)}';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(summary)),
-      );
+      setState(() {
+        _lastCsvImportFeedback = summary;
+        _lastCsvImportFeedbackIsError = importedCount == 0;
+      });
       if (importedCount > 0) {
         await bumpPaychekUserImportedTradesCount(importedCount);
       }
@@ -378,9 +383,10 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.tradeImportFailed('$e'))));
+      setState(() {
+        _lastCsvImportFeedback = l10n.tradeImportFailed('$e');
+        _lastCsvImportFeedbackIsError = true;
+      });
       await logPaychekUserCsvImportEvent(
         software: _selectedCsvSoftware ?? 'inconnu',
         status: PaychekCsvImportLogStatus.error,

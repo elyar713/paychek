@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'analyse_controller.dart';
 import 'analyse_entry_tf_storage.dart';
 import 'analyse_default_demo_seed.dart';
+import 'analyse_reports_demo_filter.dart';
+import '../shared/paychek_demo_graduation_prefs.dart';
 import 'analyse_realtime_notifier.dart';
 import 'analyse_page_content.dart';
 import 'analyse_report_apply.dart';
@@ -130,10 +132,12 @@ class _AnalysePageState extends State<AnalysePage> {
   Future<void> _restoreStoredReportsIfAny() async {
     final stored = await AnalyseReportsStorage.loadAll();
     if (!mounted) return;
-    if (stored.isNotEmpty) {
+    final eurGraduated = await PaychekDemoGraduationPrefs.isAnalyseEurGraduated();
+    final visible = await analyseReportsForDisplay(stored);
+    if (visible.isNotEmpty) {
       setState(() {
         _reportEntries = [
-          for (final s in stored)
+          for (final s in visible)
             AnalyseStackedReportEntry(
               snapshot: s,
               embedKey: _nextReportEmbedKey++,
@@ -142,7 +146,11 @@ class _AnalysePageState extends State<AnalysePage> {
       });
       return;
     }
-    setState(_seedDemoReportOnly);
+    if (!eurGraduated) {
+      setState(_seedDemoReportOnly);
+    } else {
+      setState(() => _reportEntries = []);
+    }
   }
 
   Future<void> _persistCurrentReports() async {
@@ -205,6 +213,10 @@ class _AnalysePageState extends State<AnalysePage> {
       );
     }
 
+    if (analyseSnapshotCountsAsUserValidated(snap)) {
+      unawaited(PaychekDemoGraduationPrefs.markAnalyseEurGraduated());
+    }
+
     setState(() {
       _showSaveBanner = true;
       if (editIdx != null &&
@@ -216,6 +228,10 @@ class _AnalysePageState extends State<AnalysePage> {
       } else {
         _reportEntries = [entry, ..._reportEntries];
       }
+      _reportEntries = [
+        for (final e in _reportEntries)
+          if (!isAnalyseEuroUsdDemoSnapshot(e.snapshot)) e,
+      ];
     });
 
     if (wasEditingStar) {

@@ -16,6 +16,8 @@ class ReglageProfileLoginForm extends StatelessWidget {
     super.key,
     required this.loginEmail,
     required this.loginPassword,
+    required this.obscureLoginPassword,
+    required this.onToggleLoginPasswordVisibility,
     required this.fieldDecoration,
     this.fieldTextStyle,
     this.ctaButtonStyle,
@@ -34,6 +36,8 @@ class ReglageProfileLoginForm extends StatelessWidget {
 
   final TextEditingController loginEmail;
   final TextEditingController loginPassword;
+  final bool obscureLoginPassword;
+  final VoidCallback onToggleLoginPasswordVisibility;
   final InputDecoration Function(String label, {Widget? suffixIcon}) fieldDecoration;
   final TextStyle? fieldTextStyle;
   final ButtonStyle? ctaButtonStyle;
@@ -198,13 +202,25 @@ class ReglageProfileLoginForm extends StatelessWidget {
               label: l10n.accountFieldPassword,
               controller: loginPassword,
               hintText: l10n.authTerminalHintPassword,
-              obscureText: true,
+              obscureText: obscureLoginPassword,
               keyboardType: TextInputType.visiblePassword,
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.password],
               prefixIcon: Icons.lock_outline_rounded,
+              suffixIcon: IconButton(
+                onPressed: onToggleLoginPasswordVisibility,
+                icon: Icon(
+                  obscureLoginPassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 18,
+                  color: PaychekTerminalAuthColors.zinc500,
+                ),
+                splashRadius: 18,
+                tooltip: obscureLoginPassword ? 'Afficher' : 'Masquer',
+              ),
             ),
             const SizedBox(height: 8),
             Align(
@@ -268,14 +284,26 @@ class ReglageProfileLoginForm extends StatelessWidget {
           TextField(
             controller: loginPassword,
             enabled: true,
-            obscureText: true,
+            obscureText: obscureLoginPassword,
             keyboardType: TextInputType.visiblePassword,
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.password],
             style: inputStyle,
-            decoration: fieldDecoration(l10n.accountFieldPassword),
+            decoration: fieldDecoration(
+              l10n.accountFieldPassword,
+              suffixIcon: IconButton(
+                onPressed: onToggleLoginPasswordVisibility,
+                icon: Icon(
+                  obscureLoginPassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Colors.white.withValues(alpha: 0.78),
+                ),
+                tooltip: obscureLoginPassword ? 'Afficher' : 'Masquer',
+              ),
+            ),
           ),
           const SizedBox(height: 6),
           Align(

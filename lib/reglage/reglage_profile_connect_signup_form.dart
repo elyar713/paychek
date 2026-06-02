@@ -5,6 +5,7 @@ import 'dart:async' show unawaited;
 
 import '../l10n/app_localizations.dart';
 import '../questionnaire/questionnaire_completion_prefs.dart';
+import '../trade/journal_demo_notice_prefs.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_connect_terminal_chrome.dart';
 import 'reglage_profile_prefs.dart';
@@ -19,6 +20,10 @@ class ReglageProfileSignupForm extends StatelessWidget {
     required this.signEmail,
     required this.signPassword,
     required this.signConfirm,
+    required this.obscureSignPassword,
+    required this.obscureSignConfirm,
+    required this.onToggleSignPasswordVisibility,
+    required this.onToggleSignConfirmVisibility,
     required this.fieldDecoration,
     this.signupNamesSideBySide = false,
     this.fieldTextStyle,
@@ -39,6 +44,10 @@ class ReglageProfileSignupForm extends StatelessWidget {
   final TextEditingController signEmail;
   final TextEditingController signPassword;
   final TextEditingController signConfirm;
+  final bool obscureSignPassword;
+  final bool obscureSignConfirm;
+  final VoidCallback onToggleSignPasswordVisibility;
+  final VoidCallback onToggleSignConfirmVisibility;
   final InputDecoration Function(String label, {Widget? suffixIcon}) fieldDecoration;
   final bool signupNamesSideBySide;
   final TextStyle? fieldTextStyle;
@@ -141,6 +150,7 @@ class ReglageProfileSignupForm extends StatelessWidget {
         await syncedUser.updateDisplayName('$prenom $nom'.trim());
         await syncedUser.reload();
         await QuestionnaireCompletionPrefs.markIncomplete(syncedUser.uid);
+        await JournalDemoNoticePrefs.markPendingAfterSignup(syncedUser.uid);
         if (closeImmediatelyOnSuccess) {
           await ReglageProfilePrefs.save(
             inscrit: true,
@@ -229,26 +239,50 @@ class ReglageProfileSignupForm extends StatelessWidget {
               label: l10n.accountFieldPassword,
               controller: signPassword,
               hintText: l10n.authTerminalHintPassword,
-              obscureText: true,
+              obscureText: obscureSignPassword,
               keyboardType: TextInputType.visiblePassword,
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.newPassword],
               prefixIcon: Icons.lock_outline_rounded,
+              suffixIcon: IconButton(
+                onPressed: onToggleSignPasswordVisibility,
+                icon: Icon(
+                  obscureSignPassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 18,
+                  color: PaychekTerminalAuthColors.zinc500,
+                ),
+                splashRadius: 18,
+                tooltip: obscureSignPassword ? 'Afficher' : 'Masquer',
+              ),
             ),
             const SizedBox(height: 14),
             PaychekTerminalGlassTextField(
               label: l10n.accountFieldConfirmPassword,
               controller: signConfirm,
               hintText: l10n.authTerminalHintPassword,
-              obscureText: true,
+              obscureText: obscureSignConfirm,
               keyboardType: TextInputType.visiblePassword,
               autocorrect: false,
               enableSuggestions: false,
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.newPassword],
               prefixIcon: Icons.verified_user_outlined,
+              suffixIcon: IconButton(
+                onPressed: onToggleSignConfirmVisibility,
+                icon: Icon(
+                  obscureSignConfirm
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 18,
+                  color: PaychekTerminalAuthColors.zinc500,
+                ),
+                splashRadius: 18,
+                tooltip: obscureSignConfirm ? 'Afficher' : 'Masquer',
+              ),
             ),
             const SizedBox(height: 20),
             FilledButton(
@@ -343,27 +377,51 @@ class ReglageProfileSignupForm extends StatelessWidget {
           TextField(
             controller: signPassword,
             enabled: true,
-            obscureText: true,
+            obscureText: obscureSignPassword,
             keyboardType: TextInputType.visiblePassword,
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.newPassword],
             style: inputStyle,
-            decoration: fieldDecoration(l10n.accountFieldPassword),
+            decoration: fieldDecoration(
+              l10n.accountFieldPassword,
+              suffixIcon: IconButton(
+                onPressed: onToggleSignPasswordVisibility,
+                icon: Icon(
+                  obscureSignPassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Colors.white.withValues(alpha: 0.78),
+                ),
+                tooltip: obscureSignPassword ? 'Afficher' : 'Masquer',
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: signConfirm,
             enabled: true,
-            obscureText: true,
+            obscureText: obscureSignConfirm,
             keyboardType: TextInputType.visiblePassword,
             autocorrect: false,
             enableSuggestions: false,
             textInputAction: TextInputAction.done,
             autofillHints: const [AutofillHints.newPassword],
             style: inputStyle,
-            decoration: fieldDecoration(l10n.accountFieldConfirmPassword),
+            decoration: fieldDecoration(
+              l10n.accountFieldConfirmPassword,
+              suffixIcon: IconButton(
+                onPressed: onToggleSignConfirmVisibility,
+                icon: Icon(
+                  obscureSignConfirm
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Colors.white.withValues(alpha: 0.78),
+                ),
+                tooltip: obscureSignConfirm ? 'Afficher' : 'Masquer',
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           FilledButton(

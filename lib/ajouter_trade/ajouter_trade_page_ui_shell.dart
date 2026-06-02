@@ -223,10 +223,16 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
       selectedSource: _selectedCsvSoftware,
       options: _AjouterTradePageState._csvSoftwareOptions,
       onSourceChanged: (value) {
-        setState(() => _selectedCsvSoftware = value);
+        setState(() {
+          _selectedCsvSoftware = value;
+          _lastCsvImportFeedback = null;
+          _lastCsvImportFeedbackIsError = false;
+        });
       },
       onImportTap: () => _importFromSelectedCsvSource(context),
       importedFileName: _lastImportedFileName,
+      importFeedbackMessage: _lastCsvImportFeedback,
+      importFeedbackIsError: _lastCsvImportFeedbackIsError,
       cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
       sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
     );
