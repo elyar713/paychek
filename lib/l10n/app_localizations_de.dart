@@ -2852,7 +2852,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get paywallAppleProductsUnavailable =>
-      'App-Store-Abos nicht gefunden. Erstelle in App Store Connect Paychek.monthly, Paychek.quarterly und Paychek.annual, aktiviere In-App Purchase in Xcode und installiere die App auf einem echten iPhone mit Sandbox-Konto.';
+      'App-Store-Abos nicht gefunden. Erstelle in App Store Connect Paychek.monthly, Paychek_quarterly und Paychek_annual, aktiviere In-App Purchase in Xcode und installiere die App auf einem echten iPhone mit Sandbox-Konto.';
 
   @override
   String get paywallAppleVerificationFailed =>

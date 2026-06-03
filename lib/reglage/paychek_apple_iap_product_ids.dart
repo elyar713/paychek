@@ -11,14 +11,16 @@ abstract final class PaychekAppleIapProductIds {
     defaultValue: 'Paychek.monthly',
   );
 
+  /// IDs avec `_` : anciens `Paychek.quarterly` / `Paychek.annual` déjà pris
+  /// dans des groupes supprimés (App Store Connect ne les libère pas).
   static const String quarterly = String.fromEnvironment(
     'PAYCHEK_APPLE_PRODUCT_QUARTERLY',
-    defaultValue: 'Paychek.quarterly',
+    defaultValue: 'Paychek_quarterly',
   );
 
   static const String annual = String.fromEnvironment(
     'PAYCHEK_APPLE_PRODUCT_ANNUAL',
-    defaultValue: 'Paychek.annual',
+    defaultValue: 'Paychek_annual',
   );
 
   static String forCycle(PaychekBillingCycle cycle) => switch (cycle) {

@@ -2823,7 +2823,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paywallAppleProductsUnavailable =>
-      'App Store subscriptions not found. In App Store Connect, create products Paychek.monthly, Paychek.quarterly, and Paychek.annual (Ready to Submit), enable In-App Purchase in Xcode, then reinstall on a real iPhone with a Sandbox account.';
+      'App Store subscriptions not found. In App Store Connect, create products Paychek.monthly, Paychek_quarterly, and Paychek_annual (Ready to Submit), enable In-App Purchase in Xcode, then reinstall on a real iPhone with a Sandbox account.';
 
   @override
   String get paywallAppleVerificationFailed =>

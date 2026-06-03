@@ -17,8 +17,8 @@ const PAYCHEK_IOS_BUNDLE_ID = "pro.paychek.app";
 
 const DEFAULT_PRODUCT_IDS = new Set([
   "Paychek.monthly",
-  "Paychek.quarterly",
-  "Paychek.annual",
+  "Paychek_quarterly",
+  "Paychek_annual",
 ]);
 
 let _rootCasCache = null;

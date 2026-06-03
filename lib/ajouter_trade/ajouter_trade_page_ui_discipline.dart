@@ -20,7 +20,12 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
       builder: (context, _) {
         final capStore = UserCapitalScope.of(context);
         final pf = UserPortfolioScope.of(context);
-        final cap = pf.effectiveCapitalAmount(capStore);
+        final baseCap = pf.effectiveCapitalAmount(capStore);
+        final cap = computeEffectiveTradingCapital(
+          baseCapital: baseCap,
+          journalTrades: activeJournalTradesOrDemo(context),
+          excludeTradeId: _editingTradeId,
+        );
         final sym = pf.effectiveCurrencySymbol(capStore);
         final gross = _tradeGainEstimate();
         final feeRaw =

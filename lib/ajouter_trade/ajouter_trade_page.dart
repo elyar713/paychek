@@ -38,6 +38,8 @@ import '../strategie/widgets/strategie_setup_card.dart';
 import '../strategie/widgets/strategie_setup_cards_content.dart';
 import '../reglage/trial_access_prefs.dart' show AccountEntitlementSnapshot;
 import '../trade/trade_discipline_day_snapshot.dart';
+import '../trade/effective_trading_capital.dart';
+import '../trade/trade_journal_helper.dart';
 import '../trade/trade_journal_scope.dart';
 import '../trade/trade_session_mindset.dart';
 import 'ajouter_trade_discipline_prefs_storage.dart';

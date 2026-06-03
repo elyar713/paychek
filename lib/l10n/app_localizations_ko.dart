@@ -2745,7 +2745,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get paywallAppleProductsUnavailable =>
-      'App Store 구독 상품을 찾을 수 없습니다. App Store Connect에서 Paychek.monthly, Paychek.quarterly, Paychek.annual을 만들고 Xcode에서 인앱 구매를 활성화한 뒤 Sandbox 계정으로 실제 iPhone에 다시 설치하세요.';
+      'App Store 구독 상품을 찾을 수 없습니다. App Store Connect에서 Paychek.monthly, Paychek_quarterly, Paychek_annual을 만들고 Xcode에서 인앱 구매를 활성화한 뒤 Sandbox 계정으로 실제 iPhone에 다시 설치하세요.';
 
   @override
   String get paywallAppleVerificationFailed =>

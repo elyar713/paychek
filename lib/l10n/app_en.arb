@@ -1127,7 +1127,7 @@
   "paywallStoreNotConfigured": "Stripe checkout URL missing. Set it in Admin → Config → Stripe payment link (https://…), enable billing, stay signed in, then retry.",
   "paywallSignInRequired": "Sign in to your Paychek account before subscribing.",
   "paywallAppleStoreUnavailable": "App Store is unavailable. Use the Paychek iOS app (not Safari), check your connection, then try again.",
-  "paywallAppleProductsUnavailable": "App Store subscriptions not found. In App Store Connect, create products Paychek.monthly, Paychek.quarterly, and Paychek.annual (Ready to Submit), enable In-App Purchase in Xcode, then reinstall on a real iPhone with a Sandbox account.",
+  "paywallAppleProductsUnavailable": "App Store subscriptions not found. In App Store Connect, create products Paychek.monthly, Paychek_quarterly, and Paychek_annual (Ready to Submit), enable In-App Purchase in Xcode, then reinstall on a real iPhone with a Sandbox account.",
   "paywallAppleVerificationFailed": "Purchase received but server validation failed. Try again or contact support.",
   "paywallApplePurchaseError": "App Store purchase did not complete. Try again in a moment.",
   "paywallIosWebRequiresNativeApp": "On iPhone, subscribe in the Paychek app (App Store), not in Safari. Install the app from TestFlight or the App Store.",

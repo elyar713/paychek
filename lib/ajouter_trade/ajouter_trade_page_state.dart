@@ -397,6 +397,7 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     return Listenable.merge([
       UserCapitalScope.of(context),
       UserPortfolioScope.of(context),
+      TradeJournalScope.of(context),
       _quantiteController,
       _entreeController,
       _sortieController,

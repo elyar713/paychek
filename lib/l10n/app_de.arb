@@ -1120,7 +1120,7 @@
   "paywallStoreNotConfigured": "Stripe-Checkout-URL fehlt. Admin → Config → Payment-Link (https://…), Abrechnung aktivieren, angemeldet bleiben, erneut versuchen.",
   "paywallSignInRequired": "Melde dich bei deinem Paychek-Konto an, bevor du abonnierst.",
   "paywallAppleStoreUnavailable": "App Store nicht verfügbar. Nutze die Paychek-iOS-App (nicht Safari), prüfe die Verbindung und versuche es erneut.",
-  "paywallAppleProductsUnavailable": "App-Store-Abos nicht gefunden. Erstelle in App Store Connect Paychek.monthly, Paychek.quarterly und Paychek.annual, aktiviere In-App Purchase in Xcode und installiere die App auf einem echten iPhone mit Sandbox-Konto.",
+  "paywallAppleProductsUnavailable": "App-Store-Abos nicht gefunden. Erstelle in App Store Connect Paychek.monthly, Paychek_quarterly und Paychek_annual, aktiviere In-App Purchase in Xcode und installiere die App auf einem echten iPhone mit Sandbox-Konto.",
   "paywallAppleVerificationFailed": "Kauf erhalten, Servervalidierung fehlgeschlagen. Erneut versuchen oder Support kontaktieren.",
   "paywallApplePurchaseError": "App-Store-Kauf nicht abgeschlossen. Bitte gleich erneut versuchen.",
   "paywallIosWebRequiresNativeApp": "Auf dem iPhone abonnierst du in der Paychek-App (App Store), nicht in Safari. App über TestFlight oder App Store installieren.",

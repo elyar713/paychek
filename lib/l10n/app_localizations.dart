@@ -5227,7 +5227,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallAppleProductsUnavailable.
   ///
   /// In fr, this message translates to:
-  /// **'Abonnements App Store introuvables. Vérifie dans App Store Connect les produits Paychek.monthly, Paychek.quarterly et Paychek.annual (état « Prêt à soumettre »), ajoute la capacité Achats intégrés dans Xcode, puis réinstalle l’app sur un iPhone réel avec un compte Sandbox.'**
+  /// **'Abonnements App Store introuvables. Vérifie dans App Store Connect les produits Paychek.monthly, Paychek_quarterly et Paychek_annual (état « Prêt à soumettre »), ajoute la capacité Achats intégrés dans Xcode, puis réinstalle l’app sur un iPhone réel avec un compte Sandbox.'**
   String get paywallAppleProductsUnavailable;
 
   /// No description provided for @paywallAppleVerificationFailed.

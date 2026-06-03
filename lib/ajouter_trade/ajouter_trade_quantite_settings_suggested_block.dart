@@ -4,6 +4,9 @@ import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
+import '../trade/effective_trading_capital.dart';
+import '../trade/trade_journal_helper.dart';
+import '../trade/trade_journal_scope.dart';
 import '../strategie/sections/strategie_gestion_risque_section_display.dart';
 import 'ajouter_trade_asset_class.dart';
 import 'ajouter_trade_position_sizing.dart';
@@ -34,12 +37,16 @@ class AjouterTradeQuantiteSuggestedSizeBlock extends StatelessWidget {
       listenable: Listenable.merge([
         UserCapitalScope.of(context),
         UserPortfolioScope.of(context),
+        TradeJournalScope.of(context),
       ]),
       builder: (context, _) {
         final l = AppLocalizations.of(context)!;
         final store = UserCapitalScope.of(context);
         final pf = UserPortfolioScope.of(context);
-        final cap = pf.effectiveCapitalAmount(store);
+        final cap = computeEffectiveTradingCapital(
+          baseCapital: pf.effectiveCapitalAmount(store),
+          journalTrades: activeJournalTradesOrDemo(context),
+        );
         final riskPct =
             StrategieGestionRisqueFormat.parseFlexible(riskPctCtrl.text) ??
                 1.0;

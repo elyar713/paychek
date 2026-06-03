@@ -6,6 +6,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../l10n/app_localizations.dart';
 import '../../questionnaire/user_capital_scope.dart';
 import '../../reglage/user_portfolio_scope.dart';
+import '../../trade/effective_trading_capital.dart';
+import '../../trade/trade_journal_helper.dart';
+import '../../trade/trade_journal_scope.dart';
 import '../strategie_feedback_reference.dart';
 import '../gestion_risque_edit_notifier.dart';
 import '../strategie_gestion_risque_storage.dart';
@@ -294,11 +297,16 @@ class _StrategieGestionRisqueSectionState
     _syncEditNotifier();
     final store = UserCapitalScope.of(context);
     final pf = UserPortfolioScope.of(context);
+    final journal = TradeJournalScope.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([store, pf]),
+      listenable: Listenable.merge([store, pf, journal]),
       builder: (context, _) {
-        final capital =
-            pf.effectiveCapitalAmount(store) ?? _fallbackCapital;
+        final baseCap = pf.effectiveCapitalAmount(store);
+        final capital = computeEffectiveTradingCapital(
+              baseCapital: baseCap,
+              journalTrades: activeJournalTradesOrDemo(context),
+            ) ??
+            _fallbackCapital;
         final sym = pf.effectiveCurrencySymbol(store);
         final rPct = _liveRiskPct();
         final lPct = _liveLossPct();
