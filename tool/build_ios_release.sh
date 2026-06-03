@@ -25,6 +25,10 @@ echo "   Version : $BUILD_NAME (build $BUILD_NUMBER)"
 echo "   Notes   : tool/ios_release_notes_${BUILD_NAME}.txt"
 echo ""
 
+echo ">> flutter clean (évite objective_c.framework slice simulateur en IPA)"
+flutter clean
+rm -rf build/native_assets .dart_tool/hooks_runner
+
 echo ">> flutter pub get"
 flutter pub get
 

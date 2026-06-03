@@ -18,6 +18,14 @@
 4. Pour chaque produit : métadonnées, prix, **révision App Store** (souvent liée à une nouvelle version de l’app).
 5. **Utilisateurs et accès** → **Sandbox** : créer un compte test Apple pour tester les achats.
 
+## 1 bis. Erreur Transporter `objective_c.framework` (slice simulateur)
+
+Si l’upload échoue avec *« references an unsupported platform in the arm64 slice »* :
+
+1. Le projet épingle `path_provider_foundation: 2.5.1` (évite le paquet FFI `objective_c`).
+2. Sur le Mac, avant l’IPA : `flutter clean`, supprimer `build/native_assets`, puis `./tool/build_ios_release.sh`.
+3. Ne pas archiver juste après un build **simulateur** sans `flutter clean`.
+
 ## 2. Xcode
 
 1. Ouvrir `ios/Runner.xcworkspace`
