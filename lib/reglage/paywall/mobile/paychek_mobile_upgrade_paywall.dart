@@ -64,10 +64,13 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     final locale = PaychekStorePlanPricing.resolvePricingLocale(
       appLocale: Localizations.localeOf(context),
     );
-    setState(() {
-      _pricingLocale = locale;
-      _pricing = PaychekRegionalPriceDefaults.snapshotForLocale(locale);
-    });
+    setState(() => _pricingLocale = locale);
+
+    final preview = await PaychekStorePlanPricing.loadRegionalPreview(
+      locale: locale,
+    );
+    if (mounted) setState(() => _pricing = preview);
+
     PaychekStorePlanPricing.invalidateCache();
     final snapshot = await PaychekStorePlanPricing.load(locale: locale);
     if (!mounted) return;

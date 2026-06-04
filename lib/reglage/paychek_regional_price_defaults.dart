@@ -9,12 +9,6 @@ import 'paychek_plan_price_quote.dart';
 abstract final class PaychekRegionalPriceDefaults {
   PaychekRegionalPriceDefaults._();
 
-  static const Set<String> _euCountries = {
-    'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR',
-    'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK',
-    'SI', 'ES', 'SE',
-  };
-
   static String countryFromLocale(Locale locale) {
     final cc = locale.countryCode?.trim().toUpperCase();
     if (cc != null && cc.length == 2) return cc;
@@ -23,15 +17,14 @@ abstract final class PaychekRegionalPriceDefaults {
 
   static String currencyForCountry(String countryCode) {
     final cc = countryCode.trim().toUpperCase();
-    return _countryToCurrency[cc] ??
-        (_euCountries.contains(cc) ? 'EUR' : 'USD');
+    return _countryToCurrency[cc] ?? 'USD';
   }
 
   static PaychekPlanPricingSnapshot snapshotForCountry(String countryCode) {
     final country = countryCode.trim().toUpperCase();
     final currency = currencyForCountry(country);
     final amounts = _pricesByCurrency[currency] ?? _pricesByCurrency['USD']!;
-    final formatLocale = _formatLocaleFor(country, currency);
+    final formatLocale = formatLocaleForCountry(country, currency);
     final formatter = NumberFormat.simpleCurrency(
       name: currency,
       locale: formatLocale,
@@ -69,6 +62,60 @@ abstract final class PaychekRegionalPriceDefaults {
     return snapshotForCountry(countryFromLocale(locale));
   }
 
+  static String formatLocaleForCountry(String countryCode, String currency) {
+    final country = countryCode.trim().toUpperCase();
+    const byCountry = {
+      'FR': 'fr_FR',
+      'DE': 'de_DE',
+      'ES': 'es_ES',
+      'IT': 'it_IT',
+      'PT': 'pt_PT',
+      'NL': 'nl_NL',
+      'BE': 'fr_BE',
+      'GB': 'en_GB',
+      'US': 'en_US',
+      'CA': 'en_CA',
+      'AU': 'en_AU',
+      'NZ': 'en_NZ',
+      'NO': 'nb_NO',
+      'SE': 'sv_SE',
+      'DK': 'da_DK',
+      'FI': 'fi_FI',
+      'JP': 'ja_JP',
+      'KR': 'ko_KR',
+      'BR': 'pt_BR',
+      'MX': 'es_MX',
+      'IN': 'en_IN',
+      'PL': 'pl_PL',
+      'CH': 'de_CH',
+      'SG': 'en_SG',
+      'HK': 'zh_HK',
+      'TW': 'zh_TW',
+      'AE': 'ar_AE',
+      'SA': 'ar_SA',
+      'TR': 'tr_TR',
+      'RU': 'ru_RU',
+      'UA': 'uk_UA',
+      'TH': 'th_TH',
+      'ID': 'id_ID',
+      'MY': 'ms_MY',
+      'PH': 'en_PH',
+      'ZA': 'en_ZA',
+      'NG': 'en_NG',
+      'EG': 'ar_EG',
+      'IL': 'he_IL',
+      'CN': 'zh_CN',
+      'AR': 'es_AR',
+      'CL': 'es_CL',
+      'CO': 'es_CO',
+    };
+    if (byCountry.containsKey(country)) return byCountry[country]!;
+    if (currency == 'EUR') return 'fr_FR';
+    if (currency == 'GBP') return 'en_GB';
+    if (currency == 'USD') return 'en_US';
+    return 'en_US';
+  }
+
   static String _countryFromLanguage(String languageCode) {
     switch (languageCode.toLowerCase()) {
       case 'fr':
@@ -79,22 +126,34 @@ abstract final class PaychekRegionalPriceDefaults {
         return 'ES';
       case 'pt':
         return 'PT';
+      case 'it':
+        return 'IT';
+      case 'nl':
+        return 'NL';
+      case 'ja':
+        return 'JP';
       case 'ko':
         return 'KR';
+      case 'zh':
+        return 'CN';
+      case 'ar':
+        return 'AE';
+      case 'tr':
+        return 'TR';
+      case 'pl':
+        return 'PL';
+      case 'sv':
+        return 'SE';
+      case 'nb':
+      case 'no':
+        return 'NO';
+      case 'da':
+        return 'DK';
+      case 'fi':
+        return 'FI';
       default:
         return 'US';
     }
-  }
-
-  static String _formatLocaleFor(String country, String currency) {
-    if (country == 'FR' || (currency == 'EUR' && country.isNotEmpty)) {
-      return 'fr_FR';
-    }
-    if (country == 'DE') return 'de_DE';
-    if (country == 'NO') return 'nb_NO';
-    if (country == 'GB') return 'en_GB';
-    if (currency == 'USD') return 'en_US';
-    return 'en_US';
   }
 }
 
@@ -105,31 +164,300 @@ class _Amounts {
   final double annual;
 }
 
-const Map<String, _Amounts> _pricesByCurrency = {
-  'USD': _Amounts(8.99, 20.97, 59.99),
-  'EUR': _Amounts(9.99, 23.49, 59.99),
-  'GBP': _Amounts(8.99, 20.97, 59.99),
-  'NOK': _Amounts(99, 229, 649),
-  'CAD': _Amounts(11.99, 27.99, 79.99),
-  'AUD': _Amounts(14.99, 34.99, 99.99),
-  'CHF': _Amounts(10.00, 24.00, 60.00),
-  'JPY': _Amounts(1300, 3000, 9000),
-  'BRL': _Amounts(49.90, 119.90, 349.90),
-  'MXN': _Amounts(179, 419, 1199),
-  'INR': _Amounts(899, 2099, 5900),
-  'PLN': _Amounts(39.99, 94.99, 269.99),
-  'SEK': _Amounts(99, 229, 649),
-  'DKK': _Amounts(69, 159, 449),
-  'KRW': _Amounts(11000, 25000, 75000),
-  'SGD': _Amounts(12.98, 29.98, 89.98),
+// 249 pays ISO 3166-1 → devise ISO 4217
+const Map<String, String> _countryToCurrency = {
+  'AD': 'EUR',
+  'AE': 'AED',
+  'AF': 'AFN',
+  'AG': 'XCD',
+  'AI': 'XCD',
+  'AL': 'ALL',
+  'AM': 'AMD',
+  'AO': 'AOA',
+  'AR': 'ARS',
+  'AS': 'USD',
+  'AT': 'EUR',
+  'AU': 'AUD',
+  'AW': 'AWG',
+  'AX': 'EUR',
+  'AZ': 'AZN',
+  'BA': 'BAM',
+  'BB': 'BBD',
+  'BD': 'BDT',
+  'BE': 'EUR',
+  'BF': 'XOF',
+  'BG': 'BGN',
+  'BH': 'BHD',
+  'BI': 'BIF',
+  'BJ': 'XOF',
+  'BL': 'EUR',
+  'BM': 'BMD',
+  'BN': 'BND',
+  'BO': 'BOB',
+  'BQ': 'USD',
+  'BR': 'BRL',
+  'BS': 'BSD',
+  'BT': 'BTN',
+  'BV': 'NOK',
+  'BW': 'BWP',
+  'BY': 'BYN',
+  'BZ': 'BZD',
+  'CA': 'CAD',
+  'CC': 'AUD',
+  'CD': 'CDF',
+  'CF': 'XAF',
+  'CG': 'XAF',
+  'CH': 'CHF',
+  'CI': 'XOF',
+  'CK': 'NZD',
+  'CL': 'CLP',
+  'CM': 'XAF',
+  'CN': 'CNY',
+  'CO': 'COP',
+  'CR': 'CRC',
+  'CU': 'CUP',
+  'CV': 'CVE',
+  'CW': 'ANG',
+  'CX': 'AUD',
+  'CY': 'EUR',
+  'CZ': 'CZK',
+  'DE': 'EUR',
+  'DJ': 'DJF',
+  'DK': 'DKK',
+  'DM': 'XCD',
+  'DO': 'DOP',
+  'DZ': 'DZD',
+  'EC': 'USD',
+  'EE': 'EUR',
+  'EG': 'EGP',
+  'EH': 'MAD',
+  'ER': 'ERN',
+  'ES': 'EUR',
+  'ET': 'ETB',
+  'FI': 'EUR',
+  'FJ': 'FJD',
+  'FK': 'FKP',
+  'FM': 'USD',
+  'FO': 'DKK',
+  'FR': 'EUR',
+  'GA': 'XAF',
+  'GB': 'GBP',
+  'GD': 'XCD',
+  'GE': 'GEL',
+  'GF': 'EUR',
+  'GG': 'GBP',
+  'GH': 'GHS',
+  'GI': 'GIP',
+  'GL': 'DKK',
+  'GM': 'GMD',
+  'GN': 'GNF',
+  'GP': 'EUR',
+  'GQ': 'XAF',
+  'GR': 'EUR',
+  'GS': 'GBP',
+  'GT': 'GTQ',
+  'GU': 'USD',
+  'GW': 'XOF',
+  'GY': 'GYD',
+  'HK': 'HKD',
+  'HM': 'AUD',
+  'HN': 'HNL',
+  'HR': 'EUR',
+  'HT': 'HTG',
+  'HU': 'HUF',
+  'ID': 'IDR',
+  'IE': 'EUR',
+  'IL': 'ILS',
+  'IM': 'GBP',
+  'IN': 'INR',
+  'IO': 'USD',
+  'IQ': 'IQD',
+  'IR': 'IRR',
+  'IS': 'ISK',
+  'IT': 'EUR',
+  'JE': 'GBP',
+  'JM': 'JMD',
+  'JO': 'JOD',
+  'JP': 'JPY',
+  'KE': 'KES',
+  'KG': 'KGS',
+  'KH': 'KHR',
+  'KI': 'AUD',
+  'KM': 'KMF',
+  'KN': 'XCD',
+  'KP': 'KPW',
+  'KR': 'KRW',
+  'KW': 'KWD',
+  'KY': 'KYD',
+  'KZ': 'KZT',
+  'LA': 'LAK',
+  'LB': 'LBP',
+  'LC': 'XCD',
+  'LI': 'CHF',
+  'LK': 'LKR',
+  'LR': 'LRD',
+  'LS': 'LSL',
+  'LT': 'EUR',
+  'LU': 'EUR',
+  'LV': 'EUR',
+  'LY': 'LYD',
+  'MA': 'MAD',
+  'MC': 'EUR',
+  'MD': 'MDL',
+  'ME': 'EUR',
+  'MF': 'EUR',
+  'MG': 'MGA',
+  'MH': 'USD',
+  'MK': 'MKD',
+  'ML': 'XOF',
+  'MM': 'MMK',
+  'MN': 'MNT',
+  'MO': 'MOP',
+  'MP': 'USD',
+  'MQ': 'EUR',
+  'MR': 'MRU',
+  'MS': 'XCD',
+  'MT': 'EUR',
+  'MU': 'MUR',
+  'MV': 'MVR',
+  'MW': 'MWK',
+  'MX': 'MXN',
+  'MY': 'MYR',
+  'MZ': 'MZN',
+  'NA': 'NAD',
+  'NC': 'XPF',
+  'NE': 'XOF',
+  'NF': 'AUD',
+  'NG': 'NGN',
+  'NI': 'NIO',
+  'NL': 'EUR',
+  'NO': 'NOK',
+  'NP': 'NPR',
+  'NR': 'AUD',
+  'NU': 'NZD',
+  'NZ': 'NZD',
+  'OM': 'OMR',
+  'PA': 'PAB',
+  'PE': 'PEN',
+  'PF': 'XPF',
+  'PG': 'PGK',
+  'PH': 'PHP',
+  'PK': 'PKR',
+  'PL': 'PLN',
+  'PM': 'EUR',
+  'PN': 'NZD',
+  'PR': 'USD',
+  'PS': 'ILS',
+  'PT': 'EUR',
+  'PW': 'USD',
+  'PY': 'PYG',
+  'QA': 'QAR',
+  'RE': 'EUR',
+  'RO': 'RON',
+  'RS': 'RSD',
+  'RU': 'RUB',
+  'RW': 'RWF',
+  'SA': 'SAR',
+  'SB': 'SBD',
+  'SC': 'SCR',
+  'SD': 'SDG',
+  'SE': 'SEK',
+  'SG': 'SGD',
+  'SH': 'SHP',
+  'SI': 'EUR',
+  'SJ': 'NOK',
+  'SK': 'EUR',
+  'SL': 'SLE',
+  'SM': 'EUR',
+  'SN': 'XOF',
+  'SO': 'SOS',
+  'SR': 'SRD',
+  'SS': 'SSP',
+  'ST': 'STN',
+  'SV': 'USD',
+  'SX': 'ANG',
+  'SY': 'SYP',
+  'SZ': 'SZL',
+  'TC': 'USD',
+  'TD': 'XAF',
+  'TF': 'EUR',
+  'TG': 'XOF',
+  'TH': 'THB',
+  'TJ': 'TJS',
+  'TK': 'NZD',
+  'TL': 'USD',
+  'TM': 'TMT',
+  'TN': 'TND',
+  'TO': 'TOP',
+  'TR': 'TRY',
+  'TT': 'TTD',
+  'TV': 'AUD',
+  'TW': 'TWD',
+  'TZ': 'TZS',
+  'UA': 'UAH',
+  'UG': 'UGX',
+  'UM': 'USD',
+  'US': 'USD',
+  'UY': 'UYU',
+  'UZ': 'UZS',
+  'VA': 'EUR',
+  'VC': 'XCD',
+  'VE': 'VES',
+  'VG': 'USD',
+  'VI': 'USD',
+  'VN': 'VND',
+  'VU': 'VUV',
+  'WF': 'XPF',
+  'WS': 'WST',
+  'XK': 'EUR',
+  'YE': 'YER',
+  'YT': 'EUR',
+  'ZA': 'ZAR',
+  'ZM': 'ZMW',
+  'ZW': 'USD',
 };
 
-const Map<String, String> _countryToCurrency = {
-  'FR': 'EUR', 'DE': 'EUR', 'ES': 'EUR', 'IT': 'EUR', 'NL': 'EUR',
-  'BE': 'EUR', 'AT': 'EUR', 'PT': 'EUR', 'IE': 'EUR', 'FI': 'EUR',
-  'NO': 'NOK', 'SE': 'SEK', 'DK': 'DKK', 'GB': 'GBP', 'US': 'USD',
-  'CA': 'CAD', 'AU': 'AUD', 'CH': 'CHF', 'JP': 'JPY', 'BR': 'BRL',
-  'MX': 'MXN', 'IN': 'INR', 'PL': 'PLN', 'KR': 'KRW', 'SG': 'SGD',
+// 39 devises avec montants TTC indicatifs
+const Map<String, _Amounts> _pricesByCurrency = {
+  'AED': _Amounts(32.99, 76.99, 219.99),
+  'ARS': _Amounts(8999, 20999, 59999),
+  'AUD': _Amounts(14.99, 34.99, 99.99),
+  'BRL': _Amounts(49.9, 119.9, 349.9),
+  'CAD': _Amounts(11.99, 27.99, 79.99),
+  'CHF': _Amounts(10, 24, 60),
+  'CLP': _Amounts(8990, 20990, 59990),
+  'CNY': _Amounts(58, 138, 398),
+  'COP': _Amounts(39900, 92900, 269900),
+  'CZK': _Amounts(229, 529, 1490),
+  'DKK': _Amounts(69, 159, 449),
+  'EGP': _Amounts(449.99, 999.99, 2999.99),
+  'EUR': _Amounts(9.99, 23.49, 59.99),
+  'GBP': _Amounts(8.99, 20.97, 59.99),
+  'HKD': _Amounts(68, 158, 468),
+  'HUF': _Amounts(3990, 9290, 25990),
+  'IDR': _Amounts(149000, 349000, 990000),
+  'ILS': _Amounts(34.9, 79.9, 229.9),
+  'INR': _Amounts(899, 2099, 5900),
+  'JPY': _Amounts(1300, 3000, 9000),
+  'KRW': _Amounts(11000, 25000, 75000),
+  'MXN': _Amounts(179, 419, 1199),
+  'MYR': _Amounts(39.9, 94.9, 279.9),
+  'NGN': _Amounts(12900, 29900, 84900),
+  'NOK': _Amounts(99, 229, 649),
+  'NZD': _Amounts(14.99, 34.99, 99.99),
+  'PHP': _Amounts(499, 1190, 3490),
+  'PLN': _Amounts(39.99, 94.99, 269.99),
+  'RON': _Amounts(49.99, 114.99, 329.99),
+  'RUB': _Amounts(799, 1890, 5290),
+  'SAR': _Amounts(34.99, 79.99, 229.99),
+  'SEK': _Amounts(99, 229, 649),
+  'SGD': _Amounts(12.98, 29.98, 89.98),
+  'THB': _Amounts(349, 799, 2290),
+  'TRY': _Amounts(349.99, 799.99, 2299.99),
+  'TWD': _Amounts(290, 670, 1990),
+  'UAH': _Amounts(399, 929, 2699),
+  'USD': _Amounts(8.99, 20.97, 59.99),
+  'ZAR': _Amounts(169.99, 399.99, 1099.99),
 };
 
 /// Locale utilisée pour résoudre le pays du paywall (app + système iOS/Android).
