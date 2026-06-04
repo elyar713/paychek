@@ -71,7 +71,6 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     );
     if (mounted) setState(() => _pricing = preview);
 
-    PaychekStorePlanPricing.invalidateCache();
     final snapshot = await PaychekStorePlanPricing.load(locale: locale);
     if (!mounted) return;
     setState(() => _pricing = snapshot);

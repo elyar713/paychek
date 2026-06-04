@@ -112,6 +112,58 @@ abstract final class PaychekStorePlanPricing {
     return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
   }
 
+  static String _expectedCurrencyForLocale(Locale locale) {
+    final country = PaychekRegionalPriceDefaults.countryFromLocale(locale);
+    return PaychekRegionalPriceDefaults.currencyForCountry(country);
+  }
+
+  static String? _snapshotCurrency(PaychekPlanPricingSnapshot snapshot) {
+    if (snapshot.byCycle.isEmpty) return null;
+    return snapshot.byCycle.values.first.currencyCode.trim().toUpperCase();
+  }
+
+  /// StoreKit / Play Billing utilisent le compte store (souvent USD en sandbox).
+  /// On n’affiche ces prix que s’ils correspondent au pays de l’appareil.
+  static bool _storeMatchesCountryCurrency(
+    PaychekPlanPricingSnapshot store,
+    Locale locale,
+  ) {
+    final storeCurrency = _snapshotCurrency(store);
+    if (storeCurrency == null) return false;
+    return storeCurrency == _expectedCurrencyForLocale(locale).toUpperCase();
+  }
+
+  static PaychekPlanPricingSnapshot _resolveNativeStorePricing({
+    required PaychekPlanPricingSnapshot store,
+    required PaychekPlanPricingSnapshot regional,
+    required Locale locale,
+    required PaychekPlanPricingSource storeSource,
+    required String storeLabel,
+  }) {
+    final expected = _expectedCurrencyForLocale(locale);
+    final storeCurrency = _snapshotCurrency(store);
+
+    if (store.byCycle.length == PaychekBillingCycle.values.length &&
+        store.source == storeSource &&
+        _storeMatchesCountryCurrency(store, locale)) {
+      debugPrint('[Paychek] $storeLabel prices OK $storeCurrency');
+      return store;
+    }
+
+    if (store.byCycle.isNotEmpty && _storeMatchesCountryCurrency(store, locale)) {
+      return _mergePricing(store, regional);
+    }
+
+    if (store.byCycle.isNotEmpty && storeCurrency != null) {
+      debugPrint(
+        '[Paychek] $storeLabel currency $storeCurrency '
+        '≠ country $expected — regional prices kept',
+      );
+    }
+
+    return regional;
+  }
+
   static Future<PaychekPlanPricingSnapshot> _loadApplePricing(
     Locale locale,
   ) async {
@@ -136,11 +188,7 @@ abstract final class PaychekStorePlanPricing {
       );
       if (store.byCycle.length == PaychekBillingCycle.values.length &&
           store.source == PaychekPlanPricingSource.appStore) {
-        debugPrint(
-          '[Paychek] App Store prices OK '
-          '${store.byCycle.values.first.currencyCode}',
-        );
-        return store;
+        break;
       }
     }
 
@@ -151,10 +199,13 @@ abstract final class PaychekStorePlanPricing {
     }
 
     final regional = await regionalFuture;
-    if (store.byCycle.isNotEmpty) {
-      return _mergePricing(store, regional);
-    }
-    return regional;
+    return _resolveNativeStorePricing(
+      store: store,
+      regional: regional,
+      locale: locale,
+      storeSource: PaychekPlanPricingSource.appStore,
+      storeLabel: 'App Store',
+    );
   }
 
   static Future<PaychekPlanPricingSnapshot> _loadGooglePlayPricing(
@@ -194,11 +245,7 @@ abstract final class PaychekStorePlanPricing {
       );
       if (store.byCycle.length == PaychekBillingCycle.values.length &&
           store.source == PaychekPlanPricingSource.googlePlay) {
-        debugPrint(
-          '[Paychek] Play prices OK '
-          '${store.byCycle.values.first.currencyCode}',
-        );
-        return store;
+        break;
       }
     }
 
@@ -209,10 +256,13 @@ abstract final class PaychekStorePlanPricing {
     }
 
     final regional = await regionalFuture;
-    if (store.byCycle.isNotEmpty) {
-      return _mergePricing(store, regional);
-    }
-    return regional;
+    return _resolveNativeStorePricing(
+      store: store,
+      regional: regional,
+      locale: locale,
+      storeSource: PaychekPlanPricingSource.googlePlay,
+      storeLabel: 'Play',
+    );
   }
 
   static PaychekPlanPricingSnapshot _mergePricing(
