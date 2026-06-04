@@ -875,11 +875,19 @@ async function paychekMaskedEmailForUid(db, uid) {
 
 /**
  * Un abonnement mobile (Apple ID / compte Play) ne peut être actif que sur un uid.
+ * Si [allowTransfer], l’ancien compte est révoqué (restauration / admin).
  * @param {FirebaseFirestore.Firestore} db
  * @param {string} uid
  * @param {object} opts
+ * @param {{allowTransfer?: boolean}} reconcileOpts
  */
-async function paychekAssertStoreSubscriptionOwner(db, uid, opts) {
+async function paychekAssertStoreSubscriptionOwner(
+    db,
+    uid,
+    opts,
+    reconcileOpts = {},
+) {
+  const allowTransfer = reconcileOpts.allowTransfer === true;
   const targetUid = `${uid || ""}`.trim();
   const appleOrig = `${opts.appleOriginalTransactionId ?? ""}`.trim();
   const appleTx = `${opts.appleTransactionId ?? ""}`.trim();
@@ -894,9 +902,26 @@ async function paychekAssertStoreSubscriptionOwner(db, uid, opts) {
       if (doc.id === targetUid) continue;
       const data = doc.data() || {};
       if (data.active !== true) continue;
+      if (allowTransfer) {
+        const provider =
+          channel === "apple" ? "apple_iap" : "google_play";
+        await paychekRevokeProEntitlement(db, doc.id, {
+          provider,
+          reason: `${channel}_subscription_transferred`,
+        });
+        console.warn(
+            "[Paychek] subscription transferred",
+            doc.id,
+            "→",
+            targetUid,
+            channel,
+        );
+        continue;
+      }
       const hint = await paychekMaskedEmailForUid(db, doc.id);
       const err = new Error(`${channel}_subscription_linked_to_other_account`);
       err.otherAccountHint = hint;
+      err.otherAccountUid = doc.id;
       throw err;
     }
   }
@@ -922,6 +947,33 @@ async function paychekAssertStoreSubscriptionOwner(db, uid, opts) {
         .get();
     await rejectIfOtherActive(snap, "google_play");
   }
+}
+
+/**
+ * Comptes Paychek (masqués) avec un abonnement Apple actif ailleurs.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} excludeUid
+ * @return {Promise<string[]>}
+ */
+async function paychekHintOtherActiveAppleAccounts(db, excludeUid) {
+  const snap = await db.collection("subscriber_entitlements")
+      .where("active", "==", true)
+      .limit(40)
+      .get();
+  const hints = [];
+  for (const doc of snap.docs) {
+    if (doc.id === excludeUid) continue;
+    const d = doc.data() || {};
+    const prov = `${d.provider || ""}`.trim().toLowerCase();
+    if (prov !== "apple_iap" && prov !== "apple") continue;
+    const hasApple =
+      `${d.appleProductId || ""}`.trim().length > 0 &&
+      (`${d.appleTransactionId || ""}`.trim().length > 0 ||
+        `${d.appleOriginalTransactionId || ""}`.trim().length > 0);
+    if (!hasApple) continue;
+    hints.push(await paychekMaskedEmailForUid(db, doc.id));
+  }
+  return hints.slice(0, 5);
 }
 
 function paychekApplyLegacyMaquetteTokens(out, vars) {
@@ -5981,6 +6033,8 @@ Object.assign(
       paychekGrantProEntitlement,
       paychekApplyTrialRemainderToPeriodEnd,
       paychekAssertStoreSubscriptionOwner,
+      paychekRevokeProEntitlement,
+      paychekHintOtherActiveAppleAccounts,
     }),
 );
 

@@ -277,6 +277,7 @@ async function grantProFromAppleTransaction(
     paychekApplyTrialRemainderToPeriodEnd,
     admin,
     paychekAssertStoreSubscriptionOwner,
+    allowTransfer = false,
 ) {
   const transactionId = `${tx.transactionId || ""}`;
   const originalId = `${tx.originalTransactionId || transactionId}`;
@@ -285,10 +286,15 @@ async function grantProFromAppleTransaction(
   }
 
   if (typeof paychekAssertStoreSubscriptionOwner === "function") {
-    await paychekAssertStoreSubscriptionOwner(db, uid, {
-      appleOriginalTransactionId: originalId,
-      appleTransactionId: transactionId,
-    });
+    await paychekAssertStoreSubscriptionOwner(
+        db,
+        uid,
+        {
+          appleOriginalTransactionId: originalId,
+          appleTransactionId: transactionId,
+        },
+        {allowTransfer},
+    );
   }
 
   const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
@@ -392,7 +398,45 @@ function createAppleIapExports(deps) {
     paychekGrantProEntitlement,
     paychekApplyTrialRemainderToPeriodEnd,
     paychekAssertStoreSubscriptionOwner,
+    paychekRevokeProEntitlement,
+    paychekHintOtherActiveAppleAccounts,
   } = deps;
+
+  /**
+   * Transfère l’abonnement Apple stocké d’un uid vers un autre (admin).
+   */
+  async function adminTransferAppleEntitlement(db, fromUid, toUid) {
+    const fromSnap =
+      await db.collection("subscriber_entitlements").doc(fromUid).get();
+    if (!fromSnap.exists) {
+      throw new HttpsError(
+          "not-found",
+          "Compte source sans entitlements Apple.",
+      );
+    }
+    const ent = fromSnap.data() || {};
+    const productId = `${ent.appleProductId || ""}`.trim();
+    const transactionId = `${ent.appleTransactionId || ""}`.trim();
+    if (!productId || !transactionId) {
+      throw new HttpsError(
+          "failed-precondition",
+          "Le compte source n’a pas d’achat Apple enregistré.",
+      );
+    }
+    if (typeof paychekRevokeProEntitlement === "function") {
+      await paychekRevokeProEntitlement(db, fromUid, {
+        provider: "apple_iap",
+        reason: "admin_apple_transfer",
+      });
+    }
+    return resyncProFromStoredAppleEntitlement(
+        db,
+        toUid,
+        ent,
+        paychekGrantProEntitlement,
+        admin,
+    );
+  }
 
   async function verifyAndGrant(request) {
     if (!request.auth) {
@@ -403,6 +447,7 @@ function createAppleIapExports(deps) {
         `${request.data?.signedTransaction ?? ""}`.trim();
       const appleStoreKit2Json =
         `${request.data?.appleStoreKit2Json ?? ""}`.trim();
+      const allowTransfer = request.data?.allowTransfer === true;
       let productId = `${request.data?.productId ?? ""}`.trim();
       if ((!signedTransaction && !appleStoreKit2Json) || !productId) {
         throw new HttpsError(
@@ -455,6 +500,7 @@ function createAppleIapExports(deps) {
           paychekApplyTrialRemainderToPeriodEnd,
           admin,
           paychekAssertStoreSubscriptionOwner,
+          allowTransfer,
       );
       const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
       console.log("[Paychek] verifyPaychekApplePurchase ok", {
@@ -522,6 +568,26 @@ function createAppleIapExports(deps) {
         targetUid = requested;
       }
 
+      const transferFrom = `${request.data?.transferFromUid ?? ""}`.trim();
+      if (
+        transferFrom &&
+        transferFrom !== targetUid &&
+        request.auth.token.admin === true
+      ) {
+        const transferred = await adminTransferAppleEntitlement(
+            db,
+            transferFrom,
+            targetUid,
+        );
+        return {
+          active: true,
+          granted: true,
+          reason: "admin_transfer",
+          message: "Abonnement Apple transféré depuis l’autre compte.",
+          currentPeriodEndMillis: transferred.currentPeriodEndMillis,
+        };
+      }
+
       const entSnap =
         await db.collection("subscriber_entitlements").doc(targetUid).get();
       const ent = entSnap.exists ? entSnap.data() || {} : {};
@@ -560,6 +626,8 @@ function createAppleIapExports(deps) {
             paychekApplyTrialRemainderToPeriodEnd,
             admin,
             paychekAssertStoreSubscriptionOwner,
+            request.data?.allowTransfer === true ||
+            request.auth.token.admin === true,
         );
         return {
           active: true,
@@ -574,10 +642,24 @@ function createAppleIapExports(deps) {
         (`${ent.appleTransactionId || ""}`.trim().length > 0 ||
           `${ent.appleOriginalTransactionId || ""}`.trim().length > 0);
       if (!hasApple) {
-        throw new HttpsError(
-            "failed-precondition",
-            "Aucun achat Apple enregistré pour ce compte.",
-        );
+        let message =
+          "Aucun achat Apple enregistré pour ce compte Firebase.";
+        if (typeof paychekHintOtherActiveAppleAccounts === "function") {
+          const hints =
+            await paychekHintOtherActiveAppleAccounts(db, targetUid);
+          if (hints.length > 0) {
+            message +=
+              " Un abonnement Apple actif existe sur : " +
+              hints.join(", ") +
+              ". Sur iPhone : « Restaurer les achats » avec CE compte Paychek " +
+              "(transfert automatique), ou en admin paramètre transferFromUid.";
+          } else {
+            message +=
+              " Sur iPhone (connecté avec CE email) : paywall → " +
+              "« Restaurer les achats ».";
+          }
+        }
+        throw new HttpsError("failed-precondition", message);
       }
 
       const periodEnd =
@@ -620,7 +702,15 @@ function createAppleIapExports(deps) {
 
   const verifyPaychekApplePurchase = onCall(callOpts, verifyAndGrant);
 
-  const restorePaychekAppleEntitlement = onCall(callOpts, verifyAndGrant);
+  const restorePaychekAppleEntitlement = onCall(callOpts, async (request) => {
+    return verifyAndGrant({
+      ...request,
+      data: {
+        ...(request.data || {}),
+        allowTransfer: true,
+      },
+    });
+  });
 
   const syncPaychekAppleEntitlement = onCall(callOpts, syncStoredAppleEntitlement);
 

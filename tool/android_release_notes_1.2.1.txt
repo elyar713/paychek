@@ -1,0 +1,8 @@
+Version 1.2.1 (build 20)
+
+• Abonnements Google Play : validation serveur améliorée
+• Crédit des jours d’essai Lite restants à l’achat Pro
+• Empilement des jours Pro restants si achat d’un autre forfait
+• E-mail de confirmation après achat mobile
+• Un abonnement Play ne peut être lié qu’à un seul compte Paychek
+• Corrections affichage échéance abonnement

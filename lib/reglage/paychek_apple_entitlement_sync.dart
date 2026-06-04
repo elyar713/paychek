@@ -17,6 +17,7 @@ abstract final class PaychekAppleEntitlementSync {
     required String productId,
     required String signedTransaction,
     String appleStoreKit2Json = '',
+    bool isRestore = false,
   }) async {
     lastFailureMessage = null;
     if (FirebaseAuth.instance.currentUser == null) {
@@ -35,7 +36,10 @@ abstract final class PaychekAppleEntitlementSync {
     }
     final fn =
         FirebaseFunctions.instanceFor(region: kPaychekFunctionsRegion);
-    final callable = fn.httpsCallable('verifyPaychekApplePurchase');
+    final callableName = isRestore ?
+        'restorePaychekAppleEntitlement' :
+        'verifyPaychekApplePurchase';
+    final callable = fn.httpsCallable(callableName);
     for (var attempt = 0; attempt < 4; attempt++) {
       if (attempt > 0) {
         await Future<void>.delayed(Duration(seconds: 2 * attempt));
@@ -49,6 +53,7 @@ abstract final class PaychekAppleEntitlementSync {
         if (jsonPayload.isNotEmpty) {
           payload['appleStoreKit2Json'] = jsonPayload;
         }
+        if (isRestore) payload['allowTransfer'] = true;
         final result = await callable.call<Object?>(payload);
         final data = result.data;
         if (data is Map && data['active'] == true) {

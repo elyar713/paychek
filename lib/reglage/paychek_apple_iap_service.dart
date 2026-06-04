@@ -153,21 +153,6 @@ abstract final class PaychekAppleIapService {
           break;
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          final isExplicitRestore = restoreMode;
-          if (!isExplicitRestore &&
-              purchase.status == PurchaseStatus.restored) {
-            PaychekAppleEntitlementSync.lastFailureMessage =
-                'Un abonnement Apple est déjà actif sur cet identifiant. '
-                'Connecte-toi au compte Paychek d’origine ou contacte le support.';
-            _completePending(
-              pendingKey,
-              PaychekAppleIapPurchaseOutcome.verificationFailed,
-            );
-            if (purchase.pendingCompletePurchase) {
-              await _iap.completePurchase(purchase);
-            }
-            break;
-          }
           final payload = await _resolveAppleVerificationPayload(purchase);
           if (!paychekHasAppleVerificationPayload(
             jws: payload.jws,
@@ -195,6 +180,7 @@ abstract final class PaychekAppleIapService {
             productId: productId,
             signedTransaction: payload.jws,
             appleStoreKit2Json: payload.storeKit2Json,
+            isRestore: restoreMode,
           );
           if (purchase.pendingCompletePurchase) {
             await _iap.completePurchase(purchase);
