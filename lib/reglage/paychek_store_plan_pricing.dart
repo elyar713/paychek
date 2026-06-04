@@ -10,6 +10,7 @@ import 'paychek_billing_plan.dart';
 import 'paychek_google_play_iap_service.dart';
 import 'paychek_google_play_product_ids.dart';
 import 'paychek_plan_price_quote.dart';
+import 'paychek_regional_price_defaults.dart';
 import 'paychek_stripe_paywall_pricing.dart';
 import 'paychek_subscription_platform.dart';
 
@@ -17,6 +18,9 @@ import 'paychek_subscription_platform.dart';
 /// ou Cloud Function web (pays → devise, Stripe / Firestore).
 abstract final class PaychekStorePlanPricing {
   PaychekStorePlanPricing._();
+
+  static Locale resolvePricingLocale({Locale? appLocale}) =>
+      paychekResolvePricingLocale(appLocale: appLocale);
 
   static PaychekPlanPricingSnapshot? _cache;
   static String? _cacheKey;
@@ -50,11 +54,11 @@ abstract final class PaychekStorePlanPricing {
       }
     } catch (e, st) {
       debugPrint('[Paychek] store plan pricing $e\n$st');
-      snapshot = _catalogFallback(loc);
+      snapshot = _fallbackForPlatform(loc);
     }
 
     if (snapshot.byCycle.isEmpty) {
-      snapshot = _catalogFallback(loc);
+      snapshot = _fallbackForPlatform(loc);
     }
 
     _cache = snapshot;
@@ -67,7 +71,7 @@ abstract final class PaychekStorePlanPricing {
     final platform = paychekUsesNativeAppleIap
         ? 'apple'
         : (paychekUsesNativeGooglePlayIap ? 'google' : 'web');
-    final country = locale.countryCode ?? 'US';
+    final country = PaychekRegionalPriceDefaults.countryFromLocale(locale);
     return '$platform-$country-${locale.languageCode}';
   }
 
@@ -80,7 +84,7 @@ abstract final class PaychekStorePlanPricing {
   static Future<PaychekPlanPricingSnapshot> _loadWebByCountry(
     Locale locale,
   ) async {
-    final country = locale.countryCode ?? 'US';
+    final country = PaychekRegionalPriceDefaults.countryFromLocale(locale);
     final fromServer = await PaychekStripePaywallPricing.fetch(
       countryCode: country,
       numberFormatLocale: _numberFormatLocale(locale, 'EUR'),
@@ -88,7 +92,7 @@ abstract final class PaychekStorePlanPricing {
     if (fromServer != null && fromServer.byCycle.isNotEmpty) {
       return fromServer;
     }
-    return _catalogFallback(locale);
+    return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
   }
 
   static Future<PaychekPlanPricingSnapshot> _loadFromGooglePlay({
@@ -126,7 +130,7 @@ abstract final class PaychekStorePlanPricing {
   }) async {
     final iap = InAppPurchase.instance;
     if (!await iap.isAvailable()) {
-      return _catalogFallback(locale);
+      return _fallbackForPlatform(locale);
     }
 
     final response = await iap.queryProductDetails(allProductIds);
@@ -134,7 +138,7 @@ abstract final class PaychekStorePlanPricing {
       debugPrint('[Paychek] plan pricing query ${response.error}');
     }
     if (response.productDetails.isEmpty) {
-      return _catalogFallback(locale);
+      return _fallbackForPlatform(locale);
     }
 
     final byCycle = <PaychekBillingCycle, PaychekPlanPriceQuote>{};
@@ -208,7 +212,14 @@ abstract final class PaychekStorePlanPricing {
     return 'en_US';
   }
 
-  static PaychekPlanPricingSnapshot _catalogFallback(Locale locale) {
+  static PaychekPlanPricingSnapshot _fallbackForPlatform(Locale locale) {
+    if (paychekUsesNativeStoreIap) {
+      return _usdCatalogFallback(locale);
+    }
+    return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
+  }
+
+  static PaychekPlanPricingSnapshot _usdCatalogFallback(Locale locale) {
     final currency = 'USD';
     final formatter = NumberFormat.simpleCurrency(
       name: currency,

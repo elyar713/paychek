@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../paychek_billing_plan.dart';
 import '../../paychek_plan_price_quote.dart';
+import '../../paychek_regional_price_defaults.dart';
 import '../../paychek_store_plan_pricing.dart';
 import '../../paywall_compare_rows.dart';
 import '../paywall_unified_gold_compare_table.dart';
@@ -48,7 +49,14 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
   }
 
   Future<void> _loadPricing() async {
-    final locale = Localizations.localeOf(context);
+    final locale = PaychekStorePlanPricing.resolvePricingLocale(
+      appLocale: Localizations.localeOf(context),
+    );
+    if (kIsWeb) {
+      setState(
+        () => _pricing = PaychekRegionalPriceDefaults.snapshotForLocale(locale),
+      );
+    }
     final snapshot = await PaychekStorePlanPricing.load(locale: locale);
     if (!mounted) return;
     setState(() => _pricing = snapshot);
