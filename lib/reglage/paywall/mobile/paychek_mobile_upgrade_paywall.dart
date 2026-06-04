@@ -41,6 +41,18 @@ class PaychekMobileUpgradePaywall extends StatefulWidget {
 class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywall> {
   PaychekBillingCycle _selected = PaychekBillingCycle.annual;
   PaychekPlanPricingSnapshot? _pricing;
+  Locale? _pricingLocale;
+
+  PaychekPlanPricingSnapshot get _effectivePricing {
+    if (_pricing != null && _pricing!.byCycle.isNotEmpty) return _pricing!;
+    final loc = _pricingLocale;
+    if (loc != null) {
+      return PaychekRegionalPriceDefaults.snapshotForLocale(loc);
+    }
+    return PaychekRegionalPriceDefaults.snapshotForLocale(
+      PaychekStorePlanPricing.resolvePricingLocale(),
+    );
+  }
 
   @override
   void initState() {
@@ -52,37 +64,29 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     final locale = PaychekStorePlanPricing.resolvePricingLocale(
       appLocale: Localizations.localeOf(context),
     );
-    if (kIsWeb) {
-      setState(
-        () => _pricing = PaychekRegionalPriceDefaults.snapshotForLocale(locale),
-      );
-    }
+    setState(() {
+      _pricingLocale = locale;
+      _pricing = PaychekRegionalPriceDefaults.snapshotForLocale(locale);
+    });
+    PaychekStorePlanPricing.invalidateCache();
     final snapshot = await PaychekStorePlanPricing.load(locale: locale);
     if (!mounted) return;
     setState(() => _pricing = snapshot);
   }
 
-  String _totalLabel(AppLocalizations l, PaychekBillingCycle cycle) {
-    final q = _pricing?.quoteFor(cycle);
-    if (q != null) return q.totalDisplay;
-    return l.paywallMobilePlanTotalLine(
-      PaychekBillingPlanCatalog.totalPrice(cycle),
-    );
+  String _totalLabel(PaychekBillingCycle cycle) {
+    return _effectivePricing.quoteFor(cycle)?.totalDisplay ?? '—';
   }
 
   String _perMonthLabel(AppLocalizations l, PaychekBillingCycle cycle) {
-    final q = _pricing?.quoteFor(cycle);
-    if (q != null) {
-      final end = l.paywallMobilePlanPerMonthEnd.trim();
-      return end.isNotEmpty ? '${q.perMonthDisplay} $end' : q.perMonthDisplay;
-    }
-    return l.paywallMobilePlanPerMonthLine(
-      PaychekBillingPlanCatalog.pricePerMonth(cycle),
-    );
+    final q = _effectivePricing.quoteFor(cycle);
+    if (q == null) return '—';
+    final end = l.paywallMobilePlanPerMonthEnd.trim();
+    return end.isNotEmpty ? '${q.perMonthDisplay} $end' : q.perMonthDisplay;
   }
 
   String? _savingsBadge(AppLocalizations l) {
-    final pct = _pricing?.annualSavingsPercent();
+    final pct = _effectivePricing.annualSavingsPercent();
     if (pct != null && pct >= 5) {
       return l.paywallMobilePlanSavingsPercent(pct);
     }
@@ -221,7 +225,7 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     final l = AppLocalizations.of(context)!;
     final selected = _selected == cycle;
     final perMonth = _perMonthLabel(l, cycle);
-    final total = _totalLabel(l, cycle);
+    final total = _totalLabel(cycle);
 
     late final String title;
     late final String? badge;
@@ -232,12 +236,12 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
       case PaychekBillingCycle.annual:
         title = l.paywallMobilePlanAnnualTitle;
         badge = _savingsBadge(l);
-        subtitle = _perMonthSubtitle(l, perMonth, selected);
+        subtitle = _perMonthSubtitle(l, cycle, perMonth, selected);
         billing = l.paywallMobilePlanAnnualBilling;
       case PaychekBillingCycle.quarterly:
         title = l.paywallMobilePlanQuarterlyTitle;
         badge = l.paywallMobilePlanPopular;
-        subtitle = _perMonthSubtitle(l, perMonth, selected);
+        subtitle = _perMonthSubtitle(l, cycle, perMonth, selected);
         billing = l.paywallMobilePlanQuarterlyBilling;
       case PaychekBillingCycle.monthly:
         title = l.paywallMobilePlanMonthlyTitle;
@@ -386,12 +390,17 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     );
   }
 
-  Widget _perMonthSubtitle(AppLocalizations l, String line, bool selected) {
+  Widget _perMonthSubtitle(
+    AppLocalizations l,
+    PaychekBillingCycle cycle,
+    String line,
+    bool selected,
+  ) {
     final base = _text(size: 10, color: PaywallMobileTokens.neutral400);
     if (!selected) {
       return Text(line, style: base);
     }
-    final q = _pricing?.quoteFor(_selected);
+    final q = _effectivePricing.quoteFor(cycle);
     if (q != null) {
       return Text.rich(
         TextSpan(

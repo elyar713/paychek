@@ -22,10 +22,12 @@ class PaychekPlanPricingSnapshot {
   const PaychekPlanPricingSnapshot({
     required this.byCycle,
     required this.source,
+    this.notFoundProductIds = const [],
   });
 
   final Map<PaychekBillingCycle, PaychekPlanPriceQuote> byCycle;
   final PaychekPlanPricingSource source;
+  final List<String> notFoundProductIds;
 
   PaychekPlanPriceQuote? quoteFor(PaychekBillingCycle cycle) => byCycle[cycle];
 

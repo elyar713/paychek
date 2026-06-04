@@ -5,6 +5,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:intl/intl.dart';
 
+import 'paychek_apple_iap_service.dart';
 import 'paychek_apple_iap_product_ids.dart';
 import 'paychek_billing_plan.dart';
 import 'paychek_google_play_iap_service.dart';
@@ -41,12 +42,7 @@ abstract final class PaychekStorePlanPricing {
     PaychekPlanPricingSnapshot snapshot;
     try {
       if (paychekUsesNativeAppleIap) {
-        snapshot = await _loadFromInAppPurchase(
-          productIdForCycle: PaychekAppleIapProductIds.forCycle,
-          allProductIds: PaychekAppleIapProductIds.all,
-          source: PaychekPlanPricingSource.appStore,
-          locale: loc,
-        );
+        snapshot = await _loadApplePricing(loc);
       } else if (paychekUsesNativeGooglePlayIap) {
         snapshot = await _loadFromGooglePlay(locale: loc);
       } else {
@@ -95,6 +91,70 @@ abstract final class PaychekStorePlanPricing {
     return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
   }
 
+  static Future<PaychekPlanPricingSnapshot> _loadApplePricing(
+    Locale locale,
+  ) async {
+    await PaychekAppleIapService.ensureInitialized();
+
+    PaychekPlanPricingSnapshot store = PaychekPlanPricingSnapshot(
+      byCycle: const {},
+      source: PaychekPlanPricingSource.catalogFallback,
+    );
+
+    for (var attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        await Future<void>.delayed(Duration(milliseconds: 400 * attempt));
+      }
+      store = await _loadFromInAppPurchase(
+        productIdForCycle: PaychekAppleIapProductIds.forCycle,
+        allProductIds: PaychekAppleIapProductIds.all,
+        source: PaychekPlanPricingSource.appStore,
+        locale: locale,
+      );
+      if (store.byCycle.length == PaychekBillingCycle.values.length &&
+          store.source == PaychekPlanPricingSource.appStore) {
+        debugPrint(
+          '[Paychek] App Store prices OK '
+          '${store.byCycle.values.first.currencyCode}',
+        );
+        return store;
+      }
+    }
+
+    if (store.notFoundProductIds.isNotEmpty) {
+      debugPrint(
+        '[Paychek] App Store products not found: ${store.notFoundProductIds}',
+      );
+    }
+
+    final regional = PaychekRegionalPriceDefaults.snapshotForLocale(locale);
+    if (store.byCycle.isNotEmpty) {
+      return _mergePricing(store, regional);
+    }
+
+    final fromServer = await _loadWebByCountry(locale);
+    if (fromServer.byCycle.isNotEmpty) {
+      return fromServer;
+    }
+    return regional;
+  }
+
+  static PaychekPlanPricingSnapshot _mergePricing(
+    PaychekPlanPricingSnapshot primary,
+    PaychekPlanPricingSnapshot fallback,
+  ) {
+    final byCycle = Map<PaychekBillingCycle, PaychekPlanPriceQuote>.from(
+      fallback.byCycle,
+    );
+    byCycle.addAll(primary.byCycle);
+    return PaychekPlanPricingSnapshot(
+      byCycle: byCycle,
+      source: primary.byCycle.isNotEmpty
+          ? primary.source
+          : fallback.source,
+    );
+  }
+
   static Future<PaychekPlanPricingSnapshot> _loadFromGooglePlay({
     required Locale locale,
   }) async {
@@ -137,8 +197,15 @@ abstract final class PaychekStorePlanPricing {
     if (response.error != null) {
       debugPrint('[Paychek] plan pricing query ${response.error}');
     }
+    if (response.notFoundIDs.isNotEmpty) {
+      debugPrint('[Paychek] plan pricing notFoundIDs: ${response.notFoundIDs}');
+    }
     if (response.productDetails.isEmpty) {
-      return _fallbackForPlatform(locale);
+      return PaychekPlanPricingSnapshot(
+        byCycle: const {},
+        source: PaychekPlanPricingSource.catalogFallback,
+        notFoundProductIds: response.notFoundIDs.toList(),
+      );
     }
 
     final byCycle = <PaychekBillingCycle, PaychekPlanPriceQuote>{};
@@ -166,7 +233,10 @@ abstract final class PaychekStorePlanPricing {
 
     return PaychekPlanPricingSnapshot(
       byCycle: byCycle,
-      source: byCycle.isEmpty ? PaychekPlanPricingSource.catalogFallback : source,
+      source: byCycle.isEmpty
+          ? PaychekPlanPricingSource.catalogFallback
+          : source,
+      notFoundProductIds: response.notFoundIDs.toList(),
     );
   }
 
@@ -213,43 +283,6 @@ abstract final class PaychekStorePlanPricing {
   }
 
   static PaychekPlanPricingSnapshot _fallbackForPlatform(Locale locale) {
-    if (paychekUsesNativeStoreIap) {
-      return _usdCatalogFallback(locale);
-    }
     return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
-  }
-
-  static PaychekPlanPricingSnapshot _usdCatalogFallback(Locale locale) {
-    final currency = 'USD';
-    final formatter = NumberFormat.simpleCurrency(
-      name: currency,
-      locale: _numberFormatLocale(locale, currency),
-    );
-    PaychekPlanPriceQuote quote(PaychekBillingCycle cycle) {
-      final totalStr = PaychekBillingPlanCatalog.totalPrice(cycle)
-          .replaceAll(',', '.');
-      final total = double.tryParse(totalStr) ?? 0;
-      final months = switch (cycle) {
-        PaychekBillingCycle.monthly => 1,
-        PaychekBillingCycle.quarterly => 3,
-        PaychekBillingCycle.annual => 12,
-      };
-      final perMonthStr = PaychekBillingPlanCatalog.pricePerMonth(cycle)
-          .replaceAll(',', '.');
-      final perMonth = double.tryParse(perMonthStr) ?? total / months;
-      return PaychekPlanPriceQuote(
-        cycle: cycle,
-        totalDisplay: formatter.format(total),
-        perMonthDisplay: formatter.format(perMonth),
-        rawTotal: total,
-        currencyCode: currency,
-      );
-    }
-    return PaychekPlanPricingSnapshot(
-      source: PaychekPlanPricingSource.catalogFallback,
-      byCycle: {
-        for (final c in PaychekBillingCycle.values) c: quote(c),
-      },
-    );
   }
 }

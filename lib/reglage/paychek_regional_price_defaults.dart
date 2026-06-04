@@ -132,15 +132,16 @@ const Map<String, String> _countryToCurrency = {
   'MX': 'MXN', 'IN': 'INR', 'PL': 'PLN', 'KR': 'KRW', 'SG': 'SGD',
 };
 
-/// Locale utilisée pour résoudre le pays du paywall (app + navigateur).
+/// Locale utilisée pour résoudre le pays du paywall (app + système iOS/Android).
 Locale paychekResolvePricingLocale({Locale? appLocale}) {
-  final app = appLocale ?? PlatformDispatcher.instance.locale;
-  if (app.countryCode != null && app.countryCode!.trim().isNotEmpty) {
-    return app;
-  }
   final device = PlatformDispatcher.instance.locale;
   if (device.countryCode != null && device.countryCode!.trim().isNotEmpty) {
-    return Locale(app.languageCode, device.countryCode);
+    final lang = (appLocale ?? device).languageCode;
+    return Locale(lang, device.countryCode);
+  }
+  final app = appLocale ?? device;
+  if (app.countryCode != null && app.countryCode!.trim().isNotEmpty) {
+    return app;
   }
   final country = PaychekRegionalPriceDefaults.countryFromLocale(app);
   return Locale(app.languageCode, country);
