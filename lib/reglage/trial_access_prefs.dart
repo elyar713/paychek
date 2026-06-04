@@ -458,7 +458,9 @@ abstract final class TrialAccessPrefs {
 
     DateTime? subscriptionPeriodEndUtc = subRow.periodEndUtc;
     final userPeriodEnd = row.subscriptionCurrentPeriodEndUtc;
-    if (userPeriodEnd != null) {
+    if (subRow.active && subRow.periodEndUtc != null) {
+      subscriptionPeriodEndUtc = subRow.periodEndUtc;
+    } else if (userPeriodEnd != null) {
       subscriptionPeriodEndUtc = subscriptionPeriodEndUtc == null
           ? userPeriodEnd
           : (userPeriodEnd.isAfter(subscriptionPeriodEndUtc)
@@ -501,16 +503,19 @@ abstract final class TrialAccessPrefs {
       );
     }
 
-    if (subscriptionPeriodExpired) {
+    if (subscriptionPeriodExpired && !subRow.active) {
       if (localSub) await p.setBool(_kSubscriberActive, false);
     }
 
+    final effectiveLocalSub = p.getBool(_kSubscriberActive) ?? false;
+
     // Échéance passée → plus Pro, sauf abonnement store encore actif.
     final bool hasLiveSubscription;
-    if (subscriptionPeriodExpired && !subRow.active) {
+    if (subscriptionPeriodExpired && !subRow.active && !row.docPro) {
       hasLiveSubscription = false;
     } else {
-      hasLiveSubscription = subRow.active || row.docPro || localSub;
+      hasLiveSubscription =
+          subRow.active || row.docPro || effectiveLocalSub;
     }
 
     final TrialGateVm gate;

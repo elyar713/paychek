@@ -32,15 +32,24 @@ DateTime? paychekResolveStoredSubscriptionPeriodEndUtc({
 }) {
   final nowUtc = DateTime.now().toUtc();
 
-  if (periodEndUtc != null && !periodEndUtc.isAfter(nowUtc)) {
-    return periodEndUtc;
-  }
-
   if (!storeEntitlementActive) {
+    if (periodEndUtc != null && !periodEndUtc.isAfter(nowUtc)) {
+      return periodEndUtc;
+    }
     return periodEndUtc;
   }
 
   DateTime? resolved = periodEndUtc;
+
+  // Échéance passée sur paychek_users (fin d’essai) alors qu’un IAP Apple/Play est actif.
+  if (resolved != null &&
+      !resolved.isAfter(nowUtc) &&
+      proSinceUtc != null &&
+      !resolved.isAfter(proSinceUtc.subtract(const Duration(hours: 2)))) {
+    resolved = null;
+  } else if (resolved != null && !resolved.isAfter(nowUtc)) {
+    return resolved;
+  }
 
   // Ancienne échéance d’essai (7 j) encore sur paychek_users — ignorer si achat IAP plus récent.
   if (resolved != null &&

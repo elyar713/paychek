@@ -301,6 +301,16 @@ function createAppleIapExports(deps) {
         productId = txProductId;
       }
       if (!appleTransactionGrantsPro(tx)) {
+        const expiresMs =
+          tx.expiresDate != null && typeof tx.expiresDate === "number" ?
+            tx.expiresDate :
+            null;
+        console.warn("[Paychek] verifyPaychekApplePurchase inactive tx", {
+          uid: request.auth.uid,
+          productId,
+          expiresMs,
+          now: Date.now(),
+        });
         return {active: false, reason: "expired_or_revoked"};
       }
 
