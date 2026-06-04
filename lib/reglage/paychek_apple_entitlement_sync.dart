@@ -78,6 +78,9 @@ abstract final class PaychekAppleEntitlementSync {
             e.code == 'internal') {
           continue;
         }
+        if (e.code == 'failed-precondition') {
+          return false;
+        }
         return false;
       } catch (e, st) {
         debugPrint('[Paychek] verifyPaychekApplePurchase $e\n$st');
@@ -107,8 +110,11 @@ abstract final class PaychekAppleEntitlementSync {
     if (msg.contains('JWS') ||
         msg.contains('jws') ||
         msg.contains('Transaction Apple invalide') ||
-        msg.contains('signedTransaction')) {
-      return 'Reçu Apple refusé par le serveur. Réessaie ou « Restaurer les achats ».';
+        msg.contains('signedTransaction') ||
+        msg.contains('déjà lié')) {
+      return msg.isNotEmpty ?
+          msg :
+          'Reçu Apple refusé par le serveur. Réessaie ou « Restaurer les achats ».';
     }
     if (msg.isNotEmpty) return msg;
     return 'Validation Apple impossible (${e.code}).';

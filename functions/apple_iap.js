@@ -276,11 +276,19 @@ async function grantProFromAppleTransaction(
     paychekGrantProEntitlement,
     paychekApplyTrialRemainderToPeriodEnd,
     admin,
+    paychekAssertStoreSubscriptionOwner,
 ) {
   const transactionId = `${tx.transactionId || ""}`;
   const originalId = `${tx.originalTransactionId || transactionId}`;
   if (!transactionId) {
     throw new Error("apple_transaction_id_missing");
+  }
+
+  if (typeof paychekAssertStoreSubscriptionOwner === "function") {
+    await paychekAssertStoreSubscriptionOwner(db, uid, {
+      appleOriginalTransactionId: originalId,
+      appleTransactionId: transactionId,
+    });
   }
 
   const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
@@ -383,6 +391,7 @@ function createAppleIapExports(deps) {
     admin,
     paychekGrantProEntitlement,
     paychekApplyTrialRemainderToPeriodEnd,
+    paychekAssertStoreSubscriptionOwner,
   } = deps;
 
   async function verifyAndGrant(request) {
@@ -445,6 +454,7 @@ function createAppleIapExports(deps) {
           paychekGrantProEntitlement,
           paychekApplyTrialRemainderToPeriodEnd,
           admin,
+          paychekAssertStoreSubscriptionOwner,
       );
       const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
       console.log("[Paychek] verifyPaychekApplePurchase ok", {
@@ -463,6 +473,20 @@ function createAppleIapExports(deps) {
       console.error("[Paychek] verifyPaychekApplePurchase", e);
       if (e instanceof HttpsError) throw e;
       const msg = formatAppleVerifyError(e);
+      if (
+        msg.includes("apple_subscription_linked_to_other_account") ||
+        `${e.message || ""}`.includes("apple_subscription_linked_to_other_account")
+      ) {
+        const hint = e.otherAccountHint ?
+          ` (${e.otherAccountHint})` :
+          "";
+        throw new HttpsError(
+            "failed-precondition",
+            "Cet abonnement Apple est déjà lié à un autre compte Paychek." +
+            hint +
+            " Connecte-toi avec le compte d’origine ou contacte le support.",
+        );
+      }
       if (
         msg.includes("signedTransaction_missing") ||
         msg.includes("apple_jws") ||
@@ -535,6 +559,7 @@ function createAppleIapExports(deps) {
             paychekGrantProEntitlement,
             paychekApplyTrialRemainderToPeriodEnd,
             admin,
+            paychekAssertStoreSubscriptionOwner,
         );
         return {
           active: true,

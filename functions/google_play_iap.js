@@ -376,7 +376,16 @@ async function grantProFromGooglePurchase(
     admin,
     startMs = Date.now(),
     subscriptionState = "",
+    paychekApplyTrialRemainderToPeriodEnd = null,
+    paychekAssertStoreSubscriptionOwner = null,
 ) {
+  const token = `${purchaseToken || ""}`.trim();
+  if (typeof paychekAssertStoreSubscriptionOwner === "function" && token) {
+    await paychekAssertStoreSubscriptionOwner(db, uid, {
+      googlePlayPurchaseToken: token,
+    });
+  }
+
   const anchorMs = Number.isFinite(startMs) ? startMs : Date.now();
   let resolvedExpiryMs = resolveGooglePlayPeriodEndMillis(
       productId,
@@ -398,6 +407,15 @@ async function grantProFromGooglePurchase(
   const proSinceUtc = admin.firestore.Timestamp.fromMillis(
       anchorMs > 0 && anchorMs <= Date.now() ? anchorMs : Date.now(),
   );
+
+  if (typeof paychekApplyTrialRemainderToPeriodEnd === "function") {
+    currentPeriodEnd = await paychekApplyTrialRemainderToPeriodEnd(
+        db,
+        uid,
+        currentPeriodEnd,
+        proSinceUtc,
+    );
+  }
 
   const granted = await paychekGrantProEntitlement(db, uid, {
     provider: "google_play",
@@ -505,6 +523,8 @@ function createGooglePlayIapExports(deps) {
     paychekGrantProEntitlement,
     paychekRevokeProEntitlement,
     paychekPatchSubscriberPeriodEnd,
+    paychekApplyTrialRemainderToPeriodEnd,
+    paychekAssertStoreSubscriptionOwner,
     googlePlayServiceAccountJson,
   } = deps;
 
@@ -567,6 +587,8 @@ function createGooglePlayIapExports(deps) {
             admin,
             playStartMs,
             `${sub.subscriptionState || ""}`,
+            paychekApplyTrialRemainderToPeriodEnd,
+            paychekAssertStoreSubscriptionOwner,
         );
       if (currentPeriodEnd) {
         await paychekPatchSubscriberPeriodEnd(db, uid, currentPeriodEnd);
@@ -629,6 +651,9 @@ function createGooglePlayIapExports(deps) {
             paychekGrantProEntitlement,
             admin,
             legacyStartMs,
+            "",
+            paychekApplyTrialRemainderToPeriodEnd,
+            paychekAssertStoreSubscriptionOwner,
         );
       if (currentPeriodEnd) {
         await paychekPatchSubscriberPeriodEnd(db, uid, currentPeriodEnd);
@@ -722,13 +747,37 @@ function createGooglePlayIapExports(deps) {
     const allowed = Array.isArray(request.data?.allowedProductIds) ?
       request.data.allowedProductIds :
       null;
-    return verifyGooglePlayPurchaseCore(
-        db,
-        request.auth.uid,
-        productId,
-        purchaseToken,
-        allowed,
-    );
+    try {
+      return await verifyGooglePlayPurchaseCore(
+          db,
+          request.auth.uid,
+          productId,
+          purchaseToken,
+          allowed,
+      );
+    } catch (e) {
+      console.error("[Paychek] verifyPaychekGooglePurchase", e);
+      if (e instanceof HttpsError) throw e;
+      if (
+        `${e.message || ""}`.includes(
+            "google_play_subscription_linked_to_other_account",
+        )
+      ) {
+        const hint = e.otherAccountHint ?
+          ` (${e.otherAccountHint})` :
+          "";
+        throw new HttpsError(
+            "failed-precondition",
+            "Cet abonnement Google Play est déjà lié à un autre compte Paychek." +
+            hint +
+            " Connecte-toi avec le compte d’origine ou contacte le support.",
+        );
+      }
+      throw new HttpsError(
+          "internal",
+          e && e.message ? String(e.message) : "google_verify_failed",
+      );
+    }
   }
 
   async function syncStoredGooglePlayEntitlement(request) {

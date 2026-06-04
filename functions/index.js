@@ -821,24 +821,107 @@ async function paychekTryClaimOutboundEmailFlag(docRef, fieldName) {
 async function paychekTryClaimProAccessConfirmedEmail(db, uid, sessionId) {
   const sid = `${sessionId ?? ""}`.trim();
   if (!sid) return false;
+  return paychekTryClaimProAccessConfirmedEmailKey(db, uid, sid);
+}
+
+/**
+ * Idempotence e-mail « Accès Pro confirmé » (Stripe session, Apple, Google Play).
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {string} claimKey
+ * @return {Promise<boolean>}
+ */
+async function paychekTryClaimProAccessConfirmedEmailKey(db, uid, claimKey) {
+  const key = `${claimKey ?? ""}`.trim();
+  if (!key) return false;
   const ref = db.collection("subscriber_entitlements").doc(uid);
   return admin.firestore().runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const data = snap.exists ? snap.data() ?? {} : {};
     const sentMap = data.proAccessConfirmedEmailBySession ?? {};
-    if (sentMap[sid]) return false;
+    if (sentMap[key]) return false;
     tx.set(
         ref,
         {
           proAccessConfirmedEmailBySession: {
             ...sentMap,
-            [sid]: admin.firestore.FieldValue.serverTimestamp(),
+            [key]: admin.firestore.FieldValue.serverTimestamp(),
           },
         },
         {merge: true},
     );
     return true;
   });
+}
+
+/**
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @return {Promise<string>}
+ */
+async function paychekMaskedEmailForUid(db, uid) {
+  const snap = await db.collection("paychek_users").doc(uid).get();
+  const email = `${snap.exists ? snap.data()?.email ?? "" : ""}`.trim();
+  if (!email.includes("@")) return "un autre compte Paychek";
+  const at = email.indexOf("@");
+  const local = email.slice(0, at);
+  const domain = email.slice(at + 1);
+  const masked =
+    local.length <= 2 ?
+      "***" :
+      `${local[0]}${"*".repeat(Math.min(4, local.length - 2))}${local.slice(-1)}`;
+  return `${masked}@${domain}`;
+}
+
+/**
+ * Un abonnement mobile (Apple ID / compte Play) ne peut être actif que sur un uid.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {object} opts
+ */
+async function paychekAssertStoreSubscriptionOwner(db, uid, opts) {
+  const targetUid = `${uid || ""}`.trim();
+  const appleOrig = `${opts.appleOriginalTransactionId ?? ""}`.trim();
+  const appleTx = `${opts.appleTransactionId ?? ""}`.trim();
+  const playToken = `${opts.googlePlayPurchaseToken ?? ""}`.trim();
+
+  /**
+   * @param {FirebaseFirestore.QuerySnapshot} snap
+   * @param {string} channel
+   */
+  async function rejectIfOtherActive(snap, channel) {
+    for (const doc of snap.docs) {
+      if (doc.id === targetUid) continue;
+      const data = doc.data() || {};
+      if (data.active !== true) continue;
+      const hint = await paychekMaskedEmailForUid(db, doc.id);
+      const err = new Error(`${channel}_subscription_linked_to_other_account`);
+      err.otherAccountHint = hint;
+      throw err;
+    }
+  }
+
+  if (appleOrig) {
+    const snap = await db.collection("subscriber_entitlements")
+        .where("appleOriginalTransactionId", "==", appleOrig)
+        .limit(8)
+        .get();
+    await rejectIfOtherActive(snap, "apple");
+  }
+  if (appleTx) {
+    const snap = await db.collection("subscriber_entitlements")
+        .where("appleTransactionId", "==", appleTx)
+        .limit(8)
+        .get();
+    await rejectIfOtherActive(snap, "apple");
+  }
+  if (playToken) {
+    const snap = await db.collection("subscriber_entitlements")
+        .where("googlePlayPurchaseToken", "==", playToken)
+        .limit(8)
+        .get();
+    await rejectIfOtherActive(snap, "google_play");
+  }
 }
 
 function paychekApplyLegacyMaquetteTokens(out, vars) {
@@ -2470,6 +2553,154 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
 }
 
 /**
+ * E-mail « Accès Pro confirmé » après achat App Store / Google Play.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} passRaw
+ * @param {string} uid
+ * @param {object} opts
+ */
+async function paychekSendProAccessConfirmedEmailForStore(
+    db,
+    passRaw,
+    uid,
+    opts,
+) {
+  const provider = `${opts.provider ?? ""}`.trim();
+  const claimKey = `${opts.claimKey ?? ""}`.trim();
+  const periodEndTs = opts.periodEndTs ?? null;
+  if (!claimKey) return;
+
+  const id = paychekSmtpIdentity();
+  const resendKey = `${paychekResendApiKey.value()}`.trim();
+  const pass = normalizeSmtpPassword(passRaw);
+  const smtpReady = Boolean(id.host && id.user && pass);
+  if (!resendKey && !smtpReady) {
+    console.warn(
+        "paychekIapProEmail: ni PAYCHEK_RESEND_API_KEY ni SMTP complet",
+    );
+    return;
+  }
+  if (resendKey && !`${id.mailFrom}`.includes("@")) {
+    console.warn("paychekIapProEmail: PAYCHEK_MAIL_FROM invalide");
+    return;
+  }
+
+  const userSnap = await db.collection("paychek_users").doc(uid).get();
+  const u = userSnap.exists ? userSnap.data() : {};
+  const to = `${u.email ?? ""}`.trim();
+  if (!to.includes("@")) {
+    console.warn("paychekIapProEmail: destinataire absent", uid);
+    return;
+  }
+
+  const firstName = `${u.firstName ?? ""}`.trim();
+  const lastName = `${u.lastName ?? ""}`.trim();
+  let clientLine =
+    firstName || lastName ?
+      `${firstName} ${lastName}`.trim() :
+      `${u.displayName ?? ""}`.trim();
+  if (!clientLine) {
+    clientLine = to.split("@")[0] || "Client";
+  }
+
+  const locale = await paychekResolveProEmailLocale(db, uid, u, null);
+  const periodEndFr = emailI18n.paychekFormatPeriodEndDate(locale, periodEndTs);
+  const channelLabel =
+    provider === "google_play" ? "Google Play" : "App Store";
+  const txnSuffix = `${channelLabel} · ${claimKey.slice(0, 24)}`;
+
+  const safeClient = escapeHtml(clientLine);
+  const safeEnd = escapeHtml(periodEndFr);
+  const safeTxn = escapeHtml(txnSuffix);
+
+  let customHtml = "";
+  try {
+    const tplData = await paychekLoadEmailTemplateOverrides(db);
+    customHtml = paychekProAccessHtmlOverride(tplData, locale);
+  } catch (e) {
+    console.warn("paychekIapProEmail: lecture template Firestore", e);
+  }
+
+  const supportHrefEsc = escapeHtml(
+      KNOWLEDGE_BASE_URL_FR.replace(/\/+$/, "") + "/",
+  );
+  const privacyHrefEsc = escapeHtml(PAYCHEK_PRIVACY_PAGE_URL_FR);
+  const placeholderVars = {
+    clientName: safeClient,
+    firstName: escapeHtml(firstName || clientLine.split(/\s+/)[0] || "Trader"),
+    nomUtilisateur: safeClient,
+    periodEndFr: safeEnd,
+    periodEnd: safeEnd,
+    validUntil: safeEnd,
+    DATE_ANNIVERSAIRE: safeEnd,
+    dateAnniversaire: safeEnd,
+    dateFin: safeEnd,
+    dateFinAbonnement: safeEnd,
+    txnSuffix: safeTxn,
+    ID_UNIQUE: safeTxn,
+    supportHref: supportHrefEsc,
+    privacyHref: privacyHrefEsc,
+  };
+
+  const html = paychekApplyEmailIosDarkModeFix(
+      customHtml ?
+        paychekApplyEmailPlaceholders(customHtml, placeholderVars) :
+        buildProAccessConfirmedHtml({
+          clientName: safeClient,
+          periodEndFr: safeEnd,
+          txnSuffix: safeTxn,
+        }, locale),
+  );
+
+  const text = emailI18n.pack(locale).pro.text(
+      clientLine,
+      periodEndFr,
+      txnSuffix,
+  );
+
+  await sendPaychekMailOutbound(
+      {
+        from: `"Paychek" <${id.mailFrom}>`,
+        to,
+        bcc: id.mailBcc,
+        replyTo: id.mailFrom,
+        subject: emailI18n.pack(locale).proSubject,
+        text,
+        html,
+      },
+      passRaw,
+      JSON.stringify({flow: "proWelcomeIap", uid, claimKey, provider}),
+  );
+}
+
+/**
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {object} opts
+ */
+async function paychekMaybeSendStoreProConfirmedEmail(db, uid, opts) {
+  const claimKey = `${opts.claimKey ?? ""}`.trim();
+  if (!claimKey) return;
+  const claimed = await paychekTryClaimProAccessConfirmedEmailKey(
+      db,
+      uid,
+      claimKey,
+  );
+  if (!claimed) return;
+  try {
+    const passRaw = paychekSmtpPassword.value();
+    await paychekSendProAccessConfirmedEmailForStore(
+        db,
+        passRaw,
+        uid,
+        opts,
+    );
+  } catch (e) {
+    console.warn("paychekMaybeSendStoreProConfirmedEmail", uid, e);
+  }
+}
+
+/**
  * @param {Record<string, unknown>} fsData
  * @param {import("firebase-admin/auth").UserRecord} authUser
  */
@@ -3471,6 +3702,37 @@ async function paychekGrantProEntitlement(db, uid, opts) {
   batch.set(db.collection("paychek_users").doc(uid), userPatch, {merge: true});
 
   await batch.commit();
+
+  if (provider === "apple_iap" || provider === "apple") {
+    const claimKey =
+      appleTransactionId ?
+        `apple:${appleTransactionId}` :
+        appleOriginalTransactionId ?
+          `apple_orig:${appleOriginalTransactionId}` :
+          "";
+    if (claimKey) {
+      await paychekMaybeSendStoreProConfirmedEmail(db, uid, {
+        provider: "apple_iap",
+        claimKey,
+        periodEndTs: mergedPeriodEnd,
+      });
+    }
+  } else if (provider === "google_play") {
+    const claimKey =
+      googlePlayOrderId ?
+        `google:${googlePlayOrderId}` :
+        googlePlayPurchaseToken ?
+          `google_token:${googlePlayPurchaseToken.slice(0, 48)}` :
+          "";
+    if (claimKey) {
+      await paychekMaybeSendStoreProConfirmedEmail(db, uid, {
+        provider: "google_play",
+        claimKey,
+        periodEndTs: mergedPeriodEnd,
+      });
+    }
+  }
+
   return true;
 }
 
@@ -5614,6 +5876,7 @@ Object.assign(
       admin,
       paychekGrantProEntitlement,
       paychekApplyTrialRemainderToPeriodEnd,
+      paychekAssertStoreSubscriptionOwner,
     }),
 );
 
@@ -5627,6 +5890,8 @@ Object.assign(
       paychekGrantProEntitlement,
       paychekRevokeProEntitlement,
       paychekPatchSubscriberPeriodEnd,
+      paychekApplyTrialRemainderToPeriodEnd,
+      paychekAssertStoreSubscriptionOwner,
       googlePlayServiceAccountJson: paychekGooglePlayServiceAccountJson,
     }),
 );

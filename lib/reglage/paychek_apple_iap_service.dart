@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
@@ -73,7 +74,10 @@ abstract final class PaychekAppleIapService {
     _pending[productId] = completer;
 
     final started = await _iap.buyNonConsumable(
-      purchaseParam: PurchaseParam(productDetails: product),
+      purchaseParam: PurchaseParam(
+        productDetails: product,
+        applicationUserName: FirebaseAuth.instance.currentUser?.uid,
+      ),
     );
     if (!started) {
       _pending.remove(productId);
@@ -149,6 +153,21 @@ abstract final class PaychekAppleIapService {
           break;
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
+          final isExplicitRestore = restoreMode;
+          if (!isExplicitRestore &&
+              purchase.status == PurchaseStatus.restored) {
+            PaychekAppleEntitlementSync.lastFailureMessage =
+                'Un abonnement Apple est déjà actif sur cet identifiant. '
+                'Connecte-toi au compte Paychek d’origine ou contacte le support.';
+            _completePending(
+              pendingKey,
+              PaychekAppleIapPurchaseOutcome.verificationFailed,
+            );
+            if (purchase.pendingCompletePurchase) {
+              await _iap.completePurchase(purchase);
+            }
+            break;
+          }
           final payload = await _resolveAppleVerificationPayload(purchase);
           if (!paychekHasAppleVerificationPayload(
             jws: payload.jws,
