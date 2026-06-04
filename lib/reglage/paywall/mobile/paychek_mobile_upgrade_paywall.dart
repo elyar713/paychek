@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../paychek_billing_plan.dart';
+import '../../paychek_plan_price_quote.dart';
+import '../../paychek_store_plan_pricing.dart';
 import '../../paywall_compare_rows.dart';
 import '../paywall_unified_gold_compare_table.dart';
 import 'paywall_mobile_compare_table.dart';
@@ -37,6 +39,47 @@ class PaychekMobileUpgradePaywall extends StatefulWidget {
 
 class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywall> {
   PaychekBillingCycle _selected = PaychekBillingCycle.annual;
+  PaychekPlanPricingSnapshot? _pricing;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadPricing());
+  }
+
+  Future<void> _loadPricing() async {
+    final locale = Localizations.localeOf(context);
+    final snapshot = await PaychekStorePlanPricing.load(locale: locale);
+    if (!mounted) return;
+    setState(() => _pricing = snapshot);
+  }
+
+  String _totalLabel(AppLocalizations l, PaychekBillingCycle cycle) {
+    final q = _pricing?.quoteFor(cycle);
+    if (q != null) return q.totalDisplay;
+    return l.paywallMobilePlanTotalLine(
+      PaychekBillingPlanCatalog.totalPrice(cycle),
+    );
+  }
+
+  String _perMonthLabel(AppLocalizations l, PaychekBillingCycle cycle) {
+    final q = _pricing?.quoteFor(cycle);
+    if (q != null) {
+      final end = l.paywallMobilePlanPerMonthEnd.trim();
+      return end.isNotEmpty ? '${q.perMonthDisplay} $end' : q.perMonthDisplay;
+    }
+    return l.paywallMobilePlanPerMonthLine(
+      PaychekBillingPlanCatalog.pricePerMonth(cycle),
+    );
+  }
+
+  String? _savingsBadge(AppLocalizations l) {
+    final pct = _pricing?.annualSavingsPercent();
+    if (pct != null && pct >= 5) {
+      return l.paywallMobilePlanSavingsPercent(pct);
+    }
+    return l.paywallMobilePlanSavings44;
+  }
 
   TextStyle _text({
     double size = 12,
@@ -169,8 +212,8 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
   Widget _planCard(PaychekBillingCycle cycle) {
     final l = AppLocalizations.of(context)!;
     final selected = _selected == cycle;
-    final perMonth = PaychekBillingPlanCatalog.pricePerMonth(cycle);
-    final total = PaychekBillingPlanCatalog.totalPrice(cycle);
+    final perMonth = _perMonthLabel(l, cycle);
+    final total = _totalLabel(l, cycle);
 
     late final String title;
     late final String? badge;
@@ -180,7 +223,7 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     switch (cycle) {
       case PaychekBillingCycle.annual:
         title = l.paywallMobilePlanAnnualTitle;
-        badge = l.paywallMobilePlanSavings44;
+        badge = _savingsBadge(l);
         subtitle = _perMonthSubtitle(l, perMonth, selected);
         billing = l.paywallMobilePlanAnnualBilling;
       case PaychekBillingCycle.quarterly:
@@ -305,7 +348,7 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            l.paywallMobilePlanTotalLine(total),
+                            total,
                             style: _text(
                               size: 14,
                               weight: FontWeight.w900,
@@ -335,27 +378,31 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
     );
   }
 
-  Widget _perMonthSubtitle(AppLocalizations l, String price, bool selected) {
+  Widget _perMonthSubtitle(AppLocalizations l, String line, bool selected) {
     final base = _text(size: 10, color: PaywallMobileTokens.neutral400);
     if (!selected) {
-      return Text(l.paywallMobilePlanPerMonthLine(price), style: base);
+      return Text(line, style: base);
     }
-    return Text.rich(
-      TextSpan(
-        style: base,
-        children: [
-          TextSpan(text: l.paywallMobilePlanPerMonthPrefix),
-          TextSpan(
-            text: '$price${l.paywallMobilePlanPerMonthPriceSuffix}',
-            style: base.copyWith(
-              color: PaywallMobileTokens.amber400,
-              fontWeight: FontWeight.w700,
+    final q = _pricing?.quoteFor(_selected);
+    if (q != null) {
+      return Text.rich(
+        TextSpan(
+          style: base,
+          children: [
+            TextSpan(text: l.paywallMobilePlanPerMonthPrefix),
+            TextSpan(
+              text: q.perMonthDisplay,
+              style: base.copyWith(
+                color: PaywallMobileTokens.amber400,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          TextSpan(text: l.paywallMobilePlanPerMonthEnd),
-        ],
-      ),
-    );
+            TextSpan(text: l.paywallMobilePlanPerMonthEnd),
+          ],
+        ),
+      );
+    }
+    return Text(line, style: base);
   }
 
   Widget _radio(bool selected) {

@@ -400,6 +400,7 @@ function createAppleIapExports(deps) {
     paychekAssertStoreSubscriptionOwner,
     paychekRevokeProEntitlement,
     paychekHintOtherActiveAppleAccounts,
+    paychekListActiveAppleEntitlementCandidates,
   } = deps;
 
   /**
@@ -644,22 +645,30 @@ function createAppleIapExports(deps) {
       if (!hasApple) {
         let message =
           "Aucun achat Apple enregistré pour ce compte Firebase.";
-        if (typeof paychekHintOtherActiveAppleAccounts === "function") {
+        let candidates = [];
+        if (typeof paychekListActiveAppleEntitlementCandidates === "function") {
+          candidates =
+            await paychekListActiveAppleEntitlementCandidates(db, targetUid);
+        } else if (typeof paychekHintOtherActiveAppleAccounts === "function") {
           const hints =
             await paychekHintOtherActiveAppleAccounts(db, targetUid);
-          if (hints.length > 0) {
-            message +=
-              " Un abonnement Apple actif existe sur : " +
-              hints.join(", ") +
-              ". Sur iPhone : « Restaurer les achats » avec CE compte Paychek " +
-              "(transfert automatique), ou en admin paramètre transferFromUid.";
-          } else {
-            message +=
-              " Sur iPhone (connecté avec CE email) : paywall → " +
-              "« Restaurer les achats ».";
-          }
+          candidates = hints.map((maskedEmail) => ({maskedEmail}));
         }
-        throw new HttpsError("failed-precondition", message);
+        if (candidates.length > 0) {
+          const hints = candidates
+              .map((c) => c.maskedEmail || c.uid || "")
+              .filter(Boolean);
+          message +=
+            " Un abonnement Apple actif existe sur : " +
+            hints.join(", ") +
+            ". Utilise « Transférer abonnement Apple ici » ci-dessous, " +
+            "ou sur iPhone « Restaurer les achats » avec CE compte Paychek.";
+        } else {
+          message +=
+            " Sur iPhone (connecté avec CE email) : paywall → " +
+            "« Restaurer les achats ».";
+        }
+        throw new HttpsError("failed-precondition", message, {candidates});
       }
 
       const periodEnd =
@@ -714,10 +723,35 @@ function createAppleIapExports(deps) {
 
   const syncPaychekAppleEntitlement = onCall(callOpts, syncStoredAppleEntitlement);
 
+  const listPaychekAppleTransferCandidates = onCall(
+      callOpts,
+      async (request) => {
+        if (!request.auth) {
+          throw new HttpsError("unauthenticated", "Connexion requise.");
+        }
+        if (request.auth.token.admin !== true) {
+          throw new HttpsError(
+              "permission-denied",
+              "Réservé aux administrateurs.",
+          );
+        }
+        const db = admin.firestore();
+        const excludeUid =
+          `${request.data?.excludeUserId ?? request.auth.uid}`.trim();
+        if (typeof paychekListActiveAppleEntitlementCandidates !== "function") {
+          return {candidates: []};
+        }
+        const candidates =
+          await paychekListActiveAppleEntitlementCandidates(db, excludeUid);
+        return {candidates};
+      },
+  );
+
   return {
     verifyPaychekApplePurchase,
     restorePaychekAppleEntitlement,
     syncPaychekAppleEntitlement,
+    listPaychekAppleTransferCandidates,
   };
 }
 

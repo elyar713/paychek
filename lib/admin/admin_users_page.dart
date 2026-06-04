@@ -1691,20 +1691,13 @@ class _PaychekProfileTierStripeSectionState
   bool _syncingStripe = false;
   bool _syncingGooglePlay = false;
   bool _syncingApple = false;
+  bool _transferringApple = false;
 
   bool get _showGooglePlaySync {
     final pm = widget.paymentMethod.trim().toLowerCase();
     if (pm == 'google_play' || pm == 'google') return true;
     final plat = widget.lastSeenPlatform.trim().toLowerCase();
     if (plat == 'android') return true;
-    return false;
-  }
-
-  bool get _showAppleSync {
-    final pm = widget.paymentMethod.trim().toLowerCase();
-    if (pm == 'apple' || pm == 'apple_iap') return true;
-    final plat = widget.lastSeenPlatform.trim().toLowerCase();
-    if (plat == 'ios' || plat == 'iphone' || plat == 'ipad') return true;
     return false;
   }
 
@@ -1879,6 +1872,178 @@ class _PaychekProfileTierStripeSectionState
     }
   }
 
+  Future<void> _showAppleTransferDialog({
+    List<PaychekAppleTransferCandidate>? initialCandidates,
+  }) async {
+    if (_transferringApple || _syncingApple) return;
+    final snackCtx = widget.scaffoldContext;
+    final messenger = ScaffoldMessenger.maybeOf(snackCtx);
+    final targetEmail = widget.userEmail.trim().isEmpty
+        ? widget.userId
+        : widget.userEmail.trim();
+
+    List<PaychekAppleTransferCandidate> candidates =
+        initialCandidates ?? const [];
+    if (candidates.isEmpty) {
+      setState(() => _transferringApple = true);
+      try {
+        candidates = await paychekAdminListAppleTransferCandidates(
+          excludeUserId: widget.userId,
+        );
+      } catch (e) {
+        if (snackCtx.mounted) {
+          messenger?.showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red.shade900,
+              content: Text('Impossible de lister les comptes Apple : $e'),
+            ),
+          );
+        }
+        return;
+      } finally {
+        if (mounted) setState(() => _transferringApple = false);
+      }
+    }
+
+    if (!snackCtx.mounted) return;
+    if (candidates.isEmpty) {
+      messenger?.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Aucun autre compte Paychek avec abonnement Apple actif.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final selected = await showDialog<PaychekAppleTransferCandidate>(
+      context: snackCtx,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF121212),
+          title: Text(
+            'Transférer abonnement Apple',
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Vers $targetEmail — choisis le compte source :',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    color: const Color(0xFF94A3B8),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...candidates.map((c) {
+                  final end = c.currentPeriodEndUtc;
+                  final endLabel = end != null
+                      ? DateFormat.yMMMd('fr_FR').format(end.toLocal())
+                      : null;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      c.maskedEmail,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    subtitle: Text(
+                      [
+                        if (c.appleProductId?.isNotEmpty == true)
+                          c.appleProductId!,
+                        if (endLabel != null) 'Fin Pro : $endLabel',
+                      ].join(' · '),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                    onTap: () => Navigator.of(ctx).pop(c),
+                  );
+                }),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Annuler'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selected == null) return;
+    await _runAppleTransfer(fromUid: selected.uid);
+  }
+
+  Future<void> _runAppleTransfer({required String fromUid}) async {
+    if (_transferringApple || _syncingApple) return;
+    final snackCtx = widget.scaffoldContext;
+    final messenger = ScaffoldMessenger.maybeOf(snackCtx);
+    setState(() => _transferringApple = true);
+    try {
+      final sync = await paychekAdminSyncAppleEntitlement(
+        targetUserId: widget.userId,
+        transferFromUid: fromUid,
+      );
+      if (!snackCtx.mounted) return;
+      if (sync.active) {
+        setState(() => _tier = PaychekSubscriptionTier.pro);
+        messenger?.showSnackBar(
+          SnackBar(
+            content: Text(
+              sync.message?.trim().isNotEmpty == true
+                  ? sync.message!.trim()
+                  : 'Abonnement Apple transféré — ${widget.userEmail.trim().isEmpty ? widget.userId : widget.userEmail.trim()}',
+            ),
+            duration: const Duration(seconds: 8),
+          ),
+        );
+      } else {
+        messenger?.showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.orange.shade900,
+            content: Text(
+              sync.message?.trim().isNotEmpty == true
+                  ? sync.message!.trim()
+                  : 'Transfert Apple incomplet.',
+            ),
+          ),
+        );
+      }
+    } on FirebaseFunctionsException catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Transfert Apple : ${e.message ?? e.code}'),
+        ),
+      );
+    } catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Transfert Apple : $e'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _transferringApple = false);
+    }
+  }
+
   Future<void> _syncApple() async {
     if (_syncingApple) return;
     final snackCtx = widget.scaffoldContext;
@@ -1941,6 +2106,32 @@ class _PaychekProfileTierStripeSectionState
       );
     } on FirebaseFunctionsException catch (e) {
       if (!snackCtx.mounted) return;
+      if (e.code == 'failed-precondition') {
+        var candidates = paychekAppleTransferCandidatesFromDetails(e.details);
+        if (candidates.isEmpty) {
+          try {
+            candidates = await paychekAdminListAppleTransferCandidates(
+              excludeUserId: widget.userId,
+            );
+          } catch (_) {
+            // Liste via API en secours si e.details absent (web).
+          }
+        }
+        if (candidates.isNotEmpty) {
+          unawaited(
+            _showAppleTransferDialog(initialCandidates: candidates),
+          );
+        } else {
+          messenger?.showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.orange.shade900,
+              duration: const Duration(seconds: 14),
+              content: Text('Apple : ${e.message ?? e.code}'),
+            ),
+          );
+        }
+        return;
+      }
       messenger?.showSnackBar(
         SnackBar(
           backgroundColor: Colors.red.shade900,
@@ -2053,7 +2244,8 @@ class _PaychekProfileTierStripeSectionState
     const mpInner = Color(0xFF1A1A1A);
     const mpBorder = Color(0xFF1E293B);
     final pro = _tier == PaychekSubscriptionTier.pro;
-    final busy = _syncingStripe || _syncingGooglePlay || _syncingApple;
+    final busy =
+        _syncingStripe || _syncingGooglePlay || _syncingApple || _transferringApple;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2140,16 +2332,22 @@ class _PaychekProfileTierStripeSectionState
             label: 'Synchroniser Google Play → Pro',
           ),
         ],
-        if (_showAppleSync) ...[
-          const SizedBox(height: 8),
-          _syncLinkButton(
-            onPressed: busy ? null : _syncApple,
-            syncing: _syncingApple,
-            icon: Icons.apple_rounded,
-            color: const Color(0xFFA78BFA),
-            label: 'Synchroniser Apple → Pro',
-          ),
-        ],
+        const SizedBox(height: 8),
+        _syncLinkButton(
+          onPressed: busy ? null : _syncApple,
+          syncing: _syncingApple,
+          icon: Icons.apple_rounded,
+          color: const Color(0xFFA78BFA),
+          label: 'Synchroniser Apple → Pro',
+        ),
+        const SizedBox(height: 8),
+        _syncLinkButton(
+          onPressed: busy ? null : () => _showAppleTransferDialog(),
+          syncing: _transferringApple,
+          icon: Icons.swap_horiz_rounded,
+          color: const Color(0xFFF472B6),
+          label: 'Transférer abonnement Apple ici',
+        ),
       ],
     );
   }

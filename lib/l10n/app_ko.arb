@@ -1092,6 +1092,14 @@
   "paywallMobilePlanMonthlyBilling": "월간 결제",
   "paywallMobilePlanMonthlyCommitment": "월 단위 약정",
   "paywallMobilePlanSavings44": "44% 절약",
+  "paywallMobilePlanSavingsPercent": "{percent}% 절약",
+  "@paywallMobilePlanSavingsPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "paywallMobilePlanPopular": "인기",
   "paywallMobileCompareFeatureCol": "기능",
   "paywallMobileRowTrades": "월간 트레이드",

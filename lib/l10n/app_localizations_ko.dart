@@ -2676,6 +2676,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywallMobilePlanSavings44 => '44% 절약';
 
   @override
+  String paywallMobilePlanSavingsPercent(int percent) {
+    return '$percent% 절약';
+  }
+
+  @override
   String get paywallMobilePlanPopular => '인기';
 
   @override

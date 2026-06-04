@@ -5098,6 +5098,12 @@ abstract class AppLocalizations {
   /// **'Économisez 44%'**
   String get paywallMobilePlanSavings44;
 
+  /// No description provided for @paywallMobilePlanSavingsPercent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Économisez {percent} %'**
+  String paywallMobilePlanSavingsPercent(int percent);
+
   /// No description provided for @paywallMobilePlanPopular.
   ///
   /// In fr, this message translates to:

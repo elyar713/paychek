@@ -1092,6 +1092,14 @@
   "paywallMobilePlanMonthlyBilling": "Faturado mensalmente",
   "paywallMobilePlanMonthlyCommitment": "Compromisso mensal",
   "paywallMobilePlanSavings44": "Poupe 44%",
+  "paywallMobilePlanSavingsPercent": "Poupe {percent}%",
+  "@paywallMobilePlanSavingsPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "paywallMobilePlanPopular": "Popular",
   "paywallMobileCompareFeatureCol": "Funcionalidade",
   "paywallMobileRowTrades": "Trades / mês",

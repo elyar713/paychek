@@ -955,12 +955,12 @@ async function paychekAssertStoreSubscriptionOwner(
  * @param {string} excludeUid
  * @return {Promise<string[]>}
  */
-async function paychekHintOtherActiveAppleAccounts(db, excludeUid) {
+async function paychekCollectActiveAppleEntitlements(db, excludeUid) {
   const snap = await db.collection("subscriber_entitlements")
       .where("active", "==", true)
       .limit(40)
       .get();
-  const hints = [];
+  const rows = [];
   for (const doc of snap.docs) {
     if (doc.id === excludeUid) continue;
     const d = doc.data() || {};
@@ -971,9 +971,30 @@ async function paychekHintOtherActiveAppleAccounts(db, excludeUid) {
       (`${d.appleTransactionId || ""}`.trim().length > 0 ||
         `${d.appleOriginalTransactionId || ""}`.trim().length > 0);
     if (!hasApple) continue;
-    hints.push(await paychekMaskedEmailForUid(db, doc.id));
+    let periodEndMillis = null;
+    if (
+      d.currentPeriodEnd &&
+      typeof d.currentPeriodEnd.toMillis === "function"
+    ) {
+      periodEndMillis = d.currentPeriodEnd.toMillis();
+    }
+    rows.push({
+      uid: doc.id,
+      maskedEmail: await paychekMaskedEmailForUid(db, doc.id),
+      appleProductId: `${d.appleProductId || ""}`.trim(),
+      currentPeriodEndMillis: periodEndMillis,
+    });
   }
-  return hints.slice(0, 5);
+  return rows.slice(0, 10);
+}
+
+async function paychekHintOtherActiveAppleAccounts(db, excludeUid) {
+  const rows = await paychekCollectActiveAppleEntitlements(db, excludeUid);
+  return rows.map((row) => row.maskedEmail);
+}
+
+async function paychekListActiveAppleEntitlementCandidates(db, excludeUid) {
+  return paychekCollectActiveAppleEntitlements(db, excludeUid);
 }
 
 function paychekApplyLegacyMaquetteTokens(out, vars) {
@@ -6035,6 +6056,7 @@ Object.assign(
       paychekAssertStoreSubscriptionOwner,
       paychekRevokeProEntitlement,
       paychekHintOtherActiveAppleAccounts,
+      paychekListActiveAppleEntitlementCandidates,
     }),
 );
 
@@ -6051,5 +6073,16 @@ Object.assign(
       paychekApplyTrialRemainderToPeriodEnd,
       paychekAssertStoreSubscriptionOwner,
       googlePlayServiceAccountJson: paychekGooglePlayServiceAccountJson,
+    }),
+);
+
+const paywallPricing = require("./paywall_pricing");
+Object.assign(
+    exports,
+    paywallPricing.createPaywallPricingExports({
+      onCall,
+      HttpsError,
+      admin,
+      paychekStripeSecretKey,
     }),
 );

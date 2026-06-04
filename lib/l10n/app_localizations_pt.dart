@@ -2777,6 +2777,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get paywallMobilePlanSavings44 => 'Poupe 44%';
 
   @override
+  String paywallMobilePlanSavingsPercent(int percent) {
+    return 'Poupe $percent%';
+  }
+
+  @override
   String get paywallMobilePlanPopular => 'Popular';
 
   @override
