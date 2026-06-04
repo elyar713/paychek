@@ -39,18 +39,6 @@ extension _TradePageCore on _TradePageState {
     return items.where((t) => t.entreeAt.toLocal().isBefore(monthStart)).toList();
   }
 
-  void _scrollToTrade(String tradeId, Map<String, GlobalKey> keys) {
-    final k = keys[tradeId];
-    final ctx = k?.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOut,
-      alignment: 0.15,
-    );
-  }
-
   List<TradeListItem> get _visibleItems {
     final all = activeJournalTradesOrDemo(context);
     List<TradeListItem> out;

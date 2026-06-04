@@ -5254,6 +5254,36 @@ abstract class AppLocalizations {
   /// **'Paiement via App Store • Annulable à tout moment • Conditions d’utilisation'**
   String get paywallLegalFooterApple;
 
+  /// No description provided for @paywallGooglePlayStoreUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Google Play indisponible. Utilise l’app Paychek sur Android avec une connexion réseau, puis réessaie.'**
+  String get paywallGooglePlayStoreUnavailable;
+
+  /// No description provided for @paywallGooglePlayProductsUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements Google Play introuvables. Dans Play Console, crée paychek_monthly, paychek_quarterly et paychek_annual (Monétiser → Abonnements), ajoute un compte testeur de licence, puis réinstalle depuis le test interne.'**
+  String get paywallGooglePlayProductsUnavailable;
+
+  /// No description provided for @paywallGooglePlayVerificationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Achat reçu mais la validation serveur a échoué. Réessaie ou contacte le support.'**
+  String get paywallGooglePlayVerificationFailed;
+
+  /// No description provided for @paywallGooglePlayPurchaseError.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’achat Google Play n’a pas abouti. Réessaie dans un instant.'**
+  String get paywallGooglePlayPurchaseError;
+
+  /// No description provided for @paywallLegalFooterGooglePlay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement via Google Play • Annulable à tout moment • Conditions d’utilisation'**
+  String get paywallLegalFooterGooglePlay;
+
   /// No description provided for @paywallRestoreNothingFound.
   ///
   /// In fr, this message translates to:

@@ -65,6 +65,9 @@ import 'reglage/trial_access_prefs.dart'
         TrialAccessPrefs,
         TrialGateVm,
         kPaychekSubscriberEntitlementsCollection;
+import 'reglage/paychek_google_entitlement_sync.dart';
+import 'reglage/paychek_google_play_iap_service.dart';
+import 'reglage/paychek_subscription_platform.dart';
 import 'reglage/trial_paywall_overlay.dart';
 import 'reglage/lite_freemium_page_lock.dart';
 import 'reglage/paychek_gold_upgrade_sheet.dart';
@@ -231,21 +234,41 @@ class _DashboardPageState extends State<DashboardPage>
     _reloadStrategieHomePreview();
     StrategieRealtimeNotifier.tick.addListener(_reloadStrategieHomePreview);
     ChecklistRealtimeNotifier.tick.addListener(_onChecklistCloudTick);
-    TrialAccessPrefs.loadGateStateAndAccountEntitlement().then((pair) {
-      if (!mounted) return;
-      setState(() {
-        _trialGate = pair.gate;
-        _accountEntitlement = pair.entitlement;
-        if (pair.gate.liteFreemiumRestricted &&
-            FirebaseAuth.instance.currentUser != null &&
-            _bodyIndex == 1) {
-          _bodyIndex = 2;
-          _shellBodyIndexNotifier?.value = 2;
-        }
-      });
-      _maybeAutoPromptLitePaywall(pair.gate);
-    });
+    unawaited(_bootstrapTrialGateAndEntitlement());
     _bindSubscriberEntitlementListener();
+  }
+
+  /// Android : sync Play **avant** le statut affiché (évite Pro fantôme avec date 2027).
+  Future<void> _bootstrapTrialGateAndEntitlement() async {
+    if (paychekUsesNativeGooglePlayIap &&
+        FirebaseAuth.instance.currentUser != null) {
+      await PaychekGoogleEntitlementSync.syncFromServer();
+    }
+    final pair = await TrialAccessPrefs.loadGateStateAndAccountEntitlement(
+      forceServer: true,
+    );
+    if (!mounted) return;
+    setState(() {
+      _trialGate = pair.gate;
+      _accountEntitlement = pair.entitlement;
+      if (pair.gate.liteFreemiumRestricted &&
+          FirebaseAuth.instance.currentUser != null &&
+          _bodyIndex == 1) {
+        _bodyIndex = 2;
+        _shellBodyIndexNotifier?.value = 2;
+      }
+    });
+    _maybeAutoPromptLitePaywall(pair.gate);
+    if (paychekUsesNativeGooglePlayIap) {
+      unawaited(_restoreGooglePlayPurchasesOnly());
+    }
+  }
+
+  Future<void> _restoreGooglePlayPurchasesOnly() async {
+    await PaychekGooglePlayIapService.ensureInitialized();
+    await PaychekGooglePlayIapService.restorePurchases();
+    if (!mounted) return;
+    await _reloadTrialGate(forceServer: true);
   }
 
   void _applyMobileSystemChrome() {
@@ -354,8 +377,10 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
-  Future<bool> _reloadTrialGate() async {
-    final pair = await TrialAccessPrefs.loadGateStateAndAccountEntitlement();
+  Future<bool> _reloadTrialGate({bool forceServer = true}) async {
+    final pair = await TrialAccessPrefs.loadGateStateAndAccountEntitlement(
+      forceServer: forceServer,
+    );
     if (!mounted) return true;
     final vm = pair.gate;
     final acc = pair.entitlement;

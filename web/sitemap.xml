@@ -13,6 +13,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://paychek.pro/privacy-en.html</loc>
+    <lastmod>2026-06-04</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://paychek.pro/terms.html</loc>
     <lastmod>2026-05-19</lastmod>
     <changefreq>yearly</changefreq>

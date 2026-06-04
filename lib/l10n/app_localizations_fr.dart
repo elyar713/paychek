@@ -2874,6 +2874,26 @@ class AppLocalizationsFr extends AppLocalizations {
       'Paiement via App Store • Annulable à tout moment • Conditions d’utilisation';
 
   @override
+  String get paywallGooglePlayStoreUnavailable =>
+      'Google Play indisponible. Utilise l’app Paychek sur Android avec une connexion réseau, puis réessaie.';
+
+  @override
+  String get paywallGooglePlayProductsUnavailable =>
+      'Abonnements Google Play introuvables. Dans Play Console, crée paychek_monthly, paychek_quarterly et paychek_annual (Monétiser → Abonnements), ajoute un compte testeur de licence, puis réinstalle depuis le test interne.';
+
+  @override
+  String get paywallGooglePlayVerificationFailed =>
+      'Achat reçu mais la validation serveur a échoué. Réessaie ou contacte le support.';
+
+  @override
+  String get paywallGooglePlayPurchaseError =>
+      'L’achat Google Play n’a pas abouti. Réessaie dans un instant.';
+
+  @override
+  String get paywallLegalFooterGooglePlay =>
+      'Paiement via Google Play • Annulable à tout moment • Conditions d’utilisation';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Toujours bloqué : aucun abonnement détecté. Termine l’achat ou réessaie.';
 

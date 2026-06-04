@@ -2871,6 +2871,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Abrechnung über App Store • Jederzeit kündbar • Nutzungsbedingungen';
 
   @override
+  String get paywallGooglePlayStoreUnavailable =>
+      'Google Play nicht verfügbar. Nutze die Paychek-Android-App, prüfe die Verbindung und versuche es erneut.';
+
+  @override
+  String get paywallGooglePlayProductsUnavailable =>
+      'Google-Play-Abos nicht gefunden. Erstelle in der Play Console paychek_monthly, paychek_quarterly und paychek_annual unter Monetarisierung → Abos, verknüpfe einen Lizenz-Tester und installiere die App aus dem internen Test neu.';
+
+  @override
+  String get paywallGooglePlayVerificationFailed =>
+      'Kauf erhalten, Servervalidierung fehlgeschlagen. Erneut versuchen oder Support kontaktieren.';
+
+  @override
+  String get paywallGooglePlayPurchaseError =>
+      'Google-Play-Kauf nicht abgeschlossen. Bitte gleich erneut versuchen.';
+
+  @override
+  String get paywallLegalFooterGooglePlay =>
+      'Abrechnung über Google Play • Jederzeit kündbar • Nutzungsbedingungen';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Noch gesperrt: kein aktives Abonnement erkannt.';
 

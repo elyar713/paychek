@@ -3,9 +3,11 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 
 import 'paychek_apple_entitlement_sync.dart';
 import 'paychek_apple_iap_product_ids.dart';
+import 'paychek_apple_transaction_jws.dart';
 import 'paychek_billing_plan.dart';
 
 enum PaychekAppleIapPurchaseOutcome {
@@ -100,6 +102,7 @@ abstract final class PaychekAppleIapService {
     final completer = Completer<PaychekAppleIapPurchaseOutcome>();
     _pending[restoreKey] = completer;
 
+    await _syncStoreKit2Transactions();
     await _iap.restorePurchases();
 
     return completer.future.timeout(
@@ -146,7 +149,25 @@ abstract final class PaychekAppleIapService {
           break;
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          final jws = purchase.verificationData.serverVerificationData;
+          final jws = await _resolveAppleTransactionJws(purchase);
+          if (!paychekLooksLikeAppleTransactionJws(jws)) {
+            debugPrint(
+              '[Paychek] Apple IAP: JWS invalide pour $productId '
+              '(len=${jws.length}, sk2=${purchase is SK2PurchaseDetails})',
+            );
+            PaychekAppleEntitlementSync.lastFailureMessage =
+                purchase is SK2PurchaseDetails
+                    ? 'Reçu Apple incomplet. Réessaie ou « Restaurer les achats ».'
+                    : 'Mise à jour de l’app requise (StoreKit 2) pour valider l’abonnement.';
+            _completePending(
+              pendingKey,
+              PaychekAppleIapPurchaseOutcome.verificationFailed,
+            );
+            if (purchase.pendingCompletePurchase) {
+              await _iap.completePurchase(purchase);
+            }
+            break;
+          }
           final ok = await PaychekAppleEntitlementSync.verifySignedTransaction(
             productId: productId,
             signedTransaction: jws,
@@ -173,6 +194,35 @@ abstract final class PaychekAppleIapService {
         PaychekAppleIapPurchaseOutcome.verificationFailed,
       );
     }
+  }
+
+  static Future<void> _syncStoreKit2Transactions() async {
+    if (!isSupported) return;
+    try {
+      final addition = _iap
+          .getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      await addition.sync();
+    } catch (e, st) {
+      debugPrint('[Paychek] StoreKit sync $e\n$st');
+    }
+  }
+
+  static Future<String> _resolveAppleTransactionJws(
+    PurchaseDetails purchase,
+  ) async {
+    var jws = paychekExtractAppleTransactionJws(purchase);
+    if (paychekLooksLikeAppleTransactionJws(jws)) return jws;
+
+    await _syncStoreKit2Transactions();
+    for (var attempt = 1; attempt <= 5; attempt++) {
+      await Future<void>.delayed(Duration(milliseconds: 300 * attempt));
+      jws = paychekExtractAppleTransactionJws(purchase);
+      if (paychekLooksLikeAppleTransactionJws(jws)) return jws;
+      if (attempt == 2 || attempt == 4) {
+        await _syncStoreKit2Transactions();
+      }
+    }
+    return jws;
   }
 
   static void _completePending(

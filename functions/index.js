@@ -79,6 +79,10 @@ const paychekStripeSecretKey = defineSecret("PAYCHEK_STRIPE_SECRET_KEY");
 /** Signing secret du endpoint Webhook (whsec_…). */
 const paychekStripeWebhookSecret = defineSecret("PAYCHEK_STRIPE_WEBHOOK_SECRET");
 
+const paychekGooglePlayServiceAccountJson = defineSecret(
+    "PAYCHEK_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON",
+);
+
 const COMPANY_NAME = "Paychek";
 /** Lien Base de connaissances dans l’e-mail automatique — à ajuster selon votre site réel. */
 const KNOWLEDGE_BASE_URL_FR = "https://paychek.pro/";
@@ -846,6 +850,14 @@ function paychekApplyLegacyMaquetteTokens(out, vars) {
         String(vars.nomUtilisateur) :
         "Trader";
   o = o.split("[Prénom]").join(prenom);
+  o = o.split("[Prenom]").join(prenom);
+  const clientDisplay =
+    vars.clientName != null && `${vars.clientName}`.trim() !== "" ?
+      String(vars.clientName) :
+      prenom;
+  o = o.split("[Nom]").join(clientDisplay);
+  o = o.split("[NOM]").join(clientDisplay);
+  o = o.split("[Name]").join(clientDisplay);
   if (vars.messagePreview != null && `${vars.messagePreview}`.trim() !== "") {
     const mp = String(vars.messagePreview);
     o = o.split("[Aperçu du message de l'utilisateur...]").join(mp);
@@ -875,21 +887,32 @@ function paychekApplyLegacyMaquetteTokens(out, vars) {
       String(vars.periodEndFr) :
       vars.validUntil != null && `${vars.validUntil}`.trim() !== "" ?
         String(vars.validUntil) :
+        vars.DATE_ANNIVERSAIRE != null && `${vars.DATE_ANNIVERSAIRE}`.trim() !== "" ?
+          String(vars.DATE_ANNIVERSAIRE) :
+          "—";
+  o = o.split("[Date de fin]").join(periodEnd);
+  o = o.split("[Date de renouvellement]").join(periodEnd);
+  o = o.split("[Date anniversaire]").join(periodEnd);
+  o = o.split("[DATE_ANNIVERSAIRE]").join(periodEnd);
+  o = o.split("[DATE ANNIVERSAIRE]").join(periodEnd);
+  o = o.split("[DATE DE FIN]").join(periodEnd);
+  o = o.split("[DATE_DE_FIN]").join(periodEnd);
+  o = o.split("[DATE_DE_RENOUVELLEMENT]").join(periodEnd);
+  o = o.split("[Valide jusqu'au]").join(periodEnd);
+  o = o.split("[Valide jusqu’au]").join(periodEnd);
+  o = o.split("[VALIDE JUSQU'AU]").join(periodEnd);
+  o = o.split("[VALIDE JUSQU_AU]").join(periodEnd);
+  const txn =
+    vars.txnSuffix != null && `${vars.txnSuffix}`.trim() !== "" ?
+      String(vars.txnSuffix) :
+      vars.ID_UNIQUE != null && `${vars.ID_UNIQUE}`.trim() !== "" ?
+        String(vars.ID_UNIQUE) :
         "";
-  if (periodEnd !== "") {
-    o = o.split("[Date de fin]").join(periodEnd);
-    o = o.split("[Date de renouvellement]").join(periodEnd);
-    o = o.split("[Date anniversaire]").join(periodEnd);
-    o = o.split("[DATE_ANNIVERSAIRE]").join(periodEnd);
-    o = o.split("[DATE ANNIVERSAIRE]").join(periodEnd);
-    o = o.split("[DATE DE FIN]").join(periodEnd);
-    o = o.split("[DATE_DE_FIN]").join(periodEnd);
-    o = o.split("[DATE_DE_RENOUVELLEMENT]").join(periodEnd);
-    o = o.split("[Valide jusqu'au]").join(periodEnd);
-    o = o.split("[Valide jusqu’au]").join(periodEnd);
-    o = o.split("[VALIDE JUSQU'AU]").join(periodEnd);
-    o = o.split("[VALIDE JUSQU_AU]").join(periodEnd);
-  }
+  const txnDisplay = txn || "—";
+  o = o.split("[ID_UNIQUE]").join(txnDisplay);
+  o = o.split("#PC-[ID_UNIQUE]").join(`#PC-${txnDisplay}`);
+  o = o.replace(/#PC-\[ID[\s_]*UNIQUE\]/gi, `#PC-${txnDisplay}`);
+  o = o.replace(/\[ID[\s_]*UNIQUE\]/gi, txnDisplay);
   return o;
 }
 
@@ -2400,6 +2423,8 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
 
   const placeholderVars = {
     clientName: safeClient,
+    firstName: escapeHtml(firstName || clientLine.split(/\s+/)[0] || "Trader"),
+    nomUtilisateur: safeClient,
     periodEndFr: safeEnd,
     periodEnd: safeEnd,
     validUntil: safeEnd,
@@ -2408,6 +2433,7 @@ async function paychekSendProAccessConfirmedEmail(db, passRaw, uid, session, per
     dateFin: safeEnd,
     dateFinAbonnement: safeEnd,
     txnSuffix: safeTxn,
+    ID_UNIQUE: safeTxn,
     supportHref: supportHrefEsc,
     privacyHref: privacyHrefEsc,
   };
@@ -3093,6 +3119,157 @@ async function paychekTrialRemainderMsForUid(db, uid) {
  * @param {FirebaseFirestore.Timestamp | null} proSinceUtc
  * @return {Promise<FirebaseFirestore.Timestamp | null>}
  */
+/**
+ * Met à jour `currentPeriodEnd` si absent ou plus tôt que la nouvelle date (restore / resync).
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {FirebaseFirestore.Timestamp} currentPeriodEnd
+ */
+/**
+ * Retire le Pro (abonnement expiré / annulé et période terminée côté store).
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {{provider?: string, reason?: string}} opts
+ * @return {Promise<boolean>}
+ */
+async function paychekRevokeProEntitlement(db, uid, opts = {}) {
+  const provider = `${opts.provider ?? ""}`.trim() || null;
+  const reason = `${opts.reason ?? "subscription_inactive"}`.trim();
+
+  const entRef = db.collection("subscriber_entitlements").doc(uid);
+  const entSnap = await entRef.get();
+  const entData = entSnap.exists ? entSnap.data() || {} : {};
+  const entProvider = `${entData.provider ?? ""}`.trim();
+
+  if (provider && entProvider && entProvider !== provider) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (autre fournisseur)",
+        uid,
+        entProvider,
+        provider,
+    );
+    return false;
+  }
+
+  const userRef = db.collection("paychek_users").doc(uid);
+  const userSnap = await userRef.get();
+  const userData = userSnap.exists ? userSnap.data() || {} : {};
+  const paymentMethod = `${userData.paymentMethod ?? ""}`.trim();
+  if (
+    provider === "google_play" &&
+    paymentMethod === "stripe"
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (abonnement Stripe)",
+        uid,
+    );
+    return false;
+  }
+
+  const batch = db.batch();
+  batch.set(
+      entRef,
+      {
+        active: false,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        subscriptionEndedAt: admin.firestore.FieldValue.serverTimestamp(),
+        subscriptionEndReason: reason,
+      },
+      {merge: true},
+  );
+  batch.set(
+      userRef,
+      {
+        subscriptionTier: "lite",
+        isPremium: false,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        subscriptionTierUpdatedAt:
+          admin.firestore.FieldValue.serverTimestamp(),
+      },
+      {merge: true},
+  );
+  await batch.commit();
+  console.log("paychekRevokeProEntitlement", uid, reason, provider || entProvider);
+  return true;
+}
+
+async function paychekPatchSubscriberPeriodEnd(
+    db,
+    uid,
+    currentPeriodEnd,
+    opts = {},
+) {
+  if (!currentPeriodEnd || typeof currentPeriodEnd.toMillis !== "function") {
+    return;
+  }
+  const forceReplace = opts.forceReplace === true;
+  const entRef = db.collection("subscriber_entitlements").doc(uid);
+  const snap = await entRef.get();
+  const prevEnd =
+    snap.exists &&
+    snap.data() &&
+    snap.data().currentPeriodEnd &&
+    typeof snap.data().currentPeriodEnd.toMillis === "function" ?
+      snap.data().currentPeriodEnd :
+      null;
+  let merged = currentPeriodEnd;
+  if (!forceReplace && prevEnd) {
+    merged = admin.firestore.Timestamp.fromMillis(
+        Math.max(prevEnd.toMillis(), currentPeriodEnd.toMillis()),
+    );
+  }
+  const userSnap = await db.collection("paychek_users").doc(uid).get();
+  const userPrev =
+    userSnap.exists &&
+    userSnap.data() &&
+    userSnap.data().subscriptionCurrentPeriodEnd &&
+    typeof userSnap.data().subscriptionCurrentPeriodEnd.toMillis === "function" ?
+      userSnap.data().subscriptionCurrentPeriodEnd :
+      null;
+  const userData = userSnap.exists ? userSnap.data() || {} : {};
+  const tier = `${userData.subscriptionTier || ""}`.trim().toLowerCase();
+  const needsTierMirror =
+    tier !== "pro" || userData.isPremium !== true;
+  if (
+    !needsTierMirror &&
+    prevEnd &&
+    prevEnd.toMillis() === merged.toMillis() &&
+    userPrev &&
+    userPrev.toMillis() === merged.toMillis()
+  ) {
+    return;
+  }
+  console.log(
+      "paychekPatchSubscriberPeriodEnd",
+      uid,
+      merged.toMillis(),
+      new Date(merged.toMillis()).toISOString(),
+  );
+  const batch = db.batch();
+  batch.set(
+      entRef,
+      {
+        currentPeriodEnd: merged,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      {merge: true},
+  );
+  const userPatch = {
+    subscriptionCurrentPeriodEnd: merged,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+  if (needsTierMirror) {
+    userPatch.subscriptionTier = "pro";
+    userPatch.isPremium = true;
+  }
+  batch.set(
+      db.collection("paychek_users").doc(uid),
+      userPatch,
+      {merge: true},
+  );
+  await batch.commit();
+}
+
 async function paychekApplyTrialRemainderToPeriodEnd(
     db,
     uid,
@@ -3134,6 +3311,9 @@ async function paychekGrantProEntitlement(db, uid, opts) {
     appleTransactionId = null,
     appleOriginalTransactionId = null,
     appleProductId = null,
+    googlePlayPurchaseToken = null,
+    googlePlayProductId = null,
+    googlePlayOrderId = null,
     proSinceUtc,
     currentPeriodEnd = null,
     provider = "stripe",
@@ -3160,7 +3340,52 @@ async function paychekGrantProEntitlement(db, uid, opts) {
       prev.data() &&
       prev.data().appleTransactionId === appleTransactionId
     ) {
-      return false;
+      const userSnap = await db.collection("paychek_users").doc(uid).get();
+      const tier =
+        userSnap.exists && userSnap.data() ?
+          `${userSnap.data().subscriptionTier || ""}` :
+          "";
+      if (
+        currentPeriodEnd &&
+        typeof currentPeriodEnd.toMillis === "function"
+      ) {
+        await paychekPatchSubscriberPeriodEnd(db, uid, currentPeriodEnd);
+      }
+      if (tier === "pro" && userSnap.data()?.isPremium === true) {
+        return false;
+      }
+      console.warn(
+          "paychekGrantProEntitlement: transaction Apple déjà vue, resync user Pro",
+          uid,
+      );
+    }
+  }
+  if (googlePlayPurchaseToken) {
+    const prev = await entRef.get();
+    prevSnapForMerge = prevSnapForMerge || prev;
+    if (
+      prev.exists &&
+      prev.data() &&
+      prev.data().googlePlayPurchaseToken === googlePlayPurchaseToken
+    ) {
+      const userSnap = await db.collection("paychek_users").doc(uid).get();
+      const tier =
+        userSnap.exists && userSnap.data() ?
+          `${userSnap.data().subscriptionTier || ""}` :
+          "";
+      if (
+        currentPeriodEnd &&
+        typeof currentPeriodEnd.toMillis === "function"
+      ) {
+        await paychekPatchSubscriberPeriodEnd(db, uid, currentPeriodEnd);
+      }
+      if (tier === "pro" && userSnap.data()?.isPremium === true) {
+        return false;
+      }
+      console.warn(
+          "paychekGrantProEntitlement: token Google déjà vu, resync user Pro",
+          uid,
+      );
     }
   }
 
@@ -3208,6 +3433,9 @@ async function paychekGrantProEntitlement(db, uid, opts) {
           {appleOriginalTransactionId} :
           {}),
         ...(appleProductId ? {appleProductId} : {}),
+        ...(googlePlayPurchaseToken ? {googlePlayPurchaseToken} : {}),
+        ...(googlePlayProductId ? {googlePlayProductId} : {}),
+        ...(googlePlayOrderId ? {googlePlayOrderId} : {}),
         ...(mergedPeriodEnd ? {currentPeriodEnd: mergedPeriodEnd} : {}),
       },
       {merge: true},
@@ -3227,10 +3455,15 @@ async function paychekGrantProEntitlement(db, uid, opts) {
   if (mergedPeriodEnd) {
     userPatch.subscriptionCurrentPeriodEnd = mergedPeriodEnd;
   }
+  if (provider) {
+    userPatch.paymentProvider = provider;
+  }
   if (provider === "stripe") {
     userPatch.paymentMethod = "stripe";
   } else if (provider === "apple_iap" || provider === "apple") {
     userPatch.paymentMethod = "apple_iap";
+  } else if (provider === "google_play") {
+    userPatch.paymentMethod = "google_play";
   }
   if (stripeCustomerId) {
     userPatch.stripeCustomerId = stripeCustomerId;
@@ -4723,6 +4956,51 @@ exports.syncPaychekStripeEntitlement = onCall(
 );
 
 /**
+ * Portail client Stripe (annulation, carte, factures) — web Pro.
+ */
+exports.createPaychekStripeBillingPortal = onCall(
+    {
+      region: "europe-west1",
+      secrets: [paychekStripeSecretKey],
+      timeoutSeconds: 30,
+      memory: "256MiB",
+    },
+    async (request) => {
+      if (!request.auth) {
+        throw new HttpsError("unauthenticated", "Connexion requise.");
+      }
+      const key = paychekStripeSecretKey.value().trim();
+      if (!key) {
+        throw new HttpsError(
+            "failed-precondition",
+            "Stripe non configuré.",
+        );
+      }
+      const db = admin.firestore();
+      const uid = request.auth.uid;
+      const userSnap = await db.collection("paychek_users").doc(uid).get();
+      const customerId = `${userSnap.data()?.stripeCustomerId ?? ""}`.trim();
+      if (!customerId) {
+        throw new HttpsError(
+            "failed-precondition",
+            "Aucun abonnement Stripe lié à ce compte.",
+        );
+      }
+      const returnUrl = `${request.data?.returnUrl ?? ""}`.trim() ||
+        "https://paychek.pro/";
+      const stripe = new Stripe(key);
+      const portal = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
+      });
+      if (!portal.url) {
+        throw new HttpsError("internal", "Portail Stripe indisponible.");
+      }
+      return {url: portal.url};
+    },
+);
+
+/**
  * Console admin : force la synchro Stripe → Firestore pour un utilisateur cible.
  */
 exports.adminSyncPaychekStripeEntitlement = onCall(
@@ -5336,5 +5614,19 @@ Object.assign(
       admin,
       paychekGrantProEntitlement,
       paychekApplyTrialRemainderToPeriodEnd,
+    }),
+);
+
+const googlePlayIap = require("./google_play_iap");
+Object.assign(
+    exports,
+    googlePlayIap.createGooglePlayIapExports({
+      onCall,
+      HttpsError,
+      admin,
+      paychekGrantProEntitlement,
+      paychekRevokeProEntitlement,
+      paychekPatchSubscriberPeriodEnd,
+      googlePlayServiceAccountJson: paychekGooglePlayServiceAccountJson,
     }),
 );

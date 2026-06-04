@@ -66,6 +66,10 @@ class AdminUserRow {
     this.subscriptionTierUpdatedAt,
     this.subscriptionCurrentPeriodEnd,
     this.subscriptionProSinceUtc,
+    this.googlePlayProductId,
+    this.subscriberEntitlementActive = false,
+    this.subscriptionEndedAtUtc,
+    this.subscriptionEndReason,
   });
 
   final String id;
@@ -113,11 +117,70 @@ class AdminUserRow {
   /// Miroir Functions : début période Pro (`proSinceUtc`).
   final DateTime? subscriptionProSinceUtc;
 
+  /// Produit Play stocké dans `subscriber_entitlements` (sync admin / affichage échéance).
+  final String? googlePlayProductId;
+
+  /// `subscriber_entitlements.active` (achat validé même si `paychek_users` encore Lite).
+  final bool subscriberEntitlementActive;
+
+  /// Dernière révocation / expiration enregistrée (`subscriber_entitlements`).
+  final DateTime? subscriptionEndedAtUtc;
+
+  /// Ex. `google_play_expired_or_inactive`.
+  final String? subscriptionEndReason;
+
   /// Jours civils UTC (`yyyy-MM-dd`) avec au moins une ouverture app (voir [kPaychekUserFieldAppOpenDatesUtcV1]).
   final List<String> appOpenDatesUtc;
 
   /// Formule avec accès Premium (tier Pro).
   bool get hasPaidPlan => subscriptionTier == PaychekSubscriptionTier.pro;
+
+  /// Pro Firestore ou abonnement actif dans `subscriber_entitlements`.
+  bool get hasEffectiveProAccess =>
+      hasPaidPlan || subscriberEntitlementActive;
+
+  AdminUserRow copyWith({
+    DateTime? subscriptionCurrentPeriodEnd,
+    DateTime? subscriptionProSinceUtc,
+    String? googlePlayProductId,
+    bool? subscriberEntitlementActive,
+    DateTime? subscriptionEndedAtUtc,
+    String? subscriptionEndReason,
+  }) {
+    return AdminUserRow(
+      id: id,
+      email: email,
+      joinedAt: joinedAt,
+      country: country,
+      subscriptionTier: subscriptionTier,
+      firstName: firstName,
+      lastName: lastName,
+      birthDate: birthDate,
+      paymentMethod: paymentMethod,
+      importedTrades: importedTrades,
+      platformsSeen: platformsSeen,
+      lastSeenPlatform: lastSeenPlatform,
+      accessWebEnabled: accessWebEnabled,
+      accessMobileEnabled: accessMobileEnabled,
+      appLanguageCode: appLanguageCode,
+      trialFreemiumOverrideUntil: trialFreemiumOverrideUntil,
+      lastSeenAt: lastSeenAt,
+      appOpenDatesUtc: appOpenDatesUtc,
+      subscriptionTierUpdatedAt: subscriptionTierUpdatedAt,
+      subscriptionCurrentPeriodEnd:
+          subscriptionCurrentPeriodEnd ?? this.subscriptionCurrentPeriodEnd,
+      subscriptionProSinceUtc:
+          subscriptionProSinceUtc ?? this.subscriptionProSinceUtc,
+      googlePlayProductId:
+          googlePlayProductId ?? this.googlePlayProductId,
+      subscriberEntitlementActive: subscriberEntitlementActive ??
+          this.subscriberEntitlementActive,
+      subscriptionEndedAtUtc:
+          subscriptionEndedAtUtc ?? this.subscriptionEndedAtUtc,
+      subscriptionEndReason:
+          subscriptionEndReason ?? this.subscriptionEndReason,
+    );
+  }
 }
 
 class AdminLiveFeedItem {

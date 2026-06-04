@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../reglage/paychek_billing_plan.dart';
 import 'admin_models.dart';
 import 'admin_stripe_checkout_history.dart';
+import 'admin_subscription_trace.dart';
 
 /// Synthèse facturation affichée sur le profil admin (montant, date, cycle).
 class AdminUserBillingSummary {
@@ -87,7 +88,9 @@ Future<AdminUserBillingSummary> resolveAdminUserBillingSummary({
   required AdminUserRow user,
   required DateFormat dateFormat,
 }) async {
-  if (!user.hasPaidPlan) return AdminUserBillingSummary.empty;
+  if (!adminUserHadSubscriptionHistory(user)) {
+    return AdminUserBillingSummary.empty;
+  }
 
   final paidAtUtc =
       user.subscriptionProSinceUtc ?? user.subscriptionTierUpdatedAt;
@@ -95,6 +98,16 @@ Future<AdminUserBillingSummary> resolveAdminUserBillingSummary({
     periodStartUtc: paidAtUtc,
     periodEndUtc: user.subscriptionCurrentPeriodEnd,
   );
+  final productId = user.googlePlayProductId?.trim().toLowerCase() ?? '';
+  if (cycle == null && productId.isNotEmpty) {
+    if (productId.contains('annual')) {
+      cycle = PaychekBillingCycle.annual;
+    } else if (productId.contains('quarterly')) {
+      cycle = PaychekBillingCycle.quarterly;
+    } else if (productId.contains('monthly')) {
+      cycle = PaychekBillingCycle.monthly;
+    }
+  }
 
   String amountLabel = '—';
   String paidAtLabel =

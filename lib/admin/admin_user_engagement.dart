@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../reglage/paychek_subscription_period_resolver.dart';
+import '../reglage/trial_access_prefs.dart';
 import 'admin_models.dart';
 
 /// Fin d’accès plein (freemium) : override admin sinon inscription + 7 j (UTC).
@@ -8,9 +10,28 @@ DateTime paychekAdminEffectiveTrialEndUtc(AdminUserRow u) {
   return u.trialFreemiumOverrideUntil ?? u.joinedAt.toUtc().add(trial);
 }
 
+/// Date « échéance » affichée dans le tableau admin : fin Pro si abonné, sinon fin d’essai.
+DateTime paychekAdminDisplayDueDateUtc(AdminUserRow u) {
+  if (u.hasEffectiveProAccess) {
+    final proSince = u.subscriptionProSinceUtc ?? u.subscriptionTierUpdatedAt;
+    final period = paychekResolveStoredSubscriptionPeriodEndUtc(
+      periodEndUtc: u.subscriptionCurrentPeriodEnd,
+      proSinceUtc: proSince,
+      storeProductId: u.googlePlayProductId,
+      trialEndUtc: paychekAdminEffectiveTrialEndUtc(u),
+    );
+    final proEnd = TrialAccessPrefs.proSubscriptionAdminEndUtc(
+      proSinceUtc: proSince,
+      subscriptionPeriodEndUtc: period,
+    );
+    if (proEnd != null) return proEnd;
+  }
+  return paychekAdminEffectiveTrialEndUtc(u);
+}
+
 /// Libellé court « jours restants » avant fin essai (Lite). Pro → libellé dédié.
 String paychekAdminTrialDaysRemainingShort(AdminUserRow u) {
-  if (u.hasPaidPlan) return 'Pro';
+  if (u.hasEffectiveProAccess) return 'Pro';
   final end = paychekAdminEffectiveTrialEndUtc(u);
   final now = DateTime.now().toUtc();
   if (!end.isAfter(now)) return '0 j';

@@ -2,6 +2,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import 'paychek_entitlement_local_sync.dart';
+
 /// Région des Cloud Functions Paychek (webhook, sync Stripe, support).
 const String kPaychekFunctionsRegion = 'europe-west1';
 
@@ -25,6 +27,7 @@ class PaychekStripeEntitlementSync {
         final result = await callable.call<Object?>();
         final data = result.data;
         if (data is Map && data['active'] == true) {
+          await PaychekEntitlementLocalSync.markPurchaseVerified();
           return true;
         }
       } on FirebaseFunctionsException catch (e, st) {

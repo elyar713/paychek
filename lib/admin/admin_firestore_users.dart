@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../reglage/paychek_user_firestore.dart';
 import '../reglage/reglage_language_prefs.dart';
+import '../reglage/trial_access_prefs.dart';
 import 'admin_models.dart';
 
 String _adminFirestoreStr(Object? v) => v?.toString().trim() ?? '';
@@ -44,8 +45,13 @@ AdminUserRow adminUserRowFromFirestore(
       paymentMethod = 'stripe';
     } else if (PaychekSubscriptionTierX.fromFirestoreMap(d) ==
         PaychekSubscriptionTier.pro) {
-      final provider = _adminFirestoreStr(d['paymentProvider']);
-      if (provider == 'stripe') paymentMethod = 'stripe';
+      final provider = _adminFirestoreStr(d['paymentProvider']).toLowerCase();
+      paymentMethod = switch (provider) {
+        'stripe' => 'stripe',
+        'apple' || 'apple_iap' => 'apple_iap',
+        'google' || 'google_play' => 'google_play',
+        _ => paymentMethod,
+      };
     }
   }
   final platformsRaw = d['platformsSeen'];
@@ -77,17 +83,13 @@ AdminUserRow adminUserRowFromFirestore(
     subscriptionTierUpdatedAt = rawTierUp.toDate().toUtc();
   }
 
-  DateTime? subscriptionCurrentPeriodEnd;
-  final rawSubEnd = d[kPaychekUserFieldSubscriptionCurrentPeriodEnd];
-  if (rawSubEnd is Timestamp) {
-    subscriptionCurrentPeriodEnd = rawSubEnd.toDate().toUtc();
-  }
+  final subscriptionCurrentPeriodEnd = paychekParseFirestoreInstantUtc(
+    d[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
+  );
 
-  DateTime? subscriptionProSinceUtc;
-  final rawSubSince = d[kPaychekUserFieldSubscriptionProSinceUtc];
-  if (rawSubSince is Timestamp) {
-    subscriptionProSinceUtc = rawSubSince.toDate().toUtc();
-  }
+  final subscriptionProSinceUtc = paychekParseFirestoreInstantUtc(
+    d[kPaychekUserFieldSubscriptionProSinceUtc],
+  );
 
   DateTime? lastSeenAt;
   final rawSeen = d['lastSeenAt'];
@@ -136,3 +138,83 @@ Query<Map<String, dynamic>> paychekUsersOrderedQuery() => FirebaseFirestore
     .instance
     .collection(kPaychekUsersCollection)
     .orderBy('lastSeenAt', descending: true);
+
+DateTime? _adminLatestPeriodEndUtc(DateTime? a, DateTime? b) {
+  if (a == null) return b;
+  if (b == null) return a;
+  return a.isAfter(b) ? a : b;
+}
+
+/// Fusionne la fin Pro : max(`paychek_users`, `subscriber_entitlements`).
+AdminUserRow adminUserRowMergeEntitlementData(
+  AdminUserRow u,
+  Map<String, dynamic>? entData,
+) {
+  if (entData == null) return u;
+  DateTime? periodEnd = u.subscriptionCurrentPeriodEnd;
+  final entPeriod = paychekParseFirestoreInstantUtc(entData['currentPeriodEnd']);
+  if (entPeriod != null) {
+    periodEnd = _adminLatestPeriodEndUtc(periodEnd, entPeriod);
+  }
+  DateTime? proSince = u.subscriptionProSinceUtc;
+  for (final key in ['proSinceUtc', 'proSince']) {
+    final entSince = paychekParseFirestoreInstantUtc(entData[key]);
+    if (entSince != null) {
+      proSince = proSince == null
+          ? entSince
+          : (entSince.isBefore(proSince) ? entSince : proSince);
+      break;
+    }
+  }
+  final productRaw = entData['googlePlayProductId']?.toString().trim();
+  final productId =
+      productRaw != null && productRaw.isNotEmpty ? productRaw : null;
+  final entActive = entData['active'] == true;
+  final endedAt =
+      paychekParseFirestoreInstantUtc(entData['subscriptionEndedAt']);
+  final endReason = entData['subscriptionEndReason']?.toString().trim();
+  final subscriptionEndReason =
+      endReason != null && endReason.isNotEmpty ? endReason : null;
+  if (periodEnd == u.subscriptionCurrentPeriodEnd &&
+      proSince == u.subscriptionProSinceUtc &&
+      productId == u.googlePlayProductId &&
+      entActive == u.subscriberEntitlementActive &&
+      endedAt == u.subscriptionEndedAtUtc &&
+      subscriptionEndReason == u.subscriptionEndReason) {
+    return u;
+  }
+  return u.copyWith(
+    subscriptionCurrentPeriodEnd: periodEnd,
+    subscriptionProSinceUtc: proSince,
+    googlePlayProductId: productId ?? u.googlePlayProductId,
+    subscriberEntitlementActive: entActive,
+    subscriptionEndedAtUtc: endedAt ?? u.subscriptionEndedAtUtc,
+    subscriptionEndReason: subscriptionEndReason ?? u.subscriptionEndReason,
+  );
+}
+
+/// Complète [subscriptionCurrentPeriodEnd] depuis `subscriber_entitlements` (max des deux).
+Future<List<AdminUserRow>> adminEnrichUsersWithEntitlements(
+  List<AdminUserRow> users,
+) async {
+  if (users.isEmpty) return users;
+  final db = FirebaseFirestore.instance;
+  const chunkSize = 10;
+  final out = <AdminUserRow>[];
+  for (var i = 0; i < users.length; i += chunkSize) {
+    final end = i + chunkSize < users.length ? i + chunkSize : users.length;
+    final chunk = users.sublist(i, end);
+    final refs = chunk
+        .map(
+          (u) => db
+              .collection(kPaychekSubscriberEntitlementsCollection)
+              .doc(u.id),
+        )
+        .toList();
+    final snaps = await Future.wait(refs.map((ref) => ref.get()));
+    for (var j = 0; j < chunk.length; j++) {
+      out.add(adminUserRowMergeEntitlementData(chunk[j], snaps[j].data()));
+    }
+  }
+  return out;
+}

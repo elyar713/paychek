@@ -15,6 +15,8 @@ import '../widgets/paychek_minimal_upgrade_button.dart';
 import '../web/paychek_web_tokens.dart';
 import 'paychek_change_password_dialog.dart';
 import 'paychek_gold_upgrade_sheet.dart';
+import 'paychek_google_entitlement_sync.dart';
+import 'paychek_subscription_platform.dart';
 import 'subscription_launch_helper.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_prefs.dart';
@@ -263,9 +265,14 @@ class _ReglageProfileViewPageState extends State<ReglageProfileViewPage>
   }
 
   Future<void> _loadEntitlement() async {
-    final s = await TrialAccessPrefs.loadAccountEntitlement();
+    if (paychekUsesNativeGooglePlayIap) {
+      await PaychekGoogleEntitlementSync.syncFromServer();
+    }
+    final s = await TrialAccessPrefs.loadGateStateAndAccountEntitlement(
+      forceServer: true,
+    );
     if (!mounted) return;
-    setState(() => _entitlement = s);
+    setState(() => _entitlement = s.entitlement);
   }
 
   Future<void> _openSubscriptionCheckout() async {
@@ -790,10 +797,6 @@ class _AccountStatusCard extends StatelessWidget {
             proEndForUi.toLocal(),
           ),
         );
-      } else if (s.trialEndUtc != null) {
-        proPeriodFooterLine = l10n.profileTrialEndsOn(
-          DateFormat.yMMMd(localeTag).format(s.trialEndUtc!.toLocal()),
-        );
       }
     }
 
@@ -994,7 +997,7 @@ class _SubscriptionActionButton extends StatelessWidget {
     return FilledButton(
       onPressed: () async {
         if (isPro) {
-          await openPaychekSubscriptionManagement();
+          await openPaychekSubscriptionManagement(context: context);
         } else {
           await onNonProSubscribe();
         }

@@ -70,6 +70,12 @@ async function decodeAppleTransaction(signedTransaction, bundleId) {
  * @param {object} tx decoded transaction
  * @return {boolean}
  */
+function isLikelyAppleTransactionJws(signedTransaction) {
+  const t = `${signedTransaction || ""}`.trim();
+  const parts = t.split(".");
+  return parts.length === 3 && parts[0].startsWith("eyJ");
+}
+
 function appleTransactionGrantsPro(tx) {
   const revoked = tx.revocationDate != null;
   if (revoked) return false;
@@ -78,6 +84,60 @@ function appleTransactionGrantsPro(tx) {
     return expires > Date.now();
   }
   return true;
+}
+
+/**
+ * @param {string} productId
+ * @param {number} startMs
+ * @return {number}
+ */
+function inferApplePeriodEndMillis(productId, startMs = Date.now()) {
+  const id = `${productId || ""}`.toLowerCase();
+  const d = new Date(startMs);
+  const y = d.getUTCFullYear();
+  const m = d.getUTCMonth();
+  const day = d.getUTCDate();
+  const h = d.getUTCHours();
+  const min = d.getUTCMinutes();
+  const sec = d.getUTCSeconds();
+  const ms = d.getUTCMilliseconds();
+  if (id.includes("annual")) {
+    return Date.UTC(y + 1, m, day, h, min, sec, ms);
+  }
+  if (id.includes("quarterly")) {
+    return Date.UTC(y, m + 3, day, h, min, sec, ms);
+  }
+  return Date.UTC(y, m + 1, day, h, min, sec, ms);
+}
+
+/**
+ * @param {object} tx
+ * @param {string} productId
+ * @return {number|null}
+ */
+function resolveApplePeriodEndMillis(tx, productId) {
+  const startMs =
+    typeof tx.purchaseDate === "number" ? tx.purchaseDate : Date.now();
+  let expiryMs = null;
+  if (tx.expiresDate != null && typeof tx.expiresDate === "number") {
+    expiryMs = tx.expiresDate;
+  }
+  const inferred = inferApplePeriodEndMillis(productId, startMs);
+  if (expiryMs == null || !Number.isFinite(expiryMs)) {
+    return inferred;
+  }
+  const span = expiryMs - startMs;
+  const id = `${productId || ""}`.toLowerCase();
+  let minSpanMs = 25 * 24 * 60 * 60 * 1000;
+  if (id.includes("annual")) {
+    minSpanMs = 300 * 24 * 60 * 60 * 1000;
+  } else if (id.includes("quarterly")) {
+    minSpanMs = 60 * 24 * 60 * 60 * 1000;
+  }
+  if (span < minSpanMs && expiryMs > Date.now()) {
+    return Math.max(expiryMs, inferred);
+  }
+  return expiryMs;
 }
 
 /**
@@ -104,10 +164,8 @@ async function grantProFromAppleTransaction(
     throw new Error("apple_transaction_id_missing");
   }
 
-  let currentPeriodEnd = null;
-  if (tx.expiresDate != null && typeof tx.expiresDate === "number") {
-    currentPeriodEnd = admin.firestore.Timestamp.fromMillis(tx.expiresDate);
-  }
+  const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
+  let currentPeriodEnd = admin.firestore.Timestamp.fromMillis(periodEndMs);
   const purchaseMs =
     typeof tx.purchaseDate === "number" ? tx.purchaseDate : Date.now();
   const proSinceUtc = admin.firestore.Timestamp.fromMillis(purchaseMs);
@@ -130,6 +188,72 @@ async function grantProFromAppleTransaction(
 }
 
 /**
+ * Re-synchronise Pro depuis les champs Apple déjà stockés (admin / réparation).
+ *
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {object} ent
+ * @param {function} paychekGrantProEntitlement
+ * @param {import("firebase-admin")} admin
+ */
+async function resyncProFromStoredAppleEntitlement(
+    db,
+    uid,
+    ent,
+    paychekGrantProEntitlement,
+    admin,
+) {
+  const productId = `${ent.appleProductId || ""}`.trim();
+  const transactionId = `${ent.appleTransactionId || ""}`.trim();
+  const originalId =
+    `${ent.appleOriginalTransactionId || transactionId}`.trim();
+  if (!productId || !transactionId) {
+    throw new Error("apple_stored_purchase_missing");
+  }
+
+  let currentPeriodEnd = ent.currentPeriodEnd || null;
+  if (
+    !currentPeriodEnd ||
+    typeof currentPeriodEnd.toMillis !== "function"
+  ) {
+    const proSince =
+      ent.proSinceUtc && typeof ent.proSinceUtc.toMillis === "function" ?
+        ent.proSinceUtc.toMillis() :
+        Date.now();
+    currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
+        inferApplePeriodEndMillis(productId, proSince),
+    );
+  }
+
+  const proSinceUtc =
+    ent.proSinceUtc && typeof ent.proSinceUtc.toMillis === "function" ?
+      ent.proSinceUtc :
+      admin.firestore.Timestamp.fromMillis(Date.now());
+
+  const granted = await paychekGrantProEntitlement(db, uid, {
+    provider: "apple_iap",
+    appleTransactionId: transactionId,
+    appleOriginalTransactionId: originalId,
+    appleProductId: productId,
+    proSinceUtc,
+    currentPeriodEnd,
+  });
+
+  const periodMs =
+    currentPeriodEnd && typeof currentPeriodEnd.toMillis === "function" ?
+      currentPeriodEnd.toMillis() :
+      null;
+
+  return {
+    active: true,
+    granted,
+    reason: granted ? "stored_apple_resync" : "stored_apple_already_synced",
+    currentPeriodEndMillis: periodMs,
+    message: "Abonnement Apple resynchronisé depuis Firestore.",
+  };
+}
+
+/**
  * @param {object} deps
  * @return {object} named Cloud Function exports
  */
@@ -146,60 +270,194 @@ function createAppleIapExports(deps) {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Connexion requise.");
     }
-    const signedTransaction =
-      `${request.data?.signedTransaction ?? ""}`.trim();
-    const productId = `${request.data?.productId ?? ""}`.trim();
-    if (!signedTransaction || !productId) {
-      throw new HttpsError("invalid-argument", "Transaction Apple invalide.");
-    }
-    if (!DEFAULT_PRODUCT_IDS.has(productId)) {
-      const remoteIds = request.data?.allowedProductIds;
-      if (!Array.isArray(remoteIds) || !remoteIds.includes(productId)) {
-        throw new HttpsError("invalid-argument", "Produit inconnu.");
+    try {
+      const signedTransaction =
+        `${request.data?.signedTransaction ?? ""}`.trim();
+      let productId = `${request.data?.productId ?? ""}`.trim();
+      if (!signedTransaction || !productId) {
+        throw new HttpsError(
+            "invalid-argument",
+            "Transaction Apple invalide (données manquantes).",
+        );
       }
-    }
+      if (!isLikelyAppleTransactionJws(signedTransaction)) {
+        throw new HttpsError(
+            "invalid-argument",
+            "Reçu Apple invalide (JWS StoreKit 2 attendu). " +
+            "Réessaie ou restaure l’achat depuis l’app.",
+        );
+      }
+      if (!DEFAULT_PRODUCT_IDS.has(productId)) {
+        const remoteIds = request.data?.allowedProductIds;
+        if (!Array.isArray(remoteIds) || !remoteIds.includes(productId)) {
+          throw new HttpsError("invalid-argument", "Produit inconnu.");
+        }
+      }
 
-    const bundleId = PAYCHEK_IOS_BUNDLE_ID;
-    const tx = await decodeAppleTransaction(signedTransaction, bundleId);
-    if (!appleTransactionGrantsPro(tx)) {
-      return {active: false, reason: "expired_or_revoked"};
-    }
+      const bundleId = PAYCHEK_IOS_BUNDLE_ID;
+      const tx = await decodeAppleTransaction(signedTransaction, bundleId);
+      const txProductId = `${tx.productId || ""}`.trim();
+      if (txProductId && DEFAULT_PRODUCT_IDS.has(txProductId)) {
+        productId = txProductId;
+      }
+      if (!appleTransactionGrantsPro(tx)) {
+        return {active: false, reason: "expired_or_revoked"};
+      }
 
-    const db = admin.firestore();
-    const uid = request.auth.uid;
-    const granted = await grantProFromAppleTransaction(
-        db,
-        uid,
-        tx,
-        productId,
-        paychekGrantProEntitlement,
-        paychekApplyTrialRemainderToPeriodEnd,
-        admin,
-    );
-    return {active: true, granted};
+      const db = admin.firestore();
+      const uid = request.auth.uid;
+      const granted = await grantProFromAppleTransaction(
+          db,
+          uid,
+          tx,
+          productId,
+          paychekGrantProEntitlement,
+          paychekApplyTrialRemainderToPeriodEnd,
+          admin,
+      );
+      const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
+      return {
+        active: true,
+        granted,
+        currentPeriodEndMillis: periodEndMs,
+      };
+    } catch (e) {
+      console.error("[Paychek] verifyPaychekApplePurchase", e);
+      if (e instanceof HttpsError) throw e;
+      const msg = e && e.message ? String(e.message) : "apple_verify_failed";
+      if (
+        msg.includes("signedTransaction_missing") ||
+        msg.includes("apple_jws")
+      ) {
+        throw new HttpsError(
+            "invalid-argument",
+            "Reçu Apple invalide (JWS). Réessaie ou restaure l’achat.",
+        );
+      }
+      throw new HttpsError("internal", msg);
+    }
   }
 
-  const verifyPaychekApplePurchase = onCall(
-      {
-        region: "europe-west1",
-        timeoutSeconds: 60,
-        memory: "256MiB",
-      },
-      verifyAndGrant,
-  );
+  async function syncStoredAppleEntitlement(request) {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Connexion requise.");
+    }
+    try {
+      const db = admin.firestore();
+      let targetUid = `${request.auth.uid || ""}`.trim();
+      const requested = `${request.data?.targetUserId ?? ""}`.trim();
+      if (requested && requested !== targetUid) {
+        if (request.auth.token.admin !== true) {
+          throw new HttpsError(
+              "permission-denied",
+              "Réservé aux administrateurs.",
+          );
+        }
+        targetUid = requested;
+      }
 
-  const restorePaychekAppleEntitlement = onCall(
-      {
-        region: "europe-west1",
-        timeoutSeconds: 60,
-        memory: "256MiB",
-      },
-      verifyAndGrant,
-  );
+      const entSnap =
+        await db.collection("subscriber_entitlements").doc(targetUid).get();
+      const ent = entSnap.exists ? entSnap.data() || {} : {};
+      const signedTransaction =
+        `${request.data?.signedTransaction ?? ""}`.trim();
+
+      if (signedTransaction) {
+        const productId =
+          `${ent.appleProductId || request.data?.productId || ""}`.trim();
+        if (!productId) {
+          throw new HttpsError(
+              "failed-precondition",
+              "Produit Apple manquant pour ce compte.",
+          );
+        }
+        const tx = await decodeAppleTransaction(
+            signedTransaction,
+            PAYCHEK_IOS_BUNDLE_ID,
+        );
+        if (!appleTransactionGrantsPro(tx)) {
+          return {
+            active: false,
+            reason: "expired_or_revoked",
+            message: "Transaction Apple expirée ou révoquée.",
+          };
+        }
+        const granted = await grantProFromAppleTransaction(
+            db,
+            targetUid,
+            tx,
+            productId,
+            paychekGrantProEntitlement,
+            paychekApplyTrialRemainderToPeriodEnd,
+            admin,
+        );
+        return {
+          active: true,
+          granted,
+          reason: "jws_verified",
+          currentPeriodEndMillis: resolveApplePeriodEndMillis(tx, productId),
+        };
+      }
+
+      const hasApple =
+        `${ent.appleProductId || ""}`.trim().length > 0 &&
+        (`${ent.appleTransactionId || ""}`.trim().length > 0 ||
+          `${ent.appleOriginalTransactionId || ""}`.trim().length > 0);
+      if (!hasApple) {
+        throw new HttpsError(
+            "failed-precondition",
+            "Aucun achat Apple enregistré pour ce compte.",
+        );
+      }
+
+      const periodEnd =
+        ent.currentPeriodEnd &&
+        typeof ent.currentPeriodEnd.toMillis === "function" ?
+          ent.currentPeriodEnd.toMillis() :
+          null;
+      if (ent.active !== true && periodEnd != null && periodEnd <= Date.now()) {
+        return {
+          active: false,
+          reason: "expired_or_inactive",
+          currentPeriodEndMillis: periodEnd,
+          message: "Abonnement Apple inactif ou échéance passée.",
+        };
+      }
+
+      console.log("[Paychek] syncStoredAppleEntitlement", targetUid);
+      return await resyncProFromStoredAppleEntitlement(
+          db,
+          targetUid,
+          ent,
+          paychekGrantProEntitlement,
+          admin,
+      );
+    } catch (e) {
+      console.error("[Paychek] syncStoredAppleEntitlement", e);
+      if (e instanceof HttpsError) throw e;
+      throw new HttpsError(
+          "internal",
+          e && e.message ? String(e.message) : "sync_apple_failed",
+      );
+    }
+  }
+
+  const callOpts = {
+    region: "europe-west1",
+    timeoutSeconds: 60,
+    memory: "256MiB",
+  };
+
+  const verifyPaychekApplePurchase = onCall(callOpts, verifyAndGrant);
+
+  const restorePaychekAppleEntitlement = onCall(callOpts, verifyAndGrant);
+
+  const syncPaychekAppleEntitlement = onCall(callOpts, syncStoredAppleEntitlement);
 
   return {
     verifyPaychekApplePurchase,
     restorePaychekAppleEntitlement,
+    syncPaychekAppleEntitlement,
   };
 }
 
@@ -207,6 +465,8 @@ module.exports = {
   createAppleIapExports,
   decodeAppleTransaction,
   appleTransactionGrantsPro,
+  inferApplePeriodEndMillis,
+  resolveApplePeriodEndMillis,
   PAYCHEK_IOS_BUNDLE_ID,
   DEFAULT_PRODUCT_IDS,
 };

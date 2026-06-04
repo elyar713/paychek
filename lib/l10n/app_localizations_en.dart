@@ -2842,6 +2842,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Billed via App Store • Cancel anytime • Terms of Service';
 
   @override
+  String get paywallGooglePlayStoreUnavailable =>
+      'Google Play is unavailable. Use the Paychek Android app, check your connection, then try again.';
+
+  @override
+  String get paywallGooglePlayProductsUnavailable =>
+      'Google Play subscriptions not found. In Play Console, create paychek_monthly, paychek_quarterly, and paychek_annual under Monetize → Subscriptions, link a license tester account, then reinstall from internal testing.';
+
+  @override
+  String get paywallGooglePlayVerificationFailed =>
+      'Purchase received but server validation failed. Try again or contact support.';
+
+  @override
+  String get paywallGooglePlayPurchaseError =>
+      'Google Play purchase did not complete. Try again in a moment.';
+
+  @override
+  String get paywallLegalFooterGooglePlay =>
+      'Billed via Google Play • Cancel anytime • Terms of Service';
+
+  @override
   String get paywallRestoreNothingFound =>
       'Still locked: no subscription detected yet. Finish purchase or try again.';
 

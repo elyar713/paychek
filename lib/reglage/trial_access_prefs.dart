@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'paychek_prefs_scope.dart';
+import 'paychek_subscription_period_resolver.dart';
 import 'paychek_user_firestore.dart';
 
 const _kTrialStartUtcMsBase = 'paychek_trial_start_utc_ms';
@@ -49,13 +50,18 @@ Future<
       bool userDocExists,
       bool fetchSucceeded,
     })> _readPaychekUserTrialBootstrap(
-  User u,
-) async {
+  User u, {
+  bool forceServer = false,
+}) async {
   try {
     final snap = await FirebaseFirestore.instance
         .collection(kPaychekUsersCollection)
         .doc(u.uid)
-        .get(const GetOptions(source: Source.serverAndCache));
+        .get(
+          GetOptions(
+            source: forceServer ? Source.server : Source.serverAndCache,
+          ),
+        );
     if (!snap.exists) {
       return (
         createdAtUtc: null,
@@ -90,11 +96,9 @@ Future<
     if (rawTierUp is Timestamp) {
       subscriptionTierUpdatedAtUtc = rawTierUp.toDate().toUtc();
     }
-    DateTime? subscriptionCurrentPeriodEndUtc;
-    final rawPeriodEnd = d[kPaychekUserFieldSubscriptionCurrentPeriodEnd];
-    if (rawPeriodEnd is Timestamp) {
-      subscriptionCurrentPeriodEndUtc = rawPeriodEnd.toDate().toUtc();
-    }
+    final subscriptionCurrentPeriodEndUtc = paychekParseFirestoreInstantUtc(
+      d[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
+    );
     if (d['isPremium'] == true) {
       return (
         createdAtUtc: createdUtc,
@@ -107,7 +111,7 @@ Future<
       );
     }
     final tier = d['subscriptionTier']?.toString().trim().toLowerCase();
-    final pro = tier == 'pro';
+    final pro = tier == 'pro' || d['isPremium'] == true;
     return (
       createdAtUtc: createdUtc,
       trialFreemiumOverrideUntilUtc: overrideUntilUtc,
@@ -136,6 +140,8 @@ DateTime? _resolveProSinceUtc({
     bool active,
     DateTime? periodEndUtc,
     DateTime? proSinceUtc,
+    String? googlePlayProductId,
+    String? appleProductId,
   }) subRow,
   required ({
     DateTime? createdAtUtc,
@@ -199,10 +205,16 @@ class AccountEntitlementSnapshot {
 }
 
 abstract final class TrialAccessPrefs {
+  /// Invalide le cache en mémoire (après sync Play / révocation serveur).
+  static void invalidateSignedInAccessCache() {
+    _signedInAccessFuture = null;
+  }
+
   /// Cache device (offline / dernier IAP). Firestore reflète ensuite le même **uid**.
   static Future<void> setSubscriberActive(bool value) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool(_kSubscriberActive, value);
+    if (!value) invalidateSignedInAccessCache();
   }
 
   /// À la déconnexion : évite de réattribuer essai ou statut acheteur d’un **autre** compte sur l’appareil.
@@ -227,45 +239,83 @@ abstract final class TrialAccessPrefs {
     return row.active;
   }
 
-  static Future<({bool active, DateTime? periodEndUtc, DateTime? proSinceUtc})>
-      _subscriberEntitlementFirestoreRow() async {
+  static Future<
+      ({
+        bool active,
+        DateTime? periodEndUtc,
+        DateTime? proSinceUtc,
+        String? googlePlayProductId,
+        String? appleProductId,
+      })> _subscriberEntitlementFirestoreRow({bool forceServer = false}) async {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) {
-      return (active: false, periodEndUtc: null, proSinceUtc: null);
+      return (
+        active: false,
+        periodEndUtc: null,
+        proSinceUtc: null,
+        googlePlayProductId: null,
+        appleProductId: null,
+      );
     }
 
     try {
       final doc = await FirebaseFirestore.instance
           .collection(kPaychekSubscriberEntitlementsCollection)
           .doc(u.uid)
-          .get(const GetOptions(source: Source.serverAndCache));
+          .get(
+            GetOptions(
+              source: forceServer ? Source.server : Source.serverAndCache,
+            ),
+          );
 
       final data = doc.data();
       if (data == null) {
-        return (active: false, periodEndUtc: null, proSinceUtc: null);
+        return (
+          active: false,
+          periodEndUtc: null,
+          proSinceUtc: null,
+          googlePlayProductId: null,
+          appleProductId: null,
+        );
       }
 
       final active = data['active'] == true;
       DateTime? periodEndUtc;
       for (final key in ['currentPeriodEnd', 'expiresAt', 'periodEnd']) {
-        final v = data[key];
-        if (v is Timestamp) {
-          periodEndUtc = v.toDate().toUtc();
+        final parsed = paychekParseFirestoreInstantUtc(data[key]);
+        if (parsed != null) {
+          periodEndUtc = parsed;
           break;
         }
       }
       DateTime? proSinceUtc;
       for (final key in ['proSinceUtc', 'proSince', 'currentPeriodStart']) {
-        final v = data[key];
-        if (v is Timestamp) {
-          proSinceUtc = v.toDate().toUtc();
+        final parsed = paychekParseFirestoreInstantUtc(data[key]);
+        if (parsed != null) {
+          proSinceUtc = parsed;
           break;
         }
       }
-      return (active: active, periodEndUtc: periodEndUtc, proSinceUtc: proSinceUtc);
+      final gpRaw = data['googlePlayProductId']?.toString().trim();
+      final appleRaw = data['appleProductId']?.toString().trim();
+      return (
+        active: active,
+        periodEndUtc: periodEndUtc,
+        proSinceUtc: proSinceUtc,
+        googlePlayProductId:
+            gpRaw != null && gpRaw.isNotEmpty ? gpRaw : null,
+        appleProductId:
+            appleRaw != null && appleRaw.isNotEmpty ? appleRaw : null,
+      );
     } catch (e, st) {
       debugPrint('[Paychek] subscriber_entitlements: $e\n$st');
-      return (active: false, periodEndUtc: null, proSinceUtc: null);
+      return (
+        active: false,
+        periodEndUtc: null,
+        proSinceUtc: null,
+        googlePlayProductId: null,
+        appleProductId: null,
+      );
     }
   }
 
@@ -331,7 +381,7 @@ abstract final class TrialAccessPrefs {
   /// Une lecture parallèle `paychek_users` + `subscriber_entitlements` + prefs, puis calcul des
   /// deux vues (essai / Lite **et** statut Pro affiché). Les appels concurrents partagent la même [Future].
   static Future<({TrialGateVm gate, AccountEntitlementSnapshot entitlement})>
-      loadGateStateAndAccountEntitlement() async {
+      loadGateStateAndAccountEntitlement({bool forceServer = false}) async {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) {
       return (
@@ -352,16 +402,20 @@ abstract final class TrialAccessPrefs {
       );
     }
 
-    _signedInAccessFuture ??=
-        _loadSignedInUserAccess(u).whenComplete(() => _signedInAccessFuture = null);
+    if (forceServer) invalidateSignedInAccessCache();
+
+    _signedInAccessFuture ??= _loadSignedInUserAccess(
+      u,
+      forceServer: forceServer,
+    ).whenComplete(() => _signedInAccessFuture = null);
     return _signedInAccessFuture!;
   }
 
   static Future<({TrialGateVm gate, AccountEntitlementSnapshot entitlement})>
-      _loadSignedInUserAccess(User u) async {
+      _loadSignedInUserAccess(User u, {bool forceServer = false}) async {
     final parallel = await Future.wait<Object>([
-      _readPaychekUserTrialBootstrap(u),
-      _subscriberEntitlementFirestoreRow(),
+      _readPaychekUserTrialBootstrap(u, forceServer: forceServer),
+      _subscriberEntitlementFirestoreRow(forceServer: forceServer),
       SharedPreferences.getInstance(),
     ]);
     final row = parallel[0]
@@ -375,7 +429,13 @@ abstract final class TrialAccessPrefs {
           bool fetchSucceeded,
         });
     final subRow = parallel[1]
-        as ({bool active, DateTime? periodEndUtc, DateTime? proSinceUtc});
+        as ({
+          bool active,
+          DateTime? periodEndUtc,
+          DateTime? proSinceUtc,
+          String? googlePlayProductId,
+          String? appleProductId,
+        });
     final p = parallel[2] as SharedPreferences;
 
     if (row.createdAtUtc != null) {
@@ -396,22 +456,65 @@ abstract final class TrialAccessPrefs {
         ? DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true)
         : null;
 
-    final remoteSub = subRow.active;
+    DateTime? subscriptionPeriodEndUtc = subRow.periodEndUtc;
+    final userPeriodEnd = row.subscriptionCurrentPeriodEndUtc;
+    if (userPeriodEnd != null) {
+      subscriptionPeriodEndUtc = subscriptionPeriodEndUtc == null
+          ? userPeriodEnd
+          : (userPeriodEnd.isAfter(subscriptionPeriodEndUtc)
+              ? userPeriodEnd
+              : subscriptionPeriodEndUtc);
+    }
+
+    final proSinceForResolve = _resolveProSinceUtc(subRow: subRow, row: row);
+    final trialEndForResolve = anchorUtc == null
+        ? null
+        : _effectiveTrialFullAccessEndUtc(
+            anchorUtc,
+            row.trialFreemiumOverrideUntilUtc,
+          );
+    final storeProductId = subRow.appleProductId ?? subRow.googlePlayProductId;
+    subscriptionPeriodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
+      periodEndUtc: subscriptionPeriodEndUtc,
+      proSinceUtc: proSinceForResolve,
+      storeProductId: storeProductId,
+      trialEndUtc: trialEndForResolve,
+      storeEntitlementActive: subRow.active,
+    );
+
+    final nowUtc = DateTime.now().toUtc();
+    var subscriptionPeriodExpired = subscriptionPeriodEndUtc != null &&
+        nowUtc.isAfter(subscriptionPeriodEndUtc);
+
+    // Échéance d’essai obsolète : ne pas bloquer un abonnement actif côté store.
+    if (subscriptionPeriodExpired &&
+        subRow.active &&
+        proSinceForResolve != null &&
+        !subscriptionPeriodEndUtc!.isAfter(proSinceForResolve)) {
+      subscriptionPeriodExpired = false;
+      subscriptionPeriodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
+        periodEndUtc: subRow.periodEndUtc,
+        proSinceUtc: proSinceForResolve,
+        storeProductId: storeProductId,
+        trialEndUtc: null,
+        storeEntitlementActive: true,
+      );
+    }
+
+    if (subscriptionPeriodExpired) {
+      if (localSub) await p.setBool(_kSubscriberActive, false);
+    }
+
+    // Échéance passée → plus Pro, sauf abonnement store encore actif.
+    final bool hasLiveSubscription;
+    if (subscriptionPeriodExpired && !subRow.active) {
+      hasLiveSubscription = false;
+    } else {
+      hasLiveSubscription = subRow.active || row.docPro || localSub;
+    }
 
     final TrialGateVm gate;
-    if (localSub || row.docPro) {
-      final eff = anchorUtc == null
-          ? null
-          : _effectiveTrialFullAccessEndUtc(
-              anchorUtc,
-              row.trialFreemiumOverrideUntilUtc,
-            );
-      gate = TrialGateVm(
-        liteFreemiumRestricted: false,
-        anchorUtc: anchorUtc,
-        effectiveFullAccessEndUtc: eff,
-      );
-    } else if (remoteSub) {
+    if (hasLiveSubscription) {
       final eff = anchorUtc == null
           ? null
           : _effectiveTrialFullAccessEndUtc(
@@ -434,20 +537,15 @@ abstract final class TrialAccessPrefs {
         anchorUtc,
         row.trialFreemiumOverrideUntilUtc,
       );
-      final expired = DateTime.now().toUtc().isAfter(effectiveEnd);
+      final trialExpired = nowUtc.isAfter(effectiveEnd);
       gate = TrialGateVm(
-        liteFreemiumRestricted: expired,
+        liteFreemiumRestricted: trialExpired,
         anchorUtc: anchorUtc,
         effectiveFullAccessEndUtc: effectiveEnd,
       );
     }
 
-    final remoteSubEnt = localSub || subRow.active;
-    final isPro = localSub || remoteSubEnt || row.docPro;
-
-    final DateTime? subscriptionPeriodEndUtc = isPro
-        ? (subRow.periodEndUtc ?? row.subscriptionCurrentPeriodEndUtc)
-        : null;
+    final isPro = hasLiveSubscription;
     final DateTime? proSinceUtc = isPro
         ? _resolveProSinceUtc(
             subRow: subRow,
@@ -456,21 +554,36 @@ abstract final class TrialAccessPrefs {
         : null;
 
     final AccountEntitlementSnapshot entitlement;
-    if (anchorUtc == null || isPro) {
-      final endUtc = anchorUtc == null
-          ? null
-          : _effectiveTrialFullAccessEndUtc(
-              anchorUtc,
-              row.trialFreemiumOverrideUntilUtc,
-            );
+    if (isPro) {
       entitlement = AccountEntitlementSnapshot(
-        isPro: isPro,
+        isPro: true,
         trialActive: false,
         daysLeftInTrial: 0,
-        trialEndUtc: endUtc,
+        trialEndUtc: null,
         anchorUtc: anchorUtc,
         subscriptionPeriodEndUtc: subscriptionPeriodEndUtc,
         proSinceUtc: proSinceUtc,
+      );
+    } else if (subscriptionPeriodExpired &&
+        (row.docPro || subRow.active || localSub)) {
+      entitlement = AccountEntitlementSnapshot(
+        isPro: false,
+        trialActive: false,
+        daysLeftInTrial: 0,
+        trialEndUtc: null,
+        anchorUtc: anchorUtc,
+        subscriptionPeriodEndUtc: subscriptionPeriodEndUtc,
+        proSinceUtc: null,
+      );
+    } else if (anchorUtc == null) {
+      entitlement = const AccountEntitlementSnapshot(
+        isPro: false,
+        trialActive: false,
+        daysLeftInTrial: 0,
+        trialEndUtc: null,
+        anchorUtc: null,
+        subscriptionPeriodEndUtc: null,
+        proSinceUtc: null,
       );
     } else {
       final endUtc = _effectiveTrialFullAccessEndUtc(

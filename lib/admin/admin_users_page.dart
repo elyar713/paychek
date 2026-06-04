@@ -10,12 +10,16 @@ import 'package:intl/intl.dart';
 import '../ajouter_trade/ajouter_trade_csv_section.dart';
 import '../reglage/paychek_csv_import_log.dart';
 import '../reglage/paychek_support_ticket_submit.dart';
+import '../reglage/paychek_subscription_period_resolver.dart';
 import '../reglage/paychek_user_firestore.dart';
 import '../reglage/trial_access_prefs.dart';
 import 'admin_firestore_users.dart';
+import 'admin_apple_entitlement_sync.dart';
+import 'admin_google_play_entitlement_sync.dart';
 import 'admin_models.dart';
 import 'admin_stripe_entitlement_sync.dart';
 import 'admin_stripe_refund.dart';
+import 'admin_subscription_trace.dart';
 import 'admin_user_billing_summary.dart';
 import 'admin_support_ticket_detail_page.dart';
 import 'admin_theme.dart';
@@ -84,7 +88,7 @@ Future<void> _adminExportUsersCsv(
       _adminCsvEscape(_adminAccountTierTableLabel(u.subscriptionTier)),
       _adminCsvEscape(
         DateFormat('dd/MM/yyyy').format(
-          paychekAdminEffectiveTrialEndUtc(u).toLocal(),
+          paychekAdminDisplayDueDateUtc(u).toLocal(),
         ),
       ),
       _adminCsvEscape(paychekAdminTrialDaysRemainingShort(u)),
@@ -242,6 +246,8 @@ class _UsersStatsRow extends StatelessWidget {
     required this.pro,
     required this.signup30,
     required this.stripePro,
+    required this.applePro,
+    required this.googlePlayPro,
     this.layout = _UsersStatsLayout.wrap,
   });
 
@@ -249,7 +255,19 @@ class _UsersStatsRow extends StatelessWidget {
   final int pro;
   final int signup30;
   final int stripePro;
+  final int applePro;
+  final int googlePlayPro;
   final _UsersStatsLayout layout;
+
+  static bool _isApplePayment(String pm) {
+    final t = pm.trim().toLowerCase();
+    return t == 'apple' || t == 'apple_iap';
+  }
+
+  static bool _isGooglePlayPayment(String pm) {
+    final t = pm.trim().toLowerCase();
+    return t == 'google' || t == 'google_play';
+  }
 
   String _fmt(int n) {
     final s = n.toString();
@@ -295,6 +313,20 @@ class _UsersStatsRow extends StatelessWidget {
         icon: Icons.credit_card_rounded,
         iconColor: const Color(0xFFA78BFA),
         bg: const Color(0x332E1065),
+      ),
+      (
+        label: 'Pro · App Store',
+        value: _fmt(applePro),
+        icon: Icons.phone_iphone_rounded,
+        iconColor: const Color(0xFFE2E8F0),
+        bg: const Color(0x33334155),
+      ),
+      (
+        label: 'Pro · Google Play',
+        value: _fmt(googlePlayPro),
+        icon: Icons.android_rounded,
+        iconColor: const Color(0xFF93C5FD),
+        bg: const Color(0x331E3A8A),
       ),
     ];
 
@@ -959,12 +991,30 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           u.paymentMethod.trim().toLowerCase() == 'stripe',
                     )
                     .length;
+                final statsApplePro = users
+                    .where(
+                      (u) =>
+                          u.subscriptionTier ==
+                              PaychekSubscriptionTier.pro &&
+                          _UsersStatsRow._isApplePayment(u.paymentMethod),
+                    )
+                    .length;
+                final statsGooglePlayPro = users
+                    .where(
+                      (u) =>
+                          u.subscriptionTier ==
+                              PaychekSubscriptionTier.pro &&
+                          _UsersStatsRow._isGooglePlayPayment(u.paymentMethod),
+                    )
+                    .length;
 
                 final statsStrip = _UsersStatsRow(
                   total: statsTotal,
                   pro: statsPro,
                   signup30: stats30,
                   stripePro: statsStripePro,
+                  applePro: statsApplePro,
+                  googlePlayPro: statsGooglePlayPro,
                   layout: _UsersStatsLayout.headerInline,
                 );
 
@@ -996,7 +1046,19 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   );
                 }
 
-                return Column(
+                return FutureBuilder<List<AdminUserRow>>(
+                  key: ValueKey(
+                    users
+                        .map(
+                          (u) =>
+                              '${u.id}:${u.subscriptionCurrentPeriodEnd?.millisecondsSinceEpoch ?? 0}:${u.subscriptionTier.name}',
+                        )
+                        .join('|'),
+                  ),
+                  future: adminEnrichUsersWithEntitlements(users),
+                  builder: (context, enrichedSnap) {
+                    final displayUsers = enrichedSnap.data ?? users;
+                    return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _AdminUsersIntegratedShellHeader(statsBody: statsStrip),
@@ -1032,7 +1094,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                                 child: ListenableBuilder(
                                   listenable: _searchCtrl,
                                   builder: (context, _) {
-                                    final processed = _filteredSorted(users);
+                                    final processed =
+                                        _filteredSorted(displayUsers);
                                     final totalPages = processed.isEmpty
                                         ? 1
                                         : ((processed.length + _pageSize - 1) ~/
@@ -1095,6 +1158,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       ),
                     ),
                   ],
+                );
+                  },
                 );
               },
             ),
@@ -1286,11 +1351,10 @@ class _ModernPaymentCell extends StatelessWidget {
         ),
       );
     }
-    final label = _adminPaymentMethodDisplay(raw);
-    Color accent = _UsersUi.muted;
+    final label = adminPaymentMethodDisplayLabel(raw);
+    Color accent = adminPaymentMethodAccentColor(raw);
     Widget? lead;
     if (t == 'stripe') {
-      accent = const Color(0xFF818CF8);
       lead = Container(
         width: 22,
         height: 14,
@@ -1306,13 +1370,10 @@ class _ModernPaymentCell extends StatelessWidget {
         ),
       );
     } else if (t == 'apple' || t == 'apple_iap') {
-      accent = const Color(0xFFE2E8F0);
       lead = Icon(Icons.phone_iphone_rounded, size: 16, color: accent);
     } else if (t == 'google' || t == 'google_play') {
-      accent = const Color(0xFF93C5FD);
       lead = Icon(Icons.android_rounded, size: 16, color: accent);
     } else if (t == 'admin') {
-      accent = _UsersUi.amber;
       lead =
           Icon(Icons.admin_panel_settings_rounded, size: 16, color: accent);
     }
@@ -1463,7 +1524,7 @@ class _ModernUserCollapsedCells extends StatelessWidget {
                     Expanded(
                       child: Text(
                         DateFormat('dd/MM/yyyy', 'fr_FR').format(
-                          paychekAdminEffectiveTrialEndUtc(u).toLocal(),
+                          paychekAdminDisplayDueDateUtc(u).toLocal(),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1606,12 +1667,16 @@ class _PaychekProfileTierStripeSection extends StatefulWidget {
     required this.userId,
     required this.userEmail,
     required this.initialTier,
+    required this.paymentMethod,
+    required this.lastSeenPlatform,
     required this.scaffoldContext,
   });
 
   final String userId;
   final String userEmail;
   final PaychekSubscriptionTier initialTier;
+  final String paymentMethod;
+  final String lastSeenPlatform;
   final BuildContext scaffoldContext;
 
   @override
@@ -1623,7 +1688,25 @@ class _PaychekProfileTierStripeSectionState
     extends State<_PaychekProfileTierStripeSection> {
   late PaychekSubscriptionTier _tier;
   bool _saving = false;
-  bool _syncing = false;
+  bool _syncingStripe = false;
+  bool _syncingGooglePlay = false;
+  bool _syncingApple = false;
+
+  bool get _showGooglePlaySync {
+    final pm = widget.paymentMethod.trim().toLowerCase();
+    if (pm == 'google_play' || pm == 'google') return true;
+    final plat = widget.lastSeenPlatform.trim().toLowerCase();
+    if (plat == 'android') return true;
+    return false;
+  }
+
+  bool get _showAppleSync {
+    final pm = widget.paymentMethod.trim().toLowerCase();
+    if (pm == 'apple' || pm == 'apple_iap') return true;
+    final plat = widget.lastSeenPlatform.trim().toLowerCase();
+    if (plat == 'ios' || plat == 'iphone' || plat == 'ipad') return true;
+    return false;
+  }
 
   @override
   void initState() {
@@ -1711,11 +1794,181 @@ class _PaychekProfileTierStripeSectionState
     }
   }
 
-  Future<void> _syncStripe() async {
-    if (_syncing) return;
+  Future<void> _syncGooglePlay() async {
+    if (_syncingGooglePlay) return;
     final snackCtx = widget.scaffoldContext;
     final messenger = ScaffoldMessenger.maybeOf(snackCtx);
-    setState(() => _syncing = true);
+    setState(() => _syncingGooglePlay = true);
+    try {
+      final sync = await paychekAdminSyncGooglePlayEntitlement(
+        targetUserId: widget.userId,
+      );
+      if (!snackCtx.mounted) return;
+      final emailLabel = widget.userEmail.trim().isEmpty
+          ? widget.userId
+          : widget.userEmail.trim();
+      var endLabel = sync.currentPeriodEndUtc != null
+          ? ' Fin Pro (réponse) : ${DateFormat.yMMMd('fr_FR').format(sync.currentPeriodEndUtc!.toLocal())}.'
+          : '';
+      final fresh = await FirebaseFirestore.instance
+          .collection(kPaychekUsersCollection)
+          .doc(widget.userId)
+          .get(const GetOptions(source: Source.server));
+      final ent = await FirebaseFirestore.instance
+          .collection(kPaychekSubscriberEntitlementsCollection)
+          .doc(widget.userId)
+          .get(const GetOptions(source: Source.server));
+      final d = fresh.data();
+      final ed = ent.data();
+      if (d != null) {
+        final tier = '${d['subscriptionTier'] ?? ''}'.trim();
+        final premium = d['isPremium'] == true;
+        final pe = paychekParseFirestoreInstantUtc(
+          d[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
+        );
+        final peLabel = pe != null
+            ? DateFormat.yMMMd('fr_FR').format(pe.toLocal())
+            : '—';
+        final entActive = ed?['active'] == true;
+        endLabel =
+            ' tier=$tier premium=$premium entitlements.active=$entActive'
+            ' · Fin Pro : $peLabel.';
+      }
+      final inactiveDetail = !sync.active
+          ? (sync.message?.trim().isNotEmpty == true
+              ? sync.message!.trim()
+              : (sync.reason == 'expired_or_inactive'
+                  ? 'Google Play : abonnement expiré ou inactif.'
+                  : (sync.reason?.trim().isNotEmpty == true
+                      ? sync.reason!.trim()
+                      : 'Google Play : aucun achat enregistré.')))
+          : null;
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(
+            sync.active
+                ? 'Google Play OK — $emailLabel$endLabel'
+                : '$inactiveDetail — $emailLabel$endLabel',
+          ),
+          backgroundColor: sync.active ? null : Colors.orange.shade900,
+          duration: Duration(seconds: sync.active ? 6 : 12),
+        ),
+      );
+    } on FirebaseFunctionsException catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text(
+            e.code == 'not-found' || e.code == 'unavailable'
+                ? 'Function syncPaychekGooglePlayEntitlement non déployée.'
+                : 'Google Play : ${e.message ?? e.code}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Google Play : $e'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _syncingGooglePlay = false);
+    }
+  }
+
+  Future<void> _syncApple() async {
+    if (_syncingApple) return;
+    final snackCtx = widget.scaffoldContext;
+    final messenger = ScaffoldMessenger.maybeOf(snackCtx);
+    setState(() => _syncingApple = true);
+    try {
+      final sync = await paychekAdminSyncAppleEntitlement(
+        targetUserId: widget.userId,
+      );
+      if (!snackCtx.mounted) return;
+      final emailLabel = widget.userEmail.trim().isEmpty
+          ? widget.userId
+          : widget.userEmail.trim();
+      var endLabel = sync.currentPeriodEndUtc != null
+          ? ' Fin Pro (réponse) : ${DateFormat.yMMMd('fr_FR').format(sync.currentPeriodEndUtc!.toLocal())}.'
+          : '';
+      final fresh = await FirebaseFirestore.instance
+          .collection(kPaychekUsersCollection)
+          .doc(widget.userId)
+          .get(const GetOptions(source: Source.server));
+      final ent = await FirebaseFirestore.instance
+          .collection(kPaychekSubscriberEntitlementsCollection)
+          .doc(widget.userId)
+          .get(const GetOptions(source: Source.server));
+      final d = fresh.data();
+      final ed = ent.data();
+      if (d != null) {
+        final tier = '${d['subscriptionTier'] ?? ''}'.trim();
+        final premium = d['isPremium'] == true;
+        final pe = paychekParseFirestoreInstantUtc(
+          d[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
+        );
+        final peLabel = pe != null
+            ? DateFormat.yMMMd('fr_FR').format(pe.toLocal())
+            : '—';
+        final entActive = ed?['active'] == true;
+        endLabel =
+            ' tier=$tier premium=$premium entitlements.active=$entActive'
+            ' · Fin Pro : $peLabel.';
+      }
+      final inactiveDetail = !sync.active
+          ? (sync.message?.trim().isNotEmpty == true
+              ? sync.message!.trim()
+              : (sync.reason == 'expired_or_inactive'
+                  ? 'Apple : abonnement expiré ou inactif.'
+                  : (sync.reason?.trim().isNotEmpty == true
+                      ? sync.reason!.trim()
+                      : 'Apple : aucun achat enregistré.')))
+          : null;
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(
+            sync.active
+                ? 'Apple OK — $emailLabel$endLabel'
+                : '$inactiveDetail — $emailLabel$endLabel',
+          ),
+          backgroundColor: sync.active ? null : Colors.orange.shade900,
+          duration: Duration(seconds: sync.active ? 6 : 12),
+        ),
+      );
+    } on FirebaseFunctionsException catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text(
+            e.code == 'not-found' || e.code == 'unavailable'
+                ? 'Function syncPaychekAppleEntitlement non déployée.'
+                : 'Apple : ${e.message ?? e.code}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Apple : $e'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _syncingApple = false);
+    }
+  }
+
+  Future<void> _syncStripe() async {
+    if (_syncingStripe) return;
+    final snackCtx = widget.scaffoldContext;
+    final messenger = ScaffoldMessenger.maybeOf(snackCtx);
+    setState(() => _syncingStripe = true);
     try {
       final sync = await paychekAdminSyncStripeEntitlement(
         targetUserId: widget.userId,
@@ -1758,8 +2011,41 @@ class _PaychekProfileTierStripeSectionState
         ),
       );
     } finally {
-      if (mounted) setState(() => _syncing = false);
+      if (mounted) setState(() => _syncingStripe = false);
     }
+  }
+
+  Widget _syncLinkButton({
+    required VoidCallback? onPressed,
+    required bool syncing,
+    required IconData icon,
+    required Color color,
+    required String label,
+  }) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: syncing
+          ? SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2, color: color),
+            )
+          : Icon(icon, size: 16, color: color),
+      label: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        foregroundColor: color,
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
   }
 
   @override
@@ -1767,6 +2053,7 @@ class _PaychekProfileTierStripeSectionState
     const mpInner = Color(0xFF1A1A1A);
     const mpBorder = Color(0xFF1E293B);
     final pro = _tier == PaychekSubscriptionTier.pro;
+    final busy = _syncingStripe || _syncingGooglePlay || _syncingApple;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1836,31 +2123,33 @@ class _PaychekProfileTierStripeSectionState
           ),
         ),
         const SizedBox(height: 12),
-        TextButton.icon(
-          onPressed: _syncing ? null : _syncStripe,
-          icon: _syncing
-              ? const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Icon(Icons.sync_rounded,
-                  size: 16, color: Colors.tealAccent.shade400),
-          label: Text(
-            'Synchroniser paiement Stripe → Pro',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF34D399),
-            ),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFF34D399),
-            padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+        _syncLinkButton(
+          onPressed: busy ? null : _syncStripe,
+          syncing: _syncingStripe,
+          icon: Icons.sync_rounded,
+          color: const Color(0xFF34D399),
+          label: 'Synchroniser paiement Stripe → Pro',
         ),
+        if (_showGooglePlaySync) ...[
+          const SizedBox(height: 8),
+          _syncLinkButton(
+            onPressed: busy ? null : _syncGooglePlay,
+            syncing: _syncingGooglePlay,
+            icon: Icons.shop_rounded,
+            color: const Color(0xFF38BDF8),
+            label: 'Synchroniser Google Play → Pro',
+          ),
+        ],
+        if (_showAppleSync) ...[
+          const SizedBox(height: 8),
+          _syncLinkButton(
+            onPressed: busy ? null : _syncApple,
+            syncing: _syncingApple,
+            icon: Icons.apple_rounded,
+            color: const Color(0xFFA78BFA),
+            label: 'Synchroniser Apple → Pro',
+          ),
+        ],
       ],
     );
   }
@@ -1909,7 +2198,7 @@ class _PaychekProfileTierStripeSectionState
 }
 
 /// Inscription, essai, achat Pro et fin Pro — valeurs lisibles (sans sous-texte gris).
-class _MaquetteAccountDatesBlock extends StatelessWidget {
+class _MaquetteAccountDatesBlock extends StatefulWidget {
   const _MaquetteAccountDatesBlock({
     required this.u,
     required this.df,
@@ -1917,6 +2206,55 @@ class _MaquetteAccountDatesBlock extends StatelessWidget {
 
   final AdminUserRow u;
   final DateFormat df;
+
+  @override
+  State<_MaquetteAccountDatesBlock> createState() =>
+      _MaquetteAccountDatesBlockState();
+}
+
+class _MaquetteAccountDatesBlockState extends State<_MaquetteAccountDatesBlock> {
+  bool _syncingPlay = false;
+
+  bool _isGooglePlayPayment(AdminUserRow u) {
+    final m = u.paymentMethod.trim().toLowerCase();
+    return m == 'google_play' || m == 'google';
+  }
+
+  Future<void> _resyncGooglePlayDates() async {
+    setState(() => _syncingPlay = true);
+    try {
+      final r = await paychekAdminSyncGooglePlayEntitlement(
+        targetUserId: widget.u.id,
+      );
+      if (!mounted) return;
+      if (r.active && r.currentPeriodEndUtc != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Dates Google Play mises à jour (${widget.df.format(r.currentPeriodEndUtc!.toLocal())})',
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              r.reason ?? 'Sync Google Play : abonnement inactif ou introuvable.',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sync Google Play échouée : $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _syncingPlay = false);
+    }
+  }
+
+  DateFormat get df => widget.df;
 
   static const Color _panel = Color(0xFF1A1A1A);
   static const Color _border = Color(0xFF1E293B);
@@ -1967,6 +2305,32 @@ class _MaquetteAccountDatesBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final db = FirebaseFirestore.instance;
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: db.collection(kPaychekUsersCollection).doc(widget.u.id).snapshots(),
+      builder: (context, userSnap) {
+        var base = widget.u;
+        if (userSnap.hasData && userSnap.data!.exists) {
+          base = adminUserRowFromFirestore(userSnap.data!);
+        }
+        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: db
+              .collection(kPaychekSubscriberEntitlementsCollection)
+              .doc(widget.u.id)
+              .snapshots(),
+          builder: (context, entSnap) {
+            final u = adminUserRowMergeEntitlementData(
+              base,
+              entSnap.data?.data(),
+            );
+            return _buildChrono(context, u);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildChrono(BuildContext context, AdminUserRow u) {
     final inscription = df.format(u.joinedAt.toLocal());
 
     final trialEndUtc = u.trialFreemiumOverrideUntil ??
@@ -1975,14 +2339,19 @@ class _MaquetteAccountDatesBlock extends StatelessWidget {
 
     final nowUtc = DateTime.now().toUtc();
     final trialNotExpired = nowUtc.isBefore(trialEndUtc);
-    final tierPro = u.subscriptionTier == PaychekSubscriptionTier.pro;
+    final tierPro = u.hasEffectiveProAccess;
 
-    final periodEndUtc = u.subscriptionCurrentPeriodEnd;
     final proSinceUtc = u.subscriptionProSinceUtc;
+    final anchor = proSinceUtc ?? u.subscriptionTierUpdatedAt;
+    final periodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
+      periodEndUtc: u.subscriptionCurrentPeriodEnd,
+      proSinceUtc: anchor,
+      storeProductId: u.googlePlayProductId,
+      trialEndUtc: trialEndUtc,
+    );
     final showProDates = tierPro ||
         periodEndUtc != null ||
         proSinceUtc != null;
-    final anchor = proSinceUtc ?? u.subscriptionTierUpdatedAt;
     final finProUtc = TrialAccessPrefs.proSubscriptionAdminEndUtc(
       proSinceUtc: anchor,
       subscriptionPeriodEndUtc: periodEndUtc,
@@ -2054,14 +2423,16 @@ class _MaquetteAccountDatesBlock extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: _pair('Inscription', inscription)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _pair(
-                  'Fin d’essai (accès plein)',
-                  trialEndLabel,
-                  trailing: trialChip(),
+              if (!tierPro) ...[
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _pair(
+                    'Fin d’essai (accès plein)',
+                    trialEndLabel,
+                    trailing: trialChip(),
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
           if (showProDates) ...[
@@ -2073,10 +2444,25 @@ class _MaquetteAccountDatesBlock extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _pair(
-                    'Fin Pro',
+                    'Fin Pro (abonnement)',
                     finLabel,
                     valueColor:
                         finProUtc != null ? _finPro : _value,
+                    trailing: tierPro && _isGooglePlayPayment(u)
+                        ? IconButton(
+                            tooltip: 'Resync dates Google Play',
+                            onPressed: _syncingPlay ? null : _resyncGooglePlayDates,
+                            icon: _syncingPlay
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.sync, size: 20),
+                          )
+                        : null,
                   ),
                 ),
               ],
@@ -2355,8 +2741,8 @@ class _UserExpandedDashboard extends StatelessWidget {
           const SizedBox(height: 16),
           maquetteField(
             'Mode de paiement',
-            _adminPaymentMethodDisplay(u.paymentMethod),
-            valueColor: const Color(0xFF818CF8),
+            adminPaymentMethodDisplayLabel(u.paymentMethod),
+            valueColor: adminPaymentMethodAccentColor(u.paymentMethod),
           ),
           const SizedBox(height: 22),
           const Divider(height: 1, color: mpBorder),
@@ -2395,6 +2781,8 @@ class _UserExpandedDashboard extends StatelessWidget {
             userId: u.id,
             userEmail: u.email,
             initialTier: u.subscriptionTier,
+            paymentMethod: u.paymentMethod,
+            lastSeenPlatform: u.lastSeenPlatform,
             scaffoldContext: scaffoldContext,
           ),
           const SizedBox(height: 18),
@@ -2439,10 +2827,11 @@ class _UserExpandedDashboard extends StatelessWidget {
       ),
     );
 
+    final billingAccent = adminPaymentMethodAccentColor(u.paymentMethod);
     final billingCard = _MaquetteCollapsibleCard(
-      title: 'FACTURATION',
-      leading: const Icon(Icons.credit_card_rounded,
-          size: 18, color: Color(0xFF818CF8)),
+      title: adminBillingSectionTitle(u.paymentMethod),
+      leading: Icon(Icons.credit_card_rounded,
+          size: 18, color: billingAccent),
       initiallyExpanded: true,
       headerTrailing: OutlinedButton(
         onPressed: () {
@@ -3037,7 +3426,12 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
         oldWidget.user.subscriptionProSinceUtc !=
             widget.user.subscriptionProSinceUtc ||
         oldWidget.user.subscriptionCurrentPeriodEnd !=
-            widget.user.subscriptionCurrentPeriodEnd) {
+            widget.user.subscriptionCurrentPeriodEnd ||
+        oldWidget.user.subscriberEntitlementActive !=
+            widget.user.subscriberEntitlementActive ||
+        oldWidget.user.subscriptionEndedAtUtc !=
+            widget.user.subscriptionEndedAtUtc ||
+        oldWidget.user.paymentMethod != widget.user.paymentMethod) {
       unawaited(_loadSummary());
     }
   }
@@ -3187,9 +3581,15 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
 
   @override
   Widget build(BuildContext context) {
+    final showHistory = adminUserHadSubscriptionHistory(widget.user);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        AdminSubscriptionTracePanel(
+          user: widget.user,
+          dateFormat: widget.df,
+        ),
+        const SizedBox(height: 14),
         if (_summaryLoading)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
@@ -3242,15 +3642,29 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
               ],
             ),
           ),
-        if (!widget.user.hasPaidPlan && !_summaryLoading) ...[
+        if (!showHistory && !_summaryLoading) ...[
           const SizedBox(height: 10),
           Text(
-            'Aucun abonnement payant actif pour ce compte.',
+            'Aucun historique de paiement.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AdminTheme.textMuted,
                 ),
           ),
         ],
+        if (showHistory &&
+            !widget.user.hasEffectiveProAccess &&
+            !_summaryLoading) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Dernier achat enregistré (abonnement plus actif).',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFFF59E0B),
+            ),
+          ),
+        ],
+        if (widget.user.paymentMethod.trim().toLowerCase() == 'stripe') ...[
         const SizedBox(height: 16),
         Text(
           'Montant (e-mail client uniquement — Stripe manuel)',
@@ -3304,6 +3718,7 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
             ),
           ],
         ),
+        ],
       ],
     );
   }

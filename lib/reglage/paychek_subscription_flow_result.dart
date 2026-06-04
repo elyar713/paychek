@@ -1,4 +1,5 @@
 import 'paychek_apple_iap_service.dart';
+import 'paychek_google_play_iap_service.dart';
 
 /// Résultat du flux d’abonnement (App Store, Play, Stripe web).
 enum PaychekSubscriptionFlowKind {
@@ -11,6 +12,10 @@ enum PaychekSubscriptionFlowKind {
   appleProductsUnavailable,
   appleVerificationFailed,
   applePurchaseError,
+  googlePlayStoreUnavailable,
+  googlePlayProductsUnavailable,
+  googlePlayVerificationFailed,
+  googlePlayPurchaseError,
   launchFailed,
 }
 
@@ -52,6 +57,41 @@ class PaychekSubscriptionFlowResult {
       PaychekAppleIapPurchaseOutcome.error =>
         const PaychekSubscriptionFlowResult(
           PaychekSubscriptionFlowKind.applePurchaseError,
+        ),
+    };
+  }
+
+  static PaychekSubscriptionFlowResult fromGoogleOutcome(
+    PaychekGooglePlayIapPurchaseOutcome outcome,
+  ) {
+    return switch (outcome) {
+      PaychekGooglePlayIapPurchaseOutcome.success =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.success,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.cancelled =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.cancelled,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.storeUnavailable =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.googlePlayStoreUnavailable,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.productUnavailable =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.googlePlayProductsUnavailable,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.verificationFailed =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.googlePlayVerificationFailed,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.notSignedIn =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.signInRequired,
+        ),
+      PaychekGooglePlayIapPurchaseOutcome.error =>
+        const PaychekSubscriptionFlowResult(
+          PaychekSubscriptionFlowKind.googlePlayPurchaseError,
         ),
     };
   }

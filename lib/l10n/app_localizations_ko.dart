@@ -2763,6 +2763,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywallLegalFooterApple => 'App Store 결제 • 언제든 해지 • 서비스 약관';
 
   @override
+  String get paywallGooglePlayStoreUnavailable =>
+      'Google Play를 사용할 수 없습니다. Paychek Android 앱에서 네트워크를 확인한 뒤 다시 시도하세요.';
+
+  @override
+  String get paywallGooglePlayProductsUnavailable =>
+      'Google Play 구독 상품을 찾을 수 없습니다. Play Console에서 paychek_monthly, paychek_quarterly, paychek_annual을 만들고(수익 창출 → 구독) 라이선스 테스터를 추가한 뒤 내부 테스트에서 다시 설치하세요.';
+
+  @override
+  String get paywallGooglePlayVerificationFailed =>
+      '구매는 되었지만 서버 검증에 실패했습니다. 다시 시도하거나 지원팀에 문의하세요.';
+
+  @override
+  String get paywallGooglePlayPurchaseError =>
+      'Google Play 구매가 완료되지 않았습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get paywallLegalFooterGooglePlay => 'Google Play 결제 • 언제든 해지 • 서비스 약관';
+
+  @override
   String get paywallRestoreNothingFound => '계속 차단됨: 활성 구독이 감지되지 않았습니다.';
 
   @override

@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb;
+import 'package:flutter/material.dart';
 import 'paychek_apple_iap_checkout.dart';
+import 'paychek_gold_upgrade_sheet.dart';
 import 'paychek_apple_iap_service.dart';
+import 'paychek_google_play_iap_checkout.dart';
+import 'paychek_google_play_iap_service.dart';
 import 'paychek_billing_plan.dart';
 import 'paychek_billing_remote.dart';
 import 'paychek_checkout_launch.dart';
@@ -42,6 +46,31 @@ Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
     return result;
   }
 
+  // Android natif : Google Play uniquement (jamais Stripe).
+  if (paychekUsesNativeGooglePlayIap) {
+    if (user == null) {
+      return const PaychekSubscriptionFlowResult(
+        PaychekSubscriptionFlowKind.signInRequired,
+      );
+    }
+    await PaychekGooglePlayIapService.ensureInitialized();
+    final outcome = await purchaseProOnAndroidStore(cycle: cycle);
+    if (outcome == null) {
+      debugPrint(
+        '[Paychek] IAP Android: purchaseProOnAndroidStore null '
+        '(kIsWeb=$kIsWeb, platform=$defaultTargetPlatform)',
+      );
+      return const PaychekSubscriptionFlowResult(
+        PaychekSubscriptionFlowKind.googlePlayStoreUnavailable,
+      );
+    }
+    final result = PaychekSubscriptionFlowResult.fromGoogleOutcome(outcome);
+    if (!result.ok) {
+      debugPrint('[Paychek] IAP Android outcome: $outcome');
+    }
+    return result;
+  }
+
   // Safari / web sur iPhone : pas de Stripe in-app.
   if (paychekIsIosWeb) {
     return const PaychekSubscriptionFlowResult(
@@ -71,15 +100,6 @@ Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
   }
 
   switch (defaultTargetPlatform) {
-    case TargetPlatform.android:
-      final launched = await launchPaychekCheckoutUri(
-        Uri.parse('https://play.google.com/store/account/subscriptions'),
-      );
-      return PaychekSubscriptionFlowResult(
-        launched
-          ? PaychekSubscriptionFlowKind.success
-          : PaychekSubscriptionFlowKind.launchFailed,
-      );
     default:
       PaychekBillingRemote.invalidateCache();
       final uri = await buildPaywallSubscribeUriAsync(
@@ -102,8 +122,13 @@ Future<PaychekSubscriptionFlowResult> openPaychekSubscriptionFlow({
   }
 }
 
-/// Gestion d’abonnement (réglages système App Store / Play).
-Future<bool> openPaychekSubscriptionManagement() async {
+/// Gestion d’abonnement : paywall (web), App Store / Play (mobile).
+Future<bool> openPaychekSubscriptionManagement({BuildContext? context}) async {
+  if (kIsWeb) {
+    if (context == null) return false;
+    await showPaychekGoldUpgradeSheet(context: context);
+    return true;
+  }
   switch (defaultTargetPlatform) {
     case TargetPlatform.iOS:
       return launchPaychekCheckoutUri(

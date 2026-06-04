@@ -6,8 +6,13 @@ import '../l10n/app_localizations.dart';
 import 'paychek_billing_plan.dart';
 import 'paywall/mobile/paychek_mobile_upgrade_paywall.dart';
 import 'paywall/mobile/paywall_mobile_tokens.dart';
+import 'paychek_entitlement_local_sync.dart';
+import 'paychek_apple_entitlement_sync.dart';
 import 'paychek_apple_iap_checkout.dart';
 import 'paychek_apple_iap_service.dart';
+import 'paychek_google_entitlement_sync.dart';
+import 'paychek_google_play_iap_checkout.dart';
+import 'paychek_google_play_iap_service.dart';
 import 'stripe_entitlement_sync.dart';
 import 'paywall_subscription_feedback.dart';
 import 'paychek_subscription_flow_result.dart';
@@ -171,11 +176,47 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     final result = await openPaychekSubscriptionFlow(cycle: cycle);
     if (!context.mounted) return;
     if (result.ok) {
+      await PaychekEntitlementLocalSync.refreshProFromServer();
+      await widget.onReloadTrialGate();
+      await Future<void>.delayed(const Duration(milliseconds: 1200));
+      if (!context.mounted) return;
       await widget.onReloadTrialGate();
       return;
     }
     if (result.kind == PaychekSubscriptionFlowKind.cancelled) return;
-    final message = paywallMessageForSubscriptionResult(l10n, result);
+    if (paychekUsesNativeAppleIap &&
+        (result.kind == PaychekSubscriptionFlowKind.appleVerificationFailed ||
+            result.kind == PaychekSubscriptionFlowKind.applePurchaseError)) {
+      final restored = await restoreProOnMobileStore();
+      if (!context.mounted) return;
+      if (restored == PaychekAppleIapPurchaseOutcome.success) {
+        await PaychekEntitlementLocalSync.refreshProFromServer();
+        await widget.onReloadTrialGate();
+        return;
+      }
+    }
+    if (paychekUsesNativeGooglePlayIap &&
+        (result.kind ==
+                PaychekSubscriptionFlowKind.googlePlayVerificationFailed ||
+            result.kind == PaychekSubscriptionFlowKind.googlePlayPurchaseError)) {
+      final restored = await restoreProOnAndroidStore();
+      if (!context.mounted) return;
+      if (restored == PaychekGooglePlayIapPurchaseOutcome.success) {
+        await PaychekEntitlementLocalSync.markPurchaseVerified();
+        await widget.onReloadTrialGate();
+        return;
+      }
+    }
+    var message = paywallMessageForSubscriptionResult(l10n, result);
+    if (result.kind == PaychekSubscriptionFlowKind.appleVerificationFailed &&
+        PaychekAppleEntitlementSync.lastFailureMessage != null) {
+      message = PaychekAppleEntitlementSync.lastFailureMessage!;
+    }
+    if (result.kind ==
+            PaychekSubscriptionFlowKind.googlePlayVerificationFailed &&
+        PaychekGoogleEntitlementSync.lastFailureMessage != null) {
+      message = PaychekGoogleEntitlementSync.lastFailureMessage!;
+    }
     if (message.isNotEmpty) _setBanner(message);
   }
 
@@ -189,6 +230,13 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
             if (paychekUsesNativeAppleIap) {
               final restored = await restoreProOnMobileStore();
               if (restored == PaychekAppleIapPurchaseOutcome.success) {
+                final stillLite = await widget.onReloadTrialGate();
+                if (!context.mounted) return;
+                if (!stillLite) return;
+              }
+            } else if (paychekUsesNativeGooglePlayIap) {
+              final restored = await restoreProOnAndroidStore();
+              if (restored == PaychekGooglePlayIapPurchaseOutcome.success) {
                 final stillLite = await widget.onReloadTrialGate();
                 if (!context.mounted) return;
                 if (!stillLite) return;
@@ -234,7 +282,7 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _trialFooterActions(context, l10n),
-        if (kIsWeb || paychekUsesNativeAppleIap) ...[
+        if (kIsWeb || paychekUsesNativeStoreIap) ...[
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),

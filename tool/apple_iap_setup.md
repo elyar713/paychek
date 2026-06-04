@@ -47,7 +47,7 @@ Si tu vois `Cannot find module '@apple/app-store-server-library'`, c’est que c
 Déployer les fonctions de validation (terminal **interactif**, avec tes secrets Firebase déjà configurés) :
 
 ```bash
-firebase deploy --only functions:verifyPaychekApplePurchase,functions:restorePaychekAppleEntitlement
+firebase deploy --only functions:verifyPaychekApplePurchase,functions:restorePaychekAppleEntitlement,functions:syncPaychekAppleEntitlement
 ```
 
 Le bundle iOS utilisé pour la validation est fixé dans le code : `pro.paychek.app`.
