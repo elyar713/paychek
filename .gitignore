@@ -36,6 +36,9 @@ ios/Flutter/Signing.xcconfig.save
 /build/
 /coverage/
 
+# Firebase CLI (cache hosting / deploy local)
+.firebase/
+
 # Cloud Functions (Firebase)
 functions/node_modules/
 functions/.env

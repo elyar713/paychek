@@ -36,6 +36,7 @@ Future<void> showPaychekGoldUpgradeSheet({required BuildContext context}) {
           return;
         }
         await PaychekEntitlementLocalSync.markPurchaseVerified();
+        if (!sheetContext.mounted) return;
         Navigator.pop(sheetContext);
       }
 

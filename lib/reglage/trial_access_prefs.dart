@@ -490,7 +490,7 @@ abstract final class TrialAccessPrefs {
     if (subscriptionPeriodExpired &&
         subRow.active &&
         proSinceForResolve != null &&
-        !subscriptionPeriodEndUtc!.isAfter(proSinceForResolve)) {
+        !subscriptionPeriodEndUtc.isAfter(proSinceForResolve)) {
       subscriptionPeriodExpired = false;
       subscriptionPeriodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
         periodEndUtc: subRow.periodEndUtc,
