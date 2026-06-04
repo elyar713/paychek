@@ -52,6 +52,19 @@ firebase deploy --only functions:verifyPaychekApplePurchase,functions:restorePay
 
 Le bundle iOS utilisé pour la validation est fixé dans le code : `pro.paychek.app`.
 
+### Secret `PAYCHEK_APPLE_APP_ID` (Production / TestFlight réel)
+
+App Store Connect → **Paychek** → **Informations sur l’app** → **Identifiant Apple** (nombre, ex. `6738291045`).
+
+Configure-le sur Firebase (Functions → Secrets ou `.env` local) :
+
+```bash
+firebase functions:secrets:set PAYCHEK_APPLE_APP_ID
+# coller l’identifiant numérique Apple
+```
+
+Sans ce secret, la validation **Production** du JWS échoue ; le serveur tente d’abord **Sandbox** (comptes test), puis un secours JSON sandbox si le JWS échoue.
+
 (Région : `europe-west1`, comme le reste du projet.)
 
 ## 4. Test

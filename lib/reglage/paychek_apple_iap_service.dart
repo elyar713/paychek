@@ -149,11 +149,15 @@ abstract final class PaychekAppleIapService {
           break;
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          final jws = await _resolveAppleTransactionJws(purchase);
-          if (!paychekLooksLikeAppleTransactionJws(jws)) {
+          final payload = await _resolveAppleVerificationPayload(purchase);
+          if (!paychekHasAppleVerificationPayload(
+            jws: payload.jws,
+            storeKit2Json: payload.storeKit2Json,
+          )) {
             debugPrint(
-              '[Paychek] Apple IAP: JWS invalide pour $productId '
-              '(len=${jws.length}, sk2=${purchase is SK2PurchaseDetails})',
+              '[Paychek] Apple IAP: reçu incomplet pour $productId '
+              '(jwsLen=${payload.jws.length}, jsonLen=${payload.storeKit2Json.length}, '
+              'sk2=${purchase is SK2PurchaseDetails})',
             );
             PaychekAppleEntitlementSync.lastFailureMessage =
                 purchase is SK2PurchaseDetails
@@ -170,7 +174,8 @@ abstract final class PaychekAppleIapService {
           }
           final ok = await PaychekAppleEntitlementSync.verifySignedTransaction(
             productId: productId,
-            signedTransaction: jws,
+            signedTransaction: payload.jws,
+            appleStoreKit2Json: payload.storeKit2Json,
           );
           if (purchase.pendingCompletePurchase) {
             await _iap.completePurchase(purchase);
@@ -207,22 +212,33 @@ abstract final class PaychekAppleIapService {
     }
   }
 
-  static Future<String> _resolveAppleTransactionJws(
+  static Future<({String jws, String storeKit2Json})>
+      _resolveAppleVerificationPayload(
     PurchaseDetails purchase,
   ) async {
-    var jws = paychekExtractAppleTransactionJws(purchase);
-    if (paychekLooksLikeAppleTransactionJws(jws)) return jws;
+    var payload = paychekExtractAppleVerificationPayload(purchase);
+    if (paychekHasAppleVerificationPayload(
+      jws: payload.jws,
+      storeKit2Json: payload.storeKit2Json,
+    )) {
+      return payload;
+    }
 
     await _syncStoreKit2Transactions();
     for (var attempt = 1; attempt <= 5; attempt++) {
       await Future<void>.delayed(Duration(milliseconds: 300 * attempt));
-      jws = paychekExtractAppleTransactionJws(purchase);
-      if (paychekLooksLikeAppleTransactionJws(jws)) return jws;
+      payload = paychekExtractAppleVerificationPayload(purchase);
+      if (paychekHasAppleVerificationPayload(
+        jws: payload.jws,
+        storeKit2Json: payload.storeKit2Json,
+      )) {
+        return payload;
+      }
       if (attempt == 2 || attempt == 4) {
         await _syncStoreKit2Transactions();
       }
     }
-    return jws;
+    return payload;
   }
 
   static void _completePending(

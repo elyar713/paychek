@@ -15,6 +15,14 @@ const {
 
 const PAYCHEK_IOS_BUNDLE_ID = "pro.paychek.app";
 
+/** App Store Connect → App Information → Apple ID (numérique). */
+function parseAppleAppId(raw) {
+  const n = Number.parseInt(`${raw ?? ""}`.trim(), 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+const PAYCHEK_APPLE_APP_ID = parseAppleAppId(process.env.PAYCHEK_APPLE_APP_ID);
+
 const DEFAULT_PRODUCT_IDS = new Set([
   "Paychek.monthly",
   "Paychek_quarterly",
@@ -35,35 +43,146 @@ function loadAppleRootCAs() {
 }
 
 function buildVerifier(environment, bundleId) {
+  const appAppleId =
+    environment === Environment.PRODUCTION ? PAYCHEK_APPLE_APP_ID : undefined;
+  if (environment === Environment.PRODUCTION && !appAppleId) {
+    return null;
+  }
   return new SignedDataVerifier(
       loadAppleRootCAs(),
-      true,
+      false,
       environment,
       bundleId,
-      undefined,
+      appAppleId,
   );
+}
+
+/**
+ * @param {*} value
+ * @return {number|null}
+ */
+function parseAppleMillis(value) {
+  if (value == null) return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  const parsed = Date.parse(`${value}`);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+/**
+ * @param {object} obj StoreKit 2 jsonRepresentation
+ * @return {boolean}
+ */
+function isSandboxStoreKitJson(obj) {
+  const env = `${obj.environment || obj.storefront || ""}`.toLowerCase();
+  if (env.includes("sandbox")) return true;
+  if (env.includes("xcode")) return true;
+  return false;
+}
+
+/**
+ * @param {string} raw jsonRepresentation StoreKit 2
+ * @param {string} fallbackProductId
+ * @return {object|null}
+ */
+function transactionFromStoreKitJson(raw, fallbackProductId) {
+  const trimmed = `${raw || ""}`.trim();
+  if (!trimmed.startsWith("{")) return null;
+  let obj;
+  try {
+    obj = JSON.parse(trimmed);
+  } catch (_) {
+    return null;
+  }
+  if (!obj || typeof obj !== "object") return null;
+  const productId =
+    `${obj.productId || obj.productID || fallbackProductId || ""}`.trim();
+  const transactionId =
+    `${obj.transactionId || obj.id || obj.transactionID || ""}`.trim();
+  if (!productId || !transactionId) return null;
+  const purchaseDate =
+    parseAppleMillis(obj.purchaseDate) ||
+    parseAppleMillis(obj.signedDate) ||
+    parseAppleMillis(obj.originalPurchaseDate) ||
+    Date.now();
+  const expiresDate =
+    parseAppleMillis(obj.expiresDate) ||
+    parseAppleMillis(obj.expirationDate) ||
+    null;
+  return {
+    transactionId,
+    originalTransactionId:
+      `${obj.originalTransactionId || obj.originalId || transactionId}`.trim(),
+    productId,
+    purchaseDate,
+    expiresDate,
+    environment: obj.environment,
+  };
+}
+
+/**
+ * @param {Error} err
+ * @return {string}
+ */
+function formatAppleVerifyError(err) {
+  if (!err) return "apple_jws_invalid";
+  const status = err.status;
+  if (status != null) return `apple_verify_status_${status}`;
+  return err.message ? String(err.message) : "apple_jws_invalid";
 }
 
 /**
  * @param {string} signedTransaction JWS StoreKit 2
  * @param {string} bundleId
- * @return {Promise<object>}
+ * @param {string} appleStoreKit2Json jsonRepresentation (secours sandbox)
+ * @param {string} fallbackProductId
+ * @return {Promise<{tx: object, source: string}>}
  */
-async function decodeAppleTransaction(signedTransaction, bundleId) {
+async function resolveAppleTransaction(
+    signedTransaction,
+    bundleId,
+    appleStoreKit2Json,
+    fallbackProductId,
+) {
   const jws = `${signedTransaction || ""}`.trim();
-  if (!jws) {
-    throw new Error("signedTransaction_missing");
-  }
-  let lastErr = null;
-  for (const env of [Environment.PRODUCTION, Environment.SANDBOX]) {
-    try {
-      const verifier = buildVerifier(env, bundleId);
-      return await verifier.verifyAndDecodeTransaction(jws);
-    } catch (e) {
-      lastErr = e;
+  if (isLikelyAppleTransactionJws(jws)) {
+    let lastErr = null;
+    for (const env of [Environment.SANDBOX, Environment.PRODUCTION]) {
+      try {
+        const verifier = buildVerifier(env, bundleId);
+        if (!verifier) continue;
+        const tx = await verifier.verifyAndDecodeTransaction(jws);
+        return {tx, source: env === Environment.SANDBOX ? "jws_sandbox" : "jws_production"};
+      } catch (e) {
+        lastErr = e;
+        console.warn("[Paychek] decodeAppleTransaction", env, formatAppleVerifyError(e));
+      }
     }
+    const jsonTx = transactionFromStoreKitJson(
+        appleStoreKit2Json,
+        fallbackProductId,
+    );
+    if (jsonTx && isSandboxStoreKitJson(jsonTx)) {
+      console.warn("[Paychek] resolveAppleTransaction sandbox JSON fallback", {
+        productId: jsonTx.productId,
+        transactionId: jsonTx.transactionId,
+        jwsError: formatAppleVerifyError(lastErr),
+      });
+      return {tx: jsonTx, source: "json_sandbox_fallback"};
+    }
+    throw lastErr || new Error("apple_jws_invalid");
   }
-  throw lastErr || new Error("apple_jws_invalid");
+
+  const jsonTx = transactionFromStoreKitJson(
+      appleStoreKit2Json || jws,
+      fallbackProductId,
+  );
+  if (jsonTx && isSandboxStoreKitJson(jsonTx)) {
+    return {tx: jsonTx, source: "json_sandbox_only"};
+  }
+
+  throw new Error("signedTransaction_missing");
 }
 
 /**
@@ -273,18 +392,13 @@ function createAppleIapExports(deps) {
     try {
       const signedTransaction =
         `${request.data?.signedTransaction ?? ""}`.trim();
+      const appleStoreKit2Json =
+        `${request.data?.appleStoreKit2Json ?? ""}`.trim();
       let productId = `${request.data?.productId ?? ""}`.trim();
-      if (!signedTransaction || !productId) {
+      if ((!signedTransaction && !appleStoreKit2Json) || !productId) {
         throw new HttpsError(
             "invalid-argument",
             "Transaction Apple invalide (données manquantes).",
-        );
-      }
-      if (!isLikelyAppleTransactionJws(signedTransaction)) {
-        throw new HttpsError(
-            "invalid-argument",
-            "Reçu Apple invalide (JWS StoreKit 2 attendu). " +
-            "Réessaie ou restaure l’achat depuis l’app.",
         );
       }
       if (!DEFAULT_PRODUCT_IDS.has(productId)) {
@@ -295,7 +409,13 @@ function createAppleIapExports(deps) {
       }
 
       const bundleId = PAYCHEK_IOS_BUNDLE_ID;
-      const tx = await decodeAppleTransaction(signedTransaction, bundleId);
+      const resolved = await resolveAppleTransaction(
+          signedTransaction,
+          bundleId,
+          appleStoreKit2Json,
+          productId,
+      );
+      const tx = resolved.tx;
       const txProductId = `${tx.productId || ""}`.trim();
       if (txProductId && DEFAULT_PRODUCT_IDS.has(txProductId)) {
         productId = txProductId;
@@ -308,6 +428,7 @@ function createAppleIapExports(deps) {
         console.warn("[Paychek] verifyPaychekApplePurchase inactive tx", {
           uid: request.auth.uid,
           productId,
+          source: resolved.source,
           expiresMs,
           now: Date.now(),
         });
@@ -326,22 +447,33 @@ function createAppleIapExports(deps) {
           admin,
       );
       const periodEndMs = resolveApplePeriodEndMillis(tx, productId);
+      console.log("[Paychek] verifyPaychekApplePurchase ok", {
+        uid,
+        productId,
+        source: resolved.source,
+        granted,
+      });
       return {
         active: true,
         granted,
+        source: resolved.source,
         currentPeriodEndMillis: periodEndMs,
       };
     } catch (e) {
       console.error("[Paychek] verifyPaychekApplePurchase", e);
       if (e instanceof HttpsError) throw e;
-      const msg = e && e.message ? String(e.message) : "apple_verify_failed";
+      const msg = formatAppleVerifyError(e);
       if (
         msg.includes("signedTransaction_missing") ||
-        msg.includes("apple_jws")
+        msg.includes("apple_jws") ||
+        msg.includes("apple_verify")
       ) {
+        const hint = PAYCHEK_APPLE_APP_ID ?
+          "" :
+          " (Production : configure PAYCHEK_APPLE_APP_ID sur Firebase.)";
         throw new HttpsError(
             "invalid-argument",
-            "Reçu Apple invalide (JWS). Réessaie ou restaure l’achat.",
+            "Validation Apple échouée. Réessaie « Restaurer les achats »." + hint,
         );
       }
       throw new HttpsError("internal", msg);
@@ -381,10 +513,13 @@ function createAppleIapExports(deps) {
               "Produit Apple manquant pour ce compte.",
           );
         }
-        const tx = await decodeAppleTransaction(
+        const resolved = await resolveAppleTransaction(
             signedTransaction,
             PAYCHEK_IOS_BUNDLE_ID,
+            `${request.data?.appleStoreKit2Json ?? ""}`.trim(),
+            productId,
         );
+        const tx = resolved.tx;
         if (!appleTransactionGrantsPro(tx)) {
           return {
             active: false,
@@ -473,10 +608,11 @@ function createAppleIapExports(deps) {
 
 module.exports = {
   createAppleIapExports,
-  decodeAppleTransaction,
+  resolveAppleTransaction,
   appleTransactionGrantsPro,
   inferApplePeriodEndMillis,
   resolveApplePeriodEndMillis,
   PAYCHEK_IOS_BUNDLE_ID,
+  PAYCHEK_APPLE_APP_ID,
   DEFAULT_PRODUCT_IDS,
 };
