@@ -110,7 +110,25 @@ abstract final class PaychekRegionalPriceDefaults {
       'CO': 'es_CO',
     };
     if (byCountry.containsKey(country)) return byCountry[country]!;
-    if (currency == 'EUR') return 'fr_FR';
+    if (country.length == 2) {
+      final lang = switch (currency) {
+        'EUR' => 'en',
+        'GBP' => 'en',
+        'USD' => 'en',
+        'JPY' => 'ja',
+        'KRW' => 'ko',
+        'CNY' => 'zh',
+        'BRL' => 'pt',
+        'MXN' => 'es',
+        'PLN' => 'pl',
+        'SEK' => 'sv',
+        'NOK' => 'nb',
+        'DKK' => 'da',
+        _ => 'en',
+      };
+      return '${lang}_$country';
+    }
+    if (currency == 'EUR') return 'en_IE';
     if (currency == 'GBP') return 'en_GB';
     if (currency == 'USD') return 'en_US';
     return 'en_US';
