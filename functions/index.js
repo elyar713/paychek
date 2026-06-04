@@ -3528,6 +3528,81 @@ async function paychekApplyTrialRemainderToPeriodEnd(
 }
 
 /**
+ * Nouvel achat (session / transaction / token différent de celui déjà stocké).
+ * @param {FirebaseFirestore.DocumentSnapshot|null|undefined} prevSnap
+ * @param {object} opts
+ * @return {boolean}
+ */
+function paychekIsNewPaidPurchase(prevSnap, opts) {
+  const {
+    stripeCheckoutSessionId = null,
+    appleTransactionId = null,
+    googlePlayPurchaseToken = null,
+  } = opts;
+  if (!prevSnap || !prevSnap.exists) return true;
+  const prev = prevSnap.data() || {};
+  if (stripeCheckoutSessionId) {
+    return prev.stripeCheckoutSessionId !== stripeCheckoutSessionId;
+  }
+  if (appleTransactionId) {
+    return prev.appleTransactionId !== appleTransactionId;
+  }
+  if (googlePlayPurchaseToken) {
+    return prev.googlePlayPurchaseToken !== googlePlayPurchaseToken;
+  }
+  return true;
+}
+
+/**
+ * Jours restants sur un abonnement Pro déjà actif (hors essai Lite).
+ * @param {string} uid
+ * @param {FirebaseFirestore.DocumentSnapshot|null|undefined} entSnap
+ * @param {FirebaseFirestore.DocumentSnapshot|null|undefined} userSnap
+ * @return {number}
+ */
+function paychekActivePaidProRemainderMs(uid, entSnap, userSnap) {
+  const nowMs = Date.now();
+  const u = userSnap && userSnap.exists ? userSnap.data() || {} : {};
+  const tier = `${u.subscriptionTier || ""}`.trim().toLowerCase();
+  const isPro = tier === "pro" || u.isPremium === true;
+  if (!isPro) return 0;
+
+  let prevEndMs = null;
+  if (entSnap && entSnap.exists) {
+    const ent = entSnap.data() || {};
+    if (ent.active === true) {
+      const ts = paychekCoerceFirestoreTimestamp(ent.currentPeriodEnd);
+      if (ts) prevEndMs = ts.toMillis();
+    }
+  }
+  if (prevEndMs == null) {
+    const ts = paychekCoerceFirestoreTimestamp(u.subscriptionCurrentPeriodEnd);
+    if (ts) prevEndMs = ts.toMillis();
+  }
+  if (prevEndMs == null || prevEndMs <= nowMs) return 0;
+  return prevEndMs - nowMs;
+}
+
+/**
+ * Empile les jours Pro restants sur la fin de période du nouvel achat.
+ * @param {FirebaseFirestore.Timestamp|null} newPeriodEnd
+ * @param {number} remainderMs
+ * @return {FirebaseFirestore.Timestamp|null}
+ */
+function paychekStackProRemainderOnPeriodEnd(newPeriodEnd, remainderMs) {
+  if (
+    remainderMs <= 0 ||
+    !newPeriodEnd ||
+    typeof newPeriodEnd.toMillis !== "function"
+  ) {
+    return newPeriodEnd;
+  }
+  return admin.firestore.Timestamp.fromMillis(
+      newPeriodEnd.toMillis() + remainderMs,
+  );
+}
+
+/**
  * @param {FirebaseFirestore.Firestore} db
  * @param {string} uid
  * @param {object} opts
@@ -3627,19 +3702,48 @@ async function paychekGrantProEntitlement(db, uid, opts) {
   ) {
     const snap =
       prevSnapForMerge || (await entRef.get());
-    const prevEnd =
-      snap.exists &&
-      snap.data() &&
-      snap.data().currentPeriodEnd &&
-      typeof snap.data().currentPeriodEnd.toMillis === "function" ?
-        snap.data().currentPeriodEnd :
-        null;
-    if (prevEnd) {
-      const nextMs = currentPeriodEnd.toMillis();
-      const prevMs = prevEnd.toMillis();
-      mergedPeriodEnd = admin.firestore.Timestamp.fromMillis(
-          Math.max(prevMs, nextMs),
+    const userSnap = await db.collection("paychek_users").doc(uid).get();
+    const purchaseKeyOpts = {
+      stripeCheckoutSessionId,
+      appleTransactionId,
+      googlePlayPurchaseToken,
+    };
+    const isNewPurchase = paychekIsNewPaidPurchase(snap, purchaseKeyOpts);
+
+    if (isNewPurchase) {
+      const proRemainderMs = paychekActivePaidProRemainderMs(
+          uid,
+          snap,
+          userSnap,
       );
+      if (proRemainderMs > 0) {
+        mergedPeriodEnd = paychekStackProRemainderOnPeriodEnd(
+            currentPeriodEnd,
+            proRemainderMs,
+        );
+        console.log(
+            "[Paychek] stackProRemainderOnNewPurchase",
+            uid,
+            proRemainderMs,
+            mergedPeriodEnd &&
+            typeof mergedPeriodEnd.toMillis === "function" ?
+              new Date(mergedPeriodEnd.toMillis()).toISOString() :
+              null,
+        );
+      }
+    } else {
+      const prevEnd =
+        snap.exists &&
+        snap.data() &&
+        snap.data().currentPeriodEnd &&
+        typeof snap.data().currentPeriodEnd.toMillis === "function" ?
+          snap.data().currentPeriodEnd :
+          null;
+      if (prevEnd) {
+        mergedPeriodEnd = admin.firestore.Timestamp.fromMillis(
+            Math.max(prevEnd.toMillis(), currentPeriodEnd.toMillis()),
+        );
+      }
     }
   }
 
