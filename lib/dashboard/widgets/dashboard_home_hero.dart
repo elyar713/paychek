@@ -188,27 +188,30 @@ class _MinimalWelcomeBlock extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Flexible(
-              child: Text(
-                displayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  fontSize: nameFontSize,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                  color: nameColor,
-                ),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      displayName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: nameFontSize,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                        color: nameColor,
+                      ),
+                    ),
+                  ),
+                  if (planBadge != null) ...[
+                    const SizedBox(width: 8),
+                    planBadge!,
+                  ],
+                ],
               ),
             ),
-            if (planBadge != null) ...[
-              const SizedBox(width: 8),
-              planBadge!,
-            ],
-            if (nameRowTrailing != null) ...[
-              const Spacer(),
-              nameRowTrailing!,
-            ],
+            ?nameRowTrailing,
           ],
         ),
       ],

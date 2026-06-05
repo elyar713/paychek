@@ -23,7 +23,6 @@ abstract final class _ReportCompact {
   static const padFieldX = 8.0;
   static const padFieldY = 6.0;
   static const padFieldMultilineY = 8.0;
-  static const padNote = 8.0;
   static const ringRadius = 22.0;
   static const gapColumns = 12.0;
   static const columnsBreakpoint = 720.0;

@@ -2,15 +2,16 @@ import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import 'paychek_native_store_plan_pricing.dart';
 import 'paychek_plan_price_quote.dart';
 import 'paychek_regional_price_defaults.dart';
 import 'paychek_stripe_paywall_pricing.dart';
 import 'paychek_subscription_platform.dart';
 
-/// Tarifs paywall par pays / devise (web, iOS, Android).
+/// Tarifs paywall : web = catalogue régional (standard) ; iOS/Android = store natif.
 ///
-/// Affichage : Cloud Function puis catalogue local (249 pays).
-/// Achat mobile : App Store / Play facturent via leurs services IAP (prix réels au paiement).
+/// Web : Cloud Function puis catalogue local (249 pays).
+/// Mobile : App Store / Play (`queryProductDetails`), repli catalogue si indisponible.
 abstract final class PaychekStorePlanPricing {
   PaychekStorePlanPricing._();
 
@@ -22,7 +23,7 @@ abstract final class PaychekStorePlanPricing {
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(minutes: 10);
 
-  /// Même logique sur toutes les plateformes : pays → devise → montants TTC.
+  /// Web : pays → devise → montants catalogue. Mobile : prix store natifs en priorité.
   static Future<PaychekPlanPricingSnapshot> load({Locale? locale}) async {
     final loc = locale ?? PlatformDispatcher.instance.locale;
     final key = _cacheKeyFor(loc);
@@ -36,7 +37,13 @@ abstract final class PaychekStorePlanPricing {
 
     PaychekPlanPricingSnapshot snapshot;
     try {
-      snapshot = await loadRegionalByCountry(loc);
+      if (paychekUsesNativeStoreIap) {
+        final fromStore =
+            await PaychekNativeStorePlanPricing.load(locale: loc);
+        snapshot = fromStore ?? await loadRegionalByCountry(loc);
+      } else {
+        snapshot = await loadRegionalByCountry(loc);
+      }
     } catch (e, st) {
       debugPrint('[Paychek] store plan pricing $e\n$st');
       snapshot = _offlineRegional(loc);
