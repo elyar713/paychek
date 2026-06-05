@@ -412,7 +412,7 @@ class CapitalBalanceCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 10),
                           _CapitalBalanceMobileRingsRow(
                             ringSize: ringSize,
                             win: win,
@@ -458,19 +458,19 @@ abstract final class _CapitalBalanceRingsLayout {
   static const double webGap = 12;
   static const double webWrapSpacing = 28;
   static const double webWrapRunSpacing = 20;
-  static const double mobileGap = 8;
-  static const double mobileRingMax = 45;
-  static const double mobileRingCompactMax = 38;
+  static const double mobileGap = 6;
+  static const double mobileRingMax = 54;
+  static const double mobileRingCompactMax = 48;
 
   /// Taille anneaux mobile (une seule ligne).
   static double mobileRingSize({
     required double rowMaxWidth,
     required int bottomRingCount,
   }) {
-    const minSize = 32.0;
+    const minSize = 36.0;
     final preferred =
         bottomRingCount >= 4 ? mobileRingCompactMax : mobileRingMax;
-    final ringsBudget = rowMaxWidth * 0.98;
+    final ringsBudget = rowMaxWidth;
     final needed =
         preferred * bottomRingCount + (mobileGap * (bottomRingCount - 1));
     if (ringsBudget >= needed) return preferred;
@@ -478,6 +478,9 @@ abstract final class _CapitalBalanceRingsLayout {
         (ringsBudget - mobileGap * (bottomRingCount - 1)) / bottomRingCount;
     return fitted.clamp(minSize, preferred);
   }
+
+  static double mobileStrokeForSize(double size) =>
+      size >= 50 ? 5.0 : (size >= 42 ? 4.5 : 4.0);
 }
 
 class _CapitalBalanceWebRingsRow extends StatelessWidget {
@@ -547,6 +550,7 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final stroke = _CapitalBalanceRingsLayout.mobileStrokeForSize(ringSize);
 
     final rings = <Widget>[
       DonutRing(
@@ -554,7 +558,7 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
         centerPrimary: '$win%',
         centerSecondary: l.dashboardRingWin,
         size: ringSize,
-        strokeWidth: 4,
+        strokeWidth: stroke,
         onTap: onOpenPerformance,
       ),
       DonutRing(
@@ -562,32 +566,34 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
         centerPrimary: emPct,
         centerSecondary: l.dashboardRingState,
         size: ringSize,
-        strokeWidth: 4,
+        strokeWidth: stroke,
         ringColor: MentalStateTokens.ringStrokeForScore(emScore),
         onTap: onOpenEtatMental,
       ),
       ChecklistProgressRing(
         percent: checklistPct,
         size: ringSize,
-        strokeWidth: 4,
+        strokeWidth: stroke,
         onTap: onOpenChecklist,
       ),
       if (analyseSnapshot != null && onOpenAnalyse != null)
         DashboardAnalysePrepRing(
           snapshot: analyseSnapshot!,
           size: ringSize,
-          strokeWidth: 4,
+          strokeWidth: stroke,
           onTap: onOpenAnalyse,
           centerSecondary: l.dashboardRingAnalyseMobile,
         ),
     ];
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        for (var i = 0; i < rings.length; i++)
-          Expanded(
-            child: Center(child: rings[i]),
-          ),
+        for (var i = 0; i < rings.length; i++) ...[
+          if (i > 0)
+            const SizedBox(width: _CapitalBalanceRingsLayout.mobileGap),
+          rings[i],
+        ],
       ],
     );
   }

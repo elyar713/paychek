@@ -49,12 +49,12 @@ const COUNTRY_TO_CURRENCY = {
  * @type {Record<string, {monthly: number, quarterly: number, annual: number}>}
  */
 const DEFAULT_PRICES_BY_CURRENCY = {
-  USD: {monthly: 8.99, quarterly: 20.97, annual: 59.99},
-  EUR: {monthly: 9.99, quarterly: 23.49, annual: 59.99},
-  GBP: {monthly: 8.99, quarterly: 20.97, annual: 59.99},
+  USD: {monthly: 8.99, quarterly: 20.95, annual: 59.99},
+  EUR: {monthly: 9.99, quarterly: 22.95, annual: 69.99},
+  GBP: {monthly: 8.99, quarterly: 19.95, annual: 59.99},
   CAD: {monthly: 11.99, quarterly: 27.99, annual: 79.99},
   AUD: {monthly: 14.99, quarterly: 34.99, annual: 99.99},
-  CHF: {monthly: 10.00, quarterly: 24.00, annual: 60.00},
+  CHF: {monthly: 8.0, quarterly: 20.0, annual: 50.0},
   JPY: {monthly: 1300, quarterly: 3000, annual: 9000},
   BRL: {monthly: 49.90, quarterly: 119.90, annual: 349.90},
   MXN: {monthly: 179, quarterly: 419, annual: 1199},

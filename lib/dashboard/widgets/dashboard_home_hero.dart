@@ -59,7 +59,7 @@ class DashboardHomeHero extends StatelessWidget {
         : null;
 
     final planBadge = DashboardHomePlanLogic.shouldShowPlanBadge(accountPlanIsPro)
-        ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!)
+        ? PaychekPlanMinimalBadge(isPro: accountPlanIsPro!, compact: false)
         : null;
 
     final hasHeaderExtras = planBadge != null || upgrade != null;
@@ -201,32 +201,25 @@ class _MinimalWelcomeBlock extends StatelessWidget {
             color: PaychekWebTokens.textZinc500,
           ),
         ),
-        const SizedBox(height: 2),
+        if (planBadge != null) ...[
+          const SizedBox(height: 6),
+          Align(alignment: Alignment.centerLeft, child: planBadge!),
+        ],
+        const SizedBox(height: 4),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: Row(
-                children: [
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: Text(
-                      displayName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        fontSize: nameFontSize,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                        color: nameColor,
-                      ),
-                    ),
-                  ),
-                  if (planBadge != null) ...[
-                    const SizedBox(width: 6),
-                    planBadge!,
-                  ],
-                ],
+              child: Text(
+                displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: nameFontSize,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  color: nameColor,
+                ),
               ),
             ),
             ?nameRowTrailing,

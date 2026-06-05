@@ -8,9 +8,15 @@ import '../../web/paychek_web_tokens.dart';
 ///
 /// S’adapte aux largeurs très faibles (ligne du hero avec [Flexible]) via [FittedBox.scaleDown].
 class PaychekPlanMinimalBadge extends StatelessWidget {
-  const PaychekPlanMinimalBadge({super.key, required this.isPro});
+  const PaychekPlanMinimalBadge({
+    super.key,
+    required this.isPro,
+    this.compact = true,
+  });
 
   final bool isPro;
+  /// `false` sur l’accueil dashboard (pastille un peu plus grande).
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +30,14 @@ class PaychekPlanMinimalBadge extends StatelessWidget {
     final borderAlpha = isPro ? 0.22 : 0.2;
     final shadowAlpha = isPro ? 0.65 : 0.55;
 
+    final dotSize = compact ? 4.0 : 6.0;
+    final fontSize = compact ? 10.0 : 11.5;
+    final hPad = compact ? 8.0 : 10.0;
+    final vPad = compact ? 2.0 : 3.0;
+    final gap = compact ? 4.0 : 5.0;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
       decoration: BoxDecoration(
         color: accent.withValues(alpha: bgAlpha),
         borderRadius: BorderRadius.circular(6),
@@ -39,8 +51,8 @@ class PaychekPlanMinimalBadge extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 4,
-              height: 4,
+              width: dotSize,
+              height: dotSize,
               decoration: BoxDecoration(
                 color: accent,
                 shape: BoxShape.circle,
@@ -53,13 +65,13 @@ class PaychekPlanMinimalBadge extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: gap),
             Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.clip,
               style: GoogleFonts.inter(
-                fontSize: 10,
+                fontSize: fontSize,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.5,
                 color: accent,

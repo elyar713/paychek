@@ -3,13 +3,22 @@ import 'package:flutter/material.dart';
 import '../analyse_controller.dart';
 import '../analyse_tokens.dart';
 
-const double _kPrepCheckBoxSize = 20;
+const double _kPrepCheckBoxSize = 19;
 
 Color get _prepUncheckedBorder =>
     AnalyseTokens.zinc400.withValues(alpha: 0.55);
 
 Color get _prepUncheckedFill =>
     AnalyseTokens.inputBg.withValues(alpha: 0.85);
+
+Color get _prepCheckedFill =>
+    AnalyseTokens.accentGreen.withValues(alpha: 0.14);
+
+Color get _prepCheckedBorder =>
+    AnalyseTokens.accentGreen.withValues(alpha: 0.68);
+
+Color get _prepCheckedIcon =>
+    AnalyseTokens.accentGreen.withValues(alpha: 0.82);
 
 /// Petit carré de routine (hors PDF) sur un rapport figé.
 class AnalyseReportPrepCheckBox extends StatelessWidget {
@@ -37,22 +46,18 @@ class AnalyseReportPrepCheckBox extends StatelessWidget {
             width: _kPrepCheckBoxSize,
             height: _kPrepCheckBoxSize,
             decoration: BoxDecoration(
-              color: checked
-                  ? AnalyseTokens.accentGreen.withValues(alpha: 0.22)
-                  : _prepUncheckedFill,
+              color: checked ? _prepCheckedFill : _prepUncheckedFill,
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
-                color: checked
-                    ? AnalyseTokens.accentGreen
-                    : _prepUncheckedBorder,
-                width: checked ? 2 : 1.5,
+                color: checked ? _prepCheckedBorder : _prepUncheckedBorder,
+                width: 1.5,
               ),
             ),
             child: checked
                 ? Icon(
                     Icons.check_rounded,
-                    size: 14,
-                    color: AnalyseTokens.accentGreen,
+                    size: 13,
+                    color: _prepCheckedIcon,
                   )
                 : null,
           ),
@@ -94,22 +99,18 @@ class AnalysePrepCheckBox extends StatelessWidget {
                 width: size,
                 height: size,
                 decoration: BoxDecoration(
-                  color: on
-                      ? AnalyseTokens.accentGreen.withValues(alpha: 0.22)
-                      : _prepUncheckedFill,
+                  color: on ? _prepCheckedFill : _prepUncheckedFill,
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: on
-                        ? AnalyseTokens.accentGreen
-                        : _prepUncheckedBorder,
-                    width: on ? 2 : 1.5,
+                    color: on ? _prepCheckedBorder : _prepUncheckedBorder,
+                    width: 1.5,
                   ),
                 ),
                 child: on
                     ? Icon(
                         Icons.check_rounded,
-                        size: 14,
-                        color: AnalyseTokens.accentGreen,
+                        size: 13,
+                        color: _prepCheckedIcon,
                       )
                     : null,
               ),

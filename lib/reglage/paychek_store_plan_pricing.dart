@@ -8,10 +8,11 @@ import 'paychek_regional_price_defaults.dart';
 import 'paychek_stripe_paywall_pricing.dart';
 import 'paychek_subscription_platform.dart';
 
-/// Tarifs paywall : web = USD standard fixe ; iOS/Android = store natif.
+/// Tarifs paywall : web = USD fixe ; iOS = catalogue régional ; Android = Play natif.
 ///
-/// Web : 8,99 / 20,97 / 59,99 $ pour tous les pays (pas de tarif régional).
-/// Mobile : App Store / Play (`queryProductDetails`), repli catalogue si indisponible.
+/// Web : 8,99 / 20,95 / 59,99 $ (tous pays).
+/// iOS : catalogue pays/devise (grille Apple, hors StoreKit à l’affichage ; achat via App Store).
+/// Android : Google Play (`queryProductDetails`), repli catalogue si indisponible.
 abstract final class PaychekStorePlanPricing {
   PaychekStorePlanPricing._();
 
@@ -23,7 +24,7 @@ abstract final class PaychekStorePlanPricing {
   static DateTime? _cachedAt;
   static const Duration _cacheTtl = Duration(minutes: 10);
 
-  /// Web : pays → devise → montants catalogue. Mobile : prix store natifs en priorité.
+  /// Web : USD fixe. iOS : catalogue local. Android : Play natif + repli catalogue.
   static Future<PaychekPlanPricingSnapshot> load({Locale? locale}) async {
     final loc = locale ?? PlatformDispatcher.instance.locale;
     final key = _cacheKeyFor(loc);
@@ -39,10 +40,22 @@ abstract final class PaychekStorePlanPricing {
     try {
       if (kIsWeb) {
         snapshot = await loadWebUsdPricing();
-      } else if (paychekUsesNativeStoreIap) {
+      } else if (paychekUsesNativeAppleIap) {
+        // Affichage iOS : catalogue régional (aligné Apple), pas queryProductDetails.
+        debugPrint('[Paychek] paywall iOS catalog (hors StoreKit)');
+        snapshot = PaychekRegionalPriceDefaults.snapshotForLocale(loc);
+      } else if (paychekUsesNativeGooglePlayIap) {
         final fromStore =
             await PaychekNativeStorePlanPricing.load(locale: loc);
-        snapshot = fromStore ?? await loadRegionalByCountry(loc);
+        if (fromStore != null) {
+          debugPrint(
+            '[Paychek] paywall native store (${fromStore.source.name})',
+          );
+          snapshot = fromStore;
+        } else {
+          debugPrint('[Paychek] paywall native store unavailable — regional');
+          snapshot = await loadRegionalByCountry(loc);
+        }
       } else {
         snapshot = await loadRegionalByCountry(loc);
       }
@@ -72,7 +85,7 @@ abstract final class PaychekStorePlanPricing {
     return load(locale: locale);
   }
 
-  /// Web : paywall toujours en USD standard ($8.99 / $20.97 / $59.99), tous pays.
+  /// Web : paywall toujours en USD standard ($8.99 / $20.95 / $59.99), tous pays.
   static Future<PaychekPlanPricingSnapshot> loadWebUsdPricing() async {
     debugPrint('[Paychek] paywall web USD standard (fixed catalog)');
     return PaychekRegionalPriceDefaults.usStandardSnapshot();

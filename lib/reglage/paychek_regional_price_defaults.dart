@@ -64,7 +64,7 @@ abstract final class PaychekRegionalPriceDefaults {
 
   /// Tarif web global : toujours USD 8,99 / 20,97 / 59,99 (tous pays).
   static PaychekPlanPricingSnapshot usStandardSnapshot() {
-    const amounts = _Amounts(8.99, 20.97, 59.99);
+    const amounts = _Amounts(8.99, 20.95, 59.99);
     const currency = 'USD';
     const formatLocale = 'en_US';
     final formatter = NumberFormat.simpleCurrency(
@@ -480,15 +480,15 @@ const Map<String, _Amounts> _pricesByCurrency = {
   'AUD': _Amounts(14.99, 34.99, 99.99),
   'BRL': _Amounts(49.9, 119.9, 349.9),
   'CAD': _Amounts(11.99, 27.99, 79.99),
-  'CHF': _Amounts(10, 24, 60),
+  'CHF': _Amounts(8, 20, 50),
   'CLP': _Amounts(8990, 20990, 59990),
   'CNY': _Amounts(58, 138, 398),
   'COP': _Amounts(39900, 92900, 269900),
   'CZK': _Amounts(229, 529, 1490),
   'DKK': _Amounts(69, 159, 449),
   'EGP': _Amounts(449.99, 999.99, 2999.99),
-  'EUR': _Amounts(9.99, 23.49, 59.99),
-  'GBP': _Amounts(8.99, 20.97, 59.99),
+  'EUR': _Amounts(9.99, 22.95, 69.99),
+  'GBP': _Amounts(8.99, 19.95, 59.99),
   'HKD': _Amounts(68, 158, 468),
   'HUF': _Amounts(3990, 9290, 25990),
   'IDR': _Amounts(149000, 349000, 990000),
@@ -512,7 +512,7 @@ const Map<String, _Amounts> _pricesByCurrency = {
   'TRY': _Amounts(349.99, 799.99, 2299.99),
   'TWD': _Amounts(290, 670, 1990),
   'UAH': _Amounts(399, 929, 2699),
-  'USD': _Amounts(8.99, 20.97, 59.99),
+  'USD': _Amounts(8.99, 20.95, 59.99),
   'ZAR': _Amounts(169.99, 399.99, 1099.99),
 };
 
