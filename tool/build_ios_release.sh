@@ -9,6 +9,45 @@ echo ">> Flutter: $(command -v flutter)"
 flutter --version
 echo ""
 
+paychek_validate_ios_toolchain() {
+  if ! command -v xcodebuild >/dev/null 2>&1; then
+    echo "ERROR: xcodebuild introuvable (code 127)." >&2
+    echo "  sudo xcode-select -s /Applications/Xcode.app/Contents/Developer" >&2
+    exit 127
+  fi
+  echo ">> Xcode: $(xcodebuild -version | head -1)"
+  echo ">> xcode-select: $(xcode-select -p)"
+}
+
+paychek_regenerate_ios_flutter_config() {
+  echo ">> flutter pub get + config iOS (Generated.xcconfig sur ce Mac)"
+  flutter pub get
+  set +e
+  flutter build ios --config-only --release --no-codesign
+  set -e
+  local gen="ios/Flutter/Generated.xcconfig"
+  if [[ ! -f "$gen" ]]; then
+    echo "ERROR: $gen manquant après flutter pub get" >&2
+    exit 1
+  fi
+  local root
+  root="$(grep '^FLUTTER_ROOT=' "$gen" | cut -d= -f2- | tr -d '[:space:]')"
+  if [[ -z "$root" || ! -d "$root" ]]; then
+    echo "ERROR: FLUTTER_ROOT invalide dans $gen : « $root »" >&2
+    echo "  Supprime $gen puis relance ce script sur le Mac." >&2
+    exit 1
+  fi
+  if [[ "$root" == *'\'* ]] || [[ "$root" == *':'* ]]; then
+    echo "ERROR: FLUTTER_ROOT Windows détecté ($root)." >&2
+    echo "  rm ios/Flutter/Generated.xcconfig && flutter pub get" >&2
+    exit 1
+  fi
+  echo ">> FLUTTER_ROOT OK : $root"
+}
+
+paychek_validate_ios_toolchain
+echo ""
+
 VERSION_LINE="$(grep -E '^version:' pubspec.yaml | head -1 | awk '{print $2}')"
 BUILD_NAME="${VERSION_LINE%%+*}"
 BUILD_NUMBER="${VERSION_LINE#*+}"
@@ -29,8 +68,7 @@ echo ">> flutter clean (évite objective_c.framework slice simulateur en IPA)"
 flutter clean
 rm -rf build/native_assets .dart_tool/hooks_runner
 
-echo ">> flutter pub get"
-flutter pub get
+paychek_regenerate_ios_flutter_config
 
 echo ">> flutter gen-l10n"
 flutter gen-l10n
@@ -41,7 +79,11 @@ pod install
 cd ..
 
 export_ipa_with_xcodebuild() {
-  echo ">> xcodebuild -exportArchive (secours)"
+  echo ">> xcodebuild -exportArchive (secours — contourne flutter export / code 127)"
+  if [[ -x "$(dirname "$0")/export_ios_ipa_from_archive.sh" ]]; then
+    "$(dirname "$0")/export_ios_ipa_from_archive.sh" "$ARCHIVE_PATH"
+    return
+  fi
   rm -rf "$EXPORT_DIR"
   mkdir -p "$EXPORT_DIR"
   xcodebuild -exportArchive \
@@ -79,9 +121,18 @@ if [[ -z "$IPA_FILE" ]]; then
   echo "ERROR: aucun fichier .ipa dans $EXPORT_DIR"
   echo "  Archive présente : $([ -d "$ARCHIVE_PATH" ] && echo oui || echo non)"
   echo ""
-  echo "Plan B — Xcode :"
+  echo "Plan B — export direct :"
+  echo "  ./tool/export_ios_ipa_from_archive.sh"
+  echo ""
+  echo "Plan C — Xcode Organizer :"
   echo "  open ios/Runner.xcworkspace"
   echo "  Window → Organizer → Archives → Distribute App"
+  if [[ "$FLUTTER_IPA_STATUS" -eq 127 ]]; then
+    echo ""
+    echo "Code 127 = commande introuvable (souvent flutter ou xcodebuild hors PATH)."
+    echo "  export PATH=\"\$HOME/flutter/bin:\$PATH\""
+    echo "  which flutter xcodebuild"
+  fi
   exit 1
 fi
 
