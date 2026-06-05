@@ -72,7 +72,8 @@ extension _TradePageBuild on _TradePageState {
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(hPad, 12, hPad, 0),
-                        child: Center(
+                        child: Align(
+                          alignment: Alignment.topCenter,
                           child: ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: maxW),
                             child: SingleChildScrollView(

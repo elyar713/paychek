@@ -208,7 +208,8 @@ class _MinimalWelcomeBlock extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Expanded(
+                  Flexible(
+                    fit: FlexFit.loose,
                     child: Text(
                       displayName,
                       maxLines: 1,
@@ -222,7 +223,7 @@ class _MinimalWelcomeBlock extends StatelessWidget {
                     ),
                   ),
                   if (planBadge != null) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     planBadge!,
                   ],
                 ],

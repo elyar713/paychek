@@ -1,12 +1,10 @@
 import 'dart:async' show unawaited;
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../l10n/app_localizations.dart';
-import 'analyse_confluence_score.dart';
 import 'analyse_controller.dart';
 import 'analyse_entry_tf_storage.dart';
 import 'analyse_impact_modal.dart';
@@ -14,6 +12,7 @@ import 'analyse_models.dart';
 import 'analyse_page_content_contexte_options.dart';
 import 'analyse_tokens.dart';
 import 'widgets/analyse_confidence_slider.dart';
+import 'widgets/analyse_gauge.dart';
 import 'widgets/analyse_oled_funnel_toolbar.dart';
 import 'widgets/analyse_smc_fib_chips.dart';
 
@@ -35,9 +34,22 @@ class AnalyseOledStickyHeader extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        final score = computeOledConfluenceScore(controller);
-        final color = oledConfluenceColor(score);
-        final status = oledConfluenceStatusLabel(score, l);
+        final c = controller;
+        final p = computeAnalyseGlobalConfidencePercent(
+          feuille: c.confidenceFeuille,
+          structure: c.confidenceStructure,
+          indicators: c.confidenceIndicators,
+          smc: c.confidenceSmc,
+          impactFeuille: c.impactFeuille,
+          impactStructure: c.impactStructure,
+          impactIndicators: c.impactIndicators,
+          impactSmc: c.impactSmc,
+          contextEnabled: c.contextEnabled,
+          structureEnabled: c.structureEnabled,
+          indicatorsEnabled: c.indicatorsEnabled,
+          smcEnabled: c.smcEnabled,
+        );
+        final color = AnalyseTokens.confidenceColorForPercent(p);
         return Container(
           decoration: BoxDecoration(
             color: AnalyseTokens.headerBg,
@@ -46,13 +58,12 @@ class AnalyseOledStickyHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: Row(
             children: [
-              _ConfluenceRing(score: score, color: color),
-              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    l.analyseOledConfluenceLabel,
+                    l.analyseConfidenceBarCaption,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 8,
                       fontWeight: FontWeight.w800,
@@ -60,13 +71,15 @@ class AnalyseOledStickyHeader extends StatelessWidget {
                       color: AnalyseTokens.zinc500,
                     ),
                   ),
+                  const SizedBox(height: 2),
                   Text(
-                    status,
+                    '$p%',
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10,
+                      fontSize: 22,
                       fontWeight: FontWeight.w900,
                       color: color,
-                      letterSpacing: 0.4,
+                      height: 1.05,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ],
@@ -104,96 +117,6 @@ class AnalyseOledStickyHeader extends StatelessWidget {
       },
     );
   }
-}
-
-class _ConfluenceRing extends StatelessWidget {
-  const _ConfluenceRing({required this.score, required this.color});
-
-  final int score;
-  final Color color;
-
-  static const _r = 22.0;
-  static const _stroke = 4.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final norm = _r - _stroke * 2;
-    final c = 2 * math.pi * norm;
-    final offset = c - (score / 100) * c;
-    return SizedBox(
-      width: _r * 2,
-      height: _r * 2,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(_r * 2, _r * 2),
-            painter: _RingPainter(
-              radius: norm,
-              stroke: _stroke,
-              trackColor: const Color(0xFF14151B),
-              progressColor: color,
-              dashOffset: offset,
-              circumference: c,
-            ),
-          ),
-          Text(
-            '$score%',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  _RingPainter({
-    required this.radius,
-    required this.stroke,
-    required this.trackColor,
-    required this.progressColor,
-    required this.dashOffset,
-    required this.circumference,
-  });
-
-  final double radius;
-  final double stroke;
-  final Color trackColor;
-  final Color progressColor;
-  final double dashOffset;
-  final double circumference;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final track = Paint()
-      ..color = trackColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    final prog = Paint()
-      ..color = progressColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(c, radius, track);
-    final sweep = 2 * math.pi * (1 - dashOffset / circumference);
-    canvas.drawArc(
-      Rect.fromCircle(center: c, radius: radius),
-      -math.pi / 2,
-      sweep,
-      false,
-      prog,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _RingPainter old) =>
-      old.dashOffset != dashOffset || old.progressColor != progressColor;
 }
 
 class AnalyseOledSaveBanner extends StatelessWidget {
@@ -538,9 +461,9 @@ class AnalyseOledStepShell extends StatelessWidget {
     );
   }
 }
-// —— Puces OLED ——
+// ?????? Puces OLED ??????
 
-/// Puces phase marché : colonne pleine largeur sur mobile, rangée égale sur écran large.
+/// Puces phase march? : colonne pleine largeur sur mobile, rang?e ?gale sur ?cran large.
 class _OledMarketPhaseChips extends StatelessWidget {
   const _OledMarketPhaseChips({
     required this.controller,
@@ -602,7 +525,7 @@ class OledChipButton extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-    this.emoji,
+    this.icon,
     this.activeBorder,
     this.activeBg,
     this.activeFg,
@@ -611,7 +534,7 @@ class OledChipButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final String? emoji;
+  final IconData? icon;
   final Color? activeBorder;
   final Color? activeBg;
   final Color? activeFg;
@@ -649,18 +572,42 @@ class OledChipButton extends StatelessWidget {
                 : null,
           ),
           alignment: Alignment.center,
-          child: Text(
-            '${emoji ?? ''}$label',
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 11,
-              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              color: fg,
-              height: 1.15,
-            ),
-          ),
+          child: icon != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, size: 14, color: fg),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight:
+                              selected ? FontWeight.w800 : FontWeight.w600,
+                          color: fg,
+                          height: 1.15,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                    color: fg,
+                    height: 1.15,
+                  ),
+                ),
         ),
       ),
     );
@@ -672,7 +619,7 @@ Widget oledFieldLabel(String text) => Padding(
       child: Text(text, style: AnalyseTokens.oledSectionLabel),
     );
 
-/// Titre de sous-section + interrupteur (sans texte « section active »).
+/// Titre de sous-section + interrupteur (sans texte ? section active ?).
 Widget oledSectionTitleRow(
   String title, {
   required bool enabled,
@@ -771,7 +718,7 @@ Widget _oledConfidenceSlider({
   );
 }
 
-// —— Grille principale ——
+// ?????? Grille principale ??????
 
 class AnalyseOledPlanGrid extends StatelessWidget {
   const AnalyseOledPlanGrid({
@@ -830,7 +777,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
 
   final AnalyseController controller;
 
-  /// Sur desktop : bloc VP sous FONDAMENTAL. Sur mobile : géré par [AnalyseOledPlanGrid].
+  /// Sur desktop : bloc VP sous FONDAMENTAL. Sur mobile : g?r? par [AnalyseOledPlanGrid].
   final bool showVolumeProfile;
 
   @override
@@ -885,7 +832,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   Expanded(
                     child: OledChipButton(
                       label: l.analyseSideBuy,
-                      emoji: '🟢 ',
+                      icon: LucideIcons.trendingUp,
                       selected: c.bias == AnalyseDirectionBias.achat,
                       activeBorder: AnalyseTokens.oledGreen,
                       activeBg: const Color(0xFF051C15),
@@ -897,7 +844,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   Expanded(
                     child: OledChipButton(
                       label: l.analyseSideSell,
-                      emoji: '🔴 ',
+                      icon: LucideIcons.trendingDown,
                       selected: c.bias == AnalyseDirectionBias.vente,
                       activeBorder: AnalyseTokens.oledRed,
                       activeBg: const Color(0xFF1C090D),
@@ -909,7 +856,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   Expanded(
                     child: OledChipButton(
                       label: l.analyseSideWatch,
-                      emoji: '🟡 ',
+                      icon: LucideIcons.eye,
                       selected: c.bias == AnalyseDirectionBias.surveiller,
                       activeBorder: AnalyseTokens.oledAmber,
                       activeBg: const Color(0xFF1F1505),
@@ -1011,7 +958,7 @@ class AnalyseOledHtfSection extends StatelessWidget {
   }
 }
 
-/// Volume profile : sous FONDAMENTAL (desktop) ou au-dessus d'ENTRÉE (mobile).
+/// Volume profile : sous FONDAMENTAL (desktop) ou au-dessus d'ENTR??E (mobile).
 class AnalyseOledVolumeProfileBlock extends StatelessWidget {
   const AnalyseOledVolumeProfileBlock({
     super.key,
@@ -1159,7 +1106,7 @@ Widget _oledMiniTfDropdown(
   );
 }
 
-/// Tous les timeframes chart (M1 … Monthly) + libellés personnalisés éventuels.
+/// Tous les timeframes chart (M1 ??? Monthly) + libell?s personnalis?s ?ventuels.
 List<String> analyseOledChartTfOptions({List<String> custom = const []}) {
   final out = AnalyseStructureChartTf.values.map((e) => e.label).toList();
   for (final label in custom) {
@@ -1501,7 +1448,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
   }
 }
 
-// —— LTF ——
+// ?????? LTF ??????
 
 class AnalyseOledLtfSection extends StatefulWidget {
   const AnalyseOledLtfSection({super.key, required this.controller});

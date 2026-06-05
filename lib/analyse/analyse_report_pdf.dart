@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -66,12 +65,6 @@ abstract final class _OledPdf {
   static final badgeBuyBg = PdfColor.fromInt(0xFFD1FAE5);
   static final badgeSellBg = PdfColor.fromInt(0xFFFEE2E2);
   static final badgeNeutralBg = fieldBg;
-
-  static PdfColor confluence(int score) {
-    if (score > 70) return green;
-    if (score > 40) return amber;
-    return red;
-  }
 
   static PdfColor confidencePercent(int pct) {
     if (pct >= 70) return green;
@@ -298,64 +291,24 @@ pw.Widget _srLevel({
   );
 }
 
-pw.Widget _confluenceRing(AnalyseReportSnapshot s, AnalyseReportPdfCopy copy) {
-  final score = s.confluenceScore.clamp(0, 100);
-  final color = _OledPdf.confluence(score);
-  final rest = (100 - score).clamp(0, 100);
-  final v1 = score <= 0 ? 0.001 : score.toDouble();
-  final v2 = rest <= 0 ? 0.001 : rest.toDouble();
-
-  return pw.SizedBox(
-    width: 72,
-    height: 72,
-    child: pw.Chart(
-      grid: pw.PieGrid(startAngle: -math.pi / 2),
-      datasets: [
-        pw.PieDataSet(
-          value: v1,
-          color: color,
-          innerRadius: 22,
-          legendPosition: pw.PieLegendPosition.none,
-          drawBorder: false,
-        ),
-        pw.PieDataSet(
-          value: v2,
-          color: _OledPdf.track,
-          innerRadius: 22,
-          legendPosition: pw.PieLegendPosition.none,
-          drawBorder: false,
-        ),
-      ],
-      overlay: pw.Center(
-        child: pw.Column(
-          mainAxisAlignment: pw.MainAxisAlignment.center,
-          children: [
-            _w('$score%', fontSize: 14, bold: true, color: _OledPdf.textPrimary),
-            _w(
-              copy.confluenceRingLabel,
-              fontSize: 6,
-              bold: true,
-              color: _OledPdf.zinc500,
-              letterSpacing: 0.8,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
 pw.Widget _oledHero(
   AnalyseReportSnapshot s,
   AnalyseReportPdfCopy copy,
   AnalyseReportSnapshotLabels labels,
 ) {
   final bias = labels.bias(s.biasLabel);
+  final globalPct = s.globalConfidencePercent;
+  final globalColor = _OledPdf.fromFlutter(s.globalConfidenceColor);
 
   return pw.Row(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    crossAxisAlignment: pw.CrossAxisAlignment.center,
     children: [
-      _confluenceRing(s, copy),
+      _w(
+        '$globalPct%',
+        fontSize: 22,
+        bold: true,
+        color: globalColor,
+      ),
       pw.SizedBox(width: 12),
       pw.Expanded(
         child: pw.Column(
@@ -369,14 +322,6 @@ pw.Widget _oledHero(
               copy.analysisDateLabel(_dashOr(s.contexteDateLabel)),
               fontSize: 8,
               color: _OledPdf.zinc500,
-            ),
-            pw.SizedBox(height: 6),
-            _w(
-              copy.confluenceStatusLabel(s.confluenceScore),
-              fontSize: 8,
-              bold: true,
-              color: _OledPdf.confluence(s.confluenceScore),
-              letterSpacing: 0.4,
             ),
           ],
         ),

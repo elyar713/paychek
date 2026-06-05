@@ -16,6 +16,7 @@ import '../../../../trade/trade_journal_scope.dart';
 import '../../../../trade/trade_stats.dart';
 import '../../../../web/paychek_web_tokens.dart';
 import '../../../dashboard_tokens.dart';
+import '../../../widgets/capital_evolution_chart_section.dart';
 import '../../../widgets/dashboard_analyse_prep_ring.dart';
 import '../../../widgets/donut_ring.dart';
 import '../../../widgets/timeframe_pills.dart';
@@ -56,10 +57,6 @@ class CapitalBalanceCard extends StatelessWidget {
 
   /// Web : ligne Capital + Evolution ([Table]) — [Spacer] pour remplir la hauteur commune.
   final bool webPairStretch;
-
-  /// Mobile : anneaux compacts (réduits si 4 anneaux).
-  static const double _ringSize = 45;
-  static const double _ringSizeCompact = 40;
 
   /// Web : proche des 64 px de la maquette (`w-16`).
   static const double _ringSizeWeb = 56;
@@ -309,58 +306,63 @@ class CapitalBalanceCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Transform.translate(
-                                    offset: const Offset(-4, -10),
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: mainAmount,
-                                            style: amountStyle,
+                  LayoutBuilder(
+                    builder: (context, rowConstraints) {
+                      final ringCount =
+                          (analyseSnap != null && openAnalyse != null) ? 4 : 3;
+                      final ringSize =
+                          _CapitalBalanceRingsLayout.mobileRingSize(
+                        rowMaxWidth: rowConstraints.maxWidth,
+                        bottomRingCount: ringCount,
+                      );
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                fit: FlexFit.loose,
+                                child: Transform.translate(
+                                  offset: const Offset(-4, -10),
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: mainAmount,
+                                          style: amountStyle,
+                                        ),
+                                        TextSpan(
+                                          text: ' $sym',
+                                          style: amountStyle?.copyWith(
+                                            fontSize: 17,
                                           ),
-                                          TextSpan(
-                                            text: ' $sym',
-                                            style: amountStyle?.copyWith(
-                                              fontSize: 17,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  profitNet < 0
-                                      ? Icons.trending_down
-                                      : Icons.trending_up,
-                                  color: deltaColor,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Column(
+                              ),
+                              const Spacer(),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    profitNet < 0
+                                        ? Icons.trending_down
+                                        : Icons.trending_up,
+                                    color: deltaColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        CrossAxisAlignment.end,
                                     children: [
                                       Text.rich(
                                         TextSpan(
@@ -385,6 +387,7 @@ class CapitalBalanceCard extends StatelessWidget {
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.right,
                                       ),
                                       if (signedPct != null) ...[
                                         const SizedBox(height: 2),
@@ -392,6 +395,7 @@ class CapitalBalanceCard extends StatelessWidget {
                                           signedPct,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.right,
                                           style: soldeDeltaStyle?.copyWith(
                                             color: deltaColor.withValues(
                                               alpha: 0.85,
@@ -404,29 +408,35 @@ class CapitalBalanceCard extends StatelessWidget {
                                       ],
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      _CapitalBalanceMobileRingsRow(
-                        ringSize: (analyseSnap != null && openAnalyse != null)
-                            ? _ringSizeCompact
-                            : _ringSize,
-                        win: win,
-                        emScore: emScore,
-                        emPct: emPct,
-                        checklistPct: checklistPct,
-                        analyseSnapshot: analyseSnap,
-                        onOpenPerformance: onOpenPerformance,
-                        onOpenEtatMental: onOpenEtatMental,
-                        onOpenChecklist: onOpenChecklist,
-                        onOpenAnalyse: openAnalyse,
-                      ),
-                    ],
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          _CapitalBalanceMobileRingsRow(
+                            ringSize: ringSize,
+                            win: win,
+                            emScore: emScore,
+                            emPct: emPct,
+                            checklistPct: checklistPct,
+                            analyseSnapshot: analyseSnap,
+                            onOpenPerformance: onOpenPerformance,
+                            onOpenEtatMental: onOpenEtatMental,
+                            onOpenChecklist: onOpenChecklist,
+                            onOpenAnalyse: openAnalyse,
+                          ),
+                        ],
+                      );
+                    },
                   ),
+                  if (!kIsWeb && onOpenTradeById != null) ...[
+                    const CapitalEvolutionMergedDivider(),
+                    CapitalEvolutionChartSection(
+                      timeframeIndex: timeframeIndex,
+                      onOpenTradeById: onOpenTradeById!,
+                      onOpenTradeDayKey: onOpenTradeDayKey,
+                    ),
+                  ],
                 ],
               ),
             );
@@ -448,7 +458,26 @@ abstract final class _CapitalBalanceRingsLayout {
   static const double webGap = 12;
   static const double webWrapSpacing = 28;
   static const double webWrapRunSpacing = 20;
-  static const double mobileGap = 10;
+  static const double mobileGap = 8;
+  static const double mobileRingMax = 45;
+  static const double mobileRingCompactMax = 38;
+
+  /// Taille anneaux mobile (une seule ligne).
+  static double mobileRingSize({
+    required double rowMaxWidth,
+    required int bottomRingCount,
+  }) {
+    const minSize = 32.0;
+    final preferred =
+        bottomRingCount >= 4 ? mobileRingCompactMax : mobileRingMax;
+    final ringsBudget = rowMaxWidth * 0.98;
+    final needed =
+        preferred * bottomRingCount + (mobileGap * (bottomRingCount - 1));
+    if (ringsBudget >= needed) return preferred;
+    final fitted =
+        (ringsBudget - mobileGap * (bottomRingCount - 1)) / bottomRingCount;
+    return fitted.clamp(minSize, preferred);
+  }
 }
 
 class _CapitalBalanceWebRingsRow extends StatelessWidget {
@@ -517,11 +546,13 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+
     final rings = <Widget>[
       DonutRing(
         progress: win / 100.0,
         centerPrimary: '$win%',
-        centerSecondary: AppLocalizations.of(context)!.dashboardRingWin,
+        centerSecondary: l.dashboardRingWin,
         size: ringSize,
         strokeWidth: 4,
         onTap: onOpenPerformance,
@@ -529,7 +560,7 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
       DonutRing(
         progress: emScore / 100.0,
         centerPrimary: emPct,
-        centerSecondary: AppLocalizations.of(context)!.dashboardRingState,
+        centerSecondary: l.dashboardRingState,
         size: ringSize,
         strokeWidth: 4,
         ringColor: MentalStateTokens.ringStrokeForScore(emScore),
@@ -547,52 +578,17 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
           size: ringSize,
           strokeWidth: 4,
           onTap: onOpenAnalyse,
-          centerSecondary:
-              AppLocalizations.of(context)!.dashboardRingAnalyseMobile,
+          centerSecondary: l.dashboardRingAnalyseMobile,
         ),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final gap = _CapitalBalanceRingsLayout.mobileGap;
-        if (rings.length <= 2) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              for (var i = 0; i < rings.length; i++) ...[
-                if (i > 0) SizedBox(height: gap),
-                rings[i],
-              ],
-            ],
-          );
-        }
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                rings[0],
-                SizedBox(width: gap),
-                rings[1],
-              ],
-            ),
-            SizedBox(height: gap),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                rings[2],
-                if (rings.length > 3) ...[
-                  SizedBox(width: gap),
-                  rings[3],
-                ],
-              ],
-            ),
-          ],
-        );
-      },
+    return Row(
+      children: [
+        for (var i = 0; i < rings.length; i++)
+          Expanded(
+            child: Center(child: rings[i]),
+          ),
+      ],
     );
   }
 }
@@ -632,10 +628,14 @@ String _formatSignedAmount(double amount) {
 }
 
 String _formatMainAmount(double? amount) {
-  if (amount == null) return '10 450';
+  if (amount == null) return '10 450,00';
   final v = amount;
-  if (v == v.roundToDouble()) return _separateThousands(v.round());
-  return v.toStringAsFixed(2).replaceAll('.', ',');
+  final sign = v < 0 ? '-' : '';
+  final fixed = v.abs().toStringAsFixed(2);
+  final dot = fixed.indexOf('.');
+  final intVal = int.parse(fixed.substring(0, dot));
+  final dec = fixed.substring(dot + 1);
+  return '$sign${_separateThousands(intVal)},$dec';
 }
 
 String _separateThousands(int n) {

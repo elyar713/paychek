@@ -8,9 +8,9 @@ import 'paychek_regional_price_defaults.dart';
 import 'paychek_stripe_paywall_pricing.dart';
 import 'paychek_subscription_platform.dart';
 
-/// Tarifs paywall : web = catalogue régional (standard) ; iOS/Android = store natif.
+/// Tarifs paywall : web = USD standard fixe ; iOS/Android = store natif.
 ///
-/// Web : Cloud Function puis catalogue local (249 pays).
+/// Web : 8,99 / 20,97 / 59,99 $ pour tous les pays (pas de tarif régional).
 /// Mobile : App Store / Play (`queryProductDetails`), repli catalogue si indisponible.
 abstract final class PaychekStorePlanPricing {
   PaychekStorePlanPricing._();
@@ -49,14 +49,14 @@ abstract final class PaychekStorePlanPricing {
     } catch (e, st) {
       debugPrint('[Paychek] store plan pricing $e\n$st');
       snapshot = kIsWeb
-          ? PaychekRegionalPriceDefaults.snapshotForCountry('US')
+          ? PaychekRegionalPriceDefaults.usStandardSnapshot()
           : (paychekUsesNativeStoreIap
               ? _emptyNativeFallback()
               : _offlineRegional(loc));
     }
 
     if (snapshot.byCycle.isEmpty && kIsWeb) {
-      snapshot = PaychekRegionalPriceDefaults.snapshotForCountry('US');
+      snapshot = PaychekRegionalPriceDefaults.usStandardSnapshot();
     } else if (snapshot.byCycle.isEmpty && !paychekUsesNativeStoreIap) {
       snapshot = _offlineRegional(loc);
     }
@@ -74,24 +74,10 @@ abstract final class PaychekStorePlanPricing {
     return load(locale: locale);
   }
 
-  /// Web : paywall toujours en USD ($8.99 / mois), indépendamment du pays navigateur.
+  /// Web : paywall toujours en USD standard ($8.99 / $20.97 / $59.99), tous pays.
   static Future<PaychekPlanPricingSnapshot> loadWebUsdPricing() async {
-    const country = 'US';
-    const currency = 'USD';
-    final formatLocale = PaychekRegionalPriceDefaults.formatLocaleForCountry(
-      country,
-      currency,
-    );
-    final fromServer = await PaychekStripePaywallPricing.fetch(
-      countryCode: country,
-      numberFormatLocale: formatLocale,
-    );
-    if (fromServer != null && fromServer.byCycle.isNotEmpty) {
-      debugPrint('[Paychek] paywall web USD (server)');
-      return fromServer;
-    }
-    debugPrint('[Paychek] paywall web USD (catalogue offline)');
-    return PaychekRegionalPriceDefaults.snapshotForCountry(country);
+    debugPrint('[Paychek] paywall web USD standard (fixed catalog)');
+    return PaychekRegionalPriceDefaults.usStandardSnapshot();
   }
 
   /// Résout pays → devise → montants via Cloud Function, puis catalogue local.

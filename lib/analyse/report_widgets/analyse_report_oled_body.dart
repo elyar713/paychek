@@ -1,11 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../analyse_confluence_score.dart';
 import '../analyse_prep_checks.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
@@ -23,7 +20,6 @@ abstract final class _ReportCompact {
   static const padFieldX = 8.0;
   static const padFieldY = 6.0;
   static const padFieldMultilineY = 8.0;
-  static const ringRadius = 22.0;
   static const gapColumns = 12.0;
   static const columnsBreakpoint = 720.0;
 }
@@ -58,7 +54,6 @@ class AnalyseReportOledBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = snapshot;
-    final confColor = oledConfluenceColor(s.confluenceScore);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AnalyseTokens.radiusCard),
@@ -81,7 +76,6 @@ class AnalyseReportOledBody extends StatelessWidget {
                 children: [
                   _ReportHero(
                     snapshot: s,
-                    confluenceColor: confColor,
                     onPrepToggle: onPrepToggle,
                   ),
                   const SizedBox(height: _ReportCompact.gapSection),
@@ -234,12 +228,10 @@ class _ReportColumnOff extends StatelessWidget {
 class _ReportHero extends StatelessWidget {
   const _ReportHero({
     required this.snapshot,
-    required this.confluenceColor,
     this.onPrepToggle,
   });
 
   final AnalyseReportSnapshot snapshot;
-  final Color confluenceColor;
   final ValueChanged<String>? onPrepToggle;
 
   static String _heroValue(String raw) {
@@ -256,7 +248,16 @@ class _ReportHero extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _ConfluenceRing(score: snapshot.confluenceScore, color: confluenceColor),
+        Text(
+          '${snapshot.globalConfidencePercent}%',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: snapshot.globalConfidenceColor,
+            height: 1.05,
+            letterSpacing: -0.3,
+          ),
+        ),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -305,93 +306,6 @@ class _ReportHero extends StatelessWidget {
       ],
     );
   }
-}
-
-class _ConfluenceRing extends StatelessWidget {
-  const _ConfluenceRing({required this.score, required this.color});
-
-  final int score;
-  final Color color;
-
-  static const _r = _ReportCompact.ringRadius;
-  static const _stroke = 3.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final norm = _r - _stroke * 2;
-    final c = 2 * math.pi * norm;
-    final offset = c - (score / 100) * c;
-    return SizedBox(
-      width: _r * 2,
-      height: _r * 2,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(_r * 2, _r * 2),
-            painter: _RingPainter(
-              radius: norm,
-              stroke: _stroke,
-              progressColor: color,
-              dashOffset: offset,
-              circumference: c,
-            ),
-          ),
-          Text(
-            '$score%',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  _RingPainter({
-    required this.radius,
-    required this.stroke,
-    required this.progressColor,
-    required this.dashOffset,
-    required this.circumference,
-  });
-
-  final double radius;
-  final double stroke;
-  final Color progressColor;
-  final double dashOffset;
-  final double circumference;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final track = Paint()
-      ..color = const Color(0xFF14151B)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    final prog = Paint()
-      ..color = progressColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(c, radius, track);
-    final sweep = 2 * math.pi * (1 - dashOffset / circumference);
-    canvas.drawArc(
-      Rect.fromCircle(center: c, radius: radius),
-      -math.pi / 2,
-      sweep,
-      false,
-      prog,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _RingPainter old) =>
-      old.dashOffset != dashOffset || old.progressColor != progressColor;
 }
 
 /// Titre de section à l’intérieur de la carte fusionnée (sans carte séparée).

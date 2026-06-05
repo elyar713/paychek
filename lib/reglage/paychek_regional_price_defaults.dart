@@ -62,6 +62,44 @@ abstract final class PaychekRegionalPriceDefaults {
     return snapshotForCountry(countryFromLocale(locale));
   }
 
+  /// Tarif web global : toujours USD 8,99 / 20,97 / 59,99 (tous pays).
+  static PaychekPlanPricingSnapshot usStandardSnapshot() {
+    const amounts = _Amounts(8.99, 20.97, 59.99);
+    const currency = 'USD';
+    const formatLocale = 'en_US';
+    final formatter = NumberFormat.simpleCurrency(
+      name: currency,
+      locale: formatLocale,
+    );
+
+    PaychekPlanPriceQuote quote(PaychekBillingCycle cycle, double total) {
+      final months = switch (cycle) {
+        PaychekBillingCycle.monthly => 1,
+        PaychekBillingCycle.quarterly => 3,
+        PaychekBillingCycle.annual => 12,
+      };
+      return PaychekPlanPriceQuote(
+        cycle: cycle,
+        totalDisplay: formatter.format(total),
+        perMonthDisplay: formatter.format(total / months),
+        rawTotal: total,
+        currencyCode: currency,
+      );
+    }
+
+    return PaychekPlanPricingSnapshot(
+      source: PaychekPlanPricingSource.catalogFallback,
+      byCycle: {
+        PaychekBillingCycle.monthly:
+            quote(PaychekBillingCycle.monthly, amounts.monthly),
+        PaychekBillingCycle.quarterly:
+            quote(PaychekBillingCycle.quarterly, amounts.quarterly),
+        PaychekBillingCycle.annual:
+            quote(PaychekBillingCycle.annual, amounts.annual),
+      },
+    );
+  }
+
   static String formatLocaleForCountry(String countryCode, String currency) {
     final country = countryCode.trim().toUpperCase();
     const byCountry = {

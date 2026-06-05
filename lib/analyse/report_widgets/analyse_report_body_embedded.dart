@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../dashboard/widgets/dashboard_analyse_prep_ring.dart';
 import '../../l10n/app_localizations.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
@@ -75,8 +74,6 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   ),
                 ),
               ),
-              DashboardAnalysePrepRing(snapshot: snapshot, size: 32),
-              const SizedBox(width: 4),
               IconButton(
                 onPressed: onToggleDashboardStar,
                 tooltip: isDashboardStarred

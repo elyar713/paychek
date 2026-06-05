@@ -47,7 +47,7 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
   PaychekPlanPricingSnapshot get _effectivePricing {
     if (_pricing != null && _pricing!.byCycle.isNotEmpty) return _pricing!;
     if (kIsWeb) {
-      return PaychekRegionalPriceDefaults.snapshotForCountry('US');
+      return PaychekRegionalPriceDefaults.usStandardSnapshot();
     }
     if (paychekUsesNativeStoreIap) {
       return const PaychekPlanPricingSnapshot(
