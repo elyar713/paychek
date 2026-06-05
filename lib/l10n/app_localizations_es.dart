@@ -729,6 +729,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get analyseConfidenceLow => 'Bajo';
 
   @override
+  String get analyseConfidenceBarCaption => 'Confianza en tu análisis';
+
+  @override
   String analyseCopyLabel(String label) {
     return 'Copiar $label';
   }

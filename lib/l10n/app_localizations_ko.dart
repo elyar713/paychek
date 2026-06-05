@@ -689,6 +689,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get analyseConfidenceLow => '낮음';
 
   @override
+  String get analyseConfidenceBarCaption => '분석에 대한 확신';
+
+  @override
   String analyseCopyLabel(String label) {
     return '$label 복사';
   }

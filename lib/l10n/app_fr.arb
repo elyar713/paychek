@@ -366,6 +366,7 @@
   "analyseConfidenceHigh": "Élevé",
   "analyseConfidenceLevelTitle": "NIVEAU DE CONFIANCE",
   "analyseConfidenceLow": "Faible",
+  "analyseConfidenceBarCaption": "Confiance sur l'analyse",
   "analyseCopyLabel": "Copie {label}",
   "analyseCopyNumber": "Copie {n}",
   "analyseCurrentMarketPhase": "PHASE ACTUELLE DU MARCHÉ",

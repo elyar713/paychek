@@ -213,12 +213,15 @@ Future<AnalyseReportSnapshot> persistAnalyseReportPrepToggle(
     list[idx] = updated;
     await AnalyseReportsStorage.saveAll(list);
     AnalyseFirestoreSync.pushIfSignedIn();
+    AnalyseRealtimeNotifier.bumpReports();
+    AnalyseRealtimeNotifier.bump();
+  } else {
+    final starred = await AnalyseStarredReportStorage.load();
+    if (starred != null && analyseSnapshotsEqualForStar(starred, current)) {
+      await AnalyseStarredReportStorage.save(updated);
+      AnalyseRealtimeNotifier.bumpReports();
+      AnalyseRealtimeNotifier.bump();
+    }
   }
-  final starred = await AnalyseStarredReportStorage.load();
-  if (starred != null && analyseSnapshotsEqualForStar(starred, current)) {
-    await AnalyseStarredReportStorage.save(updated);
-  }
-  AnalyseRealtimeNotifier.bumpReports();
-  AnalyseRealtimeNotifier.bump();
   return updated;
 }

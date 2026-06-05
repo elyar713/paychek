@@ -365,6 +365,7 @@
   "analyseConfidenceHigh": "Alta",
   "analyseConfidenceLevelTitle": "Nível de confiança",
   "analyseConfidenceLow": "Normal",
+  "analyseConfidenceBarCaption": "Confiança na sua análise",
   "analyseCopyLabel": "Copiar",
   "analyseCopyNumber": "Copiar",
   "analyseCurrentMarketPhase": "FASE ATUAL DO MERCADO",

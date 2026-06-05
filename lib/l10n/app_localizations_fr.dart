@@ -727,6 +727,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get analyseConfidenceLow => 'Faible';
 
   @override
+  String get analyseConfidenceBarCaption => 'Confiance sur l\'analyse';
+
+  @override
   String analyseCopyLabel(String label) {
     return 'Copie $label';
   }

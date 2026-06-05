@@ -76,7 +76,24 @@ class DashboardHomeHero extends StatelessWidget {
 
     Widget headerBody;
     if (isMobileHome) {
-      headerBody = welcomeBlock;
+      headerBody = Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: _MinimalWelcomeBlock(
+              welcomePrefix: l.webHomeWelcomeBack,
+              displayName: displayName,
+              nameColor: scheme.onSurface,
+              nameFontSize: nameFontSize,
+              planBadge: planBadge,
+            ),
+          ),
+          if (upgrade != null) ...[
+            const SizedBox(width: 12),
+            upgrade,
+          ],
+        ],
+      );
     } else {
       headerBody = LayoutBuilder(
         builder: (context, constraints) {

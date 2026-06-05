@@ -365,6 +365,7 @@
   "analyseConfidenceHigh": "높음",
   "analyseConfidenceLevelTitle": "신뢰 수준",
   "analyseConfidenceLow": "낮음",
+  "analyseConfidenceBarCaption": "분석에 대한 확신",
   "analyseCopyLabel": "{label} 복사",
   "analyseCopyNumber": "{n} 복사",
   "analyseCurrentMarketPhase": "현재 시장 페이즈",

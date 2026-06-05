@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 import '../analyse_controller.dart';
 import '../analyse_tokens.dart';
 
+const double _kPrepCheckBoxSize = 20;
+
+Color get _prepUncheckedBorder =>
+    AnalyseTokens.zinc400.withValues(alpha: 0.55);
+
+Color get _prepUncheckedFill =>
+    AnalyseTokens.inputBg.withValues(alpha: 0.85);
+
 /// Petit carré de routine (hors PDF) sur un rapport figé.
 class AnalyseReportPrepCheckBox extends StatelessWidget {
   const AnalyseReportPrepCheckBox({
@@ -26,24 +34,24 @@ class AnalyseReportPrepCheckBox extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 120),
-            width: AnalysePrepCheckBox.size,
-            height: AnalysePrepCheckBox.size,
+            width: _kPrepCheckBoxSize,
+            height: _kPrepCheckBoxSize,
             decoration: BoxDecoration(
               color: checked
-                  ? AnalyseTokens.accentGreen.withValues(alpha: 0.18)
-                  : AnalyseTokens.inputBg,
+                  ? AnalyseTokens.accentGreen.withValues(alpha: 0.22)
+                  : _prepUncheckedFill,
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
                 color: checked
                     ? AnalyseTokens.accentGreen
-                    : AnalyseTokens.cardBorder,
-                width: checked ? 1.5 : 1,
+                    : _prepUncheckedBorder,
+                width: checked ? 2 : 1.5,
               ),
             ),
             child: checked
                 ? Icon(
                     Icons.check_rounded,
-                    size: 13,
+                    size: 14,
                     color: AnalyseTokens.accentGreen,
                   )
                 : null,
@@ -65,7 +73,7 @@ class AnalysePrepCheckBox extends StatelessWidget {
   final AnalyseController controller;
   final String prepId;
 
-  static const double size = 18;
+  static const double size = _kPrepCheckBoxSize;
 
   @override
   Widget build(BuildContext context) {
@@ -87,20 +95,20 @@ class AnalysePrepCheckBox extends StatelessWidget {
                 height: size,
                 decoration: BoxDecoration(
                   color: on
-                      ? AnalyseTokens.accentGreen.withValues(alpha: 0.18)
-                      : AnalyseTokens.inputBg,
+                      ? AnalyseTokens.accentGreen.withValues(alpha: 0.22)
+                      : _prepUncheckedFill,
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
                     color: on
                         ? AnalyseTokens.accentGreen
-                        : AnalyseTokens.cardBorder,
-                    width: on ? 1.5 : 1,
+                        : _prepUncheckedBorder,
+                    width: on ? 2 : 1.5,
                   ),
                 ),
                 child: on
                     ? Icon(
                         Icons.check_rounded,
-                        size: 13,
+                        size: 14,
                         color: AnalyseTokens.accentGreen,
                       )
                     : null,

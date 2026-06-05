@@ -16,7 +16,6 @@ import '../../../../trade/trade_journal_scope.dart';
 import '../../../../trade/trade_stats.dart';
 import '../../../../web/paychek_web_tokens.dart';
 import '../../../dashboard_tokens.dart';
-import '../../../widgets/capital_evolution_chart_section.dart';
 import '../../../widgets/dashboard_analyse_prep_ring.dart';
 import '../../../widgets/donut_ring.dart';
 import '../../../widgets/timeframe_pills.dart';
@@ -310,96 +309,108 @@ class CapitalBalanceCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Transform.translate(
-                              offset: const Offset(-4, -10),
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: mainAmount,
-                                      style: amountStyle,
-                                    ),
-                                    TextSpan(
-                                      text: ' $sym',
-                                      style: amountStyle?.copyWith(fontSize: 17),
-                                    ),
-                                  ],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            profitNet < 0
-                                ? Icons.trending_down
-                                : Icons.trending_up,
-                            color: deltaColor,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
+                                Expanded(
+                                  child: Transform.translate(
+                                    offset: const Offset(-4, -10),
+                                    child: Text.rich(
                                       TextSpan(
-                                        text: '$signedDelta ',
-                                        style: soldeDeltaStyle?.copyWith(
-                                          color: deltaColor,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: mainAmount,
+                                            style: amountStyle,
+                                          ),
+                                          TextSpan(
+                                            text: ' $sym',
+                                            style: amountStyle?.copyWith(
+                                              fontSize: 17,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      TextSpan(
-                                        text: sym,
-                                        style: soldeDeltaStyle?.copyWith(
-                                          fontSize: 9.5,
-                                          color: deltaColor,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (signedPct != null) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    signedPct,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: soldeDeltaStyle?.copyWith(
-                                      color: deltaColor.withValues(alpha: 0.85),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                ],
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 10),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  profitNet < 0
+                                      ? Icons.trending_down
+                                      : Icons.trending_up,
+                                  color: deltaColor,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: '$signedDelta ',
+                                              style: soldeDeltaStyle?.copyWith(
+                                                color: deltaColor,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: sym,
+                                              style: soldeDeltaStyle?.copyWith(
+                                                fontSize: 9.5,
+                                                color: deltaColor,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (signedPct != null) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          signedPct,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: soldeDeltaStyle?.copyWith(
+                                            color: deltaColor.withValues(
+                                              alpha: 0.85,
+                                            ),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                            height: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(width: 8),
                       _CapitalBalanceMobileRingsRow(
                         ringSize: (analyseSnap != null && openAnalyse != null)
                             ? _ringSizeCompact
@@ -416,14 +427,6 @@ class CapitalBalanceCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (!kIsWeb && onOpenTradeById != null) ...[
-                    const CapitalEvolutionMergedDivider(),
-                    CapitalEvolutionChartSection(
-                      timeframeIndex: timeframeIndex,
-                      onOpenTradeById: onOpenTradeById!,
-                      onOpenTradeDayKey: onOpenTradeDayKey,
-                    ),
-                  ],
                 ],
               ),
             );
@@ -552,26 +555,41 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final gap = _CapitalBalanceRingsLayout.mobileGap;
-        final minW = (ringSize * rings.length) + (gap * (rings.length - 1));
-        if (constraints.maxWidth < minW + 8) {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+        if (rings.length <= 2) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (var i = 0; i < rings.length; i++) ...[
+                if (i > 0) SizedBox(height: gap),
+                rings[i],
+              ],
+            ],
+          );
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                for (var i = 0; i < rings.length; i++) ...[
-                  if (i > 0) SizedBox(width: gap),
-                  rings[i],
+                rings[0],
+                SizedBox(width: gap),
+                rings[1],
+              ],
+            ),
+            SizedBox(height: gap),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                rings[2],
+                if (rings.length > 3) ...[
+                  SizedBox(width: gap),
+                  rings[3],
                 ],
               ],
             ),
-          );
-        }
-        return Row(
-          children: [
-            for (var i = 0; i < rings.length; i++)
-              Expanded(
-                child: Center(child: rings[i]),
-              ),
           ],
         );
       },

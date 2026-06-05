@@ -9,6 +9,7 @@ import '../../paychek_billing_plan.dart';
 import '../../paychek_plan_price_quote.dart';
 import '../../paychek_regional_price_defaults.dart';
 import '../../paychek_store_plan_pricing.dart';
+import '../../paychek_subscription_platform.dart';
 import '../../paywall_compare_rows.dart';
 import '../paywall_unified_gold_compare_table.dart';
 import 'paywall_mobile_compare_table.dart';
@@ -45,13 +46,20 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
 
   PaychekPlanPricingSnapshot get _effectivePricing {
     if (_pricing != null && _pricing!.byCycle.isNotEmpty) return _pricing!;
+    if (kIsWeb) {
+      return PaychekRegionalPriceDefaults.snapshotForCountry('US');
+    }
+    if (paychekUsesNativeStoreIap) {
+      return const PaychekPlanPricingSnapshot(
+        byCycle: {},
+        source: PaychekPlanPricingSource.catalogFallback,
+      );
+    }
     final loc = _pricingLocale;
     if (loc != null) {
       return PaychekRegionalPriceDefaults.snapshotForLocale(loc);
     }
-    return PaychekRegionalPriceDefaults.snapshotForLocale(
-      PaychekStorePlanPricing.resolvePricingLocale(),
-    );
+    return PaychekRegionalPriceDefaults.snapshotForCountry('US');
   }
 
   @override

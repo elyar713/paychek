@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../analyse_confluence_score.dart';
@@ -300,16 +300,6 @@ class _ReportHero extends StatelessWidget {
         ),
         if (snapshot.gaugeContextEnabled) ...[
           const SizedBox(width: 8),
-          if (onPrepToggle != null) ...[
-            AnalyseReportPrepCheckBox(
-              checked: snapshotIsPrepChecked(
-                snapshot,
-                AnalysePrepCheckIds.ctxBias,
-              ),
-              onToggle: () => onPrepToggle!(AnalysePrepCheckIds.ctxBias),
-            ),
-            const SizedBox(width: 6),
-          ],
           analyseReportBiasPill(context, snapshot),
         ],
       ],

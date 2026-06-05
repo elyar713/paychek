@@ -101,26 +101,15 @@ class AnalysePageEditorSidebar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text(
-                        l.analyseConfidenceLow,
-                        style: TextStyle(
-                          color: AnalyseTokens.muted2,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        l.analyseConfidenceHigh,
-                        style: TextStyle(
-                          color: AnalyseTokens.muted2,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    l.analyseConfidenceBarCaption,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AnalyseTokens.muted2,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                    ),
                   ),
                 ],
               ),

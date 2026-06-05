@@ -1,6 +1,6 @@
 import 'dart:ui' show Locale, PlatformDispatcher;
 
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 
 import 'paychek_native_store_plan_pricing.dart';
 import 'paychek_plan_price_quote.dart';
@@ -37,19 +37,27 @@ abstract final class PaychekStorePlanPricing {
 
     PaychekPlanPricingSnapshot snapshot;
     try {
-      if (paychekUsesNativeStoreIap) {
+      if (kIsWeb) {
+        snapshot = await loadWebUsdPricing();
+      } else if (paychekUsesNativeStoreIap) {
         final fromStore =
             await PaychekNativeStorePlanPricing.load(locale: loc);
-        snapshot = fromStore ?? await loadRegionalByCountry(loc);
+        snapshot = fromStore ?? _emptyNativeFallback();
       } else {
         snapshot = await loadRegionalByCountry(loc);
       }
     } catch (e, st) {
       debugPrint('[Paychek] store plan pricing $e\n$st');
-      snapshot = _offlineRegional(loc);
+      snapshot = kIsWeb
+          ? PaychekRegionalPriceDefaults.snapshotForCountry('US')
+          : (paychekUsesNativeStoreIap
+              ? _emptyNativeFallback()
+              : _offlineRegional(loc));
     }
 
-    if (snapshot.byCycle.isEmpty) {
+    if (snapshot.byCycle.isEmpty && kIsWeb) {
+      snapshot = PaychekRegionalPriceDefaults.snapshotForCountry('US');
+    } else if (snapshot.byCycle.isEmpty && !paychekUsesNativeStoreIap) {
       snapshot = _offlineRegional(loc);
     }
 
@@ -64,6 +72,26 @@ abstract final class PaychekStorePlanPricing {
     Locale? locale,
   }) async {
     return load(locale: locale);
+  }
+
+  /// Web : paywall toujours en USD ($8.99 / mois), indépendamment du pays navigateur.
+  static Future<PaychekPlanPricingSnapshot> loadWebUsdPricing() async {
+    const country = 'US';
+    const currency = 'USD';
+    final formatLocale = PaychekRegionalPriceDefaults.formatLocaleForCountry(
+      country,
+      currency,
+    );
+    final fromServer = await PaychekStripePaywallPricing.fetch(
+      countryCode: country,
+      numberFormatLocale: formatLocale,
+    );
+    if (fromServer != null && fromServer.byCycle.isNotEmpty) {
+      debugPrint('[Paychek] paywall web USD (server)');
+      return fromServer;
+    }
+    debugPrint('[Paychek] paywall web USD (catalogue offline)');
+    return PaychekRegionalPriceDefaults.snapshotForCountry(country);
   }
 
   /// Résout pays → devise → montants via Cloud Function, puis catalogue local.
@@ -94,7 +122,9 @@ abstract final class PaychekStorePlanPricing {
     final platform = paychekUsesNativeAppleIap
         ? 'apple'
         : (paychekUsesNativeGooglePlayIap ? 'google' : 'web');
-    final country = PaychekRegionalPriceDefaults.countryFromLocale(locale);
+    final country = kIsWeb
+        ? 'US'
+        : PaychekRegionalPriceDefaults.countryFromLocale(locale);
     return '$platform-$country-${locale.languageCode}';
   }
 
@@ -106,5 +136,12 @@ abstract final class PaychekStorePlanPricing {
 
   static PaychekPlanPricingSnapshot _offlineRegional(Locale locale) {
     return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
+  }
+
+  static PaychekPlanPricingSnapshot _emptyNativeFallback() {
+    return const PaychekPlanPricingSnapshot(
+      byCycle: {},
+      source: PaychekPlanPricingSource.catalogFallback,
+    );
   }
 }

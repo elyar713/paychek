@@ -1324,6 +1324,12 @@ abstract class AppLocalizations {
   /// **'Faible'**
   String get analyseConfidenceLow;
 
+  /// No description provided for @analyseConfidenceBarCaption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confiance sur l\'analyse'**
+  String get analyseConfidenceBarCaption;
+
   /// No description provided for @analyseCopyLabel.
   ///
   /// In fr, this message translates to:
