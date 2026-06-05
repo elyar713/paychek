@@ -65,59 +65,24 @@ class DashboardHomeHero extends StatelessWidget {
     final hasHeaderExtras = planBadge != null || upgrade != null;
     final nameFontSize = isMobileHome && hasHeaderExtras ? 16.0 : 20.0;
 
-    final welcomeBlock = _MinimalWelcomeBlock(
-      welcomePrefix: l.webHomeWelcomeBack,
-      displayName: displayName,
-      nameColor: scheme.onSurface,
-      nameFontSize: nameFontSize,
-      planBadge: planBadge,
-      nameRowTrailing: isMobileHome ? upgrade : null,
-    );
-
-    Widget headerBody;
-    if (isMobileHome) {
-      headerBody = Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: _MinimalWelcomeBlock(
-              welcomePrefix: l.webHomeWelcomeBack,
-              displayName: displayName,
-              nameColor: scheme.onSurface,
-              nameFontSize: nameFontSize,
-              planBadge: planBadge,
-            ),
+    final headerBody = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: _MinimalWelcomeBlock(
+            welcomePrefix: l.webHomeWelcomeBack,
+            displayName: displayName,
+            nameColor: scheme.onSurface,
+            nameFontSize: nameFontSize,
+            planBadge: planBadge,
           ),
-          if (upgrade != null) ...[
-            const SizedBox(width: 12),
-            upgrade,
-          ],
+        ),
+        if (upgrade != null) ...[
+          const SizedBox(width: 12),
+          upgrade,
         ],
-      );
-    } else {
-      headerBody = LayoutBuilder(
-        builder: (context, constraints) {
-          final stackUpgrade = constraints.maxWidth < 420;
-          if (stackUpgrade) {
-            return _MinimalWelcomeBlock(
-              welcomePrefix: l.webHomeWelcomeBack,
-              displayName: displayName,
-              nameColor: scheme.onSurface,
-              nameFontSize: nameFontSize,
-              planBadge: planBadge,
-              nameRowTrailing: upgrade,
-            );
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(child: welcomeBlock),
-              ?upgrade,
-            ],
-          );
-        },
-      );
-    }
+      ],
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -175,7 +140,6 @@ class _MinimalWelcomeBlock extends StatelessWidget {
     required this.nameColor,
     required this.nameFontSize,
     this.planBadge,
-    this.nameRowTrailing,
   });
 
   final String welcomePrefix;
@@ -183,8 +147,6 @@ class _MinimalWelcomeBlock extends StatelessWidget {
   final Color nameColor;
   final double nameFontSize;
   final Widget? planBadge;
-  /// Web étroit : CTA Upgrade sur la ligne du nom.
-  final Widget? nameRowTrailing;
 
   @override
   Widget build(BuildContext context) {
@@ -194,22 +156,21 @@ class _MinimalWelcomeBlock extends StatelessWidget {
       children: [
         Text(
           welcomePrefix,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: GoogleFonts.inter(
             fontSize: 11,
             fontWeight: FontWeight.w500,
             letterSpacing: -0.2,
+            height: 1.1,
             color: PaychekWebTokens.textZinc500,
           ),
         ),
-        if (planBadge != null) ...[
-          const SizedBox(height: 6),
-          Align(alignment: Alignment.centerLeft, child: planBadge!),
-        ],
-        const SizedBox(height: 4),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: Text(
                 displayName,
                 maxLines: 1,
@@ -218,11 +179,15 @@ class _MinimalWelcomeBlock extends StatelessWidget {
                   fontSize: nameFontSize,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
+                  height: 1.05,
                   color: nameColor,
                 ),
               ),
             ),
-            ?nameRowTrailing,
+            if (planBadge != null) ...[
+              const SizedBox(width: 6),
+              planBadge!,
+            ],
           ],
         ),
       ],

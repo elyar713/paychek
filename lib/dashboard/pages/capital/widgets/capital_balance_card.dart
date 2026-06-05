@@ -458,24 +458,24 @@ abstract final class _CapitalBalanceRingsLayout {
   static const double webGap = 12;
   static const double webWrapSpacing = 28;
   static const double webWrapRunSpacing = 20;
-  static const double mobileGap = 6;
-  static const double mobileRingMax = 54;
-  static const double mobileRingCompactMax = 48;
+  static const double mobileGap = 14;
+  static const double mobileRingMax = 56;
+  static const double mobileRingCompactMax = 50;
 
-  /// Taille anneaux mobile (une seule ligne).
+  /// Taille anneaux mobile (une seule ligne, espacement via [MainAxisAlignment.spaceBetween]).
   static double mobileRingSize({
     required double rowMaxWidth,
     required int bottomRingCount,
   }) {
-    const minSize = 36.0;
+    const minSize = 38.0;
+    const minGap = mobileGap;
     final preferred =
         bottomRingCount >= 4 ? mobileRingCompactMax : mobileRingMax;
-    final ringsBudget = rowMaxWidth;
     final needed =
-        preferred * bottomRingCount + (mobileGap * (bottomRingCount - 1));
-    if (ringsBudget >= needed) return preferred;
+        preferred * bottomRingCount + (minGap * (bottomRingCount - 1));
+    if (rowMaxWidth >= needed) return preferred;
     final fitted =
-        (ringsBudget - mobileGap * (bottomRingCount - 1)) / bottomRingCount;
+        (rowMaxWidth - minGap * (bottomRingCount - 1)) / bottomRingCount;
     return fitted.clamp(minSize, preferred);
   }
 
@@ -587,14 +587,9 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
     ];
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < rings.length; i++) ...[
-          if (i > 0)
-            const SizedBox(width: _CapitalBalanceRingsLayout.mobileGap),
-          rings[i],
-        ],
-      ],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: rings,
     );
   }
 }

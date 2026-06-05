@@ -12,13 +12,13 @@ Color get _prepUncheckedFill =>
     AnalyseTokens.inputBg.withValues(alpha: 0.85);
 
 Color get _prepCheckedFill =>
-    AnalyseTokens.accentGreen.withValues(alpha: 0.14);
+    AnalyseTokens.accentGreen.withValues(alpha: 0.09);
 
 Color get _prepCheckedBorder =>
-    AnalyseTokens.accentGreen.withValues(alpha: 0.68);
+    AnalyseTokens.accentGreen.withValues(alpha: 0.48);
 
 Color get _prepCheckedIcon =>
-    AnalyseTokens.accentGreen.withValues(alpha: 0.82);
+    AnalyseTokens.accentGreen.withValues(alpha: 0.62);
 
 /// Petit carré de routine (hors PDF) sur un rapport figé.
 class AnalyseReportPrepCheckBox extends StatelessWidget {
