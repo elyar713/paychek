@@ -977,6 +977,14 @@ class _DashboardPageState extends State<DashboardPage>
                             setState(() => _overlayPage = _overlayNone);
                             _reloadAnalyseHomePreview();
                           },
+                          onNavigateToAddTrade: () {
+                            if (_liteRestricted) {
+                              _showLitePaywallSheet();
+                              return;
+                            }
+                            setState(() => _overlayPage = _overlayNone);
+                            _applyTabIndex(2);
+                          },
                         ),
                       ),
                     _overlayPerformance => PerformancePage(

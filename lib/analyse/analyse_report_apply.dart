@@ -385,4 +385,5 @@ void applyAnalyseReportToController(
   c.confidenceStructure = s.gaugeStructure;
   c.confidenceIndicators = s.gaugeIndicators;
   c.confidenceSmc = s.gaugeSmc;
+  c.applyPrepChecksFromSnapshot(s.prepCheckedIds);
 }

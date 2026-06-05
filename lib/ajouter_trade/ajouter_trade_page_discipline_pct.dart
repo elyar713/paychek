@@ -26,7 +26,7 @@ extension _AjouterTradeDisciplinePct on _AjouterTradePageState {
     return historical ?? 0;
   }
 
-  int get _planConfidencePercent => resolvePlanGlobalConfidencePercent(
+  int get _planConfidencePercent => resolvePlanDisciplinePercent(
         _planAnalyseSelectedReport,
         _planAnalyseStoredReports,
       );
@@ -41,7 +41,7 @@ extension _AjouterTradeDisciplinePct on _AjouterTradePageState {
     List<AnalyseReportSnapshot>? storedReports,
   }) {
     final stored = storedReports ?? _planAnalyseStoredReports;
-    final planPct = resolvePlanGlobalConfidencePercent(
+    final planPct = resolvePlanDisciplinePercent(
       _planAnalyseSelectedReport,
       stored,
     );

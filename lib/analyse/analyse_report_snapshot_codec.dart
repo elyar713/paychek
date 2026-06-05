@@ -94,6 +94,7 @@ Map<String, dynamic> encodeAnalyseReportSnapshot(AnalyseReportSnapshot s) {
     'gaugeIndicatorsEnabled': s.gaugeIndicatorsEnabled,
     'gaugeSmcEnabled': s.gaugeSmcEnabled,
     'gaugeVolumeProfileEnabled': s.gaugeVolumeProfileEnabled,
+    'prepCheckedIds': s.prepCheckedIds ?? const [],
     'contexteCopies': [
       for (final c in s.contexteCopies ?? const [])
         <String, dynamic>{
@@ -302,6 +303,10 @@ AnalyseReportSnapshot decodeAnalyseReportSnapshot(Map<String, dynamic> m) {
     gaugeIndicatorsEnabled: m['gaugeIndicatorsEnabled'] as bool? ?? true,
     gaugeSmcEnabled: m['gaugeSmcEnabled'] as bool? ?? true,
     gaugeVolumeProfileEnabled: m['gaugeVolumeProfileEnabled'] as bool? ?? true,
+    prepCheckedIds: [
+      for (final e in (m['prepCheckedIds'] as List<dynamic>? ?? const []))
+        e.toString(),
+    ],
     contexteCopies: listCopy('contexteCopies', _ctxCopy),
     structureCopies: listCopy('structureCopies', _structCopy),
     indicatorsCopies: listCopy('indicatorsCopies', _indCopy),

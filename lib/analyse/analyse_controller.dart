@@ -26,6 +26,8 @@ class AnalyseController extends ChangeNotifier
         AnalyseControllerStructureSmcIndicators {
   AnalyseController();
 
+  final Set<String> _prepCheckedIds = {};
+
   /// Capture joignable avant de générer le rapport (zone Analyse uniquement ; pas sous le rapport figé).
   Uint8List? _draftReportScreenshotBytes;
   Uint8List? get draftReportScreenshotBytes => _draftReportScreenshotBytes;
@@ -34,6 +36,37 @@ class AnalyseController extends ChangeNotifier
     _draftReportScreenshotBytes = bytes;
     notifyListeners();
   }
+
+  Set<String> get prepCheckedIds => Set<String>.unmodifiable(_prepCheckedIds);
+
+  bool isPrepChecked(String id) => _prepCheckedIds.contains(id);
+
+  void togglePrepCheck(String id) {
+    final key = id.trim();
+    if (key.isEmpty) return;
+    if (_prepCheckedIds.contains(key)) {
+      _prepCheckedIds.remove(key);
+    } else {
+      _prepCheckedIds.add(key);
+    }
+    notifyListeners();
+  }
+
+  void clearPrepChecks() {
+    if (_prepCheckedIds.isEmpty) return;
+    _prepCheckedIds.clear();
+    notifyListeners();
+  }
+
+  void applyPrepChecksFromSnapshot(Iterable<String>? ids) {
+    _prepCheckedIds
+      ..clear()
+      ..addAll(ids ?? const []);
+    notifyListeners();
+  }
+
+  List<String> prepCheckedIdsForSnapshot() =>
+      _prepCheckedIds.toList()..sort();
 
   /// Somme des poids d’impact **bruts** pour les sections dont l’interrupteur est actif.
   int get _activeImpactWeightSum {
@@ -83,5 +116,6 @@ class AnalyseController extends ChangeNotifier
     smcEnabled = true;
     volumeProfileEnabled = true;
     _draftReportScreenshotBytes = null;
+    clearPrepChecks();
   }
 }

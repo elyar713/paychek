@@ -25,6 +25,8 @@ import '../reglage/user_portfolio_scope.dart';
 import '../reglage/paychek_csv_import_log.dart';
 import '../reglage/paychek_user_firestore.dart';
 import '../analyse/analyse_default_demo_seed.dart';
+import '../analyse/analyse_prep_checks.dart';
+import '../analyse/analyse_trade_link.dart';
 import '../analyse/analyse_realtime_notifier.dart';
 import '../analyse/analyse_report_pdf.dart';
 import '../analyse/analyse_report_snapshot.dart';

@@ -17,6 +17,7 @@ import 'analyse_reports_storage.dart';
 import 'analyse_firestore_sync.dart';
 import 'analyse_starred_report_storage.dart';
 import 'analyse_oled_plan_ui.dart';
+import 'analyse_trade_link.dart';
 import 'analyse_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_setups_store.dart';
@@ -29,10 +30,12 @@ class AnalysePage extends StatefulWidget {
     this.onCloseAsTab,
     this.initialScrollToReports = false,
     this.revealSnapshot,
+    this.onNavigateToAddTrade,
   });
 
   final VoidCallback? onNavigateToDashboard;
   final VoidCallback? onCloseAsTab;
+  final VoidCallback? onNavigateToAddTrade;
 
   /// [bool?] : tolère les instances d’écran conservées au hot reload (slot null → faux).
   final bool? initialScrollToReports;
@@ -188,6 +191,18 @@ class _AnalysePageState extends State<AnalysePage> {
     });
   }
 
+  void _onOpenAddTrade() {
+    final navigate = widget.onNavigateToAddTrade;
+    if (navigate == null) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    final locale = Localizations.localeOf(context);
+    final snap = AnalyseReportSnapshot.fromController(_c, locale: locale);
+    analysePendingTradePlan.value = snap;
+    unawaited(AnalyseReportsStorage.add(snap));
+    AnalyseRealtimeNotifier.bumpReports();
+    navigate();
+  }
+
   /// Nouveau rapport en tête, ou remplacement du rapport ouvert au crayon.
   void _commitReportFromGenerator(AnalyseReportSnapshot snap) {
     final editIdx = _editingReportIndex;
@@ -317,6 +332,9 @@ class _AnalysePageState extends State<AnalysePage> {
                       AnalyseOledStickyHeader(
                         controller: _c,
                         onSave: _onSavePlan,
+                        onOpenAddTrade: widget.onNavigateToAddTrade == null
+                            ? null
+                            : _onOpenAddTrade,
                       ),
                       Expanded(
                         child: Center(

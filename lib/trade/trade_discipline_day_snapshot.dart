@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../analyse/analyse_default_demo_seed.dart';
+import '../analyse/analyse_prep_checks.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../analyse/analyse_reports_storage.dart';
 import '../checklist/checklist_page_controller.dart';
@@ -69,7 +70,7 @@ TradeDisciplineDaySnapshot resolveTradeDisciplineForEntryDay({
   final planSel = planReport;
   final double? planPct = planSel == null
       ? null
-      : resolvePlanGlobalConfidencePercent(
+      : resolvePlanDisciplinePercent(
           planSel,
           storedReports,
         ).toDouble().clamp(0.0, 100.0);

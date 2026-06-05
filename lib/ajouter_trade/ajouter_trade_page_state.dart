@@ -2,6 +2,10 @@ part of 'ajouter_trade_page.dart';
 
 class _AjouterTradePageState extends State<AjouterTradePage> {
   void _onShellBodyIndexChanged() {
+    if (widget.shellBodyIndex.value == 2) {
+      _applyPendingPlanFromAnalyse();
+      return;
+    }
     if (widget.shellBodyIndex.value != 2) {
       _ajouterTradeCloseCommission(this);
       _ajouterTradeCloseStrategieMenu(this);
@@ -10,6 +14,17 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
         _clearDisciplineFeedbackDraft();
       }
     }
+  }
+
+  void _applyPendingPlanFromAnalyse() {
+    final pending = analysePendingTradePlan.value;
+    if (pending == null) return;
+    analysePendingTradePlan.value = null;
+    if (!mounted) return;
+    setState(() {
+      _planAnalyseSelectedReport = pending;
+      _planAnalyseNonRespectIds = {};
+    });
   }
 
   bool _hasDisciplineFeedbackDraft() =>
@@ -336,7 +351,9 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   void initState() {
     super.initState();
     AnalyseRealtimeNotifier.reportsTick.addListener(_onAnalyseReportsStorageTick);
-    unawaited(_refreshPlanAnalyseFromStorage());
+    unawaited(_refreshPlanAnalyseFromStorage().then((_) {
+      _applyPendingPlanFromAnalyse();
+    }));
     AjouterTradeCustomActifsStorage.load().then((_) {
       if (!mounted) return;
       setState(() {});

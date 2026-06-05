@@ -86,6 +86,8 @@ class AnalyseReportSnapshot {
     this.indicatorsCopies,
     /// Copies SMC & liquidité sous la zone principale.
     this.smcCopies,
+    /// Cases prépa cochées (générateur — hors PDF export).
+    this.prepCheckedIds,
   })  : _noteContexte = noteContexte,
         _noteStructure = noteStructure;
 
@@ -177,6 +179,9 @@ class AnalyseReportSnapshot {
 
   /// Blocs SMC « Copie 1, 2… » sous la zone principale.
   final List<AnalyseReportSmcCopy>? smcCopies;
+
+  /// Étapes de préparation cochées (ids alignés plan discipline / CSV).
+  final List<String>? prepCheckedIds;
 
   factory AnalyseReportSnapshot.fromController(
     AnalyseController c, {
@@ -314,6 +319,7 @@ class AnalyseReportSnapshot {
       indicatorsCopies:
           indicatorsCopies.isEmpty ? null : indicatorsCopies,
       smcCopies: smcCopies.isEmpty ? null : smcCopies,
+      prepCheckedIds: c.prepCheckedIdsForSnapshot(),
     );
   }
 }
