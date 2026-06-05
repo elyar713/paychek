@@ -42,7 +42,7 @@ abstract final class PaychekStorePlanPricing {
       } else if (paychekUsesNativeStoreIap) {
         final fromStore =
             await PaychekNativeStorePlanPricing.load(locale: loc);
-        snapshot = fromStore ?? _emptyNativeFallback();
+        snapshot = fromStore ?? await loadRegionalByCountry(loc);
       } else {
         snapshot = await loadRegionalByCountry(loc);
       }
@@ -50,15 +50,13 @@ abstract final class PaychekStorePlanPricing {
       debugPrint('[Paychek] store plan pricing $e\n$st');
       snapshot = kIsWeb
           ? PaychekRegionalPriceDefaults.usStandardSnapshot()
-          : (paychekUsesNativeStoreIap
-              ? _emptyNativeFallback()
-              : _offlineRegional(loc));
+          : _offlineRegional(loc);
     }
 
-    if (snapshot.byCycle.isEmpty && kIsWeb) {
-      snapshot = PaychekRegionalPriceDefaults.usStandardSnapshot();
-    } else if (snapshot.byCycle.isEmpty && !paychekUsesNativeStoreIap) {
-      snapshot = _offlineRegional(loc);
+    if (snapshot.byCycle.isEmpty) {
+      snapshot = kIsWeb
+          ? PaychekRegionalPriceDefaults.usStandardSnapshot()
+          : _offlineRegional(loc);
     }
 
     _cache = snapshot;
@@ -122,12 +120,5 @@ abstract final class PaychekStorePlanPricing {
 
   static PaychekPlanPricingSnapshot _offlineRegional(Locale locale) {
     return PaychekRegionalPriceDefaults.snapshotForLocale(locale);
-  }
-
-  static PaychekPlanPricingSnapshot _emptyNativeFallback() {
-    return const PaychekPlanPricingSnapshot(
-      byCycle: {},
-      source: PaychekPlanPricingSource.catalogFallback,
-    );
   }
 }

@@ -93,12 +93,15 @@ abstract final class PaychekNativeStorePlanPricing {
     if (byCycle.length < PaychekBillingCycle.values.length) {
       debugPrint(
         '[Paychek] native store pricing incomplete '
-        '(found ${byCycle.length}/3, missing $notFound)',
+        '(found ${byCycle.length}/3, missing $notFound) — catalogue régional',
       );
-      return null;
+      final regional = PaychekRegionalPriceDefaults.snapshotForLocale(loc);
+      for (final cycle in PaychekBillingCycle.values) {
+        byCycle.putIfAbsent(cycle, () => regional.byCycle[cycle]!);
+      }
+    } else {
+      debugPrint('[Paychek] native store pricing ok (${source.name})');
     }
-
-    debugPrint('[Paychek] native store pricing ok (${source.name})');
     return PaychekPlanPricingSnapshot(
       byCycle: byCycle,
       source: source,
