@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../analyse/analyse_report_snapshot.dart';
 import '../../../../checklist/checklist_page_controller.dart';
 import '../../../../checklist/checklist_progress_ring.dart';
 import '../../../../etat_mental/mental_state_controller.dart';
@@ -16,6 +17,7 @@ import '../../../../trade/trade_stats.dart';
 import '../../../../web/paychek_web_tokens.dart';
 import '../../../dashboard_tokens.dart';
 import '../../../widgets/capital_evolution_chart_section.dart';
+import '../../../widgets/dashboard_analyse_prep_ring.dart';
 import '../../../widgets/donut_ring.dart';
 import '../../../widgets/timeframe_pills.dart';
 
@@ -30,6 +32,8 @@ class CapitalBalanceCard extends StatelessWidget {
     required this.onOpenEtatMental,
     required this.onOpenPerformance,
     required this.onOpenTrade,
+    this.analysePreviewSnapshot,
+    this.onOpenAnalyse,
     this.onOpenTradeById,
     this.onOpenTradeDayKey,
     this.hideTimeframePills = false,
@@ -44,6 +48,8 @@ class CapitalBalanceCard extends StatelessWidget {
   final VoidCallback onOpenEtatMental;
   final VoidCallback onOpenPerformance;
   final VoidCallback onOpenTrade;
+  final AnalyseReportSnapshot? analysePreviewSnapshot;
+  final VoidCallback? onOpenAnalyse;
   final ValueChanged<String>? onOpenTradeById;
   final ValueChanged<String>? onOpenTradeDayKey;
   final bool hideTimeframePills;
@@ -52,8 +58,9 @@ class CapitalBalanceCard extends StatelessWidget {
   /// Web : ligne Capital + Evolution ([Table]) — [Spacer] pour remplir la hauteur commune.
   final bool webPairStretch;
 
-  /// Mobile : anneaux compacts.
+  /// Mobile : anneaux compacts (réduits si 4 anneaux).
   static const double _ringSize = 45;
+  static const double _ringSizeCompact = 40;
 
   /// Web : proche des 64 px de la maquette (`w-16`).
   static const double _ringSizeWeb = 56;
@@ -119,6 +126,8 @@ class CapitalBalanceCard extends StatelessWidget {
                     : '${pct >= 0 ? '+' : ''}${pct.toStringAsFixed(1).replaceAll('.', ',')}%';
                 final rw = _ringSizeWeb;
                 final trackWeb = const Color(0xFF1F2937);
+                final analyseSnap = analysePreviewSnapshot;
+                final openAnalyse = onOpenAnalyse;
                 return Container(
               width: double.infinity,
               padding: DashboardTokens.cardPadding,
@@ -249,25 +258,24 @@ class CapitalBalanceCard extends StatelessWidget {
                                   ),
                                   caption: l.checklistProgressCl,
                                 ),
+                                if (analyseSnap != null && openAnalyse != null)
+                                  _webRingCaption(
+                                    ring: DashboardAnalysePrepRing(
+                                      snapshot: analyseSnap,
+                                      size: rw,
+                                      strokeWidth: 4,
+                                      ringColor: PaychekWebTokens.accentMint,
+                                      trackColor: trackWeb,
+                                      onTap: openAnalyse,
+                                    ),
+                                    caption: l.dashboardRingAnalyseWeb,
+                                  ),
                               ];
 
-                              // En web (rail/split), cette carte peut être rendue très étroite.
-                              // On évite les overflows: en dessous d’un seuil, on “wrap” sur plusieurs lignes.
-                              final isTight = constraints.maxWidth < (rw * 3) + 48;
-                              if (isTight) {
-                                return Center(
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    spacing: 20,
-                                    runSpacing: 16,
-                                    children: items,
-                                  ),
-                                );
-                              }
-
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: items,
+                              return _CapitalBalanceWebRingsRow(
+                                items: items,
+                                ringSize: rw,
+                                maxWidth: constraints.maxWidth,
                               );
                             },
                           ),
@@ -335,105 +343,76 @@ class CapitalBalanceCard extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Icon(
+                            profitNet < 0
+                                ? Icons.trending_down
+                                : Icons.trending_up,
+                            color: deltaColor,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
                           Expanded(
-                            child: Row(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  profitNet < 0
-                                      ? Icons.trending_down
-                                      : Icons.trending_up,
-                                  color: deltaColor,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                Text.rich(
+                                  TextSpan(
                                     children: [
-                                      Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: '$signedDelta ',
-                                              style:
-                                                  soldeDeltaStyle?.copyWith(
-                                                color: deltaColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: sym,
-                                              style:
-                                                  soldeDeltaStyle?.copyWith(
-                                                fontSize: 9.5,
-                                                color: deltaColor,
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ),
-                                          ],
+                                      TextSpan(
+                                        text: '$signedDelta ',
+                                        style: soldeDeltaStyle?.copyWith(
+                                          color: deltaColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w800,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      if (signedPct != null) ...[
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          signedPct,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: soldeDeltaStyle?.copyWith(
-                                            color: deltaColor.withValues(
-                                              alpha: 0.85,
-                                            ),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w800,
-                                            height: 1,
-                                          ),
+                                      TextSpan(
+                                        text: sym,
+                                        style: soldeDeltaStyle?.copyWith(
+                                          fontSize: 9.5,
+                                          color: deltaColor,
+                                          fontWeight: FontWeight.w800,
                                         ),
-                                      ],
+                                      ),
                                     ],
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                if (signedPct != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    signedPct,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: soldeDeltaStyle?.copyWith(
+                                      color: deltaColor.withValues(alpha: 0.85),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              DonutRing(
-                                progress: win / 100.0,
-                                centerPrimary: '$win%',
-                                centerSecondary: l.dashboardRingWin,
-                                size: _ringSize,
-                                strokeWidth: 4,
-                                onTap: onOpenPerformance,
-                              ),
-                              const SizedBox(width: 6),
-                              DonutRing(
-                                progress: emScore / 100.0,
-                                centerPrimary: emPct,
-                                centerSecondary: l.dashboardRingState,
-                                size: _ringSize,
-                                strokeWidth: 4,
-                                ringColor: MentalStateTokens.ringStrokeForScore(
-                                  emScore,
-                                ),
-                                onTap: onOpenEtatMental,
-                              ),
-                              const SizedBox(width: 6),
-                              ChecklistProgressRing(
-                                percent: checklistPct,
-                                size: _ringSize,
-                                strokeWidth: 4,
-                                onTap: onOpenChecklist,
-                              ),
-                            ],
-                          ),
                         ],
+                      ),
+                      const SizedBox(height: 14),
+                      _CapitalBalanceMobileRingsRow(
+                        ringSize: (analyseSnap != null && openAnalyse != null)
+                            ? _ringSizeCompact
+                            : _ringSize,
+                        win: win,
+                        emScore: emScore,
+                        emPct: emPct,
+                        checklistPct: checklistPct,
+                        analyseSnapshot: analyseSnap,
+                        onOpenPerformance: onOpenPerformance,
+                        onOpenEtatMental: onOpenEtatMental,
+                        onOpenChecklist: onOpenChecklist,
+                        onOpenAnalyse: openAnalyse,
                       ),
                     ],
                   ),
@@ -453,6 +432,147 @@ class CapitalBalanceCard extends StatelessWidget {
               },
             );
           },
+        );
+      },
+    );
+  }
+}
+
+/// Espacement anneaux carte Capital (web + mobile).
+abstract final class _CapitalBalanceRingsLayout {
+  _CapitalBalanceRingsLayout._();
+
+  static const double webGap = 12;
+  static const double webWrapSpacing = 28;
+  static const double webWrapRunSpacing = 20;
+  static const double mobileGap = 10;
+}
+
+class _CapitalBalanceWebRingsRow extends StatelessWidget {
+  const _CapitalBalanceWebRingsRow({
+    required this.items,
+    required this.ringSize,
+    required this.maxWidth,
+  });
+
+  final List<Widget> items;
+  final double ringSize;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = items.length;
+    final minRow =
+        (ringSize * n) + (_CapitalBalanceRingsLayout.webGap * (n - 1));
+    if (maxWidth < minRow + 24) {
+      return Center(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: _CapitalBalanceRingsLayout.webWrapSpacing,
+          runSpacing: _CapitalBalanceRingsLayout.webWrapRunSpacing,
+          children: items,
+        ),
+      );
+    }
+    return Row(
+      children: [
+        for (var i = 0; i < n; i++) ...[
+          if (i > 0) const SizedBox(width: _CapitalBalanceRingsLayout.webGap),
+          Expanded(
+            child: Center(child: items[i]),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _CapitalBalanceMobileRingsRow extends StatelessWidget {
+  const _CapitalBalanceMobileRingsRow({
+    required this.ringSize,
+    required this.win,
+    required this.emScore,
+    required this.emPct,
+    required this.checklistPct,
+    this.analyseSnapshot,
+    required this.onOpenPerformance,
+    required this.onOpenEtatMental,
+    required this.onOpenChecklist,
+    this.onOpenAnalyse,
+  });
+
+  final double ringSize;
+  final int win;
+  final double emScore;
+  final String emPct;
+  final int checklistPct;
+  final AnalyseReportSnapshot? analyseSnapshot;
+  final VoidCallback onOpenPerformance;
+  final VoidCallback onOpenEtatMental;
+  final VoidCallback onOpenChecklist;
+  final VoidCallback? onOpenAnalyse;
+
+  @override
+  Widget build(BuildContext context) {
+    final rings = <Widget>[
+      DonutRing(
+        progress: win / 100.0,
+        centerPrimary: '$win%',
+        centerSecondary: AppLocalizations.of(context)!.dashboardRingWin,
+        size: ringSize,
+        strokeWidth: 4,
+        onTap: onOpenPerformance,
+      ),
+      DonutRing(
+        progress: emScore / 100.0,
+        centerPrimary: emPct,
+        centerSecondary: AppLocalizations.of(context)!.dashboardRingState,
+        size: ringSize,
+        strokeWidth: 4,
+        ringColor: MentalStateTokens.ringStrokeForScore(emScore),
+        onTap: onOpenEtatMental,
+      ),
+      ChecklistProgressRing(
+        percent: checklistPct,
+        size: ringSize,
+        strokeWidth: 4,
+        onTap: onOpenChecklist,
+      ),
+      if (analyseSnapshot != null && onOpenAnalyse != null)
+        DashboardAnalysePrepRing(
+          snapshot: analyseSnapshot!,
+          size: ringSize,
+          strokeWidth: 4,
+          onTap: onOpenAnalyse,
+          centerSecondary:
+              AppLocalizations.of(context)!.dashboardRingAnalyseMobile,
+        ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gap = _CapitalBalanceRingsLayout.mobileGap;
+        final minW = (ringSize * rings.length) + (gap * (rings.length - 1));
+        if (constraints.maxWidth < minW + 8) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < rings.length; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  rings[i],
+                ],
+              ],
+            ),
+          );
+        }
+        return Row(
+          children: [
+            for (var i = 0; i < rings.length; i++)
+              Expanded(
+                child: Center(child: rings[i]),
+              ),
+          ],
         );
       },
     );

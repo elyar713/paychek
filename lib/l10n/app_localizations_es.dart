@@ -1505,6 +1505,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboardRingWin => 'GANAR';
 
   @override
+  String get dashboardRingAnalyseMobile => 'MA';
+
+  @override
+  String get dashboardRingAnalyseWeb => 'Análisis';
+
+  @override
   String get dashboardSuccessFactorSample => 'Deporte antes de la sesión';
 
   @override

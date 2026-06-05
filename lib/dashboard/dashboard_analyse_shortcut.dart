@@ -14,12 +14,14 @@ class DashboardAnalyseShortcut extends StatelessWidget {
     super.key,
     required this.snapshot,
     required this.onOpenAnalyse,
+    required this.onPrepToggle,
     this.cardBackgroundColor,
   });
 
   /// `null` : titre « Mon analyse » + chevron uniquement (comme checklist vide).
   final AnalyseReportSnapshot? snapshot;
   final VoidCallback onOpenAnalyse;
+  final ValueChanged<String> onPrepToggle;
 
   final Color? cardBackgroundColor;
 
@@ -29,6 +31,7 @@ class DashboardAnalyseShortcut extends StatelessWidget {
       return WebDashboardAnalysePreview(
         snapshot: snapshot,
         onOpenAnalyse: onOpenAnalyse,
+        onPrepToggle: onPrepToggle,
         cardBackgroundColor: cardBackgroundColor,
       );
     }
@@ -45,7 +48,10 @@ class DashboardAnalyseShortcut extends StatelessWidget {
           ),
           if (s != null) ...[
             const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
-            DashboardAnalyseOledPreviewContent(snapshot: s),
+            DashboardAnalyseOledPreviewContent(
+              snapshot: s,
+              onPrepToggle: onPrepToggle,
+            ),
           ],
         ],
       ),

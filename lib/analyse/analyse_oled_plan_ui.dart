@@ -8,8 +8,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../l10n/app_localizations.dart';
 import 'analyse_confluence_score.dart';
 import 'analyse_controller.dart';
-import 'analyse_prep_checks.dart';
-import 'widgets/analyse_prep_check_box.dart';
 import 'analyse_entry_tf_storage.dart';
 import 'analyse_impact_modal.dart';
 import 'analyse_models.dart';
@@ -26,12 +24,10 @@ class AnalyseOledStickyHeader extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onSave,
-    this.onOpenAddTrade,
   });
 
   final AnalyseController controller;
   final VoidCallback onSave;
-  final VoidCallback? onOpenAddTrade;
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +38,6 @@ class AnalyseOledStickyHeader extends StatelessWidget {
         final score = computeOledConfluenceScore(controller);
         final color = oledConfluenceColor(score);
         final status = oledConfluenceStatusLabel(score, l);
-        final prepPct = controllerPrepCompletionPercent(controller);
-        final applicable = applicablePrepCheckIdsFromController(controller);
-        final prepDone = applicable
-            .where(controller.prepCheckedIds.contains)
-            .length;
         return Container(
           decoration: BoxDecoration(
             color: AnalyseTokens.headerBg,
@@ -81,55 +72,6 @@ class AnalyseOledStickyHeader extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              if (applicable.isNotEmpty) ...[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '$prepPct%',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        color: AnalyseTokens.accentGreen,
-                      ),
-                    ),
-                    Text(
-                      '$prepDone/${applicable.length}',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
-                        color: AnalyseTokens.zinc500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 10),
-              ],
-              if (onOpenAddTrade != null) ...[
-                Material(
-                  color: AnalyseTokens.inputBg,
-                  borderRadius: BorderRadius.circular(12),
-                  child: InkWell(
-                    onTap: onOpenAddTrade,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      child: Text(
-                        l.ajouterTradePageTitle,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: AnalyseTokens.zinc200,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
               Material(
                 color: AnalyseTokens.oledGreen,
                 borderRadius: BorderRadius.circular(12),
@@ -488,8 +430,6 @@ class AnalyseOledStepShell extends StatelessWidget {
     required this.child,
     this.sectionEnabled,
     this.onSectionEnabledChanged,
-    this.prepController,
-    this.prepTimeframeCheckId,
   });
 
   final String title;
@@ -502,8 +442,6 @@ class AnalyseOledStepShell extends StatelessWidget {
   final Widget child;
   final bool? sectionEnabled;
   final ValueChanged<bool>? onSectionEnabledChanged;
-  final AnalyseController? prepController;
-  final String? prepTimeframeCheckId;
 
   @override
   Widget build(BuildContext context) {
@@ -551,14 +489,6 @@ class AnalyseOledStepShell extends StatelessWidget {
                                 AnalyseOledFunnelToolbar(
                                   enabled: sectionEnabled!,
                                   onEnabledChanged: onSectionEnabledChanged!,
-                                ),
-                              ],
-                              if (prepController != null &&
-                                  prepTimeframeCheckId != null) ...[
-                                const SizedBox(width: 8),
-                                AnalysePrepCheckBox(
-                                  controller: prepController!,
-                                  prepId: prepTimeframeCheckId!,
                                 ),
                               ],
                               const SizedBox(width: 12),
@@ -924,8 +854,6 @@ class AnalyseOledHtfSection extends StatelessWidget {
           onTimeframeChanged: (v) => applyAnalyseHtfDropdownChange(c, v),
           sectionEnabled: c.contextEnabled,
           onSectionEnabledChanged: (v) => c.contextEnabled = v,
-          prepController: c,
-          prepTimeframeCheckId: AnalysePrepCheckIds.ctxTimeframe,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -950,11 +878,9 @@ class AnalyseOledHtfSection extends StatelessWidget {
                 ),
               ],
               if (!c.contextEnabled) const SizedBox.shrink() else ...[
-              AnalysePrepFieldRow(
-                controller: c,
-                prepId: AnalysePrepCheckIds.ctxBias,
-                label: l.ajouterTradePlanRowBias,
-                child: Row(
+              oledFieldLabel(l.ajouterTradePlanRowBias),
+              const SizedBox(height: 8),
+              Row(
                 children: [
                   Expanded(
                     child: OledChipButton(
@@ -993,13 +919,10 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ),
               const SizedBox(height: 20),
-              AnalysePrepFieldRow(
-                controller: c,
-                prepId: AnalysePrepCheckIds.ctxTrend,
-                label: l.analyseTrendLabel,
-                child: Row(
+              oledFieldLabel(l.analyseTrendLabel),
+              const SizedBox(height: 8),
+              Row(
                 children: [
                   Expanded(
                     child: OledChipButton(
@@ -1035,14 +958,10 @@ class AnalyseOledHtfSection extends StatelessWidget {
                   ),
                 ],
               ),
-              ),
               const SizedBox(height: 20),
-              AnalysePrepFieldRow(
-                controller: c,
-                prepId: AnalysePrepCheckIds.ctxPhase,
-                label: l.ajouterTradePlanRowPhase,
-                child: _OledMarketPhaseChips(controller: c, locale: locale),
-              ),
+              oledFieldLabel(l.ajouterTradePlanRowPhase),
+              const SizedBox(height: 8),
+              _OledMarketPhaseChips(controller: c, locale: locale),
               const SizedBox(height: 20),
               oledFieldLabel(l.analyseStructureSectionTitle),
               Container(
@@ -1322,8 +1241,6 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
           timeframeValue: c.structureTf,
           timeframeOptions: analyseStructureTfOptions(c),
           onTimeframeChanged: (v) => applyAnalyseStructureTfChange(c, v),
-          prepController: c,
-          prepTimeframeCheckId: AnalysePrepCheckIds.structTf,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -1351,11 +1268,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                     );
                   },
                 ),
-                AnalysePrepFieldRow(
-                  controller: c,
-                  prepId: AnalysePrepCheckIds.structSupport,
-                  label: l.analyseSupportLower,
-                  child: _srLevelPanel(
+                _srLevelPanel(
                   title: l.analyseOledSupportsUpper,
                   levelHint: l.analyseOledLevelHint,
                   titleColor: AnalyseTokens.oledGreen,
@@ -1367,13 +1280,8 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                   onAdd: () => c.addExtraSupport(AnalyseStructureExtraLevel()),
                   accent: AnalyseTokens.oledGreen,
                 ),
-                ),
                 const SizedBox(height: 12),
-                AnalysePrepFieldRow(
-                  controller: c,
-                  prepId: AnalysePrepCheckIds.structResistance,
-                  label: l.analyseResistLower,
-                  child: _srLevelPanel(
+                _srLevelPanel(
                   title: l.analyseOledResistancesUpper,
                   levelHint: l.analyseOledLevelHint,
                   titleColor: AnalyseTokens.oledRed,
@@ -1384,7 +1292,6 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                   onRemoveExtra: c.removeExtraResistance,
                   onAdd: () => c.addExtraResistance(AnalyseStructureExtraLevel()),
                   accent: AnalyseTokens.oledRed,
-                ),
                 ),
               ],
               const SizedBox(height: 24),
@@ -1422,11 +1329,7 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      AnalysePrepFieldRow(
-                        controller: c,
-                        prepId: AnalysePrepCheckIds.smcOb,
-                        label: l.analyseOrderBlock,
-                        child: _oledSmcFieldBlock(
+                      _oledSmcFieldBlock(
                         label: l.analyseOrderBlock,
                         value: c.smcZone,
                         hint: l.analyseOledSmcObHint,
@@ -1437,13 +1340,8 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                         onAdd: () => c.addSmcZoneExtra(''),
                         accent: AnalyseTokens.oledIndigo,
                       ),
-                      ),
                       const SizedBox(height: 12),
-                      AnalysePrepFieldRow(
-                        controller: c,
-                        prepId: AnalysePrepCheckIds.smcFvg,
-                        label: l.analyseFvg,
-                        child: _oledSmcFieldBlock(
+                      _oledSmcFieldBlock(
                         label: l.analyseFvg,
                         value: c.smcFvg,
                         hint: l.analyseOledSmcFvgHint,
@@ -1453,7 +1351,6 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                         onRemoveExtra: c.removeSmcFvgExtraAt,
                         onAdd: () => c.addSmcFvgExtra(''),
                         accent: AnalyseTokens.oledIndigo,
-                      ),
                       ),
                       const SizedBox(height: 12),
                       _oledSmcFieldBlock(
@@ -1641,8 +1538,6 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
           onTimeframeChanged: (v) => applyAnalyseIndicatorsTfChange(c, v),
           sectionEnabled: c.indicatorsEnabled,
           onSectionEnabledChanged: (v) => c.indicatorsEnabled = v,
-          prepController: c,
-          prepTimeframeCheckId: AnalysePrepCheckIds.indTf,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -1667,11 +1562,9 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
                 ),
               ],
               if (!c.indicatorsEnabled) const SizedBox.shrink() else ...[
-              AnalysePrepFieldRow(
-                controller: c,
-                prepId: AnalysePrepCheckIds.indOutils,
-                label: l.ajouterTradePlanRowOutils,
-                child: Column(
+              oledFieldLabel(l.ajouterTradePlanRowOutils),
+              const SizedBox(height: 8),
+              Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Wrap(
@@ -1768,7 +1661,6 @@ class _AnalyseOledLtfSectionState extends State<AnalyseOledLtfSection> {
                     ),
                   ],
                 ),
-              ),
               const SizedBox(height: 16),
               oledFieldLabel(l.analyseOledActionPlanLabel),
               Container(

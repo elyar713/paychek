@@ -6,8 +6,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../analyse_confluence_score.dart';
+import '../analyse_prep_checks.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
+import '../widgets/analyse_prep_check_box.dart';
 import 'analyse_report_ui_primitives.dart';
 
 /// Espacements rapport (version compacte).
@@ -33,11 +35,14 @@ class AnalyseReportOledBody extends StatelessWidget {
     super.key,
     required this.snapshot,
     this.topBar,
+    this.onPrepToggle,
   });
 
   final AnalyseReportSnapshot snapshot;
   /// Barre d’actions (ex. titre Rapport + icônes) intégrée en haut de la carte.
   final Widget? topBar;
+  /// Routine pré-trade sur le rapport figé (hors PDF).
+  final ValueChanged<String>? onPrepToggle;
 
   static List<String> _lines(String main, List<String> extras) {
     final out = <String>[];
@@ -78,9 +83,13 @@ class AnalyseReportOledBody extends StatelessWidget {
                   _ReportHero(
                     snapshot: s,
                     confluenceColor: confColor,
+                    onPrepToggle: onPrepToggle,
                   ),
                   const SizedBox(height: _ReportCompact.gapSection),
-                  _ReportThreeColumns(snapshot: s),
+                  _ReportThreeColumns(
+                    snapshot: s,
+                    onPrepToggle: onPrepToggle,
+                  ),
                 ],
               ),
             ),
@@ -93,9 +102,13 @@ class AnalyseReportOledBody extends StatelessWidget {
 
 /// 3 colonnes : FONDAMENTAL (+ VP) | ZONE CLÉ & SMC | ENTRÉE.
 class _ReportThreeColumns extends StatelessWidget {
-  const _ReportThreeColumns({required this.snapshot});
+  const _ReportThreeColumns({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +120,7 @@ class _ReportThreeColumns extends StatelessWidget {
       icon: LucideIcons.landmark,
       confidence: s.gaugeContextEnabled ? s.gaugeFeuille : null,
       child: s.gaugeContextEnabled
-          ? _FundamentalBlock(snapshot: s, stacked: true)
+          ? _FundamentalBlock(snapshot: s, onPrepToggle: onPrepToggle)
           : const _ReportColumnOff(),
     );
 
@@ -116,7 +129,7 @@ class _ReportThreeColumns extends StatelessWidget {
             title: l.analyseReportOledSectionVolumeProfile,
             accent: AnalyseTokens.zinc500,
             icon: LucideIcons.barChart3,
-            child: _VolumeBlock(snapshot: s),
+            child: _VolumeBlock(snapshot: s, onPrepToggle: onPrepToggle),
           )
         : null;
 
@@ -126,7 +139,7 @@ class _ReportThreeColumns extends StatelessWidget {
       icon: LucideIcons.layers,
       confidence: s.gaugeStructureEnabled ? s.gaugeStructure : null,
       child: s.gaugeStructureEnabled
-          ? _StructureBlock(snapshot: s, stacked: true)
+          ? _StructureBlock(snapshot: s, onPrepToggle: onPrepToggle)
           : const _ReportColumnOff(),
     );
 
@@ -136,7 +149,7 @@ class _ReportThreeColumns extends StatelessWidget {
             accent: AnalyseTokens.oledIndigo,
             icon: LucideIcons.box,
             confidence: s.gaugeSmc,
-            child: _SmcBlock(snapshot: s),
+            child: _SmcBlock(snapshot: s, onPrepToggle: onPrepToggle),
           )
         : null;
 
@@ -146,7 +159,7 @@ class _ReportThreeColumns extends StatelessWidget {
       icon: LucideIcons.activity,
       confidence: s.gaugeIndicatorsEnabled ? s.gaugeIndicators : null,
       child: s.gaugeIndicatorsEnabled
-          ? _EntryBlock(snapshot: s)
+          ? _EntryBlock(snapshot: s, onPrepToggle: onPrepToggle)
           : const _ReportColumnOff(),
     );
 
@@ -223,10 +236,12 @@ class _ReportHero extends StatelessWidget {
   const _ReportHero({
     required this.snapshot,
     required this.confluenceColor,
+    this.onPrepToggle,
   });
 
   final AnalyseReportSnapshot snapshot;
   final Color confluenceColor;
+  final ValueChanged<String>? onPrepToggle;
 
   static String _heroValue(String raw) {
     final v = raw.trim();
@@ -286,6 +301,16 @@ class _ReportHero extends StatelessWidget {
         ),
         if (snapshot.gaugeContextEnabled) ...[
           const SizedBox(width: 8),
+          if (onPrepToggle != null) ...[
+            AnalyseReportPrepCheckBox(
+              checked: snapshotIsPrepChecked(
+                snapshot,
+                AnalysePrepCheckIds.ctxBias,
+              ),
+              onToggle: () => onPrepToggle!(AnalysePrepCheckIds.ctxBias),
+            ),
+            const SizedBox(width: 6),
+          ],
           analyseReportBiasPill(context, snapshot),
         ],
       ],
@@ -439,10 +464,13 @@ class _ReportOledSection extends StatelessWidget {
 }
 
 class _FundamentalBlock extends StatelessWidget {
-  const _FundamentalBlock({required this.snapshot, this.stacked = false});
+  const _FundamentalBlock({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
-  final bool stacked;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -450,11 +478,35 @@ class _FundamentalBlock extends StatelessWidget {
     final tfRow = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.contexteTfLine)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analyseTimeframeLabelShort,
+            value: snapshot.contexteTfLine,
+            prepId: AnalysePrepCheckIds.ctxTimeframe,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: l.analyseTrend, value: snapshot.trendLabel)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analyseTrend,
+            value: snapshot.trendLabel,
+            prepId: AnalysePrepCheckIds.ctxTrend,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: l.analysePhase, value: snapshot.phaseLabel)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analysePhase,
+            value: snapshot.phaseLabel,
+            prepId: AnalysePrepCheckIds.ctxPhase,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
       ],
     );
 
@@ -464,11 +516,25 @@ class _FundamentalBlock extends StatelessWidget {
         tfRow,
         if (snapshot.noteStructure.trim().isNotEmpty) ...[
           const SizedBox(height: _ReportCompact.gapField),
-          _ReadonlyField(label: l.analyseStructure, value: snapshot.noteStructure, multiline: true),
+          _ReadonlyField(
+            label: l.analyseStructure,
+            value: snapshot.noteStructure,
+            multiline: true,
+            prepId: AnalysePrepCheckIds.structNote,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
         ],
         if (snapshot.noteContexte.trim().isNotEmpty) ...[
           const SizedBox(height: _ReportCompact.gapField),
-          _ReadonlyField(label: l.analyseReportOledFieldMacroNotes, value: snapshot.noteContexte, multiline: true),
+          _ReadonlyField(
+            label: l.analyseReportOledFieldMacroNotes,
+            value: snapshot.noteContexte,
+            multiline: true,
+            prepId: AnalysePrepCheckIds.ctxNote,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
         ],
       ],
     );
@@ -476,10 +542,13 @@ class _FundamentalBlock extends StatelessWidget {
 }
 
 class _StructureBlock extends StatelessWidget {
-  const _StructureBlock({required this.snapshot, this.stacked = false});
+  const _StructureBlock({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
-  final bool stacked;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -487,9 +556,25 @@ class _StructureBlock extends StatelessWidget {
     final head = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.structureTf)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analyseTimeframeLabelShort,
+            value: snapshot.structureTf,
+            prepId: AnalysePrepCheckIds.structTf,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
         const SizedBox(width: _ReportCompact.gapRow),
-        Expanded(child: _ReadonlyField(label: l.analyseReportOledFieldChartism, value: snapshot.chartisme)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analyseReportOledFieldChartism,
+            value: snapshot.chartisme,
+            prepId: AnalysePrepCheckIds.structChartisme,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
       ],
     );
 
@@ -501,6 +586,8 @@ class _StructureBlock extends StatelessWidget {
         _SrRow(
           support: snapshot.support,
           resistance: snapshot.resistance,
+          onPrepToggle: onPrepToggle,
+          snapshot: snapshot,
         ),
       ],
     );
@@ -513,11 +600,17 @@ class _SrLevelField extends StatelessWidget {
     required this.prefix,
     required this.price,
     required this.accent,
+    this.prepId,
+    this.onPrepToggle,
+    this.snapshot,
   });
 
   final String prefix;
   final String price;
   final Color accent;
+  final String? prepId;
+  final ValueChanged<String>? onPrepToggle;
+  final AnalyseReportSnapshot? snapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -530,6 +623,15 @@ class _SrLevelField extends StatelessWidget {
       decoration: AnalyseTokens.reportFieldDecoration,
       child: Row(
         children: [
+          if (prepId != null &&
+              onPrepToggle != null &&
+              snapshot != null) ...[
+            AnalyseReportPrepCheckBox(
+              checked: snapshotIsPrepChecked(snapshot!, prepId!),
+              onToggle: () => onPrepToggle!(prepId!),
+            ),
+            const SizedBox(width: 4),
+          ],
           Text(
             prefix,
             style: TextStyle(color: accent, fontWeight: FontWeight.w800, fontSize: 9),
@@ -551,10 +653,14 @@ class _SrRow extends StatelessWidget {
   const _SrRow({
     required this.support,
     required this.resistance,
+    this.onPrepToggle,
+    this.snapshot,
   });
 
   final String support;
   final String resistance;
+  final ValueChanged<String>? onPrepToggle;
+  final AnalyseReportSnapshot? snapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -566,6 +672,9 @@ class _SrRow extends StatelessWidget {
             prefix: 'S',
             price: support,
             accent: AnalyseTokens.oledGreen,
+            prepId: AnalysePrepCheckIds.structSupport,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
           ),
         ),
         const SizedBox(width: _ReportCompact.gapRow),
@@ -574,6 +683,9 @@ class _SrRow extends StatelessWidget {
             prefix: 'R',
             price: resistance,
             accent: AnalyseTokens.oledRed,
+            prepId: AnalysePrepCheckIds.structResistance,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
           ),
         ),
       ],
@@ -582,9 +694,13 @@ class _SrRow extends StatelessWidget {
 }
 
 class _SmcBlock extends StatelessWidget {
-  const _SmcBlock({required this.snapshot});
+  const _SmcBlock({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -603,34 +719,44 @@ class _SmcBlock extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SmcFieldGroup(label: l.analyseOrderBlock, lines: obLines),
+          _SmcFieldGroup(
+            label: l.analyseOrderBlock,
+            lines: obLines,
+            prepId: AnalysePrepCheckIds.smcOb,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
           const SizedBox(height: _ReportCompact.gapBlock),
-          _SmcFieldGroup(label: l.analyseFvg, lines: fvgLines),
+          _SmcFieldGroup(
+            label: l.analyseFvg,
+            lines: fvgLines,
+            prepId: AnalysePrepCheckIds.smcFvg,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
           const SizedBox(height: _ReportCompact.gapBlock),
-          _SmcFieldGroup(label: l.analyseReportOledLiquidity, lines: liqLines),
+          _SmcFieldGroup(
+            label: l.analyseReportOledLiquidity,
+            lines: liqLines,
+            prepId: AnalysePrepCheckIds.smcLiq,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
           const SizedBox(height: _ReportCompact.gapBlock),
-          Text(l.analyseFibShort, style: AnalyseTokens.oledSmcFieldLabel),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              if (snapshot.smcFibOteLabel.isNotEmpty)
-                _NeutralPill(label: snapshot.smcFibOteLabel),
-              if (snapshot.smcFibOteLabel.isNotEmpty) const SizedBox(width: _ReportCompact.gapRow),
-              Expanded(
-                child: Text(
-                  snapshot.smcFibPrice,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AnalyseTokens.zinc200,
-                  ),
-                ),
-              ),
-            ],
+          _SmcFibRow(
+            snapshot: snapshot,
+            onPrepToggle: onPrepToggle,
           ),
           if (snapshot.noteSmc.trim().isNotEmpty) ...[
             const SizedBox(height: _ReportCompact.gapBlock),
-            _NoteBox(text: snapshot.noteSmc),
+            _ReadonlyField(
+              label: l.ajouterTradePlanRowNotes,
+              value: snapshot.noteSmc,
+              multiline: true,
+              prepId: AnalysePrepCheckIds.smcNote,
+              onPrepToggle: onPrepToggle,
+              snapshot: snapshot,
+            ),
           ],
         ],
       ),
@@ -639,17 +765,41 @@ class _SmcBlock extends StatelessWidget {
 }
 
 class _SmcFieldGroup extends StatelessWidget {
-  const _SmcFieldGroup({required this.label, required this.lines});
+  const _SmcFieldGroup({
+    required this.label,
+    required this.lines,
+    this.prepId,
+    this.onPrepToggle,
+    this.snapshot,
+  });
 
   final String label;
   final List<String> lines;
+  final String? prepId;
+  final ValueChanged<String>? onPrepToggle;
+  final AnalyseReportSnapshot? snapshot;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(label, style: AnalyseTokens.oledSmcFieldLabel),
+        Row(
+          children: [
+            if (prepId != null &&
+                onPrepToggle != null &&
+                snapshot != null) ...[
+              AnalyseReportPrepCheckBox(
+                checked: snapshotIsPrepChecked(snapshot!, prepId!),
+                onToggle: () => onPrepToggle!(prepId!),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: Text(label, style: AnalyseTokens.oledSmcFieldLabel),
+            ),
+          ],
+        ),
         const SizedBox(height: 4),
         for (var i = 0; i < lines.length; i++) ...[
           if (i > 0) const SizedBox(height: 4),
@@ -661,9 +811,13 @@ class _SmcFieldGroup extends StatelessWidget {
 }
 
 class _EntryBlock extends StatelessWidget {
-  const _EntryBlock({required this.snapshot});
+  const _EntryBlock({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -671,10 +825,24 @@ class _EntryBlock extends StatelessWidget {
     final head = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _ReadonlyField(label: l.analyseTimeframeLabelShort, value: snapshot.indicatorsTf)),
+        Expanded(
+          child: _ReadonlyField(
+            label: l.analyseTimeframeLabelShort,
+            value: snapshot.indicatorsTf,
+            prepId: AnalysePrepCheckIds.indTf,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
+        ),
         const SizedBox(width: _ReportCompact.gapRow),
         Expanded(
-          child: _ReadonlyField(label: l.analyseReportOledFieldSignals, value: snapshot.indicateursOutils),
+          child: _ReadonlyField(
+            label: l.analyseReportOledFieldSignals,
+            value: snapshot.indicateursOutils,
+            prepId: AnalysePrepCheckIds.indOutils,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
         ),
       ],
     );
@@ -688,6 +856,79 @@ class _EntryBlock extends StatelessWidget {
           label: l.analyseReportOledFieldActionPlan,
           value: snapshot.noteIndicators,
           multiline: true,
+          prepId: AnalysePrepCheckIds.indNote,
+          onPrepToggle: onPrepToggle,
+          snapshot: snapshot,
+        ),
+      ],
+    );
+  }
+}
+
+class _SmcFibRow extends StatelessWidget {
+  const _SmcFibRow({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
+
+  final AnalyseReportSnapshot snapshot;
+  final ValueChanged<String>? onPrepToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final showOte = snapshot.smcFibOteLabel.trim().isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            if (onPrepToggle != null) ...[
+              AnalyseReportPrepCheckBox(
+                checked: snapshotIsPrepChecked(
+                  snapshot,
+                  AnalysePrepCheckIds.smcFibPrix,
+                ),
+                onToggle: () => onPrepToggle!(AnalysePrepCheckIds.smcFibPrix),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: Text(
+                l.analyseFibShort,
+                style: AnalyseTokens.oledSmcFieldLabel,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            if (showOte) ...[
+              if (onPrepToggle != null) ...[
+                AnalyseReportPrepCheckBox(
+                  checked: snapshotIsPrepChecked(
+                    snapshot,
+                    AnalysePrepCheckIds.smcOte,
+                  ),
+                  onToggle: () => onPrepToggle!(AnalysePrepCheckIds.smcOte),
+                ),
+                const SizedBox(width: 4),
+              ],
+              _NeutralPill(label: snapshot.smcFibOteLabel),
+              const SizedBox(width: _ReportCompact.gapRow),
+            ],
+            Expanded(
+              child: Text(
+                snapshot.smcFibPrice,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AnalyseTokens.zinc200,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -695,27 +936,63 @@ class _EntryBlock extends StatelessWidget {
 }
 
 class _VolumeBlock extends StatelessWidget {
-  const _VolumeBlock({required this.snapshot});
+  const _VolumeBlock({
+    required this.snapshot,
+    this.onPrepToggle,
+  });
 
   final AnalyseReportSnapshot snapshot;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Expanded(child: _VpTile(label: 'POC', value: snapshot.poc)),
+            Expanded(
+              child: _VpTile(
+                label: 'POC',
+                value: snapshot.poc,
+                prepId: AnalysePrepCheckIds.volPoc,
+                onPrepToggle: onPrepToggle,
+                snapshot: snapshot,
+              ),
+            ),
             const SizedBox(width: _ReportCompact.gapRow),
-            Expanded(child: _VpTile(label: 'VAH', value: snapshot.vah)),
+            Expanded(
+              child: _VpTile(
+                label: 'VAH',
+                value: snapshot.vah,
+                prepId: AnalysePrepCheckIds.volVah,
+                onPrepToggle: onPrepToggle,
+                snapshot: snapshot,
+              ),
+            ),
             const SizedBox(width: _ReportCompact.gapRow),
-            Expanded(child: _VpTile(label: 'VAL', value: snapshot.val)),
+            Expanded(
+              child: _VpTile(
+                label: 'VAL',
+                value: snapshot.val,
+                prepId: AnalysePrepCheckIds.volVal,
+                onPrepToggle: onPrepToggle,
+                snapshot: snapshot,
+              ),
+            ),
           ],
         ),
         if (snapshot.noteVolume.trim().isNotEmpty) ...[
           const SizedBox(height: _ReportCompact.gapField),
-          _NoteBox(text: snapshot.noteVolume),
+          _ReadonlyField(
+            label: l.ajouterTradePlanRowNotes,
+            value: snapshot.noteVolume,
+            multiline: true,
+            prepId: AnalysePrepCheckIds.volNote,
+            onPrepToggle: onPrepToggle,
+            snapshot: snapshot,
+          ),
         ],
       ],
     );
@@ -723,10 +1000,19 @@ class _VolumeBlock extends StatelessWidget {
 }
 
 class _VpTile extends StatelessWidget {
-  const _VpTile({required this.label, required this.value});
+  const _VpTile({
+    required this.label,
+    required this.value,
+    this.prepId,
+    this.onPrepToggle,
+    this.snapshot,
+  });
 
   final String label;
   final String value;
+  final String? prepId;
+  final ValueChanged<String>? onPrepToggle;
+  final AnalyseReportSnapshot? snapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -738,7 +1024,22 @@ class _VpTile extends StatelessWidget {
       decoration: AnalyseTokens.reportFieldDecoration,
       child: Column(
         children: [
-          Text(label, style: AnalyseTokens.oledMicroLabel),
+          Row(
+            children: [
+              if (prepId != null &&
+                  onPrepToggle != null &&
+                  snapshot != null) ...[
+                AnalyseReportPrepCheckBox(
+                  checked: snapshotIsPrepChecked(snapshot!, prepId!),
+                  onToggle: () => onPrepToggle!(prepId!),
+                ),
+                const SizedBox(width: 4),
+              ],
+              Expanded(
+                child: Text(label, style: AnalyseTokens.oledMicroLabel),
+              ),
+            ],
+          ),
           const SizedBox(height: 2),
           Text(
             value,
@@ -759,21 +1060,43 @@ class _ReadonlyField extends StatelessWidget {
     required this.label,
     required this.value,
     this.multiline = false,
+    this.prepId,
+    this.onPrepToggle,
+    this.snapshot,
   });
 
   final String label;
   final String value;
   final bool multiline;
+  final String? prepId;
+  final ValueChanged<String>? onPrepToggle;
+  final AnalyseReportSnapshot? snapshot;
 
   @override
   Widget build(BuildContext context) {
     final v = value.trim().isEmpty ? '—' : value.trim();
+    final showPrep = prepId != null && onPrepToggle != null && snapshot != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          label,
-          style: AnalyseTokens.oledSectionLabel.copyWith(color: AnalyseTokens.zinc500),
+        Row(
+          children: [
+            if (showPrep) ...[
+              AnalyseReportPrepCheckBox(
+                checked: snapshotIsPrepChecked(snapshot!, prepId!),
+                onToggle: () => onPrepToggle!(prepId!),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Expanded(
+              child: Text(
+                label,
+                style: AnalyseTokens.oledSectionLabel.copyWith(
+                  color: AnalyseTokens.zinc500,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 4),
         Container(
@@ -819,31 +1142,6 @@ class _DeepValueBox extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class _NoteBox extends StatelessWidget {
-  const _NoteBox({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(_ReportCompact.padNote),
-      decoration: AnalyseTokens.reportFieldDecoration,
-      child: Text(
-        text,
-        style: GoogleFonts.plusJakartaSans(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AnalyseTokens.zinc400,
-          height: 1.3,
-          fontStyle: FontStyle.italic,
         ),
       ),
     );

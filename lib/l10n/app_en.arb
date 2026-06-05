@@ -631,6 +631,8 @@
   "dashboardPerfHoursTitle": "PERFORMANCE HOURS",
   "dashboardRingState": "STATE",
   "dashboardRingWin": "WIN",
+  "dashboardRingAnalyseMobile": "MA",
+  "dashboardRingAnalyseWeb": "Analysis",
   "dashboardSuccessFactorSample": "Sport before session",
   "dashboardSuccessFactorsSubtitle": "Track how your habits impact your win rate.",
   "dashboardSuccessFactorsTitle": "SUCCESS FACTORS",

@@ -34,6 +34,7 @@ class DashboardHomeContent extends StatefulWidget {
     required this.strategiePreviewSetup,
     required this.onOpenChecklist,
     required this.onOpenAnalyse,
+    required this.onToggleAnalysePrepCheck,
     required this.onOpenEtatMental,
     required this.onOpenPerformance,
     required this.onOpenStrategie,
@@ -51,6 +52,7 @@ class DashboardHomeContent extends StatefulWidget {
   final StrategieSetupCardData? strategiePreviewSetup;
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenAnalyse;
+  final ValueChanged<String> onToggleAnalysePrepCheck;
   final VoidCallback onOpenEtatMental;
   final VoidCallback onOpenPerformance;
   final VoidCallback onOpenStrategie;
@@ -100,6 +102,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           onOpenEtatMental: widget.onOpenEtatMental,
           onOpenPerformance: widget.onOpenPerformance,
           onOpenTrade: widget.onOpenTrade,
+          analysePreviewSnapshot: widget.analysePreviewSnapshot,
+          onOpenAnalyse: widget.onOpenAnalyse,
           onOpenTradeById: kIsWeb ? null : widget.onOpenTradeById,
           onOpenTradeDayKey: kIsWeb || widget.liteFreemiumRestricted
               ? null
@@ -130,6 +134,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
         return DashboardAnalyseShortcut(
           snapshot: widget.analysePreviewSnapshot,
           onOpenAnalyse: widget.onOpenAnalyse,
+          onPrepToggle: widget.onToggleAnalysePrepCheck,
           cardBackgroundColor: WebDashboardConfig.useLeftRail
               ? Colors.transparent
               : null,

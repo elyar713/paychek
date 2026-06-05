@@ -630,6 +630,8 @@
   "dashboardPerfHoursTitle": "성과 시간대",
   "dashboardRingState": "상태",
   "dashboardRingWin": "승",
+  "dashboardRingAnalyseMobile": "MA",
+  "dashboardRingAnalyseWeb": "분석",
   "dashboardSuccessFactorSample": "세션 전 운동",
   "dashboardSuccessFactorsSubtitle": "습관이 승률에 미치는 영향을 추적하세요.",
   "dashboardSuccessFactorsTitle": "성공 요인",

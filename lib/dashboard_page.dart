@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async' show Timer, StreamSubscription, unawaited;
 
 import 'analyse/analyse_page.dart';
+import 'analyse/analyse_prep_checks.dart';
 import 'analyse/analyse_report_snapshot.dart';
 import 'analyse/analyse_report_snapshot_codec.dart';
 import 'analyse/analyse_reports_storage.dart';
@@ -414,6 +415,14 @@ class _DashboardPageState extends State<DashboardPage>
     });
   }
 
+  Future<void> _onToggleAnalysePrepCheck(String prepId) async {
+    final current = _analyseHomePreview;
+    if (current == null) return;
+    final updated = await persistAnalyseReportPrepToggle(current, prepId);
+    if (!mounted) return;
+    setState(() => _analyseHomePreview = updated);
+  }
+
   Future<void> _reloadAnalyseHomePreview() async {
     final starred = await AnalyseStarredReportStorage.load();
     final storedRaw = await AnalyseReportsStorage.loadAll();
@@ -597,6 +606,9 @@ class _DashboardPageState extends State<DashboardPage>
           ),
           onOpenChecklist: _openChecklistFromHome,
           onOpenAnalyse: _openAnalyseFromHome,
+          onToggleAnalysePrepCheck: (prepId) {
+            unawaited(_onToggleAnalysePrepCheck(prepId));
+          },
           onOpenEtatMental: _openEtatMentalFromHome,
           onOpenPerformance: () {
             if (_liteRestricted) {

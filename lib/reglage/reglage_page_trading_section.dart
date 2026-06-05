@@ -40,7 +40,7 @@ class _TradingPrefsSectionState extends State<_TradingPrefsSection> {
   }
 
   Future<void> _confirmDelete(BuildContext context, UserPortfolio p) async {
-    if (p.id == kDefaultPortfolioId) return;
+    if (!widget.portfolioStore.canRemovePortfolio(p.id)) return;
     final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
@@ -331,7 +331,7 @@ class _TradingPrefsSectionState extends State<_TradingPrefsSection> {
                                         );
                                       },
                                     ),
-                                    if (p.id != kDefaultPortfolioId)
+                                    if (store.canRemovePortfolio(p.id))
                                       IconButton(
                                         tooltip: l10n.deleteTooltip,
                                         icon: Icon(

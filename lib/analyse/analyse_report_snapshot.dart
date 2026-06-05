@@ -319,7 +319,7 @@ class AnalyseReportSnapshot {
       indicatorsCopies:
           indicatorsCopies.isEmpty ? null : indicatorsCopies,
       smcCopies: smcCopies.isEmpty ? null : smcCopies,
-      prepCheckedIds: c.prepCheckedIdsForSnapshot(),
+      prepCheckedIds: const [],
     );
   }
 }

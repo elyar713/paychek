@@ -2782,6 +2782,18 @@ abstract class AppLocalizations {
   /// **'GAGNÉ'**
   String get dashboardRingWin;
 
+  /// No description provided for @dashboardRingAnalyseMobile.
+  ///
+  /// In fr, this message translates to:
+  /// **'MA'**
+  String get dashboardRingAnalyseMobile;
+
+  /// No description provided for @dashboardRingAnalyseWeb.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse'**
+  String get dashboardRingAnalyseWeb;
+
   /// No description provided for @dashboardSuccessFactorSample.
   ///
   /// In fr, this message translates to:

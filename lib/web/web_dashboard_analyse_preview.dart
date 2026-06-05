@@ -12,11 +12,13 @@ class WebDashboardAnalysePreview extends StatelessWidget {
     super.key,
     required this.snapshot,
     required this.onOpenAnalyse,
+    required this.onPrepToggle,
     this.cardBackgroundColor,
   });
 
   final AnalyseReportSnapshot? snapshot;
   final VoidCallback onOpenAnalyse;
+  final ValueChanged<String> onPrepToggle;
 
   /// Transparent si la carte est dans [WebDashboardPairedCard].
   final Color? cardBackgroundColor;
@@ -61,7 +63,10 @@ class WebDashboardAnalysePreview extends StatelessWidget {
                     ),
                     if (s != null) ...[
                       const SizedBox(height: 14),
-                      DashboardAnalyseOledPreviewContent(snapshot: s),
+                      DashboardAnalyseOledPreviewContent(
+                        snapshot: s,
+                        onPrepToggle: onPrepToggle,
+                      ),
                     ],
                   ],
                 ),

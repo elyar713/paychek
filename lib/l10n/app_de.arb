@@ -630,6 +630,8 @@
   "dashboardPerfHoursTitle": "AUFFÜHRUNGSSTUNDEN",
   "dashboardRingState": "ZUSTAND",
   "dashboardRingWin": "GEWINNEN",
+  "dashboardRingAnalyseMobile": "MA",
+  "dashboardRingAnalyseWeb": "Analyse",
   "dashboardSuccessFactorSample": "Sport vor der Sitzung",
   "dashboardSuccessFactorsSubtitle": "Verfolgen Sie, wie sich Ihre Gewohnheiten auf Ihre Gewinnrate auswirken.",
   "dashboardSuccessFactorsTitle": "ERFOLGSFAKTOREN",

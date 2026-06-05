@@ -17,7 +17,7 @@ import 'analyse_reports_storage.dart';
 import 'analyse_firestore_sync.dart';
 import 'analyse_starred_report_storage.dart';
 import 'analyse_oled_plan_ui.dart';
-import 'analyse_trade_link.dart';
+import 'analyse_prep_checks.dart';
 import 'analyse_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../strategie/strategie_setups_store.dart';
@@ -191,16 +191,26 @@ class _AnalysePageState extends State<AnalysePage> {
     });
   }
 
-  void _onOpenAddTrade() {
-    final navigate = widget.onNavigateToAddTrade;
-    if (navigate == null) return;
-    FocusManager.instance.primaryFocus?.unfocus();
-    final locale = Localizations.localeOf(context);
-    final snap = AnalyseReportSnapshot.fromController(_c, locale: locale);
-    analysePendingTradePlan.value = snap;
-    unawaited(AnalyseReportsStorage.add(snap));
-    AnalyseRealtimeNotifier.bumpReports();
-    navigate();
+  void _onToggleReportPrepCheck(int index, String prepId) {
+    if (index < 0 || index >= _reportEntries.length) return;
+    final entry = _reportEntries[index];
+    final updated = snapshotTogglePrepCheck(entry.snapshot, prepId);
+    setState(() {
+      final list = List<AnalyseStackedReportEntry>.from(_reportEntries);
+      list[index] = AnalyseStackedReportEntry(
+        snapshot: updated,
+        embedKey: entry.embedKey,
+        screenshotBytes: entry.screenshotBytes,
+      );
+      _reportEntries = list;
+      if (_reportStarredAt(index)) {
+        _storedDashboardStarSnapshot = updated;
+      }
+    });
+    if (_reportStarredAt(index)) {
+      unawaited(AnalyseStarredReportStorage.save(updated));
+    }
+    _persistCurrentReports();
   }
 
   /// Nouveau rapport en tête, ou remplacement du rapport ouvert au crayon.
@@ -209,6 +219,15 @@ class _AnalysePageState extends State<AnalysePage> {
     final wasEditingStar = _lastEditedWasStarred;
     _editingReportIndex = null;
     _lastEditedWasStarred = false;
+
+    if (editIdx != null &&
+        editIdx >= 0 &&
+        editIdx < _reportEntries.length) {
+      final prevPrep = _reportEntries[editIdx].snapshot.prepCheckedIds;
+      if (prevPrep != null && prevPrep.isNotEmpty) {
+        snap = snapshotWithPrepCheckedIds(snap, prevPrep);
+      }
+    }
 
     final AnalyseStackedReportEntry entry;
     if (editIdx != null &&
@@ -332,9 +351,6 @@ class _AnalysePageState extends State<AnalysePage> {
                       AnalyseOledStickyHeader(
                         controller: _c,
                         onSave: _onSavePlan,
-                        onOpenAddTrade: widget.onNavigateToAddTrade == null
-                            ? null
-                            : _onOpenAddTrade,
                       ),
                       Expanded(
                         child: Center(
@@ -356,6 +372,7 @@ class _AnalysePageState extends State<AnalysePage> {
                               scrollTargetReportIndex: _scrollTargetReportIndex,
                               reportStarred: _reportStarredAt,
                               onToggleReportStar: _toggleDashboardStarAt,
+                              onToggleReportPrepCheck: _onToggleReportPrepCheck,
                               onReportValidated: _commitReportFromGenerator,
                               onEditReport: (index) {
                                 if (index < 0 ||

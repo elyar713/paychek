@@ -33,6 +33,10 @@ class UserPortfolioStore extends ChangeNotifier {
 
   int get count => _items.length;
 
+  /// Suppression autorisée dès qu’il reste au moins un autre portefeuille.
+  bool canRemovePortfolio(String id) =>
+      _items.length > 1 && _items.any((e) => e.id == id);
+
   /// Anciennes clés globales (avant isolation par compte).
   Future<void> _migrateLegacyGlobalPortfoliosIfNeeded(SharedPreferences prefs) async {
     final existing = prefs.getString(_prefsKey);
@@ -229,12 +233,10 @@ class UserPortfolioStore extends ChangeNotifier {
   }
 
   Future<void> remove(String id) async {
-    if (id == kDefaultPortfolioId) return;
+    if (!canRemovePortfolio(id)) return;
     _items = _items.where((e) => e.id != id).toList();
     if (_activePortfolioId == id) {
-      _activePortfolioId = _items.any((e) => e.id == kDefaultPortfolioId)
-          ? kDefaultPortfolioId
-          : _items.first.id;
+      _activePortfolioId = _items.first.id;
       await _persistActiveId();
     }
     await _persist();

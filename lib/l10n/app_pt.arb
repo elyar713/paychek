@@ -630,6 +630,8 @@
   "dashboardPerfHoursTitle": "HORAS DE DESEMPENHO",
   "dashboardRingState": "UF",
   "dashboardRingWin": "GANHAR",
+  "dashboardRingAnalyseMobile": "MA",
+  "dashboardRingAnalyseWeb": "Análise",
   "dashboardSuccessFactorSample": "Esporte antes da sessão",
   "dashboardSuccessFactorsSubtitle": "Acompanhe como seus hábitos afetam sua taxa de vitórias.",
   "dashboardSuccessFactorsTitle": "Fatores de sucesso ",

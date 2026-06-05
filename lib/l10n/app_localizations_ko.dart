@@ -1444,6 +1444,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dashboardRingWin => '승';
 
   @override
+  String get dashboardRingAnalyseMobile => 'MA';
+
+  @override
+  String get dashboardRingAnalyseWeb => '분석';
+
+  @override
   String get dashboardSuccessFactorSample => '세션 전 운동';
 
   @override

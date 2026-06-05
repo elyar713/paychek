@@ -38,6 +38,7 @@ class AnalysePageScrollContent extends StatefulWidget {
     required this.onDeleteReport,
     required this.reportStarred,
     required this.onToggleReportStar,
+    required this.onToggleReportPrepCheck,
     this.showSaveBanner = false,
     this.onDismissSaveBanner,
   });
@@ -55,6 +56,7 @@ class AnalysePageScrollContent extends StatefulWidget {
   final void Function(int index) onDeleteReport;
   final bool Function(int index) reportStarred;
   final void Function(int index) onToggleReportStar;
+  final void Function(int index, String prepId) onToggleReportPrepCheck;
   final bool showSaveBanner;
   final VoidCallback? onDismissSaveBanner;
 
@@ -179,6 +181,8 @@ class _AnalysePageScrollContentState extends State<AnalysePageScrollContent> {
           onEdit: () => widget.onEditReport(entry.key),
           onExportPdf: () => widget.onExportPdf(entry.key),
           onDeleteReport: () => widget.onDeleteReport(entry.key),
+          onPrepToggle: (prepId) =>
+              widget.onToggleReportPrepCheck(entry.key, prepId),
         ),
       ],
     ];

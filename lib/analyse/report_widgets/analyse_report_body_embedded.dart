@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../dashboard/widgets/dashboard_analyse_prep_ring.dart';
 import '../../l10n/app_localizations.dart';
 import '../analyse_report_snapshot.dart';
 import '../analyse_tokens.dart';
@@ -11,16 +11,19 @@ class AnalyseReportBody extends StatelessWidget {
     super.key,
     required this.snapshot,
     this.topBar,
+    this.onPrepToggle,
   });
 
   final AnalyseReportSnapshot snapshot;
   final Widget? topBar;
+  final ValueChanged<String>? onPrepToggle;
 
   @override
   Widget build(BuildContext context) {
     return AnalyseReportOledBody(
       snapshot: snapshot,
       topBar: topBar,
+      onPrepToggle: onPrepToggle,
     );
   }
 }
@@ -35,6 +38,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
     required this.onEdit,
     required this.onExportPdf,
     required this.onDeleteReport,
+    required this.onPrepToggle,
   });
 
   final AnalyseReportSnapshot snapshot;
@@ -43,6 +47,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onExportPdf;
   final VoidCallback onDeleteReport;
+  final ValueChanged<String> onPrepToggle;
 
   static const Color _starActive = Color(0xFFE6C35C);
 
@@ -54,6 +59,7 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
       children: [
         AnalyseReportBody(
           snapshot: snapshot,
+          onPrepToggle: onPrepToggle,
           topBar: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -69,6 +75,8 @@ class AnalyseReportEmbeddedSection extends StatelessWidget {
                   ),
                 ),
               ),
+              DashboardAnalysePrepRing(snapshot: snapshot, size: 32),
+              const SizedBox(width: 4),
               IconButton(
                 onPressed: onToggleDashboardStar,
                 tooltip: isDashboardStarred

@@ -57,7 +57,7 @@ class _PortfoliosManagerBody extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, UserPortfolio p) async {
-    if (p.id == kDefaultPortfolioId) return;
+    if (!store.canRemovePortfolio(p.id)) return;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) {
@@ -223,14 +223,14 @@ class _PortfoliosManagerBody extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete_outline,
-                                    color: p.id == kDefaultPortfolioId
-                                        ? Colors.white12
-                                        : Colors.white38,
+                                    color: store.canRemovePortfolio(p.id)
+                                        ? Colors.white38
+                                        : Colors.white12,
                                     size: 20,
                                   ),
-                                  onPressed: p.id == kDefaultPortfolioId
-                                      ? null
-                                      : () => _confirmDelete(context, p),
+                                  onPressed: store.canRemovePortfolio(p.id)
+                                      ? () => _confirmDelete(context, p)
+                                      : null,
                                 ),
                               ],
                             ),

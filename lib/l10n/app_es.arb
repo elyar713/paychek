@@ -630,6 +630,8 @@
   "dashboardPerfHoursTitle": "HORAS DE FUNCIONAMIENTO",
   "dashboardRingState": "ESTADO",
   "dashboardRingWin": "GANAR",
+  "dashboardRingAnalyseMobile": "MA",
+  "dashboardRingAnalyseWeb": "Análisis",
   "dashboardSuccessFactorSample": "Deporte antes de la sesión",
   "dashboardSuccessFactorsSubtitle": "Realice un seguimiento de cómo sus hábitos afectan su tasa de ganancias.",
   "dashboardSuccessFactorsTitle": "FACTORES DE ÉXITO",
