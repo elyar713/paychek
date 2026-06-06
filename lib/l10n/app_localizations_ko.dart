@@ -1310,6 +1310,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get checklistMenuEdit => '편집';
 
   @override
+  String get checklistMenuReorder => '순서 변경';
+
+  @override
+  String get checklistReorderTitle => '항목 순서';
+
+  @override
+  String get checklistReorderHint =>
+      '손잡이를 드래그해 기준을 위·아래로 옮기거나 다른 섹션 아래에 놓으세요. 섹션 제목을 드래그하면 섹션 전체가 이동합니다.';
+
+  @override
+  String get checklistReorderEmptySectionHint => '빈 섹션 — 기준을 여기로 드래그하세요.';
+
+  @override
   String get checklistSectionToggleOn => '섹션 켜기';
 
   @override

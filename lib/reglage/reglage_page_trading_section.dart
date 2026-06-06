@@ -25,10 +25,14 @@ class _TradingPrefsSectionState extends State<_TradingPrefsSection> {
   bool get _portfoliosOpen => _portfoliosExpanded ?? false;
 
   String _capitalLine() {
-    final a = widget.capitalStore.capitalAmount;
-    if (a == null) return '\u2014';
-    final sym = widget.capitalStore.currencySymbol;
-    final s = _formatThousands(a);
+    final amount = widget.portfolioStore.effectiveCapitalAmount(
+      widget.capitalStore,
+    );
+    if (amount == null) return '\u2014';
+    final sym = widget.portfolioStore.effectiveCurrencySymbol(
+      widget.capitalStore,
+    );
+    final s = _formatThousands(amount);
     return '$s $sym';
   }
 

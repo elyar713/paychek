@@ -14,6 +14,7 @@ import 'checklist_sections_storage.dart';
 import 'checklist_demo_graduation.dart';
 import '../shared/paychek_demo_graduation_prefs.dart';
 import '../shared/paychek_frame_callbacks.dart';
+import 'checklist_reorder_entries.dart';
 import 'widgets/checklist_delete_section_dialog.dart';
 
 /// État et actions de [ChecklistPage] (hors arbre de widgets).
@@ -122,6 +123,9 @@ class ChecklistPageController extends ChangeNotifier {
   String? editingSectionId;
   ChecklistSectionData? sectionEditSnapshot;
   bool sectionEditInteraction = false;
+
+  /// Poignées de glissement visibles sur la page (sans navigation).
+  bool reorderModeEnabled = false;
 
   final TextEditingController sectionTitleEditController =
       TextEditingController();
@@ -791,6 +795,9 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void startSectionTitleEdit(String sectionId) {
+    if (reorderModeEnabled) {
+      setReorderMode(false);
+    }
     if (editingItemId != null) {
       commitItemLabelEdit();
     }
@@ -989,8 +996,58 @@ class ChecklistPageController extends ChangeNotifier {
     _persistSoon();
   }
 
+  /// Active / désactive les poignées de réorganisation inline.
+  void setReorderMode(bool enabled) {
+    if (reorderModeEnabled == enabled) return;
+    if (enabled && isEditingChecklist) {
+      if (editingSectionId != null) {
+        cancelSectionEdit();
+      } else if (editingItemId != null) {
+        commitItemLabelEdit();
+      }
+    }
+    reorderModeEnabled = enabled;
+    notifyListeners();
+  }
+
+  void toggleReorderMode() => setReorderMode(!reorderModeEnabled);
+
+  /// Réorganise une ligne (peut changer de section selon la position cible).
+  void reorderChecklistItem({
+    required int oldIndex,
+    required int newIndex,
+  }) {
+    final flat = buildChecklistFlatReorderEntries(_sections);
+    final next = reorderChecklistItemInFlat(flat, oldIndex, newIndex);
+    _sections = checklistSectionsFromFlatReorder(next, _sections);
+    _notifyChecklistChanged();
+    _persistSoon();
+    notifyListeners();
+  }
+
+  /// Déplace un bloc section (titre + critères) dans l’ordre global.
+  void reorderChecklistSectionBlock({
+    required int oldHeaderIndex,
+    required int newIndex,
+  }) {
+    final flat = buildChecklistFlatReorderEntries(_sections);
+    final next = reorderChecklistSectionBlockInFlat(
+      flat,
+      oldHeaderIndex,
+      newIndex,
+    );
+    _sections = checklistSectionsFromFlatReorder(next, _sections);
+    _notifyChecklistChanged();
+    _persistSoon();
+    notifyListeners();
+  }
+
   /// Retourne `false` si l’action s’arrête là (ex. annulation édition section).
   bool prepareBackNavigation() {
+    if (reorderModeEnabled) {
+      setReorderMode(false);
+      return false;
+    }
     if (editingSectionId != null) {
       cancelSectionEdit();
       return false;

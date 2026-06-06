@@ -107,12 +107,53 @@ class UserPortfolioStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Capital affiché selon le portefeuille actif (global pour [kDefaultPortfolioId]).
+  /// Capital affiché selon le portefeuille actif (aligné liste Portfolios).
   double? effectiveCapitalAmount(UserCapitalStore global) {
     final p = activePortfolio;
     if (p == null) return global.capitalAmount;
-    if (p.id == kDefaultPortfolioId) return global.capitalAmount;
-    return p.capitalAmount;
+    // Portefeuille principal : source de vérité = capital global (questionnaire / réglages).
+    if (p.id == kDefaultPortfolioId) {
+      return global.capitalAmount ?? p.capitalAmount;
+    }
+    return p.capitalAmount ?? global.capitalAmount;
+  }
+
+  /// Enregistre capital + devise sur le portefeuille **actif** (feuille Réglages).
+  Future<void> saveActivePortfolioCapital({
+    required UserCapitalStore global,
+    required double amount,
+    required bool useCustom,
+    required String customName,
+    required String customSymbol,
+    required String currencyCode,
+  }) async {
+    final active = activePortfolio;
+    if (active == null || active.id == kDefaultPortfolioId) {
+      if (useCustom) {
+        await global.setCapitalCustom(
+          amount: amount,
+          name: customName,
+          symbol: customSymbol,
+        );
+      } else {
+        await global.setCapital(
+          amount: amount,
+          currencyCode: currencyCode,
+        );
+      }
+      await syncDefaultFromCapital(global, displayName: active?.name);
+      return;
+    }
+
+    final updated = UserPortfolio(
+      id: active.id,
+      name: active.name,
+      capitalAmount: amount,
+      currencyCode: useCustom ? kCustomCurrencyCode : currencyCode,
+      customCurrencyName: useCustom ? customName : '',
+      customCurrencySymbol: useCustom ? customSymbol : '',
+    );
+    await upsert(updated);
   }
 
   String effectiveCurrencyCode(UserCapitalStore global) {

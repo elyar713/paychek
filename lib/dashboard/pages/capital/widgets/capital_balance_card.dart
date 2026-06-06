@@ -15,6 +15,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../trade/trade_journal_scope.dart';
 import '../../../../trade/trade_stats.dart';
 import '../../../../web/paychek_web_tokens.dart';
+import '../../../capital_evolution_computed.dart';
 import '../../../dashboard_tokens.dart';
 import '../../../widgets/capital_evolution_chart_section.dart';
 import '../../../widgets/dashboard_analyse_prep_ring.dart';
@@ -81,8 +82,6 @@ class CapitalBalanceCard extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([store, portfolioStore, tradingWeek]),
       builder: (context, _) {
-        final baseCapital = portfolioStore.effectiveCapitalAmount(store);
-        final sym = portfolioStore.effectiveCurrencySymbol(store);
         return ListenableBuilder(
           listenable: checklistController,
           builder: (context, _) {
@@ -94,9 +93,11 @@ class CapitalBalanceCard extends StatelessWidget {
                 final emPct = '${emScore.round()}%';
                 final tradesStore = TradeJournalScope.of(context);
                 return ListenableBuilder(
-                  listenable: Listenable.merge([tradesStore, portfolioStore]),
+                  listenable: Listenable.merge([tradesStore, portfolioStore, store]),
                   builder: (context, _) {
                 final l = AppLocalizations.of(context)!;
+                final baseCapital = portfolioStore.effectiveCapitalAmount(store);
+                final sym = portfolioStore.effectiveCurrencySymbol(store);
                 final tfLabels = [
                   l.dashboardTfDay,
                   l.dashboardTfWeek,
@@ -104,19 +105,29 @@ class CapitalBalanceCard extends StatelessWidget {
                   l.dashboardTfAll,
                 ];
                 final allTrades = activeJournalTradesOrDemo(context);
-                final win = computeTradeStats(allTrades).winRatePctDisplay;
-                final profitNet =
-                    allTrades.fold<double>(0.0, (sum, t) => sum + t.gainAmount);
-                final solde = (baseCapital == null) ? null : (baseCapital + profitNet);
+                final daysPerWeek = tradingWeek.tradingDaysPerWeek;
+                final capitalMetrics =
+                    CapitalEvolutionComputed.resolveDashboardCapitalMetrics(
+                  allTrades,
+                  timeframeIndex,
+                  tradingDaysPerWeek: daysPerWeek,
+                );
+                final win = computeTradeStats(
+                  capitalMetrics.tradesInPeriod,
+                ).winRatePctDisplay;
+                final periodNet = capitalMetrics.periodNet;
+                final solde = (baseCapital == null)
+                    ? null
+                    : (baseCapital + capitalMetrics.allTimeNet);
                 final mainAmount = _formatMainAmount(solde);
                 final pct = (baseCapital != null && baseCapital > 0)
-                    ? (profitNet / baseCapital) * 100.0
+                    ? (periodNet / baseCapital) * 100.0
                     : null;
                 final positiveAccent =
                     kIsWeb ? PaychekWebTokens.accentMint : DashboardTokens.accent;
                 final deltaColor =
-                    profitNet < 0 ? DashboardTokens.negative : positiveAccent;
-                final signedDelta = _formatSignedAmount(profitNet);
+                    periodNet < 0 ? DashboardTokens.negative : positiveAccent;
+                final signedDelta = _formatSignedAmount(periodNet);
                 final signedPct = pct == null
                     ? null
                     : '${pct >= 0 ? '+' : ''}${pct.toStringAsFixed(1).replaceAll('.', ',')}%';
@@ -178,7 +189,7 @@ class CapitalBalanceCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(
-                              profitNet < 0
+                              periodNet < 0
                                   ? Icons.trending_down_rounded
                                   : Icons.trending_up_rounded,
                               color: deltaColor,
@@ -352,7 +363,7 @@ class CapitalBalanceCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    profitNet < 0
+                                    periodNet < 0
                                         ? Icons.trending_down
                                         : Icons.trending_up,
                                     color: deltaColor,

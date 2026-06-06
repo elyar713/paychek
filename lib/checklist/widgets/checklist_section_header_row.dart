@@ -19,6 +19,7 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
     this.titleFocusNode,
     this.onTitleSubmitted,
     this.onTitleInteraction,
+    this.reorderDragIndex,
   });
 
   final String title;
@@ -36,12 +37,27 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
   /// Tap ou saisie sur le champ titre (compte comme Â« interaction Â» pour valider).
   final VoidCallback? onTitleInteraction;
 
+  /// Index dans la liste aplatie [ReorderableListView] (poignée de glissement).
+  final int? reorderDragIndex;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        if (reorderDragIndex != null)
+          ReorderableDragStartListener(
+            index: reorderDragIndex!,
+            child: const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icon(
+                Icons.drag_handle_rounded,
+                size: 22,
+                color: ChecklistTokens.sectionMenuIconColor,
+              ),
+            ),
+          ),
         Icon(
           Icons.fact_check_outlined,
           size: 18,
@@ -127,6 +143,25 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         l.checklistMenuEdit,
+                        style: ChecklistTokens.sectionPopupMenuItemStyle,
+                      ),
+                    ],
+                  ),
+                ),
+              if (!editingTitle)
+                PopupMenuItem(
+                  padding: ChecklistTokens.sectionPopupMenuItemPadding,
+                  value: ChecklistPrompts.menuActionReorder,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.swap_vert_rounded,
+                        size: 18,
+                        color: ChecklistTokens.sectionPopupMenuItemStyle.color,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        l.checklistMenuReorder,
                         style: ChecklistTokens.sectionPopupMenuItemStyle,
                       ),
                     ],

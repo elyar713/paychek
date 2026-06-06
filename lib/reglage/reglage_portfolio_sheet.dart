@@ -8,6 +8,7 @@ import '../questionnaire/trading_currency.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../questionnaire/user_capital_store.dart';
 import 'user_portfolio_scope.dart';
+import 'user_portfolio_models.dart';
 
 const Color _kBrandTeal = Color(0xFF1EB48A);
 
@@ -45,26 +46,68 @@ class _PortfolioSheetBodyState extends State<_PortfolioSheetBody> {
   late String _customSymbol;
   late TradingCurrency _currency;
   String? _error;
+  bool _seededFromActivePortfolio = false;
 
   @override
   void initState() {
     super.initState();
-    final store = widget.store;
     _amountCtrl = TextEditingController();
-    if (store.capitalAmount != null) {
-      final v = store.capitalAmount!;
+    _useCustom = false;
+    _customName = '';
+    _customSymbol = '';
+    _currency = kTradingCurrencies.first;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_seededFromActivePortfolio) return;
+    _seededFromActivePortfolio = true;
+    _seedFromActivePortfolio();
+  }
+
+  void _seedFromActivePortfolio() {
+    final pf = UserPortfolioScope.of(context);
+    final global = widget.store;
+    final active = pf.activePortfolio;
+    final useGlobal =
+        active == null || active.id == kDefaultPortfolioId;
+
+    if (useGlobal) {
+      if (global.capitalAmount != null) {
+        final v = global.capitalAmount!;
+        _amountCtrl.text =
+            v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(2);
+      }
+      if (global.isCustomCurrency) {
+        _useCustom = true;
+        _customName = global.customCurrencyName ?? '';
+        _customSymbol = global.currencySymbol;
+      } else {
+        _useCustom = false;
+        _customName = '';
+        _customSymbol = '';
+        _currency = tradingCurrencyByCode(global.currencyCode) ??
+            kTradingCurrencies.first;
+      }
+      return;
+    }
+
+    if (active.capitalAmount != null) {
+      final v = active.capitalAmount!;
       _amountCtrl.text =
           v == v.roundToDouble() ? v.round().toString() : v.toStringAsFixed(2);
     }
-    if (store.isCustomCurrency) {
+    if (active.isCustomCurrency) {
       _useCustom = true;
-      _customName = store.customCurrencyName ?? '';
-      _customSymbol = store.currencySymbol;
+      _customName = active.customCurrencyName;
+      _customSymbol = active.customCurrencySymbol;
     } else {
       _useCustom = false;
       _customName = '';
       _customSymbol = '';
-      _currency = tradingCurrencyByCode(store.currencyCode) ?? kTradingCurrencies.first;
+      _currency = tradingCurrencyByCode(active.currencyCode) ??
+          kTradingCurrencies.first;
     }
   }
 
@@ -173,21 +216,15 @@ class _PortfolioSheetBodyState extends State<_PortfolioSheetBody> {
     }
     setState(() => _error = null);
     try {
-      if (_useCustom) {
-        await widget.store.setCapitalCustom(
-          amount: value,
-          name: _customName,
-          symbol: _customSymbol,
-        );
-      } else {
-        await widget.store.setCapital(
-          amount: value,
-          currencyCode: _currency.code,
-        );
-      }
-      if (!mounted) return;
-      await UserPortfolioScope.of(context)
-          .syncDefaultFromCapital(widget.store);
+      final pf = UserPortfolioScope.of(context);
+      await pf.saveActivePortfolioCapital(
+        global: widget.store,
+        amount: value,
+        useCustom: _useCustom,
+        customName: _customName,
+        customSymbol: _customSymbol,
+        currencyCode: _currency.code,
+      );
       if (mounted) Navigator.of(context).pop();
     } on ArgumentError {
       setState(() => _error = l.errorInvalidAmount);

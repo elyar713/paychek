@@ -10,11 +10,13 @@ import 'checklist_export_pdf.dart';
 import 'checklist_item_schedule.dart';
 import 'checklist_models.dart';
 import 'checklist_page_controller.dart';
+import 'checklist_prompts.dart';
 import 'checklist_tokens.dart';
 import 'widgets/checklist_add_section_button.dart';
 import 'widgets/checklist_item_row.dart';
 import 'widgets/checklist_pdf_export_chip.dart';
 import 'widgets/checklist_daily_calendar_section.dart';
+import 'widgets/checklist_inline_reorder_list.dart';
 import 'widgets/checklist_section_card.dart';
 import 'checklist_progress_ring.dart';
 
@@ -44,9 +46,21 @@ class ChecklistPageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = controller;
-    final displaySections = c.sectionsSortedBySchedule;
+    final displaySections = c.sections;
     final n = displaySections.length;
     final l = AppLocalizations.of(context)!;
+
+    void onSectionMenu(String sectionId, String action) {
+      if (action == ChecklistPrompts.menuActionReorder) {
+        c.toggleReorderMode();
+        return;
+      }
+      c.onSectionMenu(sectionId, action, context);
+    }
+
+    void toggleReorderMode() {
+      c.toggleReorderMode();
+    }
 
     Widget sectionCard(int i, {required bool inlineRowLayout}) {
       final section = displaySections[i];
@@ -104,8 +118,7 @@ class ChecklistPageView extends StatelessWidget {
                 titleFocusNode: c.sectionTitleFocusNode,
                 onTitleSubmitted: c.commitSectionTitleEdit,
                 onTitleInteraction: c.markSectionEditInteraction,
-                onMenuSelected: (v) =>
-                    c.onSectionMenu(section.id, v, context),
+                onMenuSelected: (v) => onSectionMenu(section.id, v),
                 children: [
                   for (var j = 0; j < section.items.length; j++)
                     itemRow(j, editing: true),
@@ -127,8 +140,7 @@ class ChecklistPageView extends StatelessWidget {
               titleEditController: c.sectionTitleEditController,
               titleFocusNode: c.sectionTitleFocusNode,
               onTitleSubmitted: c.commitSectionTitleEdit,
-              onMenuSelected: (v) =>
-                  c.onSectionMenu(section.id, v, context),
+              onMenuSelected: (v) => onSectionMenu(section.id, v),
               children: [
                 for (var j = 0; j < section.items.length; j++)
                   itemRow(j, editing: false),
@@ -149,6 +161,12 @@ class ChecklistPageView extends StatelessWidget {
             final wide = constraints.maxWidth >= _wideBreakpoint;
 
             Widget sectionBlock() {
+              if (c.reorderModeEnabled) {
+                return ChecklistInlineReorderList(
+                  controller: c,
+                  onSectionMenu: onSectionMenu,
+                );
+              }
               if (wide && n > 0) {
                 final rows = <Widget>[];
                 for (var start = 0; start < n; start += _wideSectionsPerRow) {
@@ -202,14 +220,47 @@ class ChecklistPageView extends StatelessWidget {
                       PaychekPageHeader(
                         onBack: onBack,
                         title: l.checklistPageTitle,
-                        subtitle: l.checklistIntroBody,
+                        subtitle: c.reorderModeEnabled
+                            ? l.checklistReorderHint
+                            : l.checklistIntroBody,
                         subtitleMaxLines: 2,
                         maxContentWidth: 1180,
-                        trailing: ChecklistPdfExportChip(
-                          onTap: liteFreemiumRestricted
-                              ? () =>
-                                  onLiteFreemiumRestrictedTap?.call()
-                              : () => exportChecklistPdf(context, c),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Tooltip(
+                              message: l.checklistMenuReorder,
+                              child: Material(
+                                color: c.reorderModeEnabled
+                                    ? ChecklistTokens.checkboxCheckedFill
+                                        .withValues(alpha: 0.18)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                child: InkWell(
+                                  onTap: toggleReorderMode,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Icon(
+                                      Icons.swap_vert_rounded,
+                                      size: 22,
+                                      color: c.reorderModeEnabled
+                                          ? DashboardTokens.accent
+                                          : ChecklistTokens
+                                              .sectionMenuIconColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ChecklistPdfExportChip(
+                              onTap: liteFreemiumRestricted
+                                  ? () =>
+                                      onLiteFreemiumRestrictedTap?.call()
+                                  : () => exportChecklistPdf(context, c),
+                            ),
+                          ],
                         ),
                       ),
                       Padding(

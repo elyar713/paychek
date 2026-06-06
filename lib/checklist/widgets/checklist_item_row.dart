@@ -29,6 +29,7 @@ class ChecklistItemRow extends StatelessWidget {
     this.schedule,
     this.onScheduleChanged,
     this.expiredMissed = false,
+    this.reorderDragIndex,
   });
 
   final String label;
@@ -64,6 +65,9 @@ class ChecklistItemRow extends StatelessWidget {
   final ChecklistItemSchedule? schedule;
   final ValueChanged<ChecklistItemSchedule>? onScheduleChanged;
 
+  /// Poignée de glissement (mode réorganisation inline).
+  final int? reorderDragIndex;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
@@ -71,7 +75,8 @@ class ChecklistItemRow extends StatelessWidget {
     final baseLabelStyle = muted
         ? ChecklistTokens.itemLabelExpiredStyle
         : ChecklistTokens.itemLabelOnCardStyle;
-    final lineStyle = onLineDelete != null
+    final inReorderMode = reorderDragIndex != null;
+    final lineStyle = onLineDelete != null || inReorderMode
         ? baseLabelStyle
         : (checked
             ? baseLabelStyle.copyWith(
@@ -85,6 +90,18 @@ class ChecklistItemRow extends StatelessWidget {
     Widget mainTapTarget = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        if (reorderDragIndex != null)
+          ReorderableDragStartListener(
+            index: reorderDragIndex!,
+            child: const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icon(
+                Icons.drag_handle_rounded,
+                size: 20,
+                color: ChecklistTokens.sectionMenuIconColor,
+              ),
+            ),
+          ),
         if (onLineDelete != null)
           _LineDeleteButton(
             onTap: onLineDelete!,
@@ -178,36 +195,44 @@ class ChecklistItemRow extends StatelessWidget {
         ? ChecklistTokens.scheduleCustomSummary
         : DashboardTokens.accent.withValues(alpha: 0.92);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 18 + ChecklistTokens.itemRowCheckGap,
-            right: 4,
-            top: ChecklistTokens.scheduleSummaryPaddingTop,
-            bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              summary,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: ChecklistTokens.scheduleSummaryFontSize,
-                height: 1.15,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.15,
-                color: summaryColor,
+    return Material(
+      color: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 18 + ChecklistTokens.itemRowCheckGap,
+              right: 4,
+              top: ChecklistTokens.scheduleSummaryPaddingTop,
+              bottom: ChecklistTokens.scheduleSummaryPaddingBottom,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: ChecklistTokens.scheduleSummaryFontSize,
+                  height: 1.15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.15,
+                  color: summaryColor,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
           ),
-        ),
-        row,
-        if (showDividerBelow)
-          Divider(height: 1, thickness: 1, color: ChecklistTokens.dividerOnCard),
-      ],
+          row,
+          if (showDividerBelow)
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: ChecklistTokens.dividerOnCard,
+            ),
+        ],
+      ),
     );
   }
 
@@ -217,7 +242,10 @@ class ChecklistItemRow extends StatelessWidget {
             '-',
             style: lineStyle.copyWith(color: const Color(0xFF6A6A6A)),
           )
-        : Text(label, style: lineStyle);
+        : Text(
+            label,
+            style: lineStyle.copyWith(decoration: TextDecoration.none),
+          );
     if (onTapEditLabel != null) {
       return Material(
         color: Colors.transparent,

@@ -60,7 +60,7 @@ class ChecklistSectionCard extends StatelessWidget {
     if (!sectionEnabled) {
       itemsBlock = Opacity(opacity: 0.42, child: itemsBlock);
     }
-    if (!inlineRowLayout) {
+    if (!inlineRowLayout || children.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

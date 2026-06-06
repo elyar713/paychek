@@ -2524,6 +2524,30 @@ abstract class AppLocalizations {
   /// **'Éditer'**
   String get checklistMenuEdit;
 
+  /// No description provided for @checklistMenuReorder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réorganiser'**
+  String get checklistMenuReorder;
+
+  /// No description provided for @checklistReorderTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ordre des éléments'**
+  String get checklistReorderTitle;
+
+  /// No description provided for @checklistReorderHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poignée sur un critère : le déplacer (haut/bas ou vers une autre section). Poignée sur un titre de section : déplacer toute la section.'**
+  String get checklistReorderHint;
+
+  /// No description provided for @checklistReorderEmptySectionHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Section vide — glissez un critère ici.'**
+  String get checklistReorderEmptySectionHint;
+
   /// No description provided for @checklistSectionToggleOn.
   ///
   /// In fr, this message translates to:

@@ -25,6 +25,7 @@ class ChecklistPrompts {
 
   // --- Menu â‹¯ (valeurs [PopupMenuItem.value]) ---
   static const menuActionEdit = 'editer';
+  static const menuActionReorder = 'reorganiser';
   static const menuActionDelete = 'supprimer';
 
   static const menuLabelEdit = 'Éditer';

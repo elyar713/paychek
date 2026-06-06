@@ -1373,6 +1373,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checklistMenuEdit => 'Editar';
 
   @override
+  String get checklistMenuReorder => 'Reorganizar';
+
+  @override
+  String get checklistReorderTitle => 'Ordem dos elementos';
+
+  @override
+  String get checklistReorderHint =>
+      'Arraste as alças para mover um critério ou soltá-lo noutra secção. Arraste o título de uma secção para mover a secção inteira.';
+
+  @override
+  String get checklistReorderEmptySectionHint =>
+      'Secção vazia — arraste um critério para aqui.';
+
+  @override
   String get checklistSectionToggleOn => 'Ativar seção';
 
   @override

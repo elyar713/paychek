@@ -19,15 +19,18 @@ class ChecklistSectionEnableToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: Transform.scale(
-        scale: 0.82,
-        alignment: Alignment.center,
-        child: Switch.adaptive(
-          value: value,
-          onChanged: onChanged,
-          activeThumbColor: DashboardTokens.accent,
-          activeTrackColor: DashboardTokens.accent.withValues(alpha: 0.38),
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      child: Material(
+        color: Colors.transparent,
+        child: Transform.scale(
+          scale: 0.82,
+          alignment: Alignment.center,
+          child: Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: DashboardTokens.accent,
+            activeTrackColor: DashboardTokens.accent.withValues(alpha: 0.38),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
         ),
       ),
     );

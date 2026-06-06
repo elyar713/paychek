@@ -81,6 +81,46 @@ class CapitalEvolutionComputed {
     }
   }
 
+  /// Métriques dashboard capital : solde (tout le journal) vs gain/% (période sélectionnée).
+  static ({
+    double allTimeNet,
+    double periodNet,
+    List<TradeListItem> tradesInPeriod,
+  }) resolveDashboardCapitalMetrics(
+    List<TradeListItem> allTrades,
+    int timeframeIndex, {
+    int tradingDaysPerWeek = 7,
+  }) {
+    final allTimeNet =
+        allTrades.fold<double>(0, (sum, t) => sum + t.gainAmount);
+    if (allTrades.isEmpty) {
+      return (
+        allTimeNet: 0,
+        periodNet: 0,
+        tradesInPeriod: const <TradeListItem>[],
+      );
+    }
+    if (timeframeIndex == 3) {
+      return (
+        allTimeNet: allTimeNet,
+        periodNet: allTimeNet,
+        tradesInPeriod: allTrades,
+      );
+    }
+    final computed = timeframeIndex == 1
+        ? forTradingWeek(allTrades, tradingDaysPerWeek)
+        : fromTrades(
+            allTrades,
+            timeframeIndex,
+            tradingDaysPerWeek: tradingDaysPerWeek,
+          );
+    return (
+      allTimeNet: allTimeNet,
+      periodNet: computed.periodNet,
+      tradesInPeriod: computed.tradesInPeriod,
+    );
+  }
+
   static CapitalEvolutionComputed _oneDay(
     List<TradeListItem> allTrades,
     DateTime today,
