@@ -3,4 +3,4 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
-flutter build web --release --no-wasm-dry-run
+flutter build web --release --no-wasm-dry-run --no-tree-shake-icons

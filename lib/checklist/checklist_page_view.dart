@@ -16,6 +16,7 @@ import 'widgets/checklist_add_section_button.dart';
 import 'widgets/checklist_item_row.dart';
 import 'widgets/checklist_pdf_export_chip.dart';
 import 'widgets/checklist_daily_calendar_section.dart';
+import 'widgets/checklist_reorder_icons.dart';
 import 'widgets/checklist_inline_reorder_list.dart';
 import 'widgets/checklist_section_card.dart';
 import 'checklist_progress_ring.dart';
@@ -241,13 +242,8 @@ class ChecklistPageView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8),
-                                    child: Icon(
-                                      Icons.swap_vert_rounded,
-                                      size: 22,
-                                      color: c.reorderModeEnabled
-                                          ? DashboardTokens.accent
-                                          : ChecklistTokens
-                                              .sectionMenuIconColor,
+                                    child: ChecklistReorderToggleIcon(
+                                      active: c.reorderModeEnabled,
                                     ),
                                   ),
                                 ),

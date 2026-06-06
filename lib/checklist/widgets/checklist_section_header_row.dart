@@ -1,8 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../checklist_prompts.dart';
 import '../checklist_tokens.dart';
+import 'checklist_reorder_icons.dart';
 import 'checklist_section_enable_toggle.dart';
 
 /// IcÃ´ne + titre + menu â‹¯ (Ã‰diter / Supprimer).
@@ -49,12 +52,10 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
         if (reorderDragIndex != null)
           ReorderableDragStartListener(
             index: reorderDragIndex!,
-            child: const Padding(
-              padding: EdgeInsets.only(right: 4),
-              child: Icon(
-                Icons.drag_handle_rounded,
-                size: 22,
-                color: ChecklistTokens.sectionMenuIconColor,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: ChecklistReorderDragHandle(
+                size: editingTitle ? 20 : 22,
               ),
             ),
           ),
@@ -155,7 +156,7 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.swap_vert_rounded,
+                        LucideIcons.arrowUpDown,
                         size: 18,
                         color: ChecklistTokens.sectionPopupMenuItemStyle.color,
                       ),

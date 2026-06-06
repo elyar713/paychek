@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../checklist_item_schedule.dart';
 import '../checklist_item_schedule_summary.dart';
 import '../checklist_tokens.dart';
+import 'checklist_reorder_icons.dart';
 import 'checklist_schedule_calendar_button.dart';
 
 /// Ligne : case Ã  cocher **carrÃ©e** + libellÃ© (carte gris foncÃ©).
@@ -95,11 +96,7 @@ class ChecklistItemRow extends StatelessWidget {
             index: reorderDragIndex!,
             child: const Padding(
               padding: EdgeInsets.only(right: 4),
-              child: Icon(
-                Icons.drag_handle_rounded,
-                size: 20,
-                color: ChecklistTokens.sectionMenuIconColor,
-              ),
+              child: ChecklistReorderDragHandle(size: 20),
             ),
           ),
         if (onLineDelete != null)
