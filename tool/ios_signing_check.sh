@@ -35,7 +35,9 @@ if echo "$IDENTITIES" | grep -q 'Apple Distribution'; then
   echo "OK: certificat « Apple Distribution » trouvé"
 else
   echo "FAIL: pas de certificat « Apple Distribution »"
-  echo "     Xcode → Settings → Accounts → ton Apple ID → Manage Certificates → + → Apple Distribution"
+  echo "     Compte Apple dans Xcode ≠ certificat dans le Trousseau."
+  echo "     Xcode (GUI) → Settings → Accounts → Manage Certificates → + → Apple Distribution"
+  echo "     Puis relance : ./tool/export_ios_ipa_from_archive.sh (avec -allowProvisioningUpdates)"
 fi
 
 HAS_DEV=0
@@ -74,13 +76,21 @@ fi
 
 echo ""
 if [[ "$HAS_DIST" -eq 0 ]]; then
-  echo "=== Résultat: EXPORT IMPOSSIBLE sans Apple Distribution ==="
-  echo "Plan A — Xcode GUI:"
-  echo "  open ios/Runner.xcworkspace"
-  echo "  Runner → Signing & Capabilities → Team → Automatically manage signing"
-  echo "  Product → Archive → Distribute App → App Store Connect"
+  echo "=== Résultat: pas de Apple Distribution dans le trousseau (export CLI échouera) ==="
   echo ""
-  echo "Plan B — Certificat depuis developer.apple.com (Mac perso → importer .p12 sur MacinCloud)"
+  echo "MacinCloud : fais ces étapes dans l’interface Xcode (VNC), pas en SSH seul :"
+  echo "  1. open ios/Runner.xcworkspace"
+  echo "  2. Runner → Signing & Capabilities → Team + Automatically manage signing"
+  echo "  3. Xcode → Settings → Accounts → Manage Certificates → + → Apple Distribution"
+  echo "  4. cp ios/Flutter/Signing.xcconfig.example ios/Flutter/Signing.xcconfig"
+  echo "     nano ios/Flutter/Signing.xcconfig   # DEVELOPMENT_TEAM=TON_TEAM_ID"
+  echo "  5. ./tool/rearchive_ios_signed.sh && ./tool/export_ios_ipa_from_archive.sh"
+  echo ""
+  echo "Plan B (le plus fiable) :"
+  echo "  open build/ios/archive/Runner.xcarchive"
+  echo "  Distribute App → App Store Connect → Upload"
+  echo ""
+  echo "Plan C : exporter le certificat .p12 depuis ton Mac perso et l’importer sur MacinCloud"
   exit 1
 fi
 

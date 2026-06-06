@@ -1,4 +1,4 @@
-// Copier ce fichier vers Signing.xcconfig et remplacer par votre Team ID Apple.
-// Team ID : Xcode → Settings → Accounts → [votre équipe] → Team ID (10 caractères).
-// Ou : https://developer.apple.com/account → Membership → Team ID
+// Copier vers Signing.xcconfig (gitignored) et remplacer par votre Team ID Apple.
+// Team ID : Xcode → Settings → Accounts → [équipe Paychek] → Team ID (10 caractères).
+// Obligatoire pour xcodebuild / flutter build ipa sur MacinCloud (CLI).
 DEVELOPMENT_TEAM=XXXXXXXXXX

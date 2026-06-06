@@ -89,7 +89,8 @@ export_ipa_with_xcodebuild() {
   xcodebuild -exportArchive \
     -archivePath "$ARCHIVE_PATH" \
     -exportPath "$EXPORT_DIR" \
-    -exportOptionsPlist "$EXPORT_PLIST"
+    -exportOptionsPlist "$EXPORT_PLIST" \
+    -allowProvisioningUpdates
 }
 
 echo ">> flutter build ipa --release"
