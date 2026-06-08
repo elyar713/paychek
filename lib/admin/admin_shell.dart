@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../reglage/paychek_support_ticket_submit.dart';
 import 'admin_billing_page.dart';
 import 'admin_branding.dart';
+import 'admin_coach_lab_page.dart';
 import 'admin_config_page.dart';
 import 'admin_overview_page.dart';
 import 'admin_profile_page.dart';
@@ -46,6 +47,11 @@ List<_PaychekShellTab> _shellTabs(bool superadmin) => [
         title: 'Configuration',
         icon: Icons.tune_outlined,
         page: const AdminConfigPage(),
+      ),
+      _PaychekShellTab(
+        title: 'Coach AI (labo)',
+        icon: Icons.auto_awesome_outlined,
+        page: const AdminCoachLabPage(),
       ),
       _PaychekShellTab(
         title: 'Support & feedback',

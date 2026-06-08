@@ -5,7 +5,10 @@ import '../trade/trade_plan_analysis.dart';
 abstract final class CoachAiTradeJournalContext {
   static const int maxRecentTrades = 30;
 
-  static Map<String, dynamic> build(Iterable<TradeListItem> trades) {
+  static Map<String, dynamic> build(
+    Iterable<TradeListItem> trades, {
+    Map<String, dynamic>? portfolioScope,
+  }) {
     final all = trades.toList();
     final sorted = List<TradeListItem>.from(all)
       ..sort((a, b) {
@@ -17,6 +20,7 @@ abstract final class CoachAiTradeJournalContext {
 
     return <String, dynamic>{
       'source': 'trade_journal_items_v1',
+      if (portfolioScope != null) 'portfolioScope': portfolioScope,
       'sameDataAsTradePage': true,
       'totalTrades': all.length,
       'closedTrades': all.where((t) => t.isClosed).length,

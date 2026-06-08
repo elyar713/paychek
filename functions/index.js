@@ -4228,9 +4228,92 @@ async function paychekHandleStripeEvent(stripe, event, passRaw) {
 }
 
 function paychekNormalizeCoachLocale(raw) {
-  const lc = `${raw ?? ""}`.trim().toLowerCase();
+  const lc = `${raw ?? ""}`.trim().toLowerCase().split("_")[0].split("-")[0];
   if (["fr", "en", "es", "de", "pt", "ko"].includes(lc)) return lc;
   return "en";
+}
+
+/** Langue de réponse : priorité au texte de la question, sinon locale client. */
+function paychekAiCoachDetectResponseLocale(question, clientLocale) {
+  const q = `${question ?? ""}`.trim().toLowerCase();
+  if (!q) return paychekNormalizeCoachLocale(clientLocale);
+
+  let en = 0;
+  let fr = 0;
+  if (/[àâäéèêëïîôùûüç]/.test(q)) fr += 2;
+
+  const enMarkers = new Set([
+    "the", "what", "why", "how", "when", "where", "which", "should", "could",
+    "would", "can", "do", "does", "did", "is", "are", "was", "were", "my",
+    "your", "help", "please", "today", "yesterday", "week", "month",
+    "performance", "strategy", "checklist", "analysis", "mental", "tell",
+    "explain", "show", "list", "trade", "trades", "about", "with", "this",
+    "that", "have", "has", "had",
+  ]);
+  const frMarkers = new Set([
+    "le", "la", "les", "un", "une", "des", "du", "de", "et", "est", "sont",
+    "pour", "pourquoi", "comment", "quand", "quel", "quelle", "quels",
+    "quelles", "mon", "ma", "mes", "ton", "ta", "tes", "aide", "expliquer",
+    "montre", "liste", "aujourd", "semaine", "mois", "strategie", "analyse",
+    "discipline", "psychologie", "psycho", "avec", "cette", "cela", "suis",
+    "ai", "pas", "plus", "moins",
+  ]);
+
+  for (const w of q.match(/[a-zàâäéèêëïîôùûüç']+/g) || []) {
+    if (enMarkers.has(w)) en++;
+    if (frMarkers.has(w)) fr++;
+  }
+
+  if (/\b(how do|how can|how should|what is|what are|what was|why do|why did|why is|tell me|show me|help me|can you|could you|should i|i have|i had|my trades)\b/.test(q)) {
+    en += 2;
+  }
+  if (/\b(comment |pourquoi |est-ce que|qu'est-ce|quels? |quelles? |aujourd'hui|j'ai |c'est |donne-moi|aide-moi)\b/.test(q)) {
+    fr += 2;
+  }
+
+  const scores = {en, fr, de: 0, es: 0, pt: 0, ko: 0};
+  if (/[äöüß]/.test(q)) scores.de += 3;
+  if (/[ñ¿¡]/.test(q)) scores.es += 3;
+  if (/[ãõ]/.test(q)) scores.pt += 2;
+  if (/[가-힣]/.test(q)) scores.ko += 5;
+
+  const deMarkers = new Set([
+    "der", "die", "das", "und", "ist", "sind", "ich", "mein", "meine", "dein",
+    "warum", "wie", "wann", "welche", "welcher", "heute", "woche", "monat",
+    "strategie", "analyse", "disziplin", "hilfe", "bitte", "nicht", "mehr",
+  ]);
+  const esMarkers = new Set([
+    "el", "la", "los", "las", "una", "por", "porque", "cómo", "como", "cuando",
+    "cuál", "cual", "mi", "tu", "hoy", "semana", "mes", "estrategia", "disciplina",
+    "ayuda", "más", "mas", "menos",
+  ]);
+  const ptMarkers = new Set([
+    "os", "as", "uma", "são", "sao", "porque", "quando", "qual", "meu", "minha",
+    "hoje", "semana", "mês", "mes", "estratégia", "estrategia", "disciplina",
+    "ajuda", "não", "nao", "mais", "menos",
+  ]);
+  const koMarkers = new Set([
+    "오늘", "이번", "주", "월", "전략", "분석", "규율", "도움", "트레이드", "거래",
+    "왜", "어떻게", "무엇", "내", "나의",
+  ]);
+
+  for (const w of q.match(/[a-zàâäéèêëïîôùûüçäöüßñãõ가-힣']+/g) || []) {
+    if (deMarkers.has(w)) scores.de++;
+    if (esMarkers.has(w)) scores.es++;
+    if (ptMarkers.has(w)) scores.pt++;
+    if (koMarkers.has(w)) scores.ko++;
+  }
+
+  if (/\b(wie |warum |was ist|kann ich|können sie|hilf mir)\b/.test(q)) scores.de += 2;
+  if (/\b(cómo |por qué |qué es|puedes |ayúdame|muéstrame)\b/.test(q)) scores.es += 2;
+  if (/\b(como |por que |o que |podes |ajuda-me|mostra-me)\b/.test(q)) scores.pt += 2;
+  if (/(어떻게|왜|무엇|도와|알려)/.test(q)) scores.ko += 2;
+
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const top = ranked[0];
+  const second = ranked.length > 1 ? ranked[1][1] : 0;
+  if (top[1] >= 1 && top[1] > second) return top[0];
+  return paychekNormalizeCoachLocale(clientLocale);
 }
 
 /** Fautes fréquentes (miroir Flutter coach_ai_query_text.dart). */
@@ -4298,7 +4381,53 @@ function paychekAiCoachHelpCenterKnowledge(locale) {
     "- My Analysis: review initial context, confluence, and analysis report for cleaner decisions.\n" +
     "- Performance: full statistical audit (KPIs, discipline, behavior, strategy thresholds, report export).";
 
-  return locale === "fr" ? fr : en;
+  const de =
+    "PAYCHEK HELP CENTER (DE):\n" +
+    "- Trade hinzufügen: Trade mit Checkliste, Mentalzustand, Strategie erfassen.\n" +
+    "- Trade-Journal: Historie, Filter, fehlende Felder pro Trade.\n" +
+    "- Kalender: Tages-PnL, Monatsziele.\n" +
+    "- Checklist: Tagesaufgaben, Erinnerungen.\n" +
+    "- Dashboard: Kapital, Winrate, Disziplin.\n" +
+    "- Mentalzustand: Schlaf, Emotionen, Fokus.\n" +
+    "- Meine Strategie: Setups, Regeln, Sessions.\n" +
+    "- Meine Analyse: Tagesplan, Konfluenz, Bericht.\n" +
+    "- Performance: KPIs, Paychek Lens, Overtrading.";
+  const es =
+    "PAYCHEK HELP CENTER (ES):\n" +
+    "- Añadir trade: registrar con checklist, estado mental, estrategia.\n" +
+    "- Diario Trade: historial, filtros, campos faltantes.\n" +
+    "- Calendario: PnL diario/mensual, objetivos.\n" +
+    "- Checklist: tareas del día.\n" +
+    "- Dashboard: capital, winrate, disciplina.\n" +
+    "- Estado mental: sueño, emociones, foco.\n" +
+    "- Mi estrategia: setups, reglas, sesiones.\n" +
+    "- Mi análisis: plan del día, informe.\n" +
+    "- Performance: KPIs, Paychek Lens.";
+  const pt =
+    "PAYCHEK HELP CENTER (PT):\n" +
+    "- Adicionar trade: checklist, estado mental, estratégia.\n" +
+    "- Diário Trade: histórico, filtros.\n" +
+    "- Calendário: PnL, objetivos.\n" +
+    "- Checklist: tarefas do dia.\n" +
+    "- Dashboard: capital, winrate, disciplina.\n" +
+    "- Estado mental: sono, emoções.\n" +
+    "- Minha estratégia: setups, regras.\n" +
+    "- Minha análise: plano do dia.\n" +
+    "- Performance: KPIs, Paychek Lens.";
+  const ko =
+    "PAYCHEK HELP CENTER (KO):\n" +
+    "- 트레이드 추가: 체크리스트, 멘탈, 전략 기록.\n" +
+    "- 트레이드 저널: 기록, 필터.\n" +
+    "- 캘린더: 일/월 PnL, 목표.\n" +
+    "- 체크리스트: 오늘 할 일.\n" +
+    "- 대시보드: 자본, 승률, 규율.\n" +
+    "- 멘탈 상태: 수면, 감정.\n" +
+    "- 내 전략: 셋업, 규칙.\n" +
+    "- 내 분석: 일일 계획.\n" +
+    "- 퍼포먼스: KPI, Paychek Lens.";
+
+  const table = {fr, en, de, es, pt, ko};
+  return table[locale] || en;
 }
 
 function paychekAiCoachShouldUseHelpCenter(question) {
@@ -4956,7 +5085,15 @@ function paychekAiCoachFocusInstructions(locale, focus) {
     performance_overtrading: "FOCUS=Day & volume / overtrading. Use performanceOvertradingContext buckets with numbers. Max 160 words.",
   };
   const table = locale === "fr" ? fr : en;
-  return table[focus] || table.coach;
+  const instruction = table[focus] || table.coach;
+  const respondClause = {
+    de: "PFLICHT: Antworte vollständig auf Deutsch. ",
+    es: "OBLIGATORIO: Responde íntegramente en español. ",
+    pt: "OBRIGATÓRIO: Responda inteiramente em português. ",
+    ko: "필수: 전체 답변을 한국어로 작성하세요. ",
+  }[locale] || "";
+  if (locale === "fr" || locale === "en") return instruction;
+  return respondClause + instruction;
 }
 
 function paychekAiCoachSystemPrompt(locale, options = {}) {
@@ -4969,12 +5106,14 @@ function paychekAiCoachSystemPrompt(locale, options = {}) {
       "et aux questions d’utilisation de l’application PAYCHEK (fonctionnalités, pages, workflow). " +
       "Règle absolue: adapte chaque réponse à la question exacte de l'utilisateur. " +
       "Varie le style selon la question; réponses complètes et naturelles (pas de limite de mots rigide). " +
-      "N'utilise le référentiel Help Center PAYCHEK que pour les questions d'utilisation de l'app. " +
+      "Référentiel Help Center = structure de l'app ; paychekAppSnapshot + tradeJournal = données réelles de l'utilisateur. " +
       "Interdis les conseils médicaux, légaux et fiscaux. " +
       "N'affiche un avertissement risque financier que si l'utilisateur demande explicitement " +
       "un signal d'investissement (acheter/vendre, entrée/sortie, prediction de prix). " +
-      "Utilise en priorité les données JSON de contexte (tradeJournal = journal Trade récent, performanceSplit, mentalEmotionFocus, etc.). " +
-      "Si tradeJournal.recentTrades est présent, tu peux citer des trades précis (paire, date, PnL) — ne invente pas. " +
+      "Tu connais PAYCHEK (référentiel Help Center + paychekAppSnapshot.navigation). " +
+      "Utilise EN PRIORITÉ les données JSON utilisateur (paychekAppSnapshot.today, tradeJournal, recordedDiscipline, missingDiscipline, questionFocus). " +
+      "Chaque conseil actionnable doit nommer une page PAYCHEK pertinente. " +
+      "Si tradeJournal.recentTrades est présent, cite des trades précis (paire, date, PnL) — ne invente jamais. " +
       "Sois honnête et direct. " +
       "Si une donnée manque, dis 'non disponible' sans poser 5 questions. " +
       "Ne laisse jamais une phrase inachevée. " +
@@ -4985,11 +5124,13 @@ function paychekAiCoachSystemPrompt(locale, options = {}) {
       "and PAYCHEK app usage questions (features, pages, workflow). " +
       "Absolute rule: adapt every answer to the exact user question. " +
       "Never repeat the same template for all requests. " +
-      "Use Help Center knowledge only for app-usage questions. " +
+      "Help Center = app structure; paychekAppSnapshot + tradeJournal = this user's real data. " +
       "Refuse medical, legal, and tax topics. " +
       "Show a financial risk disclaimer only when the user explicitly asks for investment signals. " +
-      "Prioritize JSON context (tradeJournal = recent Trade tab journal, performanceSplit, etc.). " +
-      "Cite specific trades from tradeJournal.recentTrades when relevant; do not invent. " +
+      "You know PAYCHEK (Help Center + paychekAppSnapshot.navigation). " +
+      "PRIORITIZE user JSON (paychekAppSnapshot.today, tradeJournal, recordedDiscipline, missingDiscipline, questionFocus). " +
+      "Actionable advice must name a relevant PAYCHEK screen. " +
+      "Cite specific trades from tradeJournal.recentTrades when relevant; never invent. " +
       "Be honest and direct. " +
       "Never leave a sentence unfinished. Plain text only (no markdown). " +
       paychekAiCoachFocusInstructions(locale, focus),
@@ -5235,8 +5376,9 @@ exports.paychekAiCoach = onCall(
         throw new HttpsError("invalid-argument", "Question trop longue.");
       }
 
-      const locale = paychekNormalizeCoachLocale(request.data?.locale);
+      const clientLocale = paychekNormalizeCoachLocale(request.data?.locale);
       question = paychekAiCoachNormalizeQuestion(question);
+      const locale = paychekAiCoachDetectResponseLocale(question, clientLocale);
       const modelRaw = `${request.data?.model ?? "gemini-2.5-flash"}`.trim();
       const model = modelRaw.startsWith("gemini-") ? modelRaw : "gemini-2.5-flash";
       const contextData = request.data?.context;
@@ -5250,9 +5392,8 @@ exports.paychekAiCoach = onCall(
       const contextFollowUp = paychekAiCoachResolveFocusFromContext(contextData, question);
       const focus = clientFocus || contextFollowUp ||
         paychekAiCoachResolveFocus(question, priorFromCtx || "");
-      const useHelpCenter = focus === "app_help";
       const systemPrompt = paychekAiCoachSystemPrompt(locale, {
-        includeHelpCenter: useHelpCenter,
+        includeHelpCenter: true,
         focus,
       });
 
@@ -5265,8 +5406,10 @@ exports.paychekAiCoach = onCall(
         );
       }
 
-      const plan = await paychekAiCoachResolvePlan(db, request.auth.uid);
-      if (plan !== "pro" && plan !== "trial") {
+      let plan = await paychekAiCoachResolvePlan(db, request.auth.uid);
+      if (request.auth.token.admin === true) {
+        plan = "pro";
+      } else if (plan !== "pro" && plan !== "trial") {
         throw new HttpsError(
             "permission-denied",
             "AI Coach est disponible en essai actif ou en plan Pro.",

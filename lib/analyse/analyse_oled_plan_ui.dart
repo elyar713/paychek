@@ -1223,6 +1223,14 @@ class _AnalyseOledMtfSectionState extends State<AnalyseOledMtfSection> {
                     );
                   },
                 ),
+                const SizedBox(height: 12),
+                oledFieldLabel(l.analyseReportOledFieldChartism),
+                oledDeepInput(
+                  value: c.structureDernierPoint,
+                  hint: l.analyseOledStructureChartHint,
+                  onChanged: (v) => c.structureDernierPoint = v,
+                ),
+                const SizedBox(height: 12),
                 _srLevelPanel(
                   title: l.analyseOledSupportsUpper,
                   levelHint: l.analyseOledLevelHint,

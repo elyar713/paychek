@@ -1,3 +1,5 @@
+import 'coach_ai_locale.dart';
+
 /// Étapes UI concrètes par zone PAYCHEK (source : code app + Help Center).
 abstract final class CoachAiAppHelpSteps {
   static const appFeaturePattern =
@@ -8,7 +10,7 @@ abstract final class CoachAiAppHelpSteps {
       r'calculatrice|plus|menu|paychek|broker|portefeuille|setup|playbook|lens';
 
   static List<String> forTopic(String topicId, String languageCode) {
-    final fr = languageCode == 'fr';
+    final fr = CoachAiLocale.useFrenchHelpSteps(languageCode);
     return switch (topicId) {
       'app_overview' => fr ? _overviewFr : _overviewEn,
       'discipline_gear' => fr ? _disciplineGearFr : _disciplineGearEn,

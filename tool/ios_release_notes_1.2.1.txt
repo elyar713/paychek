@@ -1,17 +1,19 @@
 === App Store Connect — « Quoi de neuf » (version 1.2.1) ===
 
 --- Français ---
-• Import Tradovate : fichiers Orders.csv et Performance.csv (reports)
-• Coach AI : plans d’action par pilier et programme d’entraînement stratégie
-• Corrections import CSV et stabilité
+• Mon Analyse : champ chartisme (zones clés)
+• Journal trades : données limitées au portefeuille actif
+• Import Tradovate et corrections CSV
+• Stabilité et corrections diverses
 
 --- English ---
-• Tradovate import: Orders.csv and Performance.csv (reports)
-• Coach AI: pillar action plans and strategy training program
-• CSV import fixes and stability improvements
+• Trade analysis: chart pattern field in key zones
+• Trade journal: data scoped to active portfolio
+• Tradovate import and CSV fixes
+• Stability and miscellaneous fixes
 
 --- Notes internes (build) ---
 Version affichée : 1.2.1
-Build number : 37
+Build number : 42
 Bundle ID : pro.paychek.app
 Commande Mac : ./tool/build_ios_release.sh

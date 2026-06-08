@@ -46,7 +46,9 @@ abstract final class CoachAiPerformanceSummary {
       r'(ma|mon)\s+performance|'
       r'quel.*performance|'
       r'quelle.*performance|'
-      r'performance\s+(actuelle|globale|générale|generale)|'
+      r'performance\s+(actuelle|globale|générale|generale|du jour|d.?aujourd.?hui)|'
+      r"performance.{0,20}(aujourd.?hui|du jour|today)|"
+      r'(aujourd.?hui|du jour|today).{0,20}performance|'
       r'mon\s+(winrate|pnl|rendement)|'
       r'comment.*performance',
     ).hasMatch(q);

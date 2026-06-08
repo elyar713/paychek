@@ -8,6 +8,7 @@ import 'reglage_single_portfolio_editor_sheet.dart';
 import 'user_portfolio_models.dart';
 import 'user_portfolio_store.dart';
 import 'user_portfolio_scope.dart';
+import '../trade/trade_journal_helper.dart';
 
 /// Gestion des portefeuilles (multi-brokers) : créer, nommer, modifier, supprimer.
 /// Éditer un portefeuille (nom, capital, devise) — utilisé depuis Réglages (icône crayon).
@@ -85,7 +86,12 @@ class _PortfoliosManagerBody extends StatelessWidget {
         );
       },
     );
-    if (ok == true) await store.remove(p.id);
+    if (ok == true) {
+      if (context.mounted) {
+        purgeJournalTradesForPortfolio(context, p.id);
+      }
+      await store.remove(p.id);
+    }
   }
 
   @override

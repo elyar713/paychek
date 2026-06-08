@@ -13,7 +13,7 @@ class PlusMenuPopup extends StatefulWidget {
     required this.onOpenStrategie,
     required this.onOpenAnalyse,
     required this.onOpenPerformance,
-    required this.onOpenCoachAi,
+    this.onOpenCoachAi,
     required this.onOpenChecklist,
     required this.onOpenCalculatrice,
     required this.onOpenReglage,
@@ -25,7 +25,7 @@ class PlusMenuPopup extends StatefulWidget {
   final VoidCallback onOpenStrategie;
   final VoidCallback onOpenAnalyse;
   final VoidCallback onOpenPerformance;
-  final VoidCallback onOpenCoachAi;
+  final VoidCallback? onOpenCoachAi;
   final VoidCallback onOpenChecklist;
   final VoidCallback onOpenCalculatrice;
   final VoidCallback onOpenReglage;

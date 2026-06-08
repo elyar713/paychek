@@ -21,6 +21,7 @@ import 'reglage_portfolios_manager_sheet.dart';
 import 'user_portfolio_models.dart';
 import 'user_portfolio_scope.dart';
 import 'user_portfolio_store.dart';
+import '../trade/trade_journal_helper.dart';
 import 'reglage_cgv_terms_page.dart';
 import 'reglage_privacy_policy_page.dart';
 import 'reglage_profile_connect_constants.dart'

@@ -7,6 +7,7 @@ import '../performance/performance_period_filter.dart';
 import '../performance/performance_trade_metrics.dart';
 import '../performance/performance_trade_model.dart';
 import '../trade/trade_models.dart';
+import 'coach_ai_locale.dart';
 import 'coach_ai_performance_summary.dart';
 import 'coach_ai_response_format.dart';
 
@@ -59,14 +60,44 @@ abstract final class CoachAiPerformanceFocus {
   }
 
   static String periodLabel(PerformancePeriodFilter period, String languageCode) {
+    final lc = CoachAiLocale.normalize(languageCode);
     return switch (period) {
-      PerformancePeriodFilter.currentMonth =>
-        languageCode == 'fr' ? 'Ce mois' : 'This month',
-      PerformancePeriodFilter.oneWeek =>
-        languageCode == 'fr' ? '7 jours' : '7 days',
-      PerformancePeriodFilter.oneDay =>
-        languageCode == 'fr' ? "Aujourd'hui" : 'Today',
-      _ => languageCode == 'fr' ? 'Tout l’historique' : 'All time',
+      PerformancePeriodFilter.currentMonth => CoachAiLocale.pick(
+          lc,
+          fr: 'Ce mois',
+          en: 'This month',
+          de: 'Dieser Monat',
+          es: 'Este mes',
+          pt: 'Este mês',
+          ko: '이번 달',
+        ),
+      PerformancePeriodFilter.oneWeek => CoachAiLocale.pick(
+          lc,
+          fr: '7 jours',
+          en: '7 days',
+          de: '7 Tage',
+          es: '7 días',
+          pt: '7 dias',
+          ko: '7일',
+        ),
+      PerformancePeriodFilter.oneDay => CoachAiLocale.pick(
+          lc,
+          fr: "Aujourd'hui",
+          en: 'Today',
+          de: 'Heute',
+          es: 'Hoy',
+          pt: 'Hoje',
+          ko: '오늘',
+        ),
+      _ => CoachAiLocale.pick(
+          lc,
+          fr: 'Tout l’historique',
+          en: 'All time',
+          de: 'Gesamtverlauf',
+          es: 'Todo el historial',
+          pt: 'Todo o histórico',
+          ko: '전체 기간',
+        ),
     };
   }
 

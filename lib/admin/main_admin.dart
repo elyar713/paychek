@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../firebase_options.dart';
+import '../l10n/app_localizations.dart';
 import 'admin_auth_gate.dart';
 import 'admin_theme.dart';
 
@@ -22,6 +24,14 @@ Future<void> main() async {
       title: 'Paychek • Console admin',
       debugShowCheckedModeBanner: false,
       theme: AdminTheme.theme(),
+      locale: const Locale('fr'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const AdminAuthGate(),
     ),
   );

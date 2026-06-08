@@ -1,6 +1,7 @@
 import '../help_center/help_center_catalog.dart';
 import '../help_center/help_center_guide_assets.dart';
 import 'coach_ai_app_help_steps.dart';
+import 'coach_ai_locale.dart';
 import 'coach_ai_query_text.dart';
 
 /// Questions d’utilisation PAYCHEK → étapes UI locales (toute l’app) + Help Center.
@@ -143,7 +144,7 @@ abstract final class CoachAiAppHelp {
 
   static String? localCardTitle(String question, String languageCode) {
     final topic = resolveTopicId(question);
-    final fr = languageCode == 'fr';
+    final fr = CoachAiLocale.useFrenchHelpSteps(languageCode);
     final custom = switch (topic) {
       'discipline_gear' => fr ? 'Réglages discipline (⚙)' : 'Discipline settings (⚙)',
       'mental_state_gear' => fr ? 'État mental · poids (⚙)' : 'Mental state · weights (⚙)',
@@ -176,28 +177,29 @@ abstract final class CoachAiAppHelp {
 
   /// Texte coach (pourquoi les deux endroits) — affiché avant les étapes numérotées.
   static String workflowCoachIntro(String languageCode) {
-    return switch (languageCode) {
-      'en' =>
-        'Both matter, but for different things.\n\n'
-            '• More → Mental state: your DAY (focus, sleep, emotions). The Coach uses this to compare '
-            '"low mental" vs "high mental" days and your win rate.\n\n'
-            '• Trade → Add trade: each POSITION — save the trade, discipline blocks, psych TAGs (FOMO, TILT…).\n\n'
-            'Simple routine: fill Mental state once on trading days, then Trade → + for every position. '
-            'If you only pick one for mental ↔ performance: prioritize Mental state on days you trade.',
-      'de' =>
-        'Beides zählt, aber für unterschiedliche Zwecke.\n\n'
-            '• Mehr → Mentalzustand: dein TAG (Fokus, Schlaf, Emotionen) — für Coach-Vergleiche.\n\n'
-            '• Trade → Trade hinzufügen: jede POSITION — Disziplin, psych-TAGs.\n\n'
-            'Routine: Mentalzustand am Handelstag, dann jeden Trade erfassen.',
-      _ =>
-        'Les deux comptent, mais pas pour la même chose.\n\n'
-            '• Plus → État mental : ton JOUR (focus, sommeil, émotions). C’est ce que le Coach utilise pour comparer '
-            '« mental bas » vs « mental haut » et ton winrate.\n\n'
-            '• Trade → Ajouter trade : chaque POSITION — enregistrer le trade, discipline (checklist, plan, stratégie, état), '
-            'TAG psych (FOMO, TILT…).\n\n'
-            'Routine simple : État mental une fois les jours où tu trades, puis Trade → + à chaque position. '
-            'Si tu ne fais qu’un choix pour le lien mental ↔ performance : priorise la page État mental.',
-    };
+    return CoachAiLocale.pick(
+      languageCode,
+      fr:
+          'Les deux comptent, mais pas pour la même chose.\n\n'
+          '• Plus → État mental : ton JOUR (focus, sommeil, émotions). C’est ce que le Coach utilise pour comparer '
+          '« mental bas » vs « mental haut » et ton winrate.\n\n'
+          '• Trade → Ajouter trade : chaque POSITION — enregistrer le trade, discipline (checklist, plan, stratégie, état), '
+          'TAG psych (FOMO, TILT…).\n\n'
+          'Routine simple : État mental une fois les jours où tu trades, puis Trade → + à chaque position. '
+          'Si tu ne fais qu’un choix pour le lien mental ↔ performance : priorise la page État mental.',
+      en:
+          'Both matter, but for different things.\n\n'
+          '• More → Mental state: your DAY (focus, sleep, emotions). The Coach uses this to compare '
+          '"low mental" vs "high mental" days and your win rate.\n\n'
+          '• Trade → Add trade: each POSITION — save the trade, discipline blocks, psych TAGs (FOMO, TILT…).\n\n'
+          'Simple routine: fill Mental state once on trading days, then Trade → + for every position. '
+          'If you only pick one for mental ↔ performance: prioritize Mental state on days you trade.',
+      de:
+          'Beides zählt, aber für unterschiedliche Zwecke.\n\n'
+          '• Mehr → Mentalzustand: dein TAG (Fokus, Schlaf, Emotionen) — für Coach-Vergleiche.\n\n'
+          '• Trade → Trade hinzufügen: jede POSITION — Disziplin, psych-TAGs.\n\n'
+          'Routine: Mentalzustand am Handelstag, dann jeden Trade erfassen.',
+    );
   }
 
   static bool usesHybridHelpLayout(String question) =>
@@ -215,7 +217,7 @@ abstract final class CoachAiAppHelp {
     }
     buf.writeln(intro.trim());
     buf.writeln();
-    buf.writeln(languageCode == 'fr' ? 'Où cliquer dans l’app :' : 'Where to tap in the app:');
+    buf.writeln(CoachAiLocale.whereToTapHeading(languageCode));
     for (var i = 0; i < steps.length; i++) {
       buf.writeln('${i + 1}. ${steps[i]}');
     }
@@ -231,7 +233,7 @@ abstract final class CoachAiAppHelp {
     if (title != null && title.isNotEmpty) {
       buf.writeln('$title :');
     } else {
-      buf.writeln(languageCode == 'fr' ? 'Dans PAYCHEK :' : 'In PAYCHEK:');
+      buf.writeln(CoachAiLocale.inPaychekHeading(languageCode));
     }
     for (var i = 0; i < steps.length; i++) {
       buf.writeln('${i + 1}. ${steps[i]}');

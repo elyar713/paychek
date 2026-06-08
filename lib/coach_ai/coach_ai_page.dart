@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
-import '../trade/trade_journal_scope.dart';
+import '../trade/trade_journal_helper.dart';
 import '../trade/trade_models.dart';
 import '../widgets/paychek_page_header.dart';
 import '../shared/paychek_keyboard_insets.dart';
@@ -22,11 +22,13 @@ import 'coach_ai_performance_summary.dart';
 import 'coach_ai_psych_analysis.dart';
 import '../help_center/help_center_catalog.dart';
 import 'coach_ai_app_help.dart';
+import 'coach_ai_app_snapshot.dart';
 import 'coach_ai_app_pricing.dart';
 import 'coach_ai_coaching_story.dart';
 import 'coach_ai_pillar_coaching.dart';
 import 'coach_ai_focus.dart';
 import 'coach_ai_conversation.dart';
+import 'coach_ai_locale.dart';
 import 'coach_ai_query_text.dart';
 import 'coach_ai_response_format.dart';
 import 'coach_ai_trade_journal_context.dart';
@@ -98,18 +100,41 @@ class _CoachAiPageState extends State<CoachAiPage> {
   bool _sending = false;
   int? _quotaUsed;
   int? _quotaLimit;
+  bool _welcomeSeeded = false;
 
   @override
   void initState() {
     super.initState();
     _questionFocus.addListener(_onQuestionFocusChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    purgeOrphanJournalTrades(context);
+    if (_welcomeSeeded) return;
+    _welcomeSeeded = true;
     _messages.add(
-      const _CoachAiMessage(
-        text: 'Bonjour, je suis ton AI Coach. Pose-moi une question sur ton trading, ta discipline, ta stratégie ou l’utilisation de PAYCHEK.',
+      _CoachAiMessage(
+        text: _coachWelcomeText(_appLanguageCode),
         isUser: false,
       ),
     );
   }
+
+  String get _appLanguageCode =>
+      Localizations.localeOf(context).languageCode;
+
+  String _responseLang(String? question) => CoachAiQueryText.responseLanguageCode(
+        question ?? '',
+        fallback: _appLanguageCode,
+      );
+
+  /// Journal du portefeuille actif uniquement (pas les comptes supprimés / démo).
+  List<TradeListItem> _coachJournalTrades() => coachAiJournalTrades(context);
+
+  static String _coachWelcomeText(String languageCode) =>
+      CoachAiLocale.welcomeMessage(languageCode);
 
   void _onQuestionFocusChange() {
     if (!_questionFocus.hasFocus) return;
@@ -228,7 +253,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   List<String> _strategyViolationLabels() {
     final report = CoachAiNonRespectAnalysis.buildReport(
       context,
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
     );
     if (report == null) return const [];
     return [
@@ -282,7 +307,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
     required String rawQuestion,
     required String languageCode,
   }) async {
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
     final localAnswer = CoachAiCoachingStory.buildLocalAnswer(
       question: rawQuestion,
       languageCode: languageCode,
@@ -342,8 +367,8 @@ class _CoachAiPageState extends State<CoachAiPage> {
     });
     _scrollToBottom();
 
-    final locale = Localizations.localeOf(context);
-    final lang = locale.languageCode;
+    final lang = _responseLang(rawQuestion);
+    final locale = Locale(lang);
     final priorFocus = _lastAssistantFocus();
 
     // Récit psycho / feeling : local (pas cloud).
@@ -373,7 +398,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
 
     if (focus == 'trade_list' && !preferCloudThread) {
       final report = CoachAiTradeListQuery.build(
-        TradeJournalScope.of(context).items,
+        _coachJournalTrades(),
         question,
       );
       if (!mounted) return;
@@ -450,6 +475,25 @@ class _CoachAiPageState extends State<CoachAiPage> {
       languageCode: lang,
       priorAssistantFocus: priorFocus,
     );
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    final portfolioScope = coachAiPortfolioScopeJson(context);
+    auditContext['paychekAppSnapshot'] = await CoachAiAppSnapshot.buildCompact(
+      l10n: l10n,
+      trades: _coachJournalTrades(),
+      languageCode: lang,
+      portfolioScope: portfolioScope,
+    );
+    auditContext['portfolioScope'] = portfolioScope;
+    if (!mounted) return;
+    auditContext['responseLanguage'] = lang;
+    final dataFirst = CoachAiAppSnapshot.dataFirstCoachInstructions(lang);
+    final existingCoach = auditContext['coachInstructions'];
+    if (existingCoach is String && existingCoach.trim().isNotEmpty) {
+      auditContext['coachInstructions'] = '$dataFirst\n$existingCoach';
+    } else {
+      auditContext['coachInstructions'] = dataFirst;
+    }
     final res = await PaychekAiCoachCloud.ask(
       question: rawQuestion,
       locale: locale,
@@ -474,7 +518,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
       localFallback = CoachAiCoachingStory.buildLocalAnswer(
         question: rawQuestion,
         languageCode: lang,
-        trades: TradeJournalScope.of(context).items,
+        trades: _coachJournalTrades(),
       );
     } else if (!res.ok && wantsLocalPillar) {
       try {
@@ -528,7 +572,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
     int performanceLite,
     List<_CoachDisciplinePillar> disciplinePillars,
   }) _computeAuditSnapshot() {
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
     final total = trades.length;
     int closed = 0;
     int wins = 0;
@@ -741,7 +785,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
 
     if (forQuestion != null && CoachAiFocus.resolve(forQuestion) == CoachAiFocus.coachingStory) {
       final story = CoachAiCoachingStory.buildFocus(
-        TradeJournalScope.of(context).items,
+        _coachJournalTrades(),
         forQuestion,
       );
       return <String, dynamic>{
@@ -771,7 +815,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
         'questionFocus': CoachAiFocus.mentalToday,
         'mentalTodayContext': CoachAiMentalAnalysis.todayContextToJson(
           l10n,
-          TradeJournalScope.of(context).items,
+          _coachJournalTrades(),
           languageCode,
         ),
         'conversation': _conversationContextBlock(priorAssistantFocus: priorFocus),
@@ -867,7 +911,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             CoachAiFocus.calendarToday) {
       final briefFollowUp =
           CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
-      final trades = TradeJournalScope.of(context).items;
+      final trades = _coachJournalTrades();
       return <String, dynamic>{
         'questionFocus': CoachAiFocus.calendarToday,
         'calendarTodayContext': await CoachAiCalendar.todayContextToJson(
@@ -893,7 +937,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             CoachAiFocus.calendarMonth) {
       final briefFollowUp =
           CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
-      final trades = TradeJournalScope.of(context).items;
+      final trades = _coachJournalTrades();
       return <String, dynamic>{
         'questionFocus': CoachAiFocus.calendarMonth,
         'calendarMonthContext': await CoachAiCalendar.monthContextToJson(
@@ -919,7 +963,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             CoachAiFocus.performanceSummary) {
       final briefFollowUp =
           CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
-      final trades = TradeJournalScope.of(context).items;
+      final trades = _coachJournalTrades();
       return <String, dynamic>{
         'questionFocus': CoachAiFocus.performanceSummary,
         'performanceSummaryContext': await CoachAiPerformanceFocus.summaryContextToJson(
@@ -945,7 +989,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             CoachAiFocus.performanceLens) {
       final briefFollowUp =
           CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
-      final trades = TradeJournalScope.of(context).items;
+      final trades = _coachJournalTrades();
       return <String, dynamic>{
         'questionFocus': CoachAiFocus.performanceLens,
         'performanceLensContext': await CoachAiPerformanceFocus.lensContextToJson(
@@ -971,7 +1015,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
             CoachAiFocus.performanceOvertrading) {
       final briefFollowUp =
           CoachAiConversation.isFocusedTopicFollowUp(forQuestion, priorFocus);
-      final trades = TradeJournalScope.of(context).items;
+      final trades = _coachJournalTrades();
       return <String, dynamic>{
         'questionFocus': CoachAiFocus.performanceOvertrading,
         'performanceOvertradingContext':
@@ -1079,10 +1123,10 @@ class _CoachAiPageState extends State<CoachAiPage> {
     final emotionStats = mentalQuery == null
         ? null
         : CoachAiMentalAnalysis.buildStatsForQuery(
-            TradeJournalScope.of(context).items,
+            _coachJournalTrades(),
             mentalQuery,
           );
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
     final nonRespectReport = forQuestion == null
         ? null
         : CoachAiNonRespectAnalysis.buildReport(context, trades);
@@ -1172,7 +1216,11 @@ class _CoachAiPageState extends State<CoachAiPage> {
         'strategyItems': snap.disciplinePillars[2].nonRespect,
         'mentalItems': snap.disciplinePillars[3].nonRespect,
       },
-      'tradeJournal': CoachAiTradeJournalContext.build(trades),
+      'portfolioScope': coachAiPortfolioScopeJson(context),
+      'tradeJournal': CoachAiTradeJournalContext.build(
+        trades,
+        portfolioScope: coachAiPortfolioScopeJson(context),
+      ),
       'generatedAtUtc': DateTime.now().toUtc().toIso8601String(),
     };
   }
@@ -1698,10 +1746,10 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildCalendarTodayCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiCalendar.todayCardTitle(lang);
     final body = m.text.trim();
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
 
     Color pnlColor(double v) {
       if (v > 0) return const Color(0xFF34D399);
@@ -1832,10 +1880,10 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildCalendarMonthCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiCalendar.monthCardTitle(lang);
     final body = m.text.trim();
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
 
     Color pnlColor(double v) {
       if (v > 0) return const Color(0xFF34D399);
@@ -1937,7 +1985,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildStrategyTodayCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiStrategyToday.todayCardTitle(lang);
     final body = m.text.trim();
 
@@ -2050,7 +2098,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildAnalysisTodayCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiAnalysisToday.todayCardTitle(lang);
     final body = m.text.trim();
 
@@ -2225,7 +2273,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildChecklistTodayCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiChecklistToday.todayCardTitle(lang);
     final body = m.text.trim();
 
@@ -2365,11 +2413,11 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildMentalTodayCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final l10n = AppLocalizations.of(context)!;
     final snap = CoachAiMentalAnalysis.buildTodaySnapshot(
       l10n,
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
     );
     final bd = snap.breakdown;
     final title = CoachAiMentalAnalysis.todayCardTitle(lang);
@@ -2455,7 +2503,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
         CoachAiMentalAnalysis.extractMentalQuery(question) ??
         const CoachMentalQuery(kind: 'emotion', label: 'émotion');
     final stats = CoachAiMentalAnalysis.buildStatsForQuery(
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
       mentalQuery,
     );
     final query = stats?.query ?? mentalQuery;
@@ -2723,7 +2771,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
       'mental' => snap.disciplinePillars[3],
       _ => snap.disciplinePillars[2],
     };
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiPillarCoaching.pillarTitle(pillarId, lang);
     final target = CoachAiPillarCoaching.extractTargetPercent(question);
     final targetLabel = target != null ? '$target %' : null;
@@ -2863,11 +2911,11 @@ class _CoachAiPageState extends State<CoachAiPage> {
 
   Widget _buildCoachingStoryCard(_CoachAiMessage m, String question) {
     final focus = CoachAiCoachingStory.buildFocus(
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
       question,
     );
     final themes = focus?.themes ?? <String>[];
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final subtitle = CoachAiFocus.coachingStoryCardSubtitle(
       languageCode: lang,
       asksHowToFix: focus?.asksHowToFix ?? false,
@@ -2945,7 +2993,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                   ],
                   ...() {
                     final related = CoachAiRelatedTrades.build(
-                      TradeJournalScope.of(context).items,
+                      _coachJournalTrades(),
                       question,
                       themes: themes,
                     );
@@ -3081,7 +3129,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
 
   Widget _buildPsychWhyCard(_CoachAiMessage m, String question) {
     final focus = CoachAiPsychAnalysis.buildFocus(
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
       question,
     );
     final tag = focus?.tagQuery ?? 'émotion';
@@ -3184,7 +3232,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   Widget _buildNonRespectCard(_CoachAiMessage m) {
     final report = CoachAiNonRespectAnalysis.buildReport(
       context,
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
     );
 
     return Padding(
@@ -3364,7 +3412,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
 
   Widget _buildTradeListCard(_CoachAiMessage m, String question) {
     final report = CoachAiTradeListQuery.build(
-      TradeJournalScope.of(context).items,
+      _coachJournalTrades(),
       question,
     );
     final tag = CoachAiPsychAnalysis.extractTagQuery(question);
@@ -3446,7 +3494,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildStoryFollowUpCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final title = CoachAiFocus.storyFollowUpCardTitle(lang);
     final body = m.text.trim();
     final fallbackSteps = CoachAiConversation.storyFollowUpSteps(lang);
@@ -3540,7 +3588,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildAppPricingCard(_CoachAiMessage m) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(m.relatedUserQuestion);
     final title = CoachAiAppPricing.cardTitle(lang);
     final subtitle = CoachAiAppPricing.cardSubtitle(lang);
     final body = m.text.trim();
@@ -3602,7 +3650,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildAppHelpCard(_CoachAiMessage m, String question, {required String focus}) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final steps = CoachAiAppHelp.uiStepsForQuestion(question, lang);
     final slug = CoachAiAppHelp.resolveGuideSlug(question);
     final hybrid = focus == 'app_help_hybrid' || CoachAiAppHelp.usesHybridHelpLayout(question);
@@ -3742,9 +3790,9 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildPerformanceOvertradingCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final body = m.text.trim();
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
     final period = CoachAiPerformanceFocus.resolvePeriod(question);
     final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
 
@@ -3819,9 +3867,9 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildPerformanceLensCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final body = m.text.trim();
-    final trades = TradeJournalScope.of(context).items;
+    final trades = _coachJournalTrades();
     final period = CoachAiPerformanceFocus.resolvePeriod(question);
     final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
     final composite = CoachAiPerformanceFocus.compositeDisciplinePercent(trades, question);
@@ -3893,12 +3941,12 @@ class _CoachAiPageState extends State<CoachAiPage> {
   }
 
   Widget _buildPerformanceSummaryCard(_CoachAiMessage m, String question) {
-    final lang = Localizations.localeOf(context).languageCode;
+    final lang = _responseLang(question);
     final period = CoachAiPerformanceFocus.resolvePeriod(question);
     final periodLabel = CoachAiPerformanceFocus.periodLabel(period, lang);
     final split = CoachAiPerformanceSummary.build(
       CoachAiPerformanceFocus.filterJournalItems(
-        TradeJournalScope.of(context).items,
+        _coachJournalTrades(),
         period,
       ),
     );

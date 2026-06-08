@@ -16,6 +16,11 @@ import 'trade_models.dart';
 /// [TradeJournalFirestoreSync] (Firestore sous `paychek_users/{uid}/sync_data/`).
 /// [PaychekApp] sauvegarde le journal du compte sortant puis [clear] avant reload.
 class TradeJournalStore extends ChangeNotifier {
+  TradeJournalStore({this.remoteMirrorOnly = false});
+
+  /// Miroir Firestore admin (labo Coach) : pas d’écriture prefs / cloud admin.
+  final bool remoteMirrorOnly;
+
   final List<TradeListItem> _items = <TradeListItem>[];
 
   Timer? _saveDebounce;
@@ -46,7 +51,7 @@ class TradeJournalStore extends ChangeNotifier {
   }
 
   void _persistSoon() {
-    if (_suppressPersist) return;
+    if (_suppressPersist || remoteMirrorOnly) return;
     _saveDebounce?.cancel();
     _saveDebounce = Timer(const Duration(milliseconds: 400), () {
       final copy = List<TradeListItem>.from(_items);
@@ -72,6 +77,31 @@ class TradeJournalStore extends ChangeNotifier {
     return true;
   }
 
+  /// Retire les trades dont le [portfolioId] n’existe plus (portefeuilles supprimés).
+  int removeTradesWithUnknownPortfolios(Set<String> validPortfolioIds) {
+    if (validPortfolioIds.isEmpty) return 0;
+    final before = _items.length;
+    _items.removeWhere((e) => !validPortfolioIds.contains(e.portfolioId));
+    final removed = before - _items.length;
+    if (removed > 0) {
+      notifyListeners();
+      _persistSoon();
+    }
+    return removed;
+  }
+
+  /// Retire tous les trades d’un portefeuille (ex. après suppression du compte).
+  int removeAllForPortfolio(String portfolioId) {
+    final before = _items.length;
+    _items.removeWhere((e) => e.portfolioId == portfolioId);
+    final removed = before - _items.length;
+    if (removed > 0) {
+      notifyListeners();
+      _persistSoon();
+    }
+    return removed;
+  }
+
   bool update(TradeListItem item) {
     final idx = _items.indexWhere((e) => e.id == item.id);
     if (idx < 0) return false;
@@ -91,11 +121,13 @@ class TradeJournalStore extends ChangeNotifier {
   @override
   void dispose() {
     _saveDebounce?.cancel();
-    final copy = List<TradeListItem>.from(_items);
-    unawaited(() async {
-      await TradeJournalStorage.save(copy);
-      await TradeJournalFirestoreSync.pushIfSignedIn(copy);
-    }());
+    if (!remoteMirrorOnly) {
+      final copy = List<TradeListItem>.from(_items);
+      unawaited(() async {
+        await TradeJournalStorage.save(copy);
+        await TradeJournalFirestoreSync.pushIfSignedIn(copy);
+      }());
+    }
     super.dispose();
   }
 }

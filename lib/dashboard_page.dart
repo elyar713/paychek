@@ -37,6 +37,7 @@ import 'web/web_dashboard_config.dart';
 import 'shared/paychek_frame_callbacks.dart';
 import 'ajouter_trade/ajouter_trade_page.dart';
 import 'calendrier/calendrier_page.dart';
+import 'coach_ai/coach_ai_public_enabled.dart';
 import 'coach_ai/coach_ai_page.dart';
 import 'help_center/help_center_page.dart';
 import 'l10n/app_localizations.dart';
@@ -814,8 +815,9 @@ class _DashboardPageState extends State<DashboardPage>
                     },
                     onOpenPerformance: () =>
                         _openOverlayPage(_overlayPerformance),
-                    onOpenCoachAi: () =>
-                        _openOverlayPage(_overlayCoachAi),
+                    onOpenCoachAi: CoachAiPublicEnabled.value
+                        ? () => _openOverlayPage(_overlayCoachAi)
+                        : null,
                     onOpenChecklist: () {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (!mounted) return;
@@ -938,7 +940,9 @@ class _DashboardPageState extends State<DashboardPage>
                       });
                     },
                     onOpenPerformance: () => _openOverlayPage(_overlayPerformance),
-                    onOpenCoachAi: () => _openOverlayPage(_overlayCoachAi),
+                    onOpenCoachAi: CoachAiPublicEnabled.value
+                        ? () => _openOverlayPage(_overlayCoachAi)
+                        : null,
                     onOpenChecklist: () {
                       closePlus();
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1054,12 +1058,14 @@ class _DashboardPageState extends State<DashboardPage>
                               _overlayPage = _overlayHelpCenter);
                         },
                       ),
-                    _overlayCoachAi => CoachAiPage(
+                    _overlayCoachAi when CoachAiPublicEnabled.value =>
+                      CoachAiPage(
                         onCloseInShell: () {
                           if (!mounted) return;
                           setState(() => _overlayPage = _overlayNone);
                         },
                       ),
+                    _overlayCoachAi => const SizedBox.shrink(),
                     _overlayCgv => ReglageCgvTermsPage(
                         onCloseInShell: () {
                           if (!mounted) return;

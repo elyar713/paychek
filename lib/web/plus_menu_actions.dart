@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../coach_ai/coach_ai_public_enabled.dart';
 import '../l10n/app_localizations.dart';
 
 /// [allowedInLite: false] sur un **onglet** (ex. Trade) → paywall sans navigation.
@@ -22,11 +23,12 @@ class PlusMenuActions {
     required VoidCallback onOpenStrategie,
     required VoidCallback onOpenAnalyse,
     required VoidCallback onOpenPerformance,
-    required VoidCallback onOpenCoachAi,
+    VoidCallback? onOpenCoachAi,
     required VoidCallback onOpenChecklist,
     required VoidCallback onOpenCalculatrice,
     required VoidCallback onOpenReglage,
     bool includeHelpCenter = true,
+    bool includeCoachAi = CoachAiPublicEnabled.value,
     VoidCallback? onOpenHelpCenter,
     VoidCallback? onOpenSupportFeedback,
     PlusMenuLiteGate? liteGate,
@@ -87,11 +89,12 @@ class PlusMenuActions {
         label: l10n.plusPerformance,
         onTap: onOpenPerformance,
       ),
-      (
-        icon: Icons.auto_awesome_outlined,
-        label: 'AI Coach',
-        onTap: () => runLite(onOpenCoachAi, allowedInLite: false),
-      ),
+      if (includeCoachAi && onOpenCoachAi != null)
+        (
+          icon: Icons.auto_awesome_outlined,
+          label: 'AI Coach',
+          onTap: () => runLite(onOpenCoachAi, allowedInLite: false),
+        ),
       (
         icon: Icons.calculate_outlined,
         label: l10n.plusCalculator,

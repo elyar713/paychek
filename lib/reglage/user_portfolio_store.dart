@@ -232,6 +232,24 @@ class UserPortfolioStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Labo admin Coach : miroir cloud sans écrire les prefs de l’admin.
+  void applyInMemoryFromFirestore({
+    required List<UserPortfolio> portfolios,
+    String? activePortfolioId,
+  }) {
+    _items = List<UserPortfolio>.from(portfolios);
+    if (_items.isEmpty) {
+      _items = [
+        UserPortfolio(
+          id: kDefaultPortfolioId,
+          name: kDefaultPortfolioName,
+        ),
+      ];
+    }
+    _reconcileActivePortfolioId(activePortfolioId);
+    notifyListeners();
+  }
+
   /// Remplace la liste depuis Firestore (sync web / mobile).
   Future<void> applyFromFirestoreSnapshot(
     UserCapitalStore capital,
