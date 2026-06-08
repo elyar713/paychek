@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
 import '../shared/paychek_frame_callbacks.dart';
@@ -130,6 +131,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         SizedBox(height: web ? 14 : 10),
         TextField(
           controller: _searchCtrl,
+          scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
           style: GoogleFonts.plusJakartaSans(
             color: Colors.white,
             fontSize: web ? 15 : 14,
@@ -237,6 +239,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: bg,
       body: SafeArea(
         child: Column(

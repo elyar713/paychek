@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../mental_state_models.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 
 /// Libellé renommable sur place (sans dialog) — stylo → [TextField] avec `InputDecoration.collapsed`.
 class MentalStateInlineEditableName extends StatefulWidget {
@@ -113,6 +114,7 @@ class MentalStateInlineEditableNameState extends State<MentalStateInlineEditable
         ? TextField(
             controller: _controller,
             focusNode: _focusNode,
+            scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
             style: widget.style,
             decoration: const InputDecoration.collapsed(hintText: ''),
             maxLines: 1,

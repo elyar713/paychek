@@ -425,6 +425,7 @@ class _PerformancePageState extends State<PerformancePage>
         if (didPop) widget.onNavigateToDashboard?.call();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DashboardTokens.scaffoldMatte,
         body: SafeArea(
           child: LayoutBuilder(
@@ -435,11 +436,14 @@ class _PerformancePageState extends State<PerformancePage>
                 _kPerformanceContentMaxWidth,
                 constraints.maxWidth,
               );
-              final pad = EdgeInsets.fromLTRB(
-                wide ? 24 : 16,
-                10,
-                wide ? 24 : 16,
-                28,
+              final pad = PaychekKeyboardInsets.addBottom(
+                EdgeInsets.fromLTRB(
+                  wide ? 24 : 16,
+                  10,
+                  wide ? 24 : 16,
+                  28,
+                ),
+                context,
               );
 
               final savedInsight = _savedWidget == null
@@ -565,6 +569,8 @@ class _PerformancePageState extends State<PerformancePage>
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: maxW),
                   child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: pad,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,

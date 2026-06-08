@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../l10n/app_localizations.dart';
 import '../checklist_prompts.dart';
 import '../checklist_tokens.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 import 'checklist_reorder_icons.dart';
 import 'checklist_section_enable_toggle.dart';
 
@@ -72,6 +73,7 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
               ? TextField(
                   controller: titleEditController,
                   focusNode: titleFocusNode,
+                  scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
                   style: ChecklistTokens.sectionTitleOnCardStyle,
                   cursorColor: ChecklistTokens.sectionTitleOnCardStyle.color,
                   maxLines: 1,

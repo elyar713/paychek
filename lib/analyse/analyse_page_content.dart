@@ -199,9 +199,13 @@ class _AnalysePageScrollContentState extends State<AnalysePageScrollContent> {
       builder: (context, lc) {
         final wide =
             lc.maxWidth >= AnalyseTokens.pageLayoutWideBreakpoint;
+        final kb = MediaQuery.viewInsetsOf(context).bottom;
+        final pad = AnalyseTokens.pageScrollPadding(wide: wide);
+        final scrollPad = pad.copyWith(bottom: pad.bottom + kb);
 
         return ListView(
-          padding: AnalyseTokens.pageScrollPadding(wide: wide),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: scrollPad,
           children: [
             if (widget.showSaveBanner)
               AnalyseOledSaveBanner(

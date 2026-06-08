@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../ajouter_trade/ajouter_trade_actifs.dart';
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../widgets/paychek_page_header.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
@@ -259,9 +260,10 @@ class _CalculatricePageState extends State<CalculatricePage> {
         }
         if (didPop) widget.onNavigateToDashboard?.call();
       },
-      child: ColoredBox(
-        color: DashboardTokens.scaffoldMatte,
-        child: SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: DashboardTokens.scaffoldMatte,
+        body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -278,7 +280,12 @@ class _CalculatricePageState extends State<CalculatricePage> {
                     final hPad = PaychekPageHeader.horizontalPad(constraints.maxWidth);
                     final maxW = math.min(1180.0, math.max(0.0, constraints.maxWidth - 2 * hPad));
                     return ListView(
-                      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 24),
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: PaychekKeyboardInsets.addBottom(
+                        EdgeInsets.fromLTRB(hPad, 0, hPad, 24),
+                        context,
+                      ),
                       children: [
                         Center(
                           child: ConstrainedBox(

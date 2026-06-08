@@ -232,6 +232,9 @@ class _AnalyseAddInlineFieldRowState extends State<AnalyseAddInlineFieldRow>
         child: TextField(
           controller: _ctrl,
           focusNode: _focus,
+          scrollPadding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
+          ),
           style: const TextStyle(
             color: Color(0xFFDFDFDF),
             fontWeight: FontWeight.w700,

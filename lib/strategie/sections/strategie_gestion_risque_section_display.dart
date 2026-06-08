@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../strategie_tokens.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 import 'strategie_gestion_risque_section_menu.dart';
 
 /// Textes et montants (€ / capital) alignés sur le dashboard.
@@ -303,6 +304,7 @@ class StrategieGestionRisqueRiskCell extends StatelessWidget {
       child: TextField(
         controller: editingController,
         onChanged: (_) => onEditingChanged(),
+        scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
         keyboardType: decimalField
             ? const TextInputType.numberWithOptions(decimal: true)
             : TextInputType.number,

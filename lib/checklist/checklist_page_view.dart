@@ -149,9 +149,10 @@ class ChecklistPageView extends StatelessWidget {
             );
     }
 
-    return ColoredBox(
-      color: DashboardTokens.scaffoldMatte,
-      child: SafeArea(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: DashboardTokens.scaffoldMatte,
+      body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final hPad = PaychekPageHeader.horizontalPad(constraints.maxWidth);
@@ -160,6 +161,7 @@ class ChecklistPageView extends StatelessWidget {
               math.max(0.0, constraints.maxWidth - 2 * hPad),
             );
             final wide = constraints.maxWidth >= _wideBreakpoint;
+            final kb = MediaQuery.viewInsetsOf(context).bottom;
 
             Widget sectionBlock() {
               if (c.reorderModeEnabled) {
@@ -213,6 +215,7 @@ class ChecklistPageView extends StatelessWidget {
             }
 
             final scroll = CustomScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
@@ -303,7 +306,7 @@ class ChecklistPageView extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(hPad, 20, hPad, 24),
+                    padding: EdgeInsets.fromLTRB(hPad, 20, hPad, 24 + kb),
                     child: Center(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: maxBody),

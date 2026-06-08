@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../dashboard/dashboard_tokens.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 
 class SectionTitle extends StatelessWidget {
   const SectionTitle({super.key, required this.title});
@@ -63,6 +64,7 @@ class NumberField extends StatelessWidget {
         decimal: true,
         signed: false,
       ),
+      scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
       onSubmitted: onSubmitted,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -104,6 +106,7 @@ class RiskRewardField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+      scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
       onSubmitted: onSubmitted,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

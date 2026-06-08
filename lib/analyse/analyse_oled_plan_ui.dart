@@ -210,11 +210,12 @@ class AnalyseOledMetadataSection extends StatelessWidget {
               final children = [
                 _metaField(
                   label: l.analyseOledAssetSymbolLabel,
-                  child: _symbolInput(c),
+                  child: _symbolInput(context, c),
                 ),
                 _metaField(
                   label: l.analyseOledThesisStrategyLabel,
                   child: _textInput(
+                    context: context,
                     value: c.nomAnalyse,
                     hint: l.analyseOledThesisHint,
                     mono: false,
@@ -264,11 +265,14 @@ class AnalyseOledMetadataSection extends StatelessWidget {
     );
   }
 
-  Widget _symbolInput(AnalyseController c) {
+  Widget _symbolInput(BuildContext context, AnalyseController c) {
     return Container(
       decoration: AnalyseTokens.fieldDecoration,
       child: TextFormField(
         initialValue: c.analyseActif,
+        scrollPadding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
+        ),
         style: GoogleFonts.jetBrainsMono(
           fontSize: 14,
           fontWeight: FontWeight.w800,
@@ -289,6 +293,7 @@ class AnalyseOledMetadataSection extends StatelessWidget {
   }
 
   Widget _textInput({
+    required BuildContext context,
     required String value,
     required String hint,
     required bool mono,
@@ -298,6 +303,9 @@ class AnalyseOledMetadataSection extends StatelessWidget {
       decoration: AnalyseTokens.fieldDecoration,
       child: TextFormField(
         initialValue: value,
+        scrollPadding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
+        ),
         style: GoogleFonts.plusJakartaSans(
           fontSize: 13,
           fontWeight: FontWeight.w600,

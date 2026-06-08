@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/widgets/paychek_plan_minimal_badge.dart';
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../questionnaire/user_capital_store.dart';
@@ -236,6 +237,7 @@ class _ReglagePageState extends State<ReglagePage> {
 
     final isWebUi = kIsWeb;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor:
           isWebUi ? PaychekWebTokens.scaffoldBg : Colors.black,
       body: ListenableBuilder(
@@ -331,9 +333,13 @@ class _ReglagePageState extends State<ReglagePage> {
           ];
 
           final listView = ListView(
-            padding: EdgeInsets.only(
-              bottom: isWebUi ? 40 : 40,
-              top: isWebUi ? 8 : 0,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: PaychekKeyboardInsets.addBottom(
+              EdgeInsets.only(
+                bottom: isWebUi ? 40 : 40,
+                top: isWebUi ? 8 : 0,
+              ),
+              context,
             ),
             children: listChildren,
           );

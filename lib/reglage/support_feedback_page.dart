@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../help_center/help_center_page.dart';
 import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
@@ -350,6 +351,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
         '${l10n.supportFeedbackTitleLead}${l10n.supportFeedbackTitleAccent}';
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: bg,
       body: SafeArea(
         child: Column(
@@ -369,15 +371,20 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: maxContentW),
                   child: ListView(
-                    padding: EdgeInsets.fromLTRB(
-                      PaychekPageHeader.horizontalPad(
-                        MediaQuery.sizeOf(context).width,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: PaychekKeyboardInsets.addBottom(
+                      EdgeInsets.fromLTRB(
+                        PaychekPageHeader.horizontalPad(
+                          MediaQuery.sizeOf(context).width,
+                        ),
+                        0,
+                        PaychekPageHeader.horizontalPad(
+                          MediaQuery.sizeOf(context).width,
+                        ),
+                        24,
                       ),
-                      0,
-                      PaychekPageHeader.horizontalPad(
-                        MediaQuery.sizeOf(context).width,
-                      ),
-                      24,
+                      context,
                     ),
                     children: [
                 Align(
@@ -513,6 +520,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
           TextField(
             controller: _emailCtrl,
             keyboardType: TextInputType.emailAddress,
+            scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               color: DashboardTokens.onMatteEmphasis,
@@ -554,6 +562,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
             controller: _descCtrl,
             minLines: 4,
             maxLines: 8,
+            scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
               color: DashboardTokens.onMatteEmphasis,

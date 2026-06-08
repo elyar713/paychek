@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../checklist/checklist_prompts.dart';
 import '../../checklist/checklist_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 import '../strategie_more_menu.dart';
 import '../strategie_tokens.dart';
 
@@ -153,6 +154,7 @@ class StrategieMesReglesDraftRuleLine extends StatelessWidget {
               controller: controller,
               focusNode: focusNode,
               maxLines: null,
+              scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -209,6 +211,7 @@ class StrategieMesReglesEditableRuleLine extends StatelessWidget {
             child: TextField(
               controller: controller,
               maxLines: null,
+              scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,

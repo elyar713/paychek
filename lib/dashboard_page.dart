@@ -745,9 +745,10 @@ class _DashboardPageState extends State<DashboardPage>
           final navTotal = useWebRail
               ? bottomInset
               : DashboardMainBottomNav.totalHeight(bottomInset);
-          // Overlays plein écran (hors Scaffold) : remonter le bas au-dessus du clavier.
-          final keyboardInset = mq.viewInsets.bottom;
-          final overlayBottom = navTotal + keyboardInset;
+          // Overlays : hauteur fixe au-dessus de la barre du bas — le clavier est géré
+          // dans chaque page (Scaffold / scroll). Ne pas soustraire viewInsets ici :
+          // sinon la zone utile se compresse deux fois (écran noir sur Mon analyse).
+          final overlayBottom = navTotal;
           final overlayLeftInset = WebDashboardConfig.overlayLeftInsetPx;
 
           void closePlus() => _closePlusMenu();

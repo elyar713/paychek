@@ -8,6 +8,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
 import '../ajouter_trade/ajouter_trade_page_non_respect_labels.dart';
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/user_portfolio_scope.dart';

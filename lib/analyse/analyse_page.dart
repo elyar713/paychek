@@ -331,6 +331,7 @@ class _AnalysePageState extends State<AnalysePage> {
           },
           child: Scaffold(
             backgroundColor: AnalyseTokens.bg,
+            resizeToAvoidBottomInset: true,
             body: SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {

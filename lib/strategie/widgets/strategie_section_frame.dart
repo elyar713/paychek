@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../strategie_tokens.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 import 'strategie_section_more_button.dart';
 
 /// Carte section : bordure + en-tête (icône + titre + menu ⋮).
@@ -72,6 +73,8 @@ class StrategieSectionFrame extends StatelessWidget {
                       ? TextField(
                           controller: titleEditController,
                           focusNode: titleFocusNode,
+                          scrollPadding:
+                              PaychekKeyboardInsets.fieldScrollPadding(context),
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 10,
                             fontWeight: FontWeight.w800,

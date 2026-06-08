@@ -22,6 +22,28 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// flutter_timezone 5.1.0 : buildscript Kotlin 1.7.10 → échec SSL/PKIX sur Windows.
+// Retire le buildscript du plugin pub-cache (idempotent, cf. firebase_storage).
+subprojects {
+    if (project.name != "flutter_timezone") return@subprojects
+    val patchMarker = "PATCH_PAYCHEK_FLUTTER_TIMEZONE"
+    val buildGradle =
+        project.file(
+            "${System.getenv("LOCALAPPDATA")}\\Pub\\Cache\\hosted\\pub.dev\\flutter_timezone-5.1.0\\android\\build.gradle",
+        )
+    if (!buildGradle.exists()) return@subprojects
+    var text = buildGradle.readText(Charsets.UTF_8)
+    if (text.contains(patchMarker)) return@subprojects
+    val needle = "buildscript {"
+    if (!text.contains(needle)) return@subprojects
+    val end = text.indexOf("\n\nrootProject.allprojects")
+    if (end < 0) return@subprojects
+    val replacement =
+        "// $patchMarker: buildscript Kotlin 1.7.10 supprimé — Kotlin du projet racine.\n"
+    text = text.replaceRange(text.indexOf(needle), end + 2, replacement)
+    buildGradle.writeText(text, Charsets.UTF_8)
+}
+
 // firebase_storage 13.4.0 : `var codeNumber: Int` sans assignation sur tous les chemins (rejet Kotlin 2.2).
 // Corrige le fichier dans le pub-cache une fois par build (idempotent). Pas d'afterEvaluate (conflit avec evaluationDependsOn).
 subprojects {

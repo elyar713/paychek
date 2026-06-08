@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../trade/trade_journal_scope.dart';
 import '../trade/trade_models.dart';
 import '../widgets/paychek_page_header.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import 'coach_ai_performance_focus.dart';
 import 'coach_ai_calendar.dart';
 import '../calendrier/calendrier_utils.dart';
@@ -4397,9 +4398,10 @@ class _CoachAiPageState extends State<CoachAiPage> {
       );
     }
 
-    return Material(
-      color: const Color(0xFF050505),
-      child: SafeArea(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: const Color(0xFF050505),
+      body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final hPad = constraints.maxWidth >= 1200 ? 28.0 : 16.0;
@@ -4462,7 +4464,12 @@ class _CoachAiPageState extends State<CoachAiPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     controller: _scrollCtrl,
-                    padding: EdgeInsets.fromLTRB(hPad, 16, hPad, 12),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: PaychekKeyboardInsets.addBottom(
+                      EdgeInsets.fromLTRB(hPad, 16, hPad, 12),
+                      context,
+                    ),
                     child: Center(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: maxW),
@@ -4519,6 +4526,11 @@ class _CoachAiPageState extends State<CoachAiPage> {
                                     enabled: !_sending,
                                     minLines: 1,
                                     maxLines: 5,
+                                    scrollPadding:
+                                        PaychekKeyboardInsets.fieldScrollPadding(
+                                      context,
+                                      extra: 80,
+                                    ),
                                     textInputAction: TextInputAction.send,
                                     onSubmitted: (_) => _askCoach(),
                                     style: GoogleFonts.plusJakartaSans(

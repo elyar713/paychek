@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../../dashboard/dashboard_tokens.dart';
+import '../../shared/paychek_keyboard_insets.dart';
 import '../../l10n/app_localizations.dart';
 import '../checklist_item_schedule.dart';
 import '../checklist_item_schedule_summary.dart';
@@ -114,9 +115,7 @@ class ChecklistItemRow extends StatelessWidget {
               ? TextField(
                     controller: labelEditController,
                     focusNode: labelFocusNode,
-                    scrollPadding: EdgeInsets.only(
-                      bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
-                    ),
+                    scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
                     style: ChecklistTokens.itemLabelOnCardStyle,
                     cursorColor: ChecklistTokens.itemLabelOnCardStyle.color,
                     maxLines: null,

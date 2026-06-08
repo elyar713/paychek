@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/dashboard_tokens.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import '../shared/paychek_frame_callbacks.dart';
 import '../l10n/app_localizations.dart';
 import '../performance/performance_locale_copy.dart';
@@ -254,6 +255,7 @@ class _StrategiePageState extends State<StrategiePage> {
         }
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: DashboardTokens.scaffoldMatte,
         body: SafeArea(
           child: Listener(
@@ -270,7 +272,12 @@ class _StrategiePageState extends State<StrategiePage> {
                           constraints.maxWidth >= StrategieTokens.twoColumnBreakpoint;
                       final hPad = _contentHorizontalPad(constraints.maxWidth);
                       return SingleChildScrollView(
-                        padding: EdgeInsets.fromLTRB(hPad, 8, hPad, 32),
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        padding: PaychekKeyboardInsets.addBottom(
+                          EdgeInsets.fromLTRB(hPad, 8, hPad, 32),
+                          context,
+                        ),
                         child: Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(

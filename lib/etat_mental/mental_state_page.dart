@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import '../widgets/paychek_page_header.dart';
+import '../shared/paychek_keyboard_insets.dart';
 import 'mental_state_controller.dart';
 import 'mental_state_tokens.dart';
 import 'mental_state_weight_modal.dart';
@@ -245,7 +246,11 @@ class _MentalStatePageState extends State<MentalStatePage> {
       return Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 32),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: PaychekKeyboardInsets.addBottom(
+            const EdgeInsets.only(bottom: 32),
+            context,
+          ),
           child: SizedBox(
             width: maxContent,
             child: Row(
@@ -306,7 +311,11 @@ class _MentalStatePageState extends State<MentalStatePage> {
           ];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 32),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: PaychekKeyboardInsets.addBottom(
+        const EdgeInsets.only(bottom: 32),
+        context,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: mobileColumn,
@@ -480,6 +489,7 @@ class _MentalStatePageState extends State<MentalStatePage> {
             }
           },
           child: Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: MentalStateTokens.scaffoldBg,
           body: Stack(
             children: [
