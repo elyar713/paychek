@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../performance/performance_locale_copy.dart';
 import 'analyse_confluence_score.dart';
 import 'analyse_controller.dart';
+import 'analyse_prep_checks.dart';
 import 'analyse_models.dart';
 import 'analyse_phase_locale.dart';
 import 'analyse_tokens.dart';
@@ -319,7 +320,10 @@ class AnalyseReportSnapshot {
       indicatorsCopies:
           indicatorsCopies.isEmpty ? null : indicatorsCopies,
       smcCopies: smcCopies.isEmpty ? null : smcCopies,
-      prepCheckedIds: const [],
+      prepCheckedIds: [
+        for (final id in applicablePrepCheckIdsFromController(c))
+          if (c.isPrepChecked(id)) id,
+      ],
     );
   }
 }

@@ -36,55 +36,36 @@ abstract final class AnalysePrepCheckIds {
   static const volNote = 'vol_note';
 }
 
-List<String> applicablePrepCheckIdsFromController(AnalyseController c) {
+/// Critères cochables visibles (générateur + rapport figé OLED).
+List<String> _applicablePrepCheckIds({
+  required bool contextEnabled,
+  required bool structureEnabled,
+  required bool indicatorsEnabled,
+  required bool smcEnabled,
+  required bool volumeEnabled,
+  required String noteContexte,
+  required String noteStructure,
+  required String noteIndicators,
+  required String noteSmc,
+  required String noteVolume,
+  required String smcFibOteLabel,
+}) {
   final ids = <String>[];
-  if (c.contextEnabled) {
+  if (contextEnabled) {
     ids.addAll([
       AnalysePrepCheckIds.ctxTimeframe,
       AnalysePrepCheckIds.ctxBias,
       AnalysePrepCheckIds.ctxTrend,
       AnalysePrepCheckIds.ctxPhase,
     ]);
-  }
-  if (c.structureEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.structTf,
-      AnalysePrepCheckIds.structSupport,
-      AnalysePrepCheckIds.structResistance,
-    ]);
-  }
-  if (c.indicatorsEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.indTf,
-      AnalysePrepCheckIds.indOutils,
-    ]);
-  }
-  if (c.smcEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.smcOb,
-      AnalysePrepCheckIds.smcFvg,
-    ]);
-  }
-  return ids;
-}
-
-List<String> applicablePrepCheckIdsFromSnapshot(AnalyseReportSnapshot s) {
-  final ids = <String>[];
-  if (s.gaugeContextEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.ctxTimeframe,
-      AnalysePrepCheckIds.ctxBias,
-      AnalysePrepCheckIds.ctxTrend,
-      AnalysePrepCheckIds.ctxPhase,
-    ]);
-    if (s.noteContexte.trim().isNotEmpty) {
+    if (noteContexte.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.ctxNote);
     }
-    if (s.noteStructure.trim().isNotEmpty) {
+    if (noteStructure.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.structNote);
     }
   }
-  if (s.gaugeStructureEnabled) {
+  if (structureEnabled) {
     ids.addAll([
       AnalysePrepCheckIds.structTf,
       AnalysePrepCheckIds.structChartisme,
@@ -92,38 +73,73 @@ List<String> applicablePrepCheckIdsFromSnapshot(AnalyseReportSnapshot s) {
       AnalysePrepCheckIds.structResistance,
     ]);
   }
-  if (s.gaugeIndicatorsEnabled) {
+  if (indicatorsEnabled) {
     ids.addAll([
       AnalysePrepCheckIds.indTf,
       AnalysePrepCheckIds.indOutils,
       AnalysePrepCheckIds.indNote,
     ]);
   }
-  if (s.gaugeSmcEnabled) {
+  if (smcEnabled) {
     ids.addAll([
       AnalysePrepCheckIds.smcOb,
       AnalysePrepCheckIds.smcFvg,
       AnalysePrepCheckIds.smcLiq,
       AnalysePrepCheckIds.smcFibPrix,
     ]);
-    if (s.smcFibOteLabel.trim().isNotEmpty) {
+    if (smcFibOteLabel.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.smcOte);
     }
-    if (s.noteSmc.trim().isNotEmpty) {
+    if (noteSmc.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.smcNote);
     }
   }
-  if (s.gaugeVolumeProfileEnabled) {
+  if (volumeEnabled) {
     ids.addAll([
       AnalysePrepCheckIds.volPoc,
       AnalysePrepCheckIds.volVah,
       AnalysePrepCheckIds.volVal,
     ]);
-    if (s.noteVolume.trim().isNotEmpty) {
+    if (noteVolume.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.volNote);
     }
   }
   return ids;
+}
+
+List<String> applicablePrepCheckIdsFromController(AnalyseController c) {
+  final fibLevel = c.smcFibLevel?.trim() ?? '';
+  final oteLabel =
+      fibLevel.isNotEmpty ? '$fibLevel OTE' : '';
+  return _applicablePrepCheckIds(
+    contextEnabled: c.contextEnabled,
+    structureEnabled: c.structureEnabled,
+    indicatorsEnabled: c.indicatorsEnabled,
+    smcEnabled: c.smcEnabled,
+    volumeEnabled: c.volumeProfileEnabled,
+    noteContexte: c.notesTimeframe,
+    noteStructure: c.notesStructure,
+    noteIndicators: c.notesIndicators,
+    noteSmc: c.notesSmc,
+    noteVolume: c.notesVolumeProfile,
+    smcFibOteLabel: oteLabel,
+  );
+}
+
+List<String> applicablePrepCheckIdsFromSnapshot(AnalyseReportSnapshot s) {
+  return _applicablePrepCheckIds(
+    contextEnabled: s.gaugeContextEnabled,
+    structureEnabled: s.gaugeStructureEnabled,
+    indicatorsEnabled: s.gaugeIndicatorsEnabled,
+    smcEnabled: s.gaugeSmcEnabled,
+    volumeEnabled: s.gaugeVolumeProfileEnabled,
+    noteContexte: s.noteContexte,
+    noteStructure: s.noteStructure,
+    noteIndicators: s.noteIndicators,
+    noteSmc: s.noteSmc,
+    noteVolume: s.noteVolume,
+    smcFibOteLabel: s.smcFibOteLabel,
+  );
 }
 
 int prepCompletionPercent({

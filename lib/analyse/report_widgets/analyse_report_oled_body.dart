@@ -301,7 +301,22 @@ class _ReportHero extends StatelessWidget {
         ),
         if (snapshot.gaugeContextEnabled) ...[
           const SizedBox(width: 8),
-          analyseReportBiasPill(context, snapshot),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onPrepToggle != null) ...[
+                AnalyseReportPrepCheckBox(
+                  checked: snapshotIsPrepChecked(
+                    snapshot,
+                    AnalysePrepCheckIds.ctxBias,
+                  ),
+                  onToggle: () => onPrepToggle!(AnalysePrepCheckIds.ctxBias),
+                ),
+                const SizedBox(width: 6),
+              ],
+              analyseReportBiasPill(context, snapshot),
+            ],
+          ),
         ],
       ],
     );

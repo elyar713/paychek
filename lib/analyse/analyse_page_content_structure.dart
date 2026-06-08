@@ -16,6 +16,8 @@ import 'widgets/analyse_text_field.dart';
 import 'widgets/analyse_collapsible_section_body.dart';
 import 'widgets/analyse_section_title_row.dart';
 import 'widgets/analyse_structure_tf_picker.dart';
+import 'analyse_prep_checks.dart';
+import 'widgets/analyse_prep_check_box.dart';
 
 /// Carte Â« Structure Â».
 class AnalyseStructureCard extends StatefulWidget {
@@ -99,11 +101,24 @@ class _AnalyseStructureCardState extends State<AnalyseStructureCard> {
                               ),
                               const SizedBox(width: 4),
                               Expanded(
-                                child: AnalyseTextField(
-                                  hintText: l.analyseLastPointHint,
-                                  value: c.structureDernierPoint,
-                                  onChanged: (v) => c.structureDernierPoint = v,
-                                  compact: true,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    AnalysePrepCheckBox(
+                                      controller: c,
+                                      prepId: AnalysePrepCheckIds.structChartisme,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: AnalyseTextField(
+                                        hintText: l.analyseLastPointHint,
+                                        value: c.structureDernierPoint,
+                                        onChanged: (v) =>
+                                            c.structureDernierPoint = v,
+                                        compact: true,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
