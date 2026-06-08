@@ -20,6 +20,21 @@ abstract final class TradeJournalFirestoreSync {
 
   static const _docId = 'journal_trades_v1';
 
+  static int _suppressRemoteApply = 0;
+
+  /// Pendant une suppression de portefeuille : évite qu’un snapshot cloud réinjecte
+  /// les trades qu’on vient d’effacer localement.
+  static Future<T> runWithRemoteApplySuppressed<T>(
+    Future<T> Function() action,
+  ) async {
+    _suppressRemoteApply++;
+    try {
+      return await action();
+    } finally {
+      _suppressRemoteApply--;
+    }
+  }
+
   /// Une seule fusion à la fois : plusieurs [snapshots] en parallèle empilent des listes
   /// (pics mémoire / GC ~centaines de Mo sur appareils modestes).
   static Future<void> _remoteApplyChain = Future<void>.value();
@@ -51,6 +66,7 @@ abstract final class TradeJournalFirestoreSync {
     TradeJournalStore store,
     DocumentSnapshot<Map<String, dynamic>> snap,
   ) async {
+    if (_suppressRemoteApply > 0) return;
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
     _remoteApplyChain = _remoteApplyChain.then((_) async {

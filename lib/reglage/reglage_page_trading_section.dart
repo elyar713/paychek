@@ -79,9 +79,8 @@ class _TradingPrefsSectionState extends State<_TradingPrefsSection> {
         ],
       ),
     );
-    if (ok == true) {
-      purgeJournalTradesForPortfolio(context, p.id);
-      await widget.portfolioStore.remove(p.id);
+    if (ok == true && context.mounted) {
+      await PortfolioDeletionSync.deletePortfolio(context, portfolioId: p.id);
     }
   }
 

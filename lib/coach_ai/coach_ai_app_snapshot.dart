@@ -23,7 +23,7 @@ abstract final class CoachAiAppSnapshot {
     return <String, dynamic>{
       'source': 'paychek_app_snapshot_v1',
       'languageCode': lc,
-      if (portfolioScope != null) 'portfolioScope': portfolioScope,
+      'portfolioScope': ?portfolioScope,
       'navigation': _navigation(lc),
       'today': <String, dynamic>{
         'mental': _compactMental(mental),

@@ -52,7 +52,10 @@ Map<String, dynamic> coachAiPortfolioScopeJson(BuildContext context) {
   };
 }
 
-/// Supprime du journal les trades rattachés à un portefeuille supprimé.
+/// Supprime du journal les trades rattachés à un portefeuille (local uniquement).
+///
+/// Pour une suppression complète avec sync Firebase, utiliser
+/// `PortfolioDeletionSync.deletePortfolio`.
 void purgeJournalTradesForPortfolio(BuildContext context, String portfolioId) {
   TradeJournalScope.of(context).removeAllForPortfolio(portfolioId);
 }

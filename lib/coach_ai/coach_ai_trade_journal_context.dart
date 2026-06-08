@@ -20,7 +20,7 @@ abstract final class CoachAiTradeJournalContext {
 
     return <String, dynamic>{
       'source': 'trade_journal_items_v1',
-      if (portfolioScope != null) 'portfolioScope': portfolioScope,
+      'portfolioScope': ?portfolioScope,
       'sameDataAsTradePage': true,
       'totalTrades': all.length,
       'closedTrades': all.where((t) => t.isClosed).length,
