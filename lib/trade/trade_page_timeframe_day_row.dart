@@ -15,9 +15,16 @@ extension _TradePageTimeframeDayRow on _TradePageState {
     final count = dayTrades.length;
     final net = dayTrades.fold<double>(0.0, (sum, t) => sum + t.gainAmount);
     final avg = count <= 0 ? 0.0 : (net / count);
-    final cap = UserPortfolioScope.of(context)
+    final baseCap = UserPortfolioScope.of(context)
         .effectiveCapitalAmount(UserCapitalScope.of(context));
-    final pct = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
+    final pct = gainPctOfReferenceCapital(
+      net,
+      capitalAtDayStart(
+        baseCapital: baseCap,
+        day: dLocal,
+        allTrades: allRaw,
+      ),
+    );
 
     final avgChecklistVal = averageExplicitChecklistPct(dayTrades);
     final avgPlanVal = averageExplicitPlanPct(dayTrades);
@@ -39,6 +46,9 @@ extension _TradePageTimeframeDayRow on _TradePageState {
       counts[id] = (counts[id] ?? 0) + 1;
     }
     final maxCount = counts.values.fold<int>(0, (a, b) => a > b ? a : b);
+    final capitalBeforeById = baseCap != null
+        ? capitalBeforeTradeById(baseCapital: baseCap, allTrades: allRaw)
+        : null;
 
     Widget ringCell({
       required String title,
@@ -158,6 +168,7 @@ extension _TradePageTimeframeDayRow on _TradePageState {
                     t,
                     tradeKeys,
                     allRaw,
+                    capitalBeforeById: capitalBeforeById,
                   ),
             )
           : const SizedBox.shrink(),

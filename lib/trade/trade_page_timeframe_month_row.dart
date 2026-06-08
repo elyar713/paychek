@@ -17,9 +17,14 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
     final count = monthTrades.length;
     final net = monthTrades.fold<double>(0.0, (sum, t) => sum + t.gainAmount);
     final avg = count <= 0 ? 0.0 : (net / count);
-    final cap = UserPortfolioScope.of(context)
+    final baseCap = UserPortfolioScope.of(context)
         .effectiveCapitalAmount(UserCapitalScope.of(context));
-    final pct = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
+    final monthRefCap = capitalAtMonthStart(
+      baseCapital: baseCap,
+      monthStart: monthStart,
+      allTrades: allRaw,
+    );
+    final pct = gainPctOfReferenceCapital(net, monthRefCap);
 
     final avgChecklistVal = averageExplicitChecklistPct(monthTrades);
     final avgPlanVal = averageExplicitPlanPct(monthTrades);
@@ -44,8 +49,16 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
 
     final loc = AppLocalizations.of(context)!;
 
-    Widget rowTrade(TradeListItem t) =>
-        _buildExpandableTradeCard(context, t, tradeKeys, allRaw);
+    final capitalBeforeById = baseCap != null
+        ? capitalBeforeTradeById(baseCapital: baseCap, allTrades: allRaw)
+        : null;
+    Widget rowTrade(TradeListItem t) => _buildExpandableTradeCard(
+          context,
+          t,
+          tradeKeys,
+          allRaw,
+          capitalBeforeById: capitalBeforeById,
+        );
 
     Widget ringCell({
       required String title,
@@ -108,7 +121,7 @@ extension _TradePageTimeframeMonthRow on _TradePageState {
           context: context,
           monthStart: monthStart,
           monthTrades: monthTrades,
-          initialCapital: cap,
+          initialCapital: monthRefCap,
           filenamePrefix: 'trades_month',
           checklistController: widget.checklistController,
         );

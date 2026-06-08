@@ -5,6 +5,7 @@ import '../dashboard/capital_evolution_computed.dart';
 import '../dashboard/widgets/dashboard_cumulative_sparkline.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/month_detail_expandable_card.dart';
+import '../trade/trade_capital_at_moment.dart';
 import '../trade/trade_models.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_month_pills.dart';
@@ -183,7 +184,11 @@ class CalendrierPerformancePanel extends StatelessWidget {
                     )
                     .toList(),
                 currencySymbol: capSymbol,
-                initialCapital: initialCapital,
+                initialCapital: capitalAtMonthStart(
+                  baseCapital: initialCapital,
+                  monthStart: focusedMonth,
+                  allTrades: allTrades,
+                ),
                 onExportPdf: onExportMonthPdf ?? () async {},
                 onTradeSelected: liteInteractionLocked ? null : onTradeSelected,
                 onExpandHeaderLockedTap: liteInteractionLocked

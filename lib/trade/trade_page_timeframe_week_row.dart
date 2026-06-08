@@ -12,9 +12,16 @@ extension _TradePageTimeframeWeekRow on _TradePageState {
     final count = weekTrades.length;
     final net = weekTrades.fold<double>(0.0, (sum, t) => sum + t.gainAmount);
     final avg = count <= 0 ? 0.0 : (net / count);
-    final cap = UserPortfolioScope.of(context)
+    final baseCap = UserPortfolioScope.of(context)
         .effectiveCapitalAmount(UserCapitalScope.of(context));
-    final pct = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
+    final pct = gainPctOfReferenceCapital(
+      net,
+      capitalAtWeekStart(
+        baseCapital: baseCap,
+        weekMonday: monday,
+        allTrades: allRaw,
+      ),
+    );
     final n = TradingWeekScope.of(context).tradingDaysPerWeek;
     final weekDays =
         List<DateTime>.generate(n, (i) => monday.add(Duration(days: i)));
@@ -49,8 +56,16 @@ extension _TradePageTimeframeWeekRow on _TradePageState {
 
     final loc = AppLocalizations.of(context)!;
 
-    Widget rowTrade(TradeListItem t) =>
-        _buildExpandableTradeCard(context, t, tradeKeys, allRaw);
+    final capitalBeforeById = baseCap != null
+        ? capitalBeforeTradeById(baseCapital: baseCap, allTrades: allRaw)
+        : null;
+    Widget rowTrade(TradeListItem t) => _buildExpandableTradeCard(
+          context,
+          t,
+          tradeKeys,
+          allRaw,
+          capitalBeforeById: capitalBeforeById,
+        );
 
     Widget ringCell({
       required String title,

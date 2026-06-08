@@ -10,8 +10,6 @@ import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/checklist_localizations.dart';
 import '../etat_mental/mental_state_controller.dart';
-import '../questionnaire/user_capital_scope.dart';
-import '../reglage/user_portfolio_scope.dart';
 import 'trade_date_format.dart';
 import 'trade_linked_analyse_pdf.dart';
 import 'trade_models.dart';
@@ -32,9 +30,12 @@ class TradeCard extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onExportPdf,
+    this.referenceCapitalForPct,
   });
 
   final TradeListItem item;
+  /// Capital courant au moment de l'entrée (base + P&L antérieur).
+  final double? referenceCapitalForPct;
   final bool expanded;
   final VoidCallback onToggle;
   final int tradeNumberOfDay;

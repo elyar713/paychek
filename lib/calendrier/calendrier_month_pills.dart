@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../l10n/app_localizations.dart';
 import '../l10n/app_localizations_month.dart';
+import '../trade/trade_capital_at_moment.dart';
 import '../trade/trade_models.dart';
 import 'calendrier_constants.dart';
 import 'calendrier_utils.dart';
@@ -151,9 +152,12 @@ class _CalendrierMonthPillsState extends State<CalendrierMonthPills> {
     final tradingDays = trades.map((t) => t.entreeAt.day).toSet().length;
     final averagePerDay = tradingDays > 0 ? net / tradingDays : 0.0;
     
-    final capitalIncrease = (widget.initialCapital != null && widget.initialCapital! > 0)
-        ? (net / widget.initialCapital!) * 100.0
-        : null;
+    final monthRefCap = capitalAtMonthStart(
+      baseCapital: widget.initialCapital,
+      monthStart: month,
+      allTrades: widget.allTrades,
+    );
+    final capitalIncrease = gainPctOfReferenceCapital(net, monthRefCap);
     
     final objectiveProgress = (widget.monthlyObjective != null && widget.monthlyObjective! > 0)
         ? (net / widget.monthlyObjective!) * 100.0

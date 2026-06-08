@@ -12,6 +12,7 @@ import '../trade/trade_journal_helper.dart';
 import '../trade/trade_journal_scope.dart';
 import '../trade/trade_models.dart';
 import '../shared/month_pdf_helper.dart';
+import '../trade/trade_capital_at_moment.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../performance/performance_locale_copy.dart';
 import '../web/paychek_web_tokens.dart';
@@ -142,6 +143,7 @@ class _CalendrierPageState extends State<CalendrierPage> {
   Future<void> _exportMonthPdf({
     required BuildContext context,
     required List<TradeListItem> monthTrades,
+    required List<TradeListItem> allTrades,
     required String capSymbol,
     required double? initialCapital,
   }) async {
@@ -149,7 +151,11 @@ class _CalendrierPageState extends State<CalendrierPage> {
       context: context,
       monthStart: _focusedMonth,
       monthTrades: monthTrades,
-      initialCapital: initialCapital,
+      initialCapital: capitalAtMonthStart(
+        baseCapital: initialCapital,
+        monthStart: _focusedMonth,
+        allTrades: allTrades,
+      ),
       filenamePrefix: 'calendrier_month',
     );
   }
@@ -228,6 +234,7 @@ class _CalendrierPageState extends State<CalendrierPage> {
           onExportMonthPdf: () => _exportMonthPdf(
             context: context,
             monthTrades: monthTradesList,
+            allTrades: trades,
             capSymbol: capSymbol,
             initialCapital: initialCapital,
           ),
@@ -337,6 +344,9 @@ class _CalendrierPageState extends State<CalendrierPage> {
                                   UserCapitalScope.of(context).currencySymbol;
                               return CalendrierMonthInfo(
                                 monthTradesList: monthTradesList,
+                                monthStart: _focusedMonth,
+                                allTrades: trades,
+                                baseCapital: initialCapital,
                                 monthlyObjective: _monthlyObjective,
                                 onShowObjectiveDialog: () =>
                                     _showObjectiveDialog(sym),

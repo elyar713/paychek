@@ -128,16 +128,9 @@ extension _TradeCardBuild on TradeCard {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  ListenableBuilder(
-                    listenable: Listenable.merge([
-                      UserCapitalScope.of(context),
-                      UserPortfolioScope.of(context),
-                    ]),
-                    builder: (context, _) {
-                      final g = UserCapitalScope.of(context);
-                      final cap = UserPortfolioScope.of(
-                        context,
-                      ).effectiveCapitalAmount(g);
+                  Builder(
+                    builder: (context) {
+                      final cap = referenceCapitalForPct;
                       final pctVsCapital = (cap != null && cap > 0)
                           ? (item.gainAmount / cap) * 100.0
                           : null;

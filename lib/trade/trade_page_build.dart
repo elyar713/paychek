@@ -31,9 +31,16 @@ extension _TradePageBuild on _TradePageState {
         final win = computeTradeStats(baseForBar).winRatePctDisplay;
         final openPositions = baseForBar.where((e) => e.sortieAt == null).toList();
         final openCount = openPositions.length;
-        final cap = pf.effectiveCapitalAmount(capStore);
+        final baseCap = pf.effectiveCapitalAmount(capStore);
+        final capitalBeforeById = baseCap != null
+            ? capitalBeforeTradeById(
+                baseCapital: baseCap,
+                allTrades: allRaw,
+              )
+            : null;
+        // Bandeau : % total vs capital initial (inchangé pour ALL / vue globale).
         final pctNetVsCapital =
-            (cap != null && cap > 0) ? (s.net / cap) * 100.0 : null;
+            gainPctOfReferenceCapital(s.net, baseCap);
         final mostTraded = _mostTradedPairs(allRaw);
 
         final countAll = baseForBar.length;
@@ -231,6 +238,7 @@ extension _TradePageBuild on _TradePageState {
                         item,
                         tradeKeys,
                         allRaw,
+                        capitalBeforeById: capitalBeforeById,
                       ),
                 ],
                               ),

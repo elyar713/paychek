@@ -5,8 +5,9 @@ extension _TradePageExpandableTradeCard on _TradePageState {
     BuildContext context,
     TradeListItem item,
     Map<String, GlobalKey> tradeKeys,
-    List<TradeListItem> allRaw,
-  ) {
+    List<TradeListItem> allRaw, {
+    Map<String, double>? capitalBeforeById,
+  }) {
     _tradeKeysById.putIfAbsent(item.id, GlobalKey.new);
     final key = tradeKeys[item.id] ?? _tradeKeysById[item.id]!;
 
@@ -14,6 +15,7 @@ extension _TradePageExpandableTradeCard on _TradePageState {
       key: key,
       child: TradeCard(
         item: item,
+        referenceCapitalForPct: capitalBeforeById?[item.id],
         expanded: _expandedTradeId == item.id,
         tradeNumberOfDay: _tradeNumberOfDay(item, allRaw),
         checklistController: widget.checklistController,

@@ -211,6 +211,9 @@ class _DashboardCalendrierCardState extends State<DashboardCalendrierCard> {
                 final capSymbol = capStore.currencySymbol;
                 return CalendrierMonthInfo(
                   monthTradesList: monthTradesList,
+                  monthStart: _focusedMonth,
+                  allTrades: trades,
+                  baseCapital: pf.effectiveCapitalAmount(capStore),
                   monthlyObjective: _monthlyObjective,
                   onShowObjectiveDialog: widget.liteInteractionLocked
                       ? () => widget.onLiteInteractionLockedTap?.call()

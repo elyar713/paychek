@@ -17,6 +17,7 @@ import '../shared/month_pdf_helper.dart';
 import 'trade_journal_helper.dart';
 import 'trade_journal_scope.dart';
 import 'trade_session.dart';
+import 'trade_capital_at_moment.dart';
 import 'trade_card.dart';
 import 'trade_discipline_day_snapshot.dart';
 import 'trade_export_pdf.dart';

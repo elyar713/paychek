@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
+import '../trade/trade_capital_at_moment.dart';
 import '../trade/trade_models.dart';
 import '../trade/trade_stats.dart';
 import '../questionnaire/user_capital_scope.dart';
@@ -14,11 +15,17 @@ class CalendrierMonthInfo extends StatelessWidget {
   const CalendrierMonthInfo({
     super.key,
     required this.monthTradesList,
+    required this.monthStart,
+    required this.allTrades,
+    required this.baseCapital,
     required this.monthlyObjective,
     required this.onShowObjectiveDialog,
   });
 
   final List<TradeListItem> monthTradesList;
+  final DateTime monthStart;
+  final List<TradeListItem> allTrades;
+  final double? baseCapital;
   final double? monthlyObjective;
   final VoidCallback onShowObjectiveDialog;
 
@@ -30,9 +37,15 @@ class CalendrierMonthInfo extends StatelessWidget {
     final net = monthTradesList.fold<double>(0.0, (sum, t) => sum + t.gainAmount);
     final capStore = UserCapitalScope.of(context);
     final pf = UserPortfolioScope.of(context);
-    final cap = pf.effectiveCapitalAmount(capStore);
     final capSymbol = pf.effectiveCurrencySymbol(capStore);
-    final pctOfCap = (cap != null && cap > 0) ? (net / cap) * 100.0 : null;
+    final pctOfCap = gainPctOfReferenceCapital(
+      net,
+      capitalAtMonthStart(
+        baseCapital: baseCapital,
+        monthStart: monthStart,
+        allTrades: allTrades,
+      ),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 8),
