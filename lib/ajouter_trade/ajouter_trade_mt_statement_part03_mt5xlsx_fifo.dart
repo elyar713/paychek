@@ -166,12 +166,17 @@ String _csvFirstNonEmptyCell(List<String> cols, List<int> indices) {
   return '';
 }
 
-/// PnL Tradovate Performance : `$24.50` ou `$(73.50)`.
+/// PnL Tradovate Performance : `$24.50`, `$(73.50)` ou `"$1,803.00"` (milliers US).
 double? _parseTradovatePnl(String raw) {
   final s = raw.trim();
   if (s.isEmpty) return null;
   final negative = s.contains('(') && s.contains(')');
-  final n = _parseMtNumber(s.replaceAll(RegExp(r'[\$\(\)]'), ''));
+  var numPart = s.replaceAll(RegExp(r'[\$\(\)\s]'), '');
+  // US : virgule = séparateur de milliers si un point décimal est aussi présent.
+  if (numPart.contains('.') && numPart.contains(',')) {
+    numPart = numPart.replaceAll(',', '');
+  }
+  final n = _parseMtNumber(numPart);
   if (n == null) return null;
   return negative ? -n.abs() : n;
 }

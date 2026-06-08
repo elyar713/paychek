@@ -54,6 +54,17 @@ MNQM6,-2,0,0.25,518233460514,518233460471,1,30304.75,30282.50,\$(44.50),05/29/20
       expect(rows.last.openTime.isBefore(rows.last.closeTime), isTrue);
     });
 
+    test('Performance.csv PnL with US thousands separator (\$1,803.00)', () {
+      const csv = '''
+symbol,_priceFormat,_priceFormatType,_tickSize,buyFillId,sellFillId,qty,buyPrice,sellPrice,pnl,boughtTimestamp,soldTimestamp,duration
+MNQM6,-2,0,0.25,530420580733,530420580767,3,29196.00,29496.50,"\$1,803.00",06/08/2026 12:29:46,06/08/2026 14:42:33,2h 12min 46sec
+''';
+      final rows = parseTradovateImportCsv(csv);
+      expect(rows, hasLength(1));
+      expect(rows.first.profit, closeTo(1803.00, 0.01));
+      expect(rows.first.size, 3);
+    });
+
     test('semicolon delimiter', () {
       const csv = '''
 orderId;Contract;Status;B/S;Filled Qty;Avg Fill Price;Fill Time
