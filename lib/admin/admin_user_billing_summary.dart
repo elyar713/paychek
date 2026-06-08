@@ -54,7 +54,7 @@ PaychekBillingCycle? _cycleFromStripeAmountMajor(double amount, String currency)
   if (c != 'USD' && c.isNotEmpty) return null;
   bool near(double a, double b) => (a - b).abs() < 0.75;
   if (near(amount, 8.99)) return PaychekBillingCycle.monthly;
-  if (near(amount, 20.97)) return PaychekBillingCycle.quarterly;
+  if (near(amount, 20.99) || near(amount, 20.97)) return PaychekBillingCycle.quarterly;
   if (near(amount, 59.99)) return PaychekBillingCycle.annual;
   return null;
 }

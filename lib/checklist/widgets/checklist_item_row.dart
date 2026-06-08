@@ -114,6 +114,9 @@ class ChecklistItemRow extends StatelessWidget {
               ? TextField(
                     controller: labelEditController,
                     focusNode: labelFocusNode,
+                    scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
+                    ),
                     style: ChecklistTokens.itemLabelOnCardStyle,
                     cursorColor: ChecklistTokens.itemLabelOnCardStyle.color,
                     maxLines: null,

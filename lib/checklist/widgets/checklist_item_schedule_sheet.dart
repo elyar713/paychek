@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -400,6 +401,18 @@ class _ChecklistItemScheduleDialogState extends State<_ChecklistItemScheduleDial
                   ),
                 ),
               ),
+              if (!kIsWeb) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l.checklistScheduleNotificationHint,
+                  style: const TextStyle(
+                    color: DashboardTokens.muted,
+                    fontSize: 10,
+                    height: 1.35,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ],
           ),
         ),

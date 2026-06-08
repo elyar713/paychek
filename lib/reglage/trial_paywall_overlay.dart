@@ -176,11 +176,14 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     final result = await openPaychekSubscriptionFlow(cycle: cycle);
     if (!context.mounted) return;
     if (result.ok) {
-      await PaychekEntitlementLocalSync.refreshProFromServer();
-      await widget.onReloadTrialGate();
-      await Future<void>.delayed(const Duration(milliseconds: 1200));
-      if (!context.mounted) return;
-      await widget.onReloadTrialGate();
+      // App Store / Play : achat terminé sur l’appareil. Stripe web : checkout ouvert seulement.
+      if (paychekUsesNativeStoreIap) {
+        await PaychekEntitlementLocalSync.refreshProFromServer();
+        await widget.onReloadTrialGate();
+        await Future<void>.delayed(const Duration(milliseconds: 1200));
+        if (!context.mounted) return;
+        await widget.onReloadTrialGate();
+      }
       return;
     }
     if (result.kind == PaychekSubscriptionFlowKind.cancelled) return;

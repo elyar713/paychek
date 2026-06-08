@@ -130,7 +130,7 @@
       }
     }
   },
-  "tradeImportSummary": "{count} negociação(ões) importada(s) de {source}{duplicates}.",
+  "tradeImportSummary": "{count} negociação(ões) guardada(s) no diário de {source}{duplicates}.",
   "@tradeImportSummary": {
     "placeholders": {
       "count": {
@@ -144,6 +144,23 @@
       }
     }
   },
+  "tradeImportConfirmTitle": "Importar para o diário?",
+  "tradeImportConfirmBody": "{count} negociação(ões) de {source} serão guardadas diretamente (Guardar não se aplica).{duplicates}",
+  "@tradeImportConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportConfirmAction": "Importar para o diário",
+  "tradeImportCancelled": "Importação cancelada — nenhuma negociação guardada.",
   "tradeImportDuplicatesSuffix": " · {count} duplicado(s) ignorado(s)",
   "@tradeImportDuplicatesSuffix": {
     "placeholders": {
@@ -611,6 +628,9 @@
   "checklistScheduleWarningHeading": "4 · Alert time",
   "checklistSchedulePickTime": "Pick time",
   "checklistScheduleCalendarTooltip": "Date and reminder settings",
+  "settingsChecklistRemindersTitle": "Checklist reminders",
+  "settingsChecklistRemindersSubtitle": "Notify at the time set on each row (Edit → calendar).",
+  "checklistScheduleNotificationHint": "On mobile, a local notification is sent at this time (permission required).",
   "clearAll": "Limpar Tudo",
   "confirm": "Confirmar",
   "currencyNameHint": "por exemplo, CHF, XOF",
@@ -1097,7 +1117,7 @@
   "paywallMobilePlanAnnualBilling": "Faturado anualmente",
   "paywallMobilePlanQuarterlyBilling": "A cada 3 meses",
   "paywallMobilePlanMonthlyBilling": "Faturado mensalmente",
-  "paywallMobilePlanMonthlyCommitment": "Compromisso mensal",
+  "paywallMobilePlanMonthlyCommitment": "Sem compromisso",
   "paywallMobilePlanSavings44": "Poupe 44%",
   "paywallMobilePlanSavingsPercent": "Poupe {percent}%",
   "@paywallMobilePlanSavingsPercent": {

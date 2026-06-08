@@ -4397,8 +4397,6 @@ class _CoachAiPageState extends State<CoachAiPage> {
       );
     }
 
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-
     return Material(
       color: const Color(0xFF050505),
       child: SafeArea(
@@ -4484,11 +4482,7 @@ class _CoachAiPageState extends State<CoachAiPage> {
                     ),
                   ),
                 ),
-                AnimatedPadding(
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOutCubic,
-                  padding: EdgeInsets.only(bottom: keyboardInset),
-                  child: Container(
+                Container(
                   padding: EdgeInsets.fromLTRB(hPad, 10, hPad, 14),
                   decoration: BoxDecoration(
                     color: const Color(0xFF050505),
@@ -4590,7 +4584,6 @@ class _CoachAiPageState extends State<CoachAiPage> {
                       ),
                     ),
                   ),
-                ),
                 ),
               ],
             );

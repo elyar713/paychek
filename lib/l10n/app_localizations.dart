@@ -505,8 +505,32 @@ abstract class AppLocalizations {
   /// No description provided for @tradeImportSummary.
   ///
   /// In fr, this message translates to:
-  /// **'{count} trade(s) importé(s) depuis {source}{duplicates}.'**
+  /// **'{count} trade(s) enregistré(s) dans le journal depuis {source}{duplicates}.'**
   String tradeImportSummary(int count, String source, String duplicates);
+
+  /// No description provided for @tradeImportConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer dans le journal ?'**
+  String get tradeImportConfirmTitle;
+
+  /// No description provided for @tradeImportConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} trade(s) depuis {source} seront enregistrés directement (sans passer par Enregistrer).{duplicates}'**
+  String tradeImportConfirmBody(int count, String source, String duplicates);
+
+  /// No description provided for @tradeImportConfirmAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer au journal'**
+  String get tradeImportConfirmAction;
+
+  /// No description provided for @tradeImportCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import annulé — aucun trade enregistré.'**
+  String get tradeImportCancelled;
 
   /// No description provided for @tradeImportDuplicatesSuffix.
   ///
@@ -2667,6 +2691,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Règlage date et rappel'**
   String get checklistScheduleCalendarTooltip;
+
+  /// No description provided for @settingsChecklistRemindersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rappels checklist'**
+  String get settingsChecklistRemindersTitle;
+
+  /// No description provided for @settingsChecklistRemindersSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notification à l’heure définie sur chaque ligne (Modifier → calendrier).'**
+  String get settingsChecklistRemindersSubtitle;
+
+  /// No description provided for @checklistScheduleNotificationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur mobile, une notification locale est envoyée à cette heure (autorisation requise).'**
+  String get checklistScheduleNotificationHint;
 
   /// No description provided for @clearAll.
   ///
@@ -5131,7 +5173,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallMobilePlanMonthlyCommitment.
   ///
   /// In fr, this message translates to:
-  /// **'Engagement mensuel'**
+  /// **'Sans engagement'**
   String get paywallMobilePlanMonthlyCommitment;
 
   /// No description provided for @paywallMobilePlanSavings44.

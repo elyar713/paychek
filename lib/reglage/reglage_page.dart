@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'dart:async' show unawaited;
 import 'package:google_fonts/google_fonts.dart';
 
 import '../dashboard/widgets/paychek_plan_minimal_badge.dart';
@@ -29,12 +30,17 @@ import 'reglage_profile_view_page.dart';
 import 'support_feedback_page.dart';
 import 'trial_access_prefs.dart';
 import 'user_profile_scope.dart';
+import '../checklist/checklist_models.dart';
+import '../checklist/checklist_notification_prefs.dart';
+import '../checklist/checklist_notification_service.dart';
+import '../checklist/checklist_sections_storage.dart';
 
 part 'reglage_page_tokens.dart';
 part 'reglage_page_profile_section.dart';
 part 'reglage_page_trading_section.dart';
 part 'reglage_page_cgv_data_reset.dart';
 part 'reglage_page_language_week.dart';
+part 'reglage_page_checklist_reminders.dart';
 part 'reglage_page_support_section.dart';
 
 /// Colonne Réglages centrée sur le web (maquette shell).
@@ -301,6 +307,10 @@ class _ReglagePageState extends State<ReglagePage> {
               tradingWeek: tradingWeek,
               localeController: localeController,
             ),
+            if (!isWebUi) ...[
+              SizedBox(height: gap),
+              const _ChecklistRemindersSection(),
+            ],
             SizedBox(height: gap),
             _SupportFeedbackReglageCard(
               onOpenHelpCenterInShell: widget.onOpenHelpCenter,

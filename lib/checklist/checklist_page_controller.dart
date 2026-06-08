@@ -1,5 +1,6 @@
 import 'dart:async' show Timer, unawaited;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'checklist_daily_completion_storage.dart';
@@ -12,6 +13,7 @@ import 'checklist_models.dart';
 import 'checklist_prompts.dart';
 import 'checklist_sections_storage.dart';
 import 'checklist_demo_graduation.dart';
+import 'checklist_notification_service.dart';
 import '../shared/paychek_demo_graduation_prefs.dart';
 import '../shared/paychek_frame_callbacks.dart';
 import 'checklist_reorder_entries.dart';
@@ -46,6 +48,7 @@ class ChecklistPageController extends ChangeNotifier {
   List<ChecklistSectionData> _sections;
 
   Timer? _saveDebounce;
+  Timer? _notificationSyncDebounce;
   bool _hydrated = false;
   bool _checklistDemoGraduated = false;
   Map<int, ChecklistDailyDaySnapshot> _snapshotsByDay = {};
@@ -89,6 +92,15 @@ class ChecklistPageController extends ChangeNotifier {
     _refreshCompletionPeriods(silent: true);
     notifyListeners();
     _snapshotTodayCompletion();
+    _syncNotificationsSoon();
+  }
+
+  void _syncNotificationsSoon() {
+    if (kIsWeb || !_hydrated) return;
+    _notificationSyncDebounce?.cancel();
+    _notificationSyncDebounce = Timer(const Duration(milliseconds: 700), () {
+      unawaited(ChecklistNotificationService.syncSections(_sections));
+    });
   }
 
   void _persistSoon() {
@@ -148,6 +160,12 @@ class ChecklistPageController extends ChangeNotifier {
   /// Pendant un rebuild (nouvelle ligne +), le [TextField] précédent lâche le focus :
   /// sans garde, [commitItemLabelEdit] supprime le brouillon vide tout de suite.
   int _itemLabelBlurCommitPause = 0;
+
+  /// Mobile : 1er tap hors carte = fermer le clavier ; 2e tap = valider / annuler.
+  int _outsideSectionEditTapCount = 0;
+
+  /// Empêche [commitItemLabelEdit] auto au blur après le 1er tap extérieur.
+  bool _deferItemLabelBlurCommit = false;
 
   bool get isEditingChecklist =>
       editingSectionId != null || editingItemId != null;
@@ -529,6 +547,7 @@ class ChecklistPageController extends ChangeNotifier {
     _refreshCompletionPeriods(silent: true);
     notifyListeners();
     _snapshotTodayCompletion();
+    _syncNotificationsSoon();
   }
 
   void _flushDeferredReloadIfNeeded() {
@@ -585,12 +604,14 @@ class ChecklistPageController extends ChangeNotifier {
     _refreshCompletionPeriods(silent: true);
     notifyListeners();
     _snapshotTodayCompletion();
+    _syncNotificationsSoon();
   }
 
   @override
   void dispose() {
     _disposed = true;
     _saveDebounce?.cancel();
+    _notificationSyncDebounce?.cancel();
     if (_hydrated) {
       unawaited(_persistToDiskAndCloud());
     }
@@ -642,6 +663,7 @@ class ChecklistPageController extends ChangeNotifier {
     // Mode Modifier section : validation uniquement sur Entrée ou action explicite.
     if (editingSectionId != null) return;
     if (!itemLabelFocusNode.hasFocus && editingItemId != null) {
+      if (_deferItemLabelBlurCommit) return;
       final isDraft = draftItemId == editingItemId;
       final empty = itemLabelEditController.text.trim().isEmpty;
       if (isDraft && empty) return;
@@ -649,8 +671,36 @@ class ChecklistPageController extends ChangeNotifier {
     }
   }
 
+  void _resetOutsideSectionEditTap() {
+    _outsideSectionEditTapCount = 0;
+    _deferItemLabelBlurCommit = false;
+  }
+
+  /// Annule la séquence « 2 taps extérieurs » (ex. retour sur la carte en édition).
+  void resetOutsideSectionEditTap() => _resetOutsideSectionEditTap();
+
+  /// Tap hors de la carte en mode « Modifier » ([requireDoubleTap] sur mobile étroit).
+  void handleOutsidePointerWhileSectionEditing({required bool requireDoubleTap}) {
+    if (editingSectionId == null) return;
+    if (!requireDoubleTap) {
+      _resetOutsideSectionEditTap();
+      finishSectionEditFromOutsideTap();
+      return;
+    }
+    _outsideSectionEditTapCount++;
+    if (_outsideSectionEditTapCount < 2) {
+      _deferItemLabelBlurCommit = true;
+      itemLabelFocusNode.unfocus();
+      sectionTitleFocusNode.unfocus();
+      return;
+    }
+    _resetOutsideSectionEditTap();
+    finishSectionEditFromOutsideTap();
+  }
+
   void commitItemLabelEdit() {
     if (_disposed) return;
+    _resetOutsideSectionEditTap();
     final id = editingItemId;
     if (id == null) return;
     final t = itemLabelEditController.text.trim();
@@ -724,6 +774,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void markSectionEditInteraction() {
+    _resetOutsideSectionEditTap();
     if (!sectionEditInteraction) {
       sectionEditInteraction = true;
       notifyListeners();
@@ -795,6 +846,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void startSectionTitleEdit(String sectionId) {
+    _resetOutsideSectionEditTap();
     if (reorderModeEnabled) {
       setReorderMode(false);
     }
@@ -818,6 +870,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void commitSectionTitleEdit() {
+    _resetOutsideSectionEditTap();
     if (editingItemId != null) {
       commitItemLabelEdit();
     }
@@ -841,6 +894,7 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void cancelSectionEdit() {
+    _resetOutsideSectionEditTap();
     final id = editingSectionId;
     if (id == null) return;
     final snap = sectionEditSnapshot;

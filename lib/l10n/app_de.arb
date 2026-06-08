@@ -130,7 +130,7 @@
       }
     }
   },
-  "tradeImportSummary": "{count} Trade(s) von {source} importiert{duplicates}.",
+  "tradeImportSummary": "{count} Trade(s) im Journal gespeichert von {source}{duplicates}.",
   "@tradeImportSummary": {
     "placeholders": {
       "count": {
@@ -144,6 +144,23 @@
       }
     }
   },
+  "tradeImportConfirmTitle": "Ins Journal importieren?",
+  "tradeImportConfirmBody": "{count} Trade(s) von {source} werden direkt gespeichert (Speichern gilt nicht).{duplicates}",
+  "@tradeImportConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportConfirmAction": "Ins Journal importieren",
+  "tradeImportCancelled": "Import abgebrochen — keine Trades gespeichert.",
   "tradeImportDuplicatesSuffix": " · {count} Duplikat(e) ignoriert",
   "@tradeImportDuplicatesSuffix": {
     "placeholders": {
@@ -611,6 +628,9 @@
   "checklistScheduleWarningHeading": "4 · Alert time",
   "checklistSchedulePickTime": "Pick time",
   "checklistScheduleCalendarTooltip": "Date and reminder settings",
+  "settingsChecklistRemindersTitle": "Checklist reminders",
+  "settingsChecklistRemindersSubtitle": "Notify at the time set on each row (Edit → calendar).",
+  "checklistScheduleNotificationHint": "On mobile, a local notification is sent at this time (permission required).",
   "clearAll": "Alles löschen",
   "confirm": "Bestätigen",
   "currencyNameHint": "z.B. ",
@@ -1097,7 +1117,7 @@
   "paywallMobilePlanAnnualBilling": "Jährlich abgerechnet",
   "paywallMobilePlanQuarterlyBilling": "Alle 3 Monate",
   "paywallMobilePlanMonthlyBilling": "Monatlich abgerechnet",
-  "paywallMobilePlanMonthlyCommitment": "Monatliche Bindung",
+  "paywallMobilePlanMonthlyCommitment": "Ohne Bindung",
   "paywallMobilePlanSavings44": "44 % sparen",
   "paywallMobilePlanSavingsPercent": "{percent} % sparen",
   "@paywallMobilePlanSavingsPercent": {

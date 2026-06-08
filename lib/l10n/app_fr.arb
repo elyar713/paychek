@@ -131,7 +131,7 @@
       }
     }
   },
-  "tradeImportSummary": "{count} trade(s) importé(s) depuis {source}{duplicates}.",
+  "tradeImportSummary": "{count} trade(s) enregistré(s) dans le journal depuis {source}{duplicates}.",
   "@tradeImportSummary": {
     "placeholders": {
       "count": {
@@ -145,6 +145,23 @@
       }
     }
   },
+  "tradeImportConfirmTitle": "Importer dans le journal ?",
+  "tradeImportConfirmBody": "{count} trade(s) depuis {source} seront enregistrés directement (sans passer par Enregistrer).{duplicates}",
+  "@tradeImportConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportConfirmAction": "Importer au journal",
+  "tradeImportCancelled": "Import annulé — aucun trade enregistré.",
   "tradeImportDuplicatesSuffix": " · {count} doublon(s) ignoré(s)",
   "@tradeImportDuplicatesSuffix": {
     "placeholders": {
@@ -612,6 +629,9 @@
   "checklistScheduleWarningHeading": "4 · Heure d’avertissement",
   "checklistSchedulePickTime": "Choisir l’heure",
   "checklistScheduleCalendarTooltip": "Règlage date et rappel",
+  "settingsChecklistRemindersTitle": "Rappels checklist",
+  "settingsChecklistRemindersSubtitle": "Notification à l’heure définie sur chaque ligne (Modifier → calendrier).",
+  "checklistScheduleNotificationHint": "Sur mobile, une notification locale est envoyée à cette heure (autorisation requise).",
   "clearAll": "Tout effacer",
   "confirm": "Confirmer",
   "currencyNameHint": "ex. CHF, XOF",
@@ -1104,7 +1124,7 @@
   "paywallMobilePlanAnnualBilling": "Facturé à l'année",
   "paywallMobilePlanQuarterlyBilling": "Tous les 3 mois",
   "paywallMobilePlanMonthlyBilling": "Facturé au mois",
-  "paywallMobilePlanMonthlyCommitment": "Engagement mensuel",
+  "paywallMobilePlanMonthlyCommitment": "Sans engagement",
   "paywallMobilePlanSavings44": "Économisez 44%",
   "paywallMobilePlanSavingsPercent": "Économisez {percent} %",
   "@paywallMobilePlanSavingsPercent": {

@@ -3,6 +3,114 @@
 part of 'ajouter_trade_page.dart';
 
 extension _AjouterTradePageStateCsv on _AjouterTradePageState {
+  void _showCsvImportSnackBar(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
+    if (!context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (!kIsWeb) {
+      final bottomInset = MediaQuery.paddingOf(context).bottom;
+      final navClearance =
+          DashboardMainBottomNav.totalHeight(bottomInset) + 12;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.fromLTRB(16, 0, 16, navClearance),
+          duration: const Duration(seconds: 6),
+          backgroundColor: isError ? const Color(0xFF2A1810) : null,
+        ),
+      );
+      return;
+    }
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        duration: const Duration(seconds: 5),
+        backgroundColor: isError ? const Color(0xFF2A1810) : null,
+      ),
+    );
+  }
+
+  void _revealCsvImportFeedback() {
+    if (kIsWeb) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _csvImportFeedbackKey.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        alignment: 0.15,
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  void _setCsvImportFeedback(
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      _lastCsvImportFeedback = message;
+      _lastCsvImportFeedbackIsError = isError;
+    });
+    _revealCsvImportFeedback();
+  }
+
+  Future<bool> _confirmCsvJournalImport(
+    BuildContext context, {
+    required int count,
+    required String source,
+    required int skippedDuplicates,
+    required int skippedLiteMonthlyCap,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final dupSuffix = skippedDuplicates > 0
+        ? l10n.tradeImportDuplicatesSuffix(skippedDuplicates)
+        : '';
+    var liteCapNote = '';
+    if (skippedLiteMonthlyCap > 0) {
+      liteCapNote =
+          ' ${l10n.ajouterTradeLiteMonthlyLimitImportSkipped(skippedLiteMonthlyCap, TradeLiteMonthlyLimit.maxTradesPerCalendarMonthNonPro)}';
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          backgroundColor: DashboardTokens.cardBoxBg,
+          title: Text(
+            l.tradeImportConfirmTitle,
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Text(
+            '${l.tradeImportConfirmBody(count, source, dupSuffix)}$liteCapNote',
+            style: TextStyle(color: DashboardTokens.muted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(
+                l.tradeImportConfirmAction,
+                style: TextStyle(color: DashboardTokens.accent),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed == true;
+  }
+
   String _atasXlsxEmptyMessage(
     AppLocalizations l,
     AtasXlsxEmptyReason reason,
@@ -35,11 +143,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
 
   Future<void> _importFromSelectedCsvSource(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    if (widget.liteFreemiumRestricted) {
+      widget.onLiteFreemiumRestrictedTap?.call();
+      return;
+    }
     final source = _selectedCsvSoftware;
     if (source == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.tradeImportPickSoftwareFirst)),
-      );
+      _showCsvImportSnackBar(context, l10n.tradeImportPickSoftwareFirst);
       return;
     }
     try {
@@ -58,41 +168,22 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       });
       final fileNameLower = file.name.toLowerCase();
       final isXlsx = fileNameLower.endsWith('.xlsx');
-      String? html;
-      Uint8List? rawBytes;
-      List<MtStatementTradeRow> parsedRows = const <MtStatementTradeRow>[];
-      if (kIsWeb) {
-        final bytes = file.bytes;
-        if (bytes != null) {
-          rawBytes = bytes;
-          if (!isXlsx) {
-            html = _decodeHtmlBytes(bytes);
-          }
-        }
-      } else {
-        final path = file.path;
-        if (path != null && path.trim().isNotEmpty) {
-          final xFile = XFile(path);
-          if (isXlsx) {
-            rawBytes = await xFile.readAsBytes();
-          } else {
-            final htmlBytes = await xFile.readAsBytes();
-            html = _decodeHtmlBytes(htmlBytes);
-          }
-        } else if (file.bytes != null && file.bytes!.isNotEmpty) {
-          // Certains chemins file_picker : pas de path mais octets présents.
-          rawBytes = file.bytes;
-          if (!isXlsx) {
-            html = _decodeHtmlBytes(file.bytes!);
-          }
-        }
+      final rawBytes = await paychekSupportReadPlatformFileBytes(file);
+      if (!context.mounted) return;
+      if (rawBytes == null || rawBytes.isEmpty) {
+        final msg = l10n.tradeImportEmptyFile;
+        _setCsvImportFeedback(msg, isError: true);
+        _showCsvImportSnackBar(context, msg, isError: true);
+        return;
       }
+      final html = isXlsx ? null : _decodeHtmlBytes(rawBytes);
+      List<MtStatementTradeRow> parsedRows = const <MtStatementTradeRow>[];
 
       if (!context.mounted) return;
       if (!isXlsx && (html == null || html.trim().isEmpty)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.tradeImportEmptyFile)),
-        );
+        final msg = l10n.tradeImportEmptyFile;
+        _setCsvImportFeedback(msg, isError: true);
+        _showCsvImportSnackBar(context, msg, isError: true);
         return;
       }
 
@@ -108,8 +199,7 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           break;
         case 'MT5':
           if (isXlsx) {
-            final bytes = rawBytes ?? Uint8List(0);
-            parsedRows = _parseMt5SpreadsheetBytes(bytes);
+            parsedRows = _parseMt5SpreadsheetBytes(rawBytes);
           } else if (fileNameLower.endsWith('.csv')) {
             parsedRows = parseMt5PositionsCsv(html!);
           } else {
@@ -196,31 +286,13 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
           break;
         case 'ATAS':
           if (isXlsx) {
-            var bytes = rawBytes;
-            if (bytes == null || bytes.isEmpty) {
-              final p = file.path;
-              if (p != null && p.trim().isNotEmpty) {
-                bytes = await XFile(p).readAsBytes();
-              }
-            }
-            if (!context.mounted) return;
-            if (bytes == null || bytes.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.tradeImportAtasXlsxReadFailed)),
-              );
-              return;
-            }
-            final atasOutcome = parseAtasTradesXlsxOutcome(bytes);
+            final atasOutcome = parseAtasTradesXlsxOutcome(rawBytes);
             parsedRows = atasOutcome.rows;
             if (!context.mounted) return;
             if (parsedRows.isEmpty && atasOutcome.emptyReason != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    _atasXlsxEmptyMessage(l10n, atasOutcome.emptyReason!),
-                  ),
-                ),
-              );
+              final msg = _atasXlsxEmptyMessage(l10n, atasOutcome.emptyReason!);
+              _setCsvImportFeedback(msg, isError: true);
+              _showCsvImportSnackBar(context, msg, isError: true);
               return;
             }
             break;
@@ -242,9 +314,8 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
 
       if (parsedRows.isEmpty) {
         final emptyDetail = _tradeImportEmptyDetail(l10n, source, isXlsx);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(emptyDetail)),
-        );
+        _setCsvImportFeedback(emptyDetail, isError: true);
+        _showCsvImportSnackBar(context, emptyDetail, isError: true);
         await logPaychekUserCsvImportEvent(
           software: source,
           status: PaychekCsvImportLogStatus.empty,
@@ -342,6 +413,42 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         existingIds.add(baseId);
       }
 
+      if (pendingImports.isEmpty) {
+        if (!context.mounted) return;
+        final dupSuffix = skippedCount > 0
+            ? l10n.tradeImportDuplicatesOnlySuffix(skippedCount)
+            : '';
+        final summary = l10n.tradeImportNoneNew(source, dupSuffix);
+        _setCsvImportFeedback(summary, isError: true);
+        _showCsvImportSnackBar(context, summary, isError: true);
+        await logPaychekUserCsvImportEvent(
+          software: source,
+          status: PaychekCsvImportLogStatus.empty,
+          tradeCount: 0,
+          skippedDuplicates: skippedCount,
+          parsedRowCount: parsedRows.length,
+          fileName: file.name,
+          message: summary,
+        );
+        return;
+      }
+
+      if (!context.mounted) return;
+      final confirmed = await _confirmCsvJournalImport(
+        context,
+        count: pendingImports.length,
+        source: source,
+        skippedDuplicates: skippedCount,
+        skippedLiteMonthlyCap: skippedLiteMonthlyCap,
+      );
+      if (!confirmed) {
+        if (!context.mounted) return;
+        final cancelled = l10n.tradeImportCancelled;
+        _setCsvImportFeedback(cancelled, isError: false);
+        _showCsvImportSnackBar(context, cancelled);
+        return;
+      }
+
       final taggedImports = applySessionMindsetToIncomingTrades(
         existing: store.items,
         incoming: pendingImports,
@@ -365,10 +472,12 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
         summary +=
             ' ${l10n.ajouterTradeLiteMonthlyLimitImportSkipped(skippedLiteMonthlyCap, TradeLiteMonthlyLimit.maxTradesPerCalendarMonthNonPro)}';
       }
-      setState(() {
-        _lastCsvImportFeedback = summary;
-        _lastCsvImportFeedbackIsError = importedCount == 0;
-      });
+      _setCsvImportFeedback(summary, isError: importedCount == 0);
+      _showCsvImportSnackBar(
+        context,
+        summary,
+        isError: importedCount == 0,
+      );
       if (importedCount > 0) {
         await bumpPaychekUserImportedTradesCount(importedCount);
       }
@@ -383,10 +492,9 @@ extension _AjouterTradePageStateCsv on _AjouterTradePageState {
       );
     } catch (e) {
       if (!context.mounted) return;
-      setState(() {
-        _lastCsvImportFeedback = l10n.tradeImportFailed('$e');
-        _lastCsvImportFeedbackIsError = true;
-      });
+      final msg = l10n.tradeImportFailed('$e');
+      _setCsvImportFeedback(msg, isError: true);
+      _showCsvImportSnackBar(context, msg, isError: true);
       await logPaychekUserCsvImportEvent(
         software: _selectedCsvSoftware ?? 'inconnu',
         status: PaychekCsvImportLogStatus.error,

@@ -217,24 +217,27 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
       cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
       sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
     );
-    final csvCard = AjouterTradeCsvSection(
-      labelStyle: labelStyle,
-      mutedStyle: mutedStyle,
-      selectedSource: _selectedCsvSoftware,
-      options: _AjouterTradePageState._csvSoftwareOptions,
-      onSourceChanged: (value) {
-        setState(() {
-          _selectedCsvSoftware = value;
-          _lastCsvImportFeedback = null;
-          _lastCsvImportFeedbackIsError = false;
-        });
-      },
-      onImportTap: () => _importFromSelectedCsvSource(context),
-      importedFileName: _lastImportedFileName,
-      importFeedbackMessage: _lastCsvImportFeedback,
-      importFeedbackIsError: _lastCsvImportFeedbackIsError,
-      cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
-      sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
+    final csvCard = KeyedSubtree(
+      key: _csvImportFeedbackKey,
+      child: AjouterTradeCsvSection(
+        labelStyle: labelStyle,
+        mutedStyle: mutedStyle,
+        selectedSource: _selectedCsvSoftware,
+        options: _AjouterTradePageState._csvSoftwareOptions,
+        onSourceChanged: (value) {
+          setState(() {
+            _selectedCsvSoftware = value;
+            _lastCsvImportFeedback = null;
+            _lastCsvImportFeedbackIsError = false;
+          });
+        },
+        onImportTap: () => _importFromSelectedCsvSource(context),
+        importedFileName: _lastImportedFileName,
+        importFeedbackMessage: _lastCsvImportFeedback,
+        importFeedbackIsError: _lastCsvImportFeedbackIsError,
+        cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
+        sectionTitleColor: kIsWeb ? PaychekWebTokens.sectionLabelCopper : null,
+      ),
     );
     final analyseCard = AjouterTradeAnalyseAttachmentCard(
       labelStyle: labelStyle,
@@ -251,6 +254,7 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
 
     final noteCard = AjouterTradeNoteCard(
       controller: _tradeNoteController,
+      focusNode: _tradeNoteFocus,
       labelStyle: labelStyle,
       mutedStyle: mutedStyle,
       cardDecoration: kIsWeb ? PaychekWebTokens.shellCardDecoration() : null,
@@ -286,7 +290,10 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             columnGap: gap >= 20 ? 16 : 12,
           ),
           SizedBox(height: gap >= 20 ? 16 : 12),
-          liteLockDisciplineExtras(noteCard),
+          KeyedSubtree(
+            key: _tradeNoteCardKey,
+            child: liteLockDisciplineExtras(noteCard),
+          ),
         ],
       );
     }
@@ -422,14 +429,10 @@ extension _AjouterTradePageUi on _AjouterTradePageState {
             ),
             Expanded(
               child: SingleChildScrollView(
+                controller: _mobileTradeScrollController,
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  16,
-                  20,
-                  32 + MediaQuery.viewInsetsOf(context).bottom,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
                 child: GestureDetector(
                   behavior: HitTestBehavior.deferToChild,
                   onTap: () => FocusManager.instance.primaryFocus?.unfocus(),

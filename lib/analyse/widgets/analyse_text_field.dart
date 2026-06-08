@@ -82,6 +82,9 @@ class _AnalyseTextFieldState extends State<AnalyseTextField> {
       child: TextField(
         controller: _controller,
         onChanged: widget.onChanged,
+        scrollPadding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 120,
+        ),
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         minLines: effectiveMin,
         maxLines: effectiveMax,

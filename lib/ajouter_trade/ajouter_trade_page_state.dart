@@ -91,6 +91,8 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   final TextEditingController _entreeController = TextEditingController();
   final TextEditingController _sortieController = TextEditingController();
   final TextEditingController _tradeNoteController = TextEditingController();
+  final FocusNode _tradeNoteFocus = FocusNode();
+  final GlobalKey _tradeNoteCardKey = GlobalKey();
   DateTime _entreeDateTime = DateTime.now();
   DateTime _sortieDateTime = DateTime.now();
   bool _breakeven = false;
@@ -229,6 +231,8 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
   /// Résumé dernier import (trades / doublons) — affiché sous le bouton CSV.
   String? _lastCsvImportFeedback;
   bool _lastCsvImportFeedbackIsError = false;
+  final GlobalKey _csvImportFeedbackKey = GlobalKey();
+  final ScrollController _mobileTradeScrollController = ScrollController();
   String? _editingTradeId;
   String? _editingPortfolioId;
 
@@ -376,6 +380,7 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     _loadDisciplinePrefsFromStorage();
     _applyNewsFlagsFromChecklist();
     _sortieController.addListener(_onSortieTextChanged);
+    _tradeNoteFocus.addListener(_onTradeNoteFocusChanged);
     StrategieSetupsStore.ensureLoaded().then((_) async {
       await StrategieMesReglesStore.ensureLoaded();
       if (!mounted) return;
@@ -389,6 +394,36 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
       if (!match) {
         setState(() => _strategieChoisie = titres.first);
       }
+    });
+  }
+
+  void _onTradeNoteFocusChanged() {
+    if (kIsWeb || !_tradeNoteFocus.hasFocus) return;
+    _revealTradeNoteField();
+  }
+
+  void _revealTradeNoteField() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_tradeNoteFocus.hasFocus) return;
+      final ctx = _tradeNoteCardKey.currentContext;
+      if (ctx == null || !ctx.mounted) return;
+      Scrollable.ensureVisible(
+        ctx,
+        alignment: 0.22,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+    });
+    Future<void>.delayed(const Duration(milliseconds: 320), () {
+      if (!mounted || !_tradeNoteFocus.hasFocus) return;
+      final ctx = _tradeNoteCardKey.currentContext;
+      if (ctx == null || !ctx.mounted) return;
+      Scrollable.ensureVisible(
+        ctx,
+        alignment: 0.18,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
@@ -529,9 +564,12 @@ class _AjouterTradePageState extends State<AjouterTradePage> {
     _prixPositionController.dispose();
     _entreeController.dispose();
     _sortieController.dispose();
+    _tradeNoteFocus.removeListener(_onTradeNoteFocusChanged);
+    _tradeNoteFocus.dispose();
     _tradeNoteController.dispose();
     _psychTagNewController.dispose();
     _psychTagNewFocus.dispose();
+    _mobileTradeScrollController.dispose();
     super.dispose();
   }
 

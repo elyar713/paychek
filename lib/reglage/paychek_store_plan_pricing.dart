@@ -10,7 +10,7 @@ import 'paychek_subscription_platform.dart';
 
 /// Tarifs paywall : web = USD fixe ; iOS = catalogue régional ; Android = Play natif.
 ///
-/// Web : 8,99 / 20,95 / 59,99 $ (tous pays).
+/// Web : 8,99 / 20,99 / 59,99 $ (tous pays).
 /// iOS : catalogue pays/devise (grille Apple, hors StoreKit à l’affichage ; achat via App Store).
 /// Android : Google Play (`queryProductDetails`), repli catalogue si indisponible.
 abstract final class PaychekStorePlanPricing {
@@ -85,7 +85,7 @@ abstract final class PaychekStorePlanPricing {
     return load(locale: locale);
   }
 
-  /// Web : paywall toujours en USD standard ($8.99 / $20.95 / $59.99), tous pays.
+  /// Web : paywall toujours en USD standard ($8.99 / $20.99 / $59.99), tous pays.
   static Future<PaychekPlanPricingSnapshot> loadWebUsdPricing() async {
     debugPrint('[Paychek] paywall web USD standard (fixed catalog)');
     return PaychekRegionalPriceDefaults.usStandardSnapshot();

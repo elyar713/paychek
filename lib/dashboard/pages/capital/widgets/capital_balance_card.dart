@@ -333,31 +333,35 @@ class CapitalBalanceCard extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: Transform.translate(
-                                  offset: const Offset(-4, -10),
-                                  child: Text.rich(
-                                    TextSpan(
-                                      children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Transform.translate(
+                                      offset: const Offset(-4, -10),
+                                      child: Text.rich(
                                         TextSpan(
-                                          text: mainAmount,
-                                          style: amountStyle,
+                                          children: [
+                                            TextSpan(
+                                              text: mainAmount,
+                                              style: amountStyle,
+                                            ),
+                                            TextSpan(
+                                              text: ' $sym',
+                                              style: amountStyle?.copyWith(
+                                                fontSize: 17,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        TextSpan(
-                                          text: ' $sym',
-                                          style: amountStyle?.copyWith(
-                                            fontSize: 17,
-                                          ),
-                                        ),
-                                      ],
+                                        maxLines: 1,
+                                      ),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
-                              const Spacer(),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,

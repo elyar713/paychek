@@ -130,7 +130,7 @@
       }
     }
   },
-  "tradeImportSummary": "{count} operación(es) importada(s) desde {source}{duplicates}.",
+  "tradeImportSummary": "{count} operación(es) guardada(s) en el diario desde {source}{duplicates}.",
   "@tradeImportSummary": {
     "placeholders": {
       "count": {
@@ -144,6 +144,23 @@
       }
     }
   },
+  "tradeImportConfirmTitle": "¿Importar al diario?",
+  "tradeImportConfirmBody": "{count} operación(es) de {source} se guardarán directamente (Guardar no aplica).{duplicates}",
+  "@tradeImportConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportConfirmAction": "Importar al diario",
+  "tradeImportCancelled": "Importación cancelada — ninguna operación guardada.",
   "tradeImportDuplicatesSuffix": " · {count} duplicado(s) ignorado(s)",
   "@tradeImportDuplicatesSuffix": {
     "placeholders": {
@@ -611,6 +628,9 @@
   "checklistScheduleWarningHeading": "4 · Alert time",
   "checklistSchedulePickTime": "Pick time",
   "checklistScheduleCalendarTooltip": "Date and reminder settings",
+  "settingsChecklistRemindersTitle": "Checklist reminders",
+  "settingsChecklistRemindersSubtitle": "Notify at the time set on each row (Edit → calendar).",
+  "checklistScheduleNotificationHint": "On mobile, a local notification is sent at this time (permission required).",
   "clearAll": "Borrar todo",
   "confirm": "Confirmar",
   "currencyNameHint": "p.ej. CHF, XOF",
@@ -1097,7 +1117,7 @@
   "paywallMobilePlanAnnualBilling": "Facturado al año",
   "paywallMobilePlanQuarterlyBilling": "Cada 3 meses",
   "paywallMobilePlanMonthlyBilling": "Facturado al mes",
-  "paywallMobilePlanMonthlyCommitment": "Compromiso mensual",
+  "paywallMobilePlanMonthlyCommitment": "Sin compromiso",
   "paywallMobilePlanSavings44": "Ahorra un 44 %",
   "paywallMobilePlanSavingsPercent": "Ahorra un {percent} %",
   "@paywallMobilePlanSavingsPercent": {

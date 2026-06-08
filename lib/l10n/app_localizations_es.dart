@@ -260,8 +260,23 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String tradeImportSummary(int count, String source, String duplicates) {
-    return '$count operación(es) importada(s) desde $source$duplicates.';
+    return '$count operación(es) guardada(s) en el diario desde $source$duplicates.';
   }
+
+  @override
+  String get tradeImportConfirmTitle => '¿Importar al diario?';
+
+  @override
+  String tradeImportConfirmBody(int count, String source, String duplicates) {
+    return '$count operación(es) de $source se guardarán directamente (Guardar no aplica).$duplicates';
+  }
+
+  @override
+  String get tradeImportConfirmAction => 'Importar al diario';
+
+  @override
+  String get tradeImportCancelled =>
+      'Importación cancelada — ninguna operación guardada.';
 
   @override
   String tradeImportDuplicatesSuffix(int count) {
@@ -1445,6 +1460,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
+
+  @override
+  String get settingsChecklistRemindersTitle => 'Checklist reminders';
+
+  @override
+  String get settingsChecklistRemindersSubtitle =>
+      'Notify at the time set on each row (Edit → calendar).';
+
+  @override
+  String get checklistScheduleNotificationHint =>
+      'On mobile, a local notification is sent at this time (permission required).';
 
   @override
   String get clearAll => 'Borrar todo';
@@ -2803,7 +2829,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallMobilePlanMonthlyBilling => 'Facturado al mes';
 
   @override
-  String get paywallMobilePlanMonthlyCommitment => 'Compromiso mensual';
+  String get paywallMobilePlanMonthlyCommitment => 'Sin compromiso';
 
   @override
   String get paywallMobilePlanSavings44 => 'Ahorra un 44 %';

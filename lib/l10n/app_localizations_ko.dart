@@ -241,8 +241,22 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String tradeImportSummary(int count, String source, String duplicates) {
-    return '$source에서 $count건을 가져왔습니다$duplicates.';
+    return '$source에서 $count건의 거래가 저널에 저장되었습니다$duplicates.';
   }
+
+  @override
+  String get tradeImportConfirmTitle => '저널로 가져올까요?';
+
+  @override
+  String tradeImportConfirmBody(int count, String source, String duplicates) {
+    return '$source의 $count건 거래가 바로 저장됩니다(저장 버튼과 무관).$duplicates';
+  }
+
+  @override
+  String get tradeImportConfirmAction => '저널로 가져오기';
+
+  @override
+  String get tradeImportCancelled => '가져오기 취소 — 저장된 거래 없음.';
 
   @override
   String tradeImportDuplicatesSuffix(int count) {
@@ -1383,6 +1397,17 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
+
+  @override
+  String get settingsChecklistRemindersTitle => 'Checklist reminders';
+
+  @override
+  String get settingsChecklistRemindersSubtitle =>
+      'Notify at the time set on each row (Edit → calendar).';
+
+  @override
+  String get checklistScheduleNotificationHint =>
+      'On mobile, a local notification is sent at this time (permission required).';
 
   @override
   String get clearAll => '모두 지우기';
@@ -2692,7 +2717,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywallMobilePlanMonthlyBilling => '월간 결제';
 
   @override
-  String get paywallMobilePlanMonthlyCommitment => '월 단위 약정';
+  String get paywallMobilePlanMonthlyCommitment => '약정 없음';
 
   @override
   String get paywallMobilePlanSavings44 => '44% 절약';

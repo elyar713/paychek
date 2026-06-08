@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../dashboard/dashboard_main_bottom_nav.dart';
 import '../dashboard/dashboard_tokens.dart';
 
 /// Rayon des coins des pastilles (carré visuel, coins légèrement arrondis).
@@ -167,6 +169,16 @@ class _PsychNewTagField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final navClearance = kIsWeb
+        ? 24.0
+        : DashboardMainBottomNav.totalHeight(mq.padding.bottom);
+    final scrollPadding = EdgeInsets.fromLTRB(
+      20,
+      80,
+      20,
+      navClearance + mq.viewInsets.bottom + 48,
+    );
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: 100,
@@ -185,6 +197,7 @@ class _PsychNewTagField extends StatelessWidget {
         child: TextField(
           controller: controller,
           focusNode: focusNode,
+          scrollPadding: scrollPadding,
           style: const TextStyle(
             color: DashboardTokens.onMatteEmphasis,
             fontWeight: FontWeight.w700,

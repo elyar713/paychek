@@ -62,9 +62,9 @@ abstract final class PaychekRegionalPriceDefaults {
     return snapshotForCountry(countryFromLocale(locale));
   }
 
-  /// Tarif web global : toujours USD 8,99 / 20,97 / 59,99 (tous pays).
+  /// Tarif web global : toujours USD 8,99 / 20,99 / 59,99 (tous pays).
   static PaychekPlanPricingSnapshot usStandardSnapshot() {
-    const amounts = _Amounts(8.99, 20.95, 59.99);
+    const amounts = _Amounts(8.99, 20.99, 59.99);
     const currency = 'USD';
     const formatLocale = 'en_US';
     final formatter = NumberFormat.simpleCurrency(
@@ -512,7 +512,7 @@ const Map<String, _Amounts> _pricesByCurrency = {
   'TRY': _Amounts(349.99, 799.99, 2299.99),
   'TWD': _Amounts(290, 670, 1990),
   'UAH': _Amounts(399, 929, 2699),
-  'USD': _Amounts(8.99, 20.95, 59.99),
+  'USD': _Amounts(8.99, 20.99, 59.99),
   'ZAR': _Amounts(169.99, 399.99, 1099.99),
 };
 

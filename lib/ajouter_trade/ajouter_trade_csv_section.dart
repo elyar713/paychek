@@ -163,16 +163,48 @@ class AjouterTradeCsvSection extends StatelessWidget {
           ),
           if (importFeedbackMessage != null &&
               importFeedbackMessage!.trim().isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              importFeedbackMessage!.trim(),
-              style: TextStyle(
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
                 color: importFeedbackIsError
-                    ? const Color(0xFFE57373)
-                    : DashboardTokens.labelGrey,
-                fontSize: 11,
-                height: 1.4,
-                fontWeight: FontWeight.w500,
+                    ? const Color(0xFF2A1810)
+                    : const Color(0xFF102A22),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: importFeedbackIsError
+                      ? const Color(0xFFE57373).withValues(alpha: 0.5)
+                      : DashboardTokens.accent.withValues(alpha: 0.45),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    importFeedbackIsError
+                        ? Icons.error_outline_rounded
+                        : Icons.check_circle_outline_rounded,
+                    size: 18,
+                    color: importFeedbackIsError
+                        ? const Color(0xFFE57373)
+                        : DashboardTokens.accent,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      importFeedbackMessage!.trim(),
+                      style: TextStyle(
+                        color: importFeedbackIsError
+                            ? const Color(0xFFE57373)
+                            : DashboardTokens.onMatteEmphasis,
+                        fontSize: 12,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

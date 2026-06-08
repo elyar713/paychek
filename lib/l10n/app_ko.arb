@@ -130,7 +130,7 @@
       }
     }
   },
-  "tradeImportSummary": "{source}에서 {count}건을 가져왔습니다{duplicates}.",
+  "tradeImportSummary": "{source}에서 {count}건의 거래가 저널에 저장되었습니다{duplicates}.",
   "@tradeImportSummary": {
     "placeholders": {
       "count": {
@@ -144,6 +144,23 @@
       }
     }
   },
+  "tradeImportConfirmTitle": "저널로 가져올까요?",
+  "tradeImportConfirmBody": "{source}의 {count}건 거래가 바로 저장됩니다(저장 버튼과 무관).{duplicates}",
+  "@tradeImportConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "source": {
+        "type": "String"
+      },
+      "duplicates": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeImportConfirmAction": "저널로 가져오기",
+  "tradeImportCancelled": "가져오기 취소 — 저장된 거래 없음.",
   "tradeImportDuplicatesSuffix": " · 중복 {count}건 무시",
   "@tradeImportDuplicatesSuffix": {
     "placeholders": {
@@ -611,6 +628,9 @@
   "checklistScheduleWarningHeading": "4 · Alert time",
   "checklistSchedulePickTime": "Pick time",
   "checklistScheduleCalendarTooltip": "Date and reminder settings",
+  "settingsChecklistRemindersTitle": "Checklist reminders",
+  "settingsChecklistRemindersSubtitle": "Notify at the time set on each row (Edit → calendar).",
+  "checklistScheduleNotificationHint": "On mobile, a local notification is sent at this time (permission required).",
   "clearAll": "모두 지우기",
   "confirm": "확인",
   "currencyNameHint": "예: CHF, XOF",
@@ -1097,7 +1117,7 @@
   "paywallMobilePlanAnnualBilling": "연간 결제",
   "paywallMobilePlanQuarterlyBilling": "3개월마다",
   "paywallMobilePlanMonthlyBilling": "월간 결제",
-  "paywallMobilePlanMonthlyCommitment": "월 단위 약정",
+  "paywallMobilePlanMonthlyCommitment": "약정 없음",
   "paywallMobilePlanSavings44": "44% 절약",
   "paywallMobilePlanSavingsPercent": "{percent}% 절약",
   "@paywallMobilePlanSavingsPercent": {

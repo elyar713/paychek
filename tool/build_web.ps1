@@ -4,3 +4,5 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 flutter build web --release --no-wasm-dry-run --no-tree-shake-icons
+Write-Host ""
+Write-Host "Build web OK — sortie dans build/web/" -ForegroundColor Green

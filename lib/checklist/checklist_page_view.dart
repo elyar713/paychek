@@ -337,8 +337,13 @@ class ChecklistPageView extends StatelessWidget {
             return Listener(
               behavior: HitTestBehavior.translucent,
               onPointerDown: (e) {
-                if (c.isPointerOnEditingSectionCard(e.position)) return;
-                c.finishSectionEditFromOutsideTap();
+                if (c.isPointerOnEditingSectionCard(e.position)) {
+                  c.resetOutsideSectionEditTap();
+                  return;
+                }
+                c.handleOutsidePointerWhileSectionEditing(
+                  requireDoubleTap: !wide,
+                );
               },
               child: scroll,
             );

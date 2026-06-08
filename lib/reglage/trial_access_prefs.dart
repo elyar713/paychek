@@ -451,6 +451,9 @@ abstract final class TrialAccessPrefs {
     // (évite un 2e essai de 7 j sur Android quand le réseau/cache diffère de l’iPhone).
 
     final localSub = p.getBool(_kSubscriberActive) ?? false;
+    if (forceServer && localSub && !subRow.active && !row.docPro) {
+      await p.setBool(_kSubscriberActive, false);
+    }
     final ms = p.getInt(_kTrialStartUtcMs);
     final anchorUtc = ms != null
         ? DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true)

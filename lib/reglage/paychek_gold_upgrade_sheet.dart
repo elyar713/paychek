@@ -7,6 +7,7 @@ import 'gold_upgrade/gold_upgrade_embed.dart';
 import 'paychek_billing_plan.dart';
 import 'paychek_entitlement_local_sync.dart';
 import 'paychek_subscription_flow_result.dart';
+import 'paychek_subscription_platform.dart';
 import 'paywall_subscription_feedback.dart';
 import 'subscription_launch_helper.dart';
 
@@ -35,7 +36,10 @@ Future<void> showPaychekGoldUpgradeSheet({required BuildContext context}) {
           );
           return;
         }
-        await PaychekEntitlementLocalSync.markPurchaseVerified();
+        // Stripe web : result.ok = checkout ouvert — Pro seulement après paiement confirmé.
+        if (paychekUsesNativeStoreIap) {
+          await PaychekEntitlementLocalSync.refreshProFromServer();
+        }
         if (!sheetContext.mounted) return;
         Navigator.pop(sheetContext);
       }

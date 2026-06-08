@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../dashboard/dashboard_main_bottom_nav.dart';
 import '../dashboard/dashboard_tokens.dart';
 
 /// Hauteur des pilules Actif / Qté / Entrée / Sortie (carte instrument).
@@ -72,6 +74,16 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
 
     final h = fieldHeight ?? _defaultFieldHeight;
     final horizontalPad = fs <= 11 ? 6.0 : 8.0;
+    final mq = MediaQuery.of(context);
+    final navClearance = kIsWeb
+        ? 24.0
+        : DashboardMainBottomNav.totalHeight(mq.padding.bottom);
+    final scrollPadding = EdgeInsets.fromLTRB(
+      20,
+      80,
+      20,
+      navClearance + mq.viewInsets.bottom + 32,
+    );
     final fieldBox = Container(
       height: h,
       decoration: BoxDecoration(
@@ -96,7 +108,7 @@ class AjouterTradeLabeledFieldBox extends StatelessWidget {
         style: centeredStyle,
         cursorColor: DashboardTokens.accent,
         showCursor: true,
-        scrollPadding: EdgeInsets.zero,
+        scrollPadding: scrollPadding,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: hintStyle,

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'paychek_entitlement_local_sync.dart';
+import 'trial_access_prefs.dart';
 
 /// Région des Cloud Functions Paychek (webhook, sync Stripe, support).
 const String kPaychekFunctionsRegion = 'europe-west1';
@@ -27,9 +28,13 @@ class PaychekStripeEntitlementSync {
         final result = await callable.call<Object?>();
         final data = result.data;
         if (data is Map && data['active'] == true) {
-          await PaychekEntitlementLocalSync.markPurchaseVerified();
+          await PaychekEntitlementLocalSync.refreshEntitlementFromServer(
+            purchaseActive: true,
+          );
           return true;
         }
+        await _clearStaleLocalProIfServerInactive();
+        return false;
       } on FirebaseFunctionsException catch (e, st) {
         debugPrint(
           '[Paychek] syncPaychekStripeEntitlement ${e.code}: ${e.message}\n$st',
@@ -38,6 +43,29 @@ class PaychekStripeEntitlementSync {
         debugPrint('[Paychek] syncPaychekStripeEntitlement $e\n$st');
       }
     }
+    await _clearStaleLocalProIfServerInactive();
     return false;
   }
+
+  /// Retire un flag Pro local posé par erreur (checkout Stripe non payé).
+
+  static Future<void> _clearStaleLocalProIfServerInactive() async {
+
+    TrialAccessPrefs.invalidateSignedInAccessCache();
+
+    final snap = await TrialAccessPrefs.loadGateStateAndAccountEntitlement(
+
+      forceServer: true,
+
+    );
+
+    if (!snap.entitlement.isPro) {
+
+      await PaychekEntitlementLocalSync.markSubscriptionInactive();
+
+    }
+
+  }
+
 }
+

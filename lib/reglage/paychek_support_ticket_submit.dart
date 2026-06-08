@@ -92,12 +92,20 @@ String paychekSupportContentTypeForFileName(String fileName) {
   }
 }
 
-/// Préfère [FilePicker] avec `withData: true` ; sur mobile, secours lecture [path].
+/// Préfère [FilePicker] avec `withData: true` ; secours [path] (mobile) puis [readStream] (web).
 Future<Uint8List?> paychekSupportReadPlatformFileBytes(PlatformFile f) async {
   if (f.bytes != null && f.bytes!.isNotEmpty) return f.bytes;
   if (!kIsWeb) {
     final fromPath = await paychekSupportReadLocalPathAsBytes(f.path);
     if (fromPath != null && fromPath.isNotEmpty) return fromPath;
+  }
+  final stream = f.readStream;
+  if (stream != null) {
+    final chunks = <int>[];
+    await for (final chunk in stream) {
+      chunks.addAll(chunk);
+    }
+    if (chunks.isNotEmpty) return Uint8List.fromList(chunks);
   }
   debugPrint(
     '[Paychek] Fichier sans octets (bytes vides, path ${kIsWeb ? "n/a web" : f.path}).',

@@ -17,13 +17,13 @@ abstract final class PaychekBillingPlanCatalog {
 
   static String pricePerMonth(PaychekBillingCycle cycle) => switch (cycle) {
         PaychekBillingCycle.monthly => '8,99',
-        PaychekBillingCycle.quarterly => '6,99',
+        PaychekBillingCycle.quarterly => '7,00',
         PaychekBillingCycle.annual => '4,99',
       };
 
   static String totalPrice(PaychekBillingCycle cycle) => switch (cycle) {
         PaychekBillingCycle.monthly => '8,99',
-        PaychekBillingCycle.quarterly => '20,97',
+        PaychekBillingCycle.quarterly => '20,99',
         PaychekBillingCycle.annual => '59,99',
       };
 }

@@ -48,7 +48,10 @@ import 'analyse/analyse_firestore_sync.dart';
 import 'analyse/analyse_realtime_notifier.dart';
 import 'ajouter_trade/ajouter_trade_custom_actifs_storage.dart';
 import 'checklist/checklist_firestore_sync.dart';
+import 'checklist/checklist_models.dart';
+import 'checklist/checklist_notification_service.dart';
 import 'checklist/checklist_realtime_notifier.dart';
+import 'checklist/checklist_sections_storage.dart';
 import 'shared/paychek_frame_callbacks.dart';
 import 'shared/paychek_widgets_binding.dart';
 
@@ -99,6 +102,7 @@ Future<void> main() async {
 
   if (!kIsWeb) {
     unawaited(PaychekAppleIapService.ensureInitialized());
+    unawaited(ChecklistNotificationService.ensureInitialized());
   }
 
   // Windows : persistance SQLite + threads natifs → plantages / codec (ex. type 142) signalés côté FlutterFire.
@@ -637,6 +641,19 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
   }
 
   /// Re-ouverture de l’app : tirer le cloud **avant** tout push local (évite d’écraser le web).
+  Future<void> _resyncChecklistNotificationsFromPrefs() async {
+    if (kIsWeb) return;
+    try {
+      final raw = await ChecklistSectionsStorage.load();
+      if (raw == null || raw.isEmpty) return;
+      await ChecklistNotificationService.syncSections(
+        checklistEnsureProtectedSections(raw),
+      );
+    } catch (e, st) {
+      debugPrint('[Paychek] checklist notification resync: $e\n$st');
+    }
+  }
+
   Future<void> _pullSyncDataFromCloudOnResume() async {
     if (FirebaseAuth.instance.currentUser == null || !mounted) return;
     _capitalPortfolioCloudPushDebounce?.cancel();
@@ -653,6 +670,7 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
       ]);
       if (mounted) {
         ChecklistRealtimeNotifier.bump();
+        unawaited(_resyncChecklistNotificationsFromPrefs());
         AnalyseRealtimeNotifier.bumpReports();
         AnalyseRealtimeNotifier.bump();
         StrategieRealtimeNotifier.bump();

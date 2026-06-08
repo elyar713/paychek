@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
+import '../dashboard/dashboard_main_bottom_nav.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 
@@ -8,6 +10,7 @@ class AjouterTradeNoteCard extends StatelessWidget {
   const AjouterTradeNoteCard({
     super.key,
     required this.controller,
+    this.focusNode,
     required this.labelStyle,
     required this.mutedStyle,
     this.cardDecoration,
@@ -16,6 +19,7 @@ class AjouterTradeNoteCard extends StatelessWidget {
   });
 
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final TextStyle? labelStyle;
   final TextStyle? mutedStyle;
   final BoxDecoration? cardDecoration;
@@ -25,6 +29,16 @@ class AjouterTradeNoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final mq = MediaQuery.of(context);
+    final navClearance = kIsWeb
+        ? 24.0
+        : DashboardMainBottomNav.totalHeight(mq.padding.bottom);
+    final scrollPadding = EdgeInsets.fromLTRB(
+      20,
+      80,
+      20,
+      navClearance + mq.viewInsets.bottom + 48,
+    );
     final headerStyle = (labelStyle ??
             const TextStyle(
               color: DashboardTokens.onMatteEmphasis,
@@ -54,6 +68,8 @@ class AjouterTradeNoteCard extends StatelessWidget {
           const SizedBox(height: 8),
           TextField(
             controller: controller,
+            focusNode: focusNode,
+            scrollPadding: scrollPadding,
             maxLines: 4,
             minLines: 3,
             maxLength: maxLength,

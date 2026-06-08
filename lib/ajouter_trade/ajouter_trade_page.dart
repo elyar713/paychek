@@ -17,12 +17,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
+import '../dashboard/dashboard_main_bottom_nav.dart';
 import '../checklist/checklist_news_trade_classifier.dart';
 import '../checklist/checklist_page_controller.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../questionnaire/user_capital_scope.dart';
 import '../reglage/user_portfolio_scope.dart';
 import '../reglage/paychek_csv_import_log.dart';
+import '../reglage/paychek_support_ticket_submit.dart'
+    show paychekSupportReadPlatformFileBytes;
 import '../reglage/paychek_user_firestore.dart';
 import '../analyse/analyse_default_demo_seed.dart';
 import '../analyse/analyse_prep_checks.dart';

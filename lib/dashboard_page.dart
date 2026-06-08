@@ -745,6 +745,9 @@ class _DashboardPageState extends State<DashboardPage>
           final navTotal = useWebRail
               ? bottomInset
               : DashboardMainBottomNav.totalHeight(bottomInset);
+          // Overlays plein écran (hors Scaffold) : remonter le bas au-dessus du clavier.
+          final keyboardInset = mq.viewInsets.bottom;
+          final overlayBottom = navTotal + keyboardInset;
           final overlayLeftInset = WebDashboardConfig.overlayLeftInsetPx;
 
           void closePlus() => _closePlusMenu();
@@ -767,7 +770,8 @@ class _DashboardPageState extends State<DashboardPage>
               Scaffold(
                 backgroundColor: DashboardTokens.scaffoldMatte,
                 extendBody: true,
-                resizeToAvoidBottomInset: !useWebRail ? false : true,
+                // Onglet Ajouter trade : champs en bas (note) — le corps doit remonter au-dessus du clavier.
+                resizeToAvoidBottomInset: useWebRail || _bodyIndex == 2,
                 body: WebDashboardBody(
                   useWebRail: useWebRail,
                   navTotal: navTotal,
@@ -840,7 +844,7 @@ class _DashboardPageState extends State<DashboardPage>
                   left: overlayLeftInset,
                   right: 0,
                   top: 0,
-                  bottom: navTotal,
+                  bottom: overlayBottom,
                   child: ReglagePage(
                     onClose: () {
                       setState(() => _reglageOverlayOpen = false);
@@ -961,7 +965,7 @@ class _DashboardPageState extends State<DashboardPage>
                   left: overlayLeftInset,
                   right: 0,
                   top: 0,
-                  bottom: navTotal,
+                  bottom: overlayBottom,
                   child: switch (_overlayPage) {
                     _overlayMental => _wrapLiteProOverlayPage(
                         MentalStatePage(
