@@ -3599,7 +3599,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get performancePlanAnalysisSectionEmpty =>
-      '연결된 플랜이 있는 트레이드가 없습니다. 내 분석 보고서를 연결하면 플랜 준수별 승률을 볼 수 있습니다.';
+      '연결된 플랜이 있는 트레이드가 없습니다. 내 분석 보고서를 연결하면 플랜 준수별 WR을 볼 수 있습니다.';
 
   @override
   String get tradeStrategieExecutionNoData => '—';
@@ -4010,5 +4010,5 @@ class AppLocalizationsKo extends AppLocalizations {
   String get validate => '확인';
 
   @override
-  String get winrate => '승률';
+  String get winrate => 'WR';
 }
