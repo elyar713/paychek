@@ -427,16 +427,16 @@
                 <div class="flex items-center gap-2 sm:gap-3">
                     <div class="relative group hidden sm:block">
                         <button type="button" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn">
-                            <img id="lang-trigger-flag" src="https://flagcdn.com/w40/fr.png" alt="FR" class="flag-icon">
-                            <span id="lang-trigger-code">FR</span>
+                            <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
+                            <span id="lang-trigger-code">EN</span>
                             <i class="fas fa-chevron-down text-[8px] opacity-50"></i>
                         </button>
                         <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]">
-                            <a href="#" onclick="landingSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="fr">
-                                <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
+                            <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
+                                <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
                             </a>
-                            <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="en">
-                                <img src="https://flagcdn.com/w40/gb.png" alt="" class="flag-icon"> ENGLISH
+                            <a href="#" onclick="landingSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="fr">
+                                <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
                             </a>
                             <a href="#" onclick="landingSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
                                 <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
@@ -1165,8 +1165,8 @@
 
         /** Codes alignés sur l’app Flutter ([ReglageLanguagePrefs.availableCodes]). */
         var LANDING_LANG_META = {
+            en: { flag: 'us', trigger: 'EN' },
             fr: { flag: 'fr', trigger: 'FR' },
-            en: { flag: 'gb', trigger: 'EN' },
             de: { flag: 'de', trigger: 'DE' },
             es: { flag: 'es', trigger: 'ES' },
             pt: { flag: 'pt', trigger: 'PT' },
@@ -1287,7 +1287,7 @@
             } catch (e) {}
             var initialLocale = typeof landingDetectInitialLocale === 'function'
                 ? landingDetectInitialLocale()
-                : 'fr';
+                : 'en';
             if (typeof landingSaveLocale === 'function') {
                 landingSaveLocale(initialLocale);
             }

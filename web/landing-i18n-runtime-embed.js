@@ -1,5 +1,5 @@
 function landingNormalizeLocale(raw) {
-  if (!raw || typeof raw !== "string") return "fr";
+  if (!raw || typeof raw !== "string") return "en";
   var c = raw.trim().toLowerCase();
   if (c.startsWith("en")) return "en";
   if (c.startsWith("de")) return "de";
@@ -7,13 +7,13 @@ function landingNormalizeLocale(raw) {
   if (c.startsWith("pt")) return "pt";
   if (c.startsWith("ko")) return "ko";
   if (c.startsWith("fr")) return "fr";
-  return "fr";
+  return "en";
 }
 
 function htmlLangFromCode(code) {
   var m = { fr: "fr", en: "en", de: "de", es: "es", pt: "pt", ko: "ko" };
   var n = landingNormalizeLocale(code);
-  return m[n] ? m[n] : "fr";
+  return m[n] ? m[n] : "en";
 }
 
 window.landingDetectInitialLocale = function landingDetectInitialLocale() {
@@ -21,11 +21,11 @@ window.landingDetectInitialLocale = function landingDetectInitialLocale() {
     var s = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("paychek_landing_lang") : null;
     if (s) return landingNormalizeLocale(s);
   } catch (_e0) {}
-  return landingNormalizeLocale(typeof navigator !== "undefined" && navigator.language ? navigator.language : "fr");
+  return landingNormalizeLocale(typeof navigator !== "undefined" && navigator.language ? navigator.language : "en");
 };
 
 window.landingSaveLocale = function landingSaveLocale(code) {
-  var n = landingNormalizeLocale(code || "fr");
+  var n = landingNormalizeLocale(code || "en");
   try {
     if (typeof sessionStorage !== "undefined") sessionStorage.setItem("paychek_landing_lang", n);
   } catch (_e1) {}

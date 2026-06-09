@@ -42,32 +42,36 @@ abstract final class ReglageLanguagePrefs {
     return null;
   }
 
-  /// Après connexion : reprend le choix fait sur la landing (`__guest`) si le compte
-  /// n’a pas encore de langue **ou** si le guest est plus récent (choix explicite landing).
-  ///
-  /// Retourne `true` si une promotion a eu lieu (le merge cloud ne doit pas l’écraser).
-  static Future<bool> promoteGuestLanguageToCurrentAccountIfNeeded() async {
+  /// `true` si ce compte a déjà une langue enregistrée localement (hors prefs guest landing).
+  static Future<bool> hasAccountScopedLanguage() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return false;
     final p = await SharedPreferences.getInstance();
     await _migrateLegacyGlobalIfNeeded(p);
-    final scopedCodeKey = paychekScopedPrefsKey(_kLanguageCodeBase);
-    final scopedAtKey = paychekScopedPrefsKey(_kUpdatedAtMsBase);
+    final scopedKey = paychekScopedPrefsKey(_kLanguageCodeBase);
+    return _readCodeIfValid(p.getString(scopedKey)) != null;
+  }
 
+  /// Après connexion : reprend le choix landing (`__guest`) uniquement si le compte
+  /// n’a encore aucune langue locale (première visite web / nouvelle inscription).
+  ///
+  /// Ne doit pas écraser une langue déjà choisie dans Réglages (autre appareil ou session).
+  static Future<bool> promoteGuestLanguageToCurrentAccountIfNeeded() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+    if (await hasAccountScopedLanguage()) return false;
+
+    final p = await SharedPreferences.getInstance();
+    await _migrateLegacyGlobalIfNeeded(p);
     final guestCode = _readCodeIfValid(
       p.getString(_guestScopedKey(_kLanguageCodeBase)),
     );
     if (guestCode == null) return false;
 
     final guestMs = p.getInt(_guestScopedKey(_kUpdatedAtMsBase)) ?? 0;
-    final scopedCode = _readCodeIfValid(p.getString(scopedCodeKey));
-    final scopedMs = p.getInt(scopedAtKey) ?? 0;
-
-    if (scopedCode != null && scopedMs >= guestMs && guestMs > 0) {
-      return false;
-    }
-
-    final ms = DateTime.now().millisecondsSinceEpoch;
+    final ms = guestMs > 0
+        ? guestMs
+        : DateTime.now().millisecondsSinceEpoch;
     await save(guestCode, updatedAtMillis: ms);
     return true;
   }

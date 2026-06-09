@@ -110,13 +110,6 @@ const Duration _kAppLanguageFirestoreReadTimeout = Duration(seconds: 4);
 
 Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
   try {
-    final guestPromoted =
-        await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
-    if (guestPromoted) {
-      final code = await ReglageLanguagePrefs.loadCode();
-      await paychekPushUserAppLanguageToFirestore(code);
-      return;
-    }
     final DocumentSnapshot<Map<String, dynamic>> snap;
     try {
       snap = await FirebaseFirestore.instance
@@ -127,32 +120,46 @@ Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
     } on TimeoutException {
       return;
     }
-    if (!snap.exists) return;
-    final data = snap.data();
-    if (data == null) return;
-    final raw = data['appLanguageCode'];
-    if (raw is! String) return;
-    final cloudCode = raw.trim().toLowerCase();
-    if (!ReglageLanguagePrefs.availableCodes.contains(cloudCode)) return;
 
-    final cloudTs = data['appLanguageUpdatedAt'];
-    final cloudMs =
-        cloudTs is Timestamp ? cloudTs.millisecondsSinceEpoch : 0;
+    String? cloudCode;
+    var cloudMs = 0;
+    if (snap.exists) {
+      final data = snap.data();
+      final raw = data?['appLanguageCode'];
+      if (raw is String) {
+        final trimmed = raw.trim().toLowerCase();
+        if (ReglageLanguagePrefs.availableCodes.contains(trimmed)) {
+          cloudCode = trimmed;
+          final cloudTs = data?['appLanguageUpdatedAt'];
+          cloudMs =
+              cloudTs is Timestamp ? cloudTs.millisecondsSinceEpoch : 0;
+        }
+      }
+    }
 
     final localMs = await ReglageLanguagePrefs.loadUpdatedAtMillis();
     final localCode = await ReglageLanguagePrefs.loadCode();
+    final hasScoped = await ReglageLanguagePrefs.hasAccountScopedLanguage();
 
-    final takeCloud = cloudMs > localMs ||
-        (cloudMs == 0 &&
-            localMs == 0 &&
-            cloudCode != localCode);
+    if (cloudCode != null) {
+      final takeCloud = cloudMs > localMs ||
+          !hasScoped ||
+          (cloudMs == 0 && localMs == 0 && cloudCode != localCode);
+      if (takeCloud) {
+        final ms = cloudMs > 0
+            ? cloudMs
+            : DateTime.now().millisecondsSinceEpoch;
+        await ReglageLanguagePrefs.save(cloudCode, updatedAtMillis: ms);
+      }
+      return;
+    }
 
-    if (!takeCloud) return;
-
-    final ms = cloudMs > 0
-        ? cloudMs
-        : DateTime.now().millisecondsSinceEpoch;
-    await ReglageLanguagePrefs.save(cloudCode, updatedAtMillis: ms);
+    final guestPromoted =
+        await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
+    if (guestPromoted) {
+      final code = await ReglageLanguagePrefs.loadCode();
+      await paychekPushUserAppLanguageToFirestore(code);
+    }
   } catch (e, st) {
     debugPrint('[Paychek] paychekMergeAppLanguageFromFirestore: $e\n$st');
   }

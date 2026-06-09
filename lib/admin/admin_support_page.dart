@@ -1136,14 +1136,16 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                   ]
                 : null,
           ),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (selected)
-                  Container(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              if (selected)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
                     width: 3,
-                    margin: const EdgeInsets.only(right: 10),
                     decoration: BoxDecoration(
                       color: AdminTheme.accent,
                       borderRadius: BorderRadius.circular(99),
@@ -1155,8 +1157,11 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                       ],
                     ),
                   ),
-                Expanded(
-                  child: Column(
+                ),
+              Padding(
+                padding: EdgeInsets.only(left: selected ? 13 : 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Row(
@@ -1283,7 +1288,6 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
           ),
         ),
       ),
-    ),
     );
   }
 }

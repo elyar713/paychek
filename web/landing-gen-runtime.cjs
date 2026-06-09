@@ -17,7 +17,7 @@ function L(s) {
 }
 
 L('function landingNormalizeLocale(raw) {');
-L('  if (!raw || typeof raw !== "string") return "fr";');
+L('  if (!raw || typeof raw !== "string") return "en";');
 L('  var c = raw.trim().toLowerCase();');
 L('  if (c.startsWith("en")) return "en";');
 L('  if (c.startsWith("de")) return "de";');
@@ -25,14 +25,14 @@ L('  if (c.startsWith("es")) return "es";');
 L('  if (c.startsWith("pt")) return "pt";');
 L('  if (c.startsWith("ko")) return "ko";');
 L('  if (c.startsWith("fr")) return "fr";');
-L('  return "fr";');
+L('  return "en";');
 L('}');
 
 L('');
 L('function htmlLangFromCode(code) {');
 L('  var m = { fr: "fr", en: "en", de: "de", es: "es", pt: "pt", ko: "ko" };');
 L('  var n = landingNormalizeLocale(code);');
-L('  return m[n] ? m[n] : "fr";');
+L('  return m[n] ? m[n] : "en";');
 L('}');
 
 L('');
@@ -42,13 +42,13 @@ L('    var s = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("p
 L('    if (s) return landingNormalizeLocale(s);');
 L('  } catch (_e0) {}');
 L(
-  '  return landingNormalizeLocale(typeof navigator !== "undefined" && navigator.language ? navigator.language : "fr");'
+  '  return landingNormalizeLocale(typeof navigator !== "undefined" && navigator.language ? navigator.language : "en");'
 );
 L('};');
 
 L('');
 L('window.landingSaveLocale = function landingSaveLocale(code) {');
-L('  var n = landingNormalizeLocale(code || "fr");');
+L('  var n = landingNormalizeLocale(code || "en");');
 L('  try {');
 L('    if (typeof sessionStorage !== "undefined") sessionStorage.setItem("paychek_landing_lang", n);');
 L('  } catch (_e1) {}');

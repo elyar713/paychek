@@ -178,8 +178,7 @@ class _WebLandingUnauthenticatedWebState
       if (eventOrigin != null && eventOrigin != html.window.location.origin) {
         return;
       }
-      final codeFromLanding = map['code']?.toString().toLowerCase();
-      unawaited(_syncLocaleWithLanding(codeFromLanding));
+      unawaited(_syncLocaleWithLanding());
       return;
     }
 
@@ -209,15 +208,12 @@ class _WebLandingUnauthenticatedWebState
     }
   }
 
-  Future<void> _syncLocaleWithLanding(String? codeFromLanding) async {
-    if (!mounted || _tearDown) return;
-    if (codeFromLanding != null &&
-        ReglageLanguagePrefs.availableCodes.contains(codeFromLanding)) {
-      await widget.onLocaleSelected(codeFromLanding);
-    }
+  Future<void> _syncLocaleWithLanding() async {
     if (!mounted || _tearDown) return;
     final host = widget.hostContext;
     if (!host.mounted) return;
+    // Landing prête : pousser la langue app (guest / défaut) vers l’iframe, sans
+    // écraser les prefs avec la locale détectée par la landing (navigateur).
     final code = ReglageLanguagePrefs.codeFromLocale(
       AppLocaleScope.of(host).locale,
     );
