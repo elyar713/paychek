@@ -1155,7 +1155,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get calcLabelTradesShort => 'Trades';
 
   @override
-  String get calcLabelWinRateShort => 'Win rate';
+  String get calcLabelWinRateShort => 'WR';
 
   @override
   String get calcLoss => 'Perte';
@@ -1207,7 +1207,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le nombre de trades doit être entre 1 et 2000.';
 
   @override
-  String get calcErrorWinRateRange => 'Le win rate doit être entre 0 et 100.';
+  String get calcErrorWinRateRange => 'Le WR doit être entre 0 et 100.';
 
   @override
   String get calcErrorRiskRange => 'Le risque (%) doit être entre 0 et 100.';
@@ -1489,7 +1489,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboardAiCoachBody =>
-      'Appuyez sur « Analyser » pour que l\'IA étudie vos statistiques de la semaine (Winrate, Horaires, Facteurs) et génère un conseil psychologique sur-mesure.';
+      'Appuyez sur « Analyser » pour que l\'IA étudie vos statistiques de la semaine (WR, Horaires, Facteurs) et génère un conseil psychologique sur-mesure.';
 
   @override
   String get dashboardAiCoachTitle => 'COACH IA PAYCHEK';
@@ -1555,7 +1555,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dashboardSuccessFactorsSubtitle =>
-      'Suivez l\'impact de vos habitudes sur votre Winrate.';
+      'Suivez l\'impact de vos habitudes sur votre WR.';
 
   @override
   String get dashboardSuccessFactorsTitle => 'FACTEURS DE RÉUSSITE';
@@ -1954,7 +1954,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get perf0Sub => 'Impact du stress et de la fatigue sur le Winrate';
+  String get perf0Sub => 'Impact du stress et de la fatigue sur le WR';
 
   @override
   String get perf0Title => 'Psychologie : Émotions & sommeil';
@@ -2008,7 +2008,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get perf8Title => 'Stratégie : Smart Money Concept (SMC)';
 
   @override
-  String get perf9Sub => 'Impact du risque financier sur le Winrate';
+  String get perf9Sub => 'Impact du risque financier sur le WR';
 
   @override
   String get perf9Title => 'Volume & taille de lot';
@@ -3735,7 +3735,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get performancePlanAnalysisSectionEmpty =>
-      'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.';
+      'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le WR par respect du plan.';
 
   @override
   String get tradeStrategieExecutionNoData => '—';
@@ -3890,7 +3890,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tradePdfTrades => 'Trades';
 
   @override
-  String get tradePdfWinRate => 'Win rate';
+  String get tradePdfWinRate => 'WR';
 
   @override
   String tradePctOfCapital(String percent) {
@@ -3954,7 +3954,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tradeSummaryTrades => 'TRADES';
 
   @override
-  String get tradeSummaryWinRate => 'WIN RATE';
+  String get tradeSummaryWinRate => 'WR';
 
   @override
   String get tradeTotalUpper => 'TOTAL';
@@ -3975,7 +3975,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tradeWinDayRingSubtitle => 'WIN (jour)';
 
   @override
-  String get tradeWinrateLabel => 'Winrate';
+  String get tradeWinrateLabel => 'WR';
 
   @override
   String get settingsTradingWeek5 => '5 jours (lun–ven)';
@@ -4005,7 +4005,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsDashOpenHomeButton => 'Voir l’accueil';
 
   @override
-  String get settingsDashSectionCapital => 'Capital et winrate';
+  String get settingsDashSectionCapital => 'Capital et WR';
 
   @override
   String get settingsDashSectionChecklist => 'Checklist';
@@ -4152,5 +4152,5 @@ class AppLocalizationsFr extends AppLocalizations {
   String get validate => 'Valider';
 
   @override
-  String get winrate => 'Winrate';
+  String get winrate => 'WR';
 }

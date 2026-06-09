@@ -2137,7 +2137,7 @@ abstract class AppLocalizations {
   /// No description provided for @calcLabelWinRateShort.
   ///
   /// In fr, this message translates to:
-  /// **'Win rate'**
+  /// **'WR'**
   String get calcLabelWinRateShort;
 
   /// No description provided for @calcLoss.
@@ -2239,7 +2239,7 @@ abstract class AppLocalizations {
   /// No description provided for @calcErrorWinRateRange.
   ///
   /// In fr, this message translates to:
-  /// **'Le win rate doit être entre 0 et 100.'**
+  /// **'Le WR doit être entre 0 et 100.'**
   String get calcErrorWinRateRange;
 
   /// No description provided for @calcErrorRiskRange.
@@ -2749,7 +2749,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardAiCoachBody.
   ///
   /// In fr, this message translates to:
-  /// **'Appuyez sur « Analyser » pour que l\'IA étudie vos statistiques de la semaine (Winrate, Horaires, Facteurs) et génère un conseil psychologique sur-mesure.'**
+  /// **'Appuyez sur « Analyser » pour que l\'IA étudie vos statistiques de la semaine (WR, Horaires, Facteurs) et génère un conseil psychologique sur-mesure.'**
   String get dashboardAiCoachBody;
 
   /// No description provided for @dashboardAiCoachTitle.
@@ -2875,7 +2875,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardSuccessFactorsSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Suivez l\'impact de vos habitudes sur votre Winrate.'**
+  /// **'Suivez l\'impact de vos habitudes sur votre WR.'**
   String get dashboardSuccessFactorsSubtitle;
 
   /// No description provided for @dashboardSuccessFactorsTitle.
@@ -3601,7 +3601,7 @@ abstract class AppLocalizations {
   /// No description provided for @perf0Sub.
   ///
   /// In fr, this message translates to:
-  /// **'Impact du stress et de la fatigue sur le Winrate'**
+  /// **'Impact du stress et de la fatigue sur le WR'**
   String get perf0Sub;
 
   /// No description provided for @perf0Title.
@@ -3709,7 +3709,7 @@ abstract class AppLocalizations {
   /// No description provided for @perf9Sub.
   ///
   /// In fr, this message translates to:
-  /// **'Impact du risque financier sur le Winrate'**
+  /// **'Impact du risque financier sur le WR'**
   String get perf9Sub;
 
   /// No description provided for @perf9Title.
@@ -6841,7 +6841,7 @@ abstract class AppLocalizations {
   /// No description provided for @performancePlanAnalysisSectionEmpty.
   ///
   /// In fr, this message translates to:
-  /// **'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.'**
+  /// **'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le WR par respect du plan.'**
   String get performancePlanAnalysisSectionEmpty;
 
   /// No description provided for @tradeStrategieExecutionNoData.
@@ -7111,7 +7111,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradePdfWinRate.
   ///
   /// In fr, this message translates to:
-  /// **'Win rate'**
+  /// **'WR'**
   String get tradePdfWinRate;
 
   /// No description provided for @tradePctOfCapital.
@@ -7231,7 +7231,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradeSummaryWinRate.
   ///
   /// In fr, this message translates to:
-  /// **'WIN RATE'**
+  /// **'WR'**
   String get tradeSummaryWinRate;
 
   /// No description provided for @tradeTotalUpper.
@@ -7273,7 +7273,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradeWinrateLabel.
   ///
   /// In fr, this message translates to:
-  /// **'Winrate'**
+  /// **'WR'**
   String get tradeWinrateLabel;
 
   /// No description provided for @settingsTradingWeek5.
@@ -7327,7 +7327,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDashSectionCapital.
   ///
   /// In fr, this message translates to:
-  /// **'Capital et winrate'**
+  /// **'Capital et WR'**
   String get settingsDashSectionCapital;
 
   /// No description provided for @settingsDashSectionChecklist.
@@ -7591,7 +7591,7 @@ abstract class AppLocalizations {
   /// No description provided for @winrate.
   ///
   /// In fr, this message translates to:
-  /// **'Winrate'**
+  /// **'WR'**
   String get winrate;
 }
 

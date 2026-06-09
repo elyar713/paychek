@@ -1149,7 +1149,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calcLabelTradesShort => 'Trades';
 
   @override
-  String get calcLabelWinRateShort => 'Win rate';
+  String get calcLabelWinRateShort => 'WR';
 
   @override
   String get calcLoss => 'Loss';
@@ -1200,7 +1200,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calcErrorTradesRange => 'Trades must be between 1 and 2000.';
 
   @override
-  String get calcErrorWinRateRange => 'Win rate must be between 0 and 100.';
+  String get calcErrorWinRateRange => 'WR must be between 0 and 100.';
 
   @override
   String get calcErrorRiskRange => 'Risk % must be between 0 and 100.';
@@ -1480,7 +1480,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardAiCoachBody =>
-      'Tap « Analyze » so the AI reviews your weekly stats (Win rate, Hours, Factors) and generates tailored psychological advice.';
+      'Tap « Analyze » so the AI reviews your weekly stats (WR, Hours, Factors) and generates tailored psychological advice.';
 
   @override
   String get dashboardAiCoachTitle => 'PAYCHEK AI COACH';
@@ -1546,7 +1546,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardSuccessFactorsSubtitle =>
-      'Track how your habits impact your win rate.';
+      'Track how your habits impact your WR.';
 
   @override
   String get dashboardSuccessFactorsTitle => 'SUCCESS FACTORS';
@@ -1942,7 +1942,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
-  String get perf0Sub => 'Impact of stress and fatigue on win rate';
+  String get perf0Sub => 'Impact of stress and fatigue on WR';
 
   @override
   String get perf0Title => 'Psychology: Emotions & sleep';
@@ -1996,7 +1996,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get perf8Title => 'Strategy: Smart Money Concept (SMC)';
 
   @override
-  String get perf9Sub => 'Impact of financial risk on win rate';
+  String get perf9Sub => 'Impact of financial risk on WR';
 
   @override
   String get perf9Title => 'Volume & lot size';
@@ -2200,7 +2200,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get q3o1t => 'OFF THE ROLLER COASTER';
 
   @override
-  String get q3o2s => 'Improve win rate and entry precision.';
+  String get q3o2s => 'Improve WR and entry precision.';
 
   @override
   String get q3o2s2 =>
@@ -3697,7 +3697,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get performancePlanAnalysisSectionEmpty =>
-      'No trades with a linked plan. Attach a My Analysis report to your trades to see win rate by plan adherence.';
+      'No trades with a linked plan. Attach a My Analysis report to your trades to see WR by plan adherence.';
 
   @override
   String get tradeStrategieExecutionNoData => '—';
@@ -3852,7 +3852,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradePdfTrades => 'Trades';
 
   @override
-  String get tradePdfWinRate => 'Win rate';
+  String get tradePdfWinRate => 'WR';
 
   @override
   String tradePctOfCapital(String percent) {
@@ -3916,7 +3916,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradeSummaryTrades => 'TRADES';
 
   @override
-  String get tradeSummaryWinRate => 'WIN RATE';
+  String get tradeSummaryWinRate => 'WR';
 
   @override
   String get tradeTotalUpper => 'TOTAL';
@@ -3937,7 +3937,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tradeWinDayRingSubtitle => 'WIN (day)';
 
   @override
-  String get tradeWinrateLabel => 'Win rate';
+  String get tradeWinrateLabel => 'WR';
 
   @override
   String get settingsTradingWeek5 => '5 days (Mon–Fri)';
@@ -3967,7 +3967,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDashOpenHomeButton => 'View home';
 
   @override
-  String get settingsDashSectionCapital => 'Capital and win rate';
+  String get settingsDashSectionCapital => 'Capital and WR';
 
   @override
   String get settingsDashSectionChecklist => 'Checklist';
@@ -4111,5 +4111,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validate => 'Confirm';
 
   @override
-  String get winrate => 'Win rate';
+  String get winrate => 'WR';
 }

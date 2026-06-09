@@ -12,7 +12,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get actionAdd => 'Agregar';
 
   @override
-  String get addPortfolio => 'Agregar cartera';
+  String get addPortfolio => 'Agregar portafolio';
 
   @override
   String get ajouterTradeCapitalRequiredHint =>
@@ -41,7 +41,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Agregue un gráfico o una captura de pantalla de configuración (opcional).';
 
   @override
-  String get ajouterTradeCsvChooseSoftware => 'Choisir un logiciel';
+  String get ajouterTradeCsvChooseSoftware => 'Elegir plataforma';
 
   @override
   String get ajouterTradeAnalyseCardTitle => 'ANÁLISIS';
@@ -107,7 +107,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeNoteSectionTitle => 'Nota';
 
   @override
-  String get ajouterTradePageTitle => 'Agregar comercio';
+  String get ajouterTradePageTitle => 'Añadir trade';
 
   @override
   String get ajouterTradeErrorQtyPositive =>
@@ -344,7 +344,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ajouterTradeFieldSortie => 'Salida';
 
   @override
-  String get ajouterTradeCheckboxBreakeven => 'Punto de equilibrio';
+  String get ajouterTradeCheckboxBreakeven => 'Breakeven';
 
   @override
   String get ajouterTradeCheckboxPositionOpen => 'Posición abierta';
@@ -410,7 +410,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ajouterTradeDisciplineSettingsSubtitle =>
-      'Elija qué secciones están activas para este comercio.';
+      'Elige qué secciones están activas para este trade.';
 
   @override
   String get ajouterTradeDisciplineFeelingModeTitle => 'Modo sentimiento';
@@ -1159,7 +1159,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get calcLabelTradesShort => 'Vientos alisios';
 
   @override
-  String get calcLabelWinRateShort => 'Tasa de ganancia';
+  String get calcLabelWinRateShort => 'WR';
 
   @override
   String get calcLoss => 'Pérdida';
@@ -1212,7 +1212,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'El número de operaciones debe estar entre 1 y 2000.';
 
   @override
-  String get calcErrorWinRateRange => 'El win rate debe estar entre 0 y 100.';
+  String get calcErrorWinRateRange => 'El WR debe estar entre 0 y 100.';
 
   @override
   String get calcErrorRiskRange => 'El riesgo (%) debe estar entre 0 y 100.';
@@ -1424,53 +1424,53 @@ class AppLocalizationsEs extends AppLocalizations {
   String get checklistSectionRisque => 'GESTIÓN DE RIESGOS';
 
   @override
-  String get checklistScheduleTitle => 'Item reminder';
+  String get checklistScheduleTitle => 'Recordatorio del ítem';
 
   @override
-  String get checklistScheduleDefaultHeading => '1 · Default rule';
+  String get checklistScheduleDefaultHeading => '1 · Regla predeterminada';
 
   @override
-  String get checklistScheduleModeDaily => 'Every day';
+  String get checklistScheduleModeDaily => 'Todos los días';
 
   @override
-  String get checklistScheduleModeWeekly => 'Once a week';
+  String get checklistScheduleModeWeekly => '1× / semana';
 
   @override
-  String get checklistScheduleModeSpecificDate => 'Specific date';
+  String get checklistScheduleModeSpecificDate => 'Fecha concreta';
 
   @override
-  String get checklistScheduleUserDateHeading => '2 · Chosen date';
+  String get checklistScheduleUserDateHeading => '2 · Fecha elegida';
 
   @override
-  String get checklistSchedulePickDate => 'Pick a date';
+  String get checklistSchedulePickDate => 'Elegir fecha';
 
   @override
-  String get checklistScheduleWeekHeading => '3 · Day of week';
+  String get checklistScheduleWeekHeading => '3 · Día de la semana';
 
   @override
   String checklistScheduleNextOccurrence(String date) {
-    return 'Next date: $date';
+    return 'Próxima fecha: $date';
   }
 
   @override
-  String get checklistScheduleWarningHeading => '4 · Alert time';
+  String get checklistScheduleWarningHeading => '4 · Hora de alerta';
 
   @override
-  String get checklistSchedulePickTime => 'Pick time';
+  String get checklistSchedulePickTime => 'Elegir hora';
 
   @override
-  String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
+  String get checklistScheduleCalendarTooltip => 'Fecha y recordatorio';
 
   @override
-  String get settingsChecklistRemindersTitle => 'Checklist reminders';
+  String get settingsChecklistRemindersTitle => 'Recordatorios checklist';
 
   @override
   String get settingsChecklistRemindersSubtitle =>
-      'Notify at the time set on each row (Edit → calendar).';
+      'Notificación a la hora definida en cada fila (Editar → calendario).';
 
   @override
   String get checklistScheduleNotificationHint =>
-      'On mobile, a local notification is sent at this time (permission required).';
+      'En móvil, se envía una notificación local a esta hora (permiso requerido).';
 
   @override
   String get clearAll => 'Borrar todo';
@@ -1492,7 +1492,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dashboardAiCoachBody =>
-      'Toque «Analizar» para que la IA revise sus estadísticas semanales (tasa de ganancias, horas, factores) y genere consejos psicológicos personalizados.';
+      'Toque «Analizar» para que la IA revise sus estadísticas semanales (WR, horas, factores) y genere consejos psicológicos personalizados.';
 
   @override
   String get dashboardAiCoachTitle => 'ENTRENADOR DE AI DE PAGO';
@@ -1501,7 +1501,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboardAnalyseShortcutTitle => 'Mi análisis';
 
   @override
-  String get dashboardBestTradeLabel => 'Mejor comercio';
+  String get dashboardBestTradeLabel => 'Mejor trade';
 
   @override
   String get dashboardCapitalBalanceHeader => 'CAPITAL / SALDO';
@@ -1558,7 +1558,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dashboardSuccessFactorsSubtitle =>
-      'Realice un seguimiento de cómo sus hábitos afectan su tasa de ganancias.';
+      'Realice un seguimiento de cómo sus hábitos afectan su WR.';
 
   @override
   String get dashboardSuccessFactorsTitle => 'FACTORES DE ÉXITO';
@@ -1581,7 +1581,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get dashboardTradeOne => '1 comercio';
+  String get dashboardTradeOne => '1 trade';
 
   @override
   String dashboardEvolutionTradesThisPeriod(int count) {
@@ -1652,7 +1652,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteTooltip => 'Borrar';
 
   @override
-  String get editPortfolioTooltip => 'Editar nombre, capital, moneda';
+  String get editPortfolioTooltip =>
+      'Editar nombre, capital y moneda del portafolio';
 
   @override
   String get errorAmount => 'Ingrese una cantidad válida (≥ 0).';
@@ -1676,7 +1677,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Exportación de PDF cancelada o no disponible.';
 
   @override
-  String get homePerformance => 'Actuación';
+  String get homePerformance => 'Rendimiento';
 
   @override
   String get webHomeHeroSubtitle =>
@@ -1849,22 +1850,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get mentalGlobalScoreCalendarTitle => 'PUNTUACIÓN GLOBAL POR DÍA';
 
   @override
-  String get mentalCalendarDayStartDialogTitle => 'Début';
+  String get mentalCalendarDayStartDialogTitle => 'Inicio';
 
   @override
-  String get mentalCalendarDayWindowStartLabel => 'Début';
+  String get mentalCalendarDayWindowStartLabel => 'Inicio';
 
   @override
   String get mentalCalendarDayWindowEndLabel => 'Fin';
 
   @override
-  String get mentalCalendarDayWindowSettingsTooltip => 'Plage 24 h';
+  String get mentalCalendarDayWindowSettingsTooltip => 'Franja 24 h';
 
   @override
-  String get mentalCalendarDayWindowDialogTitle => 'Plage horaire du score';
+  String get mentalCalendarDayWindowDialogTitle => 'Franja horaria del score';
 
   @override
-  String get mentalCalendarDayEndDialogTitle => 'Fin de la plage';
+  String get mentalCalendarDayEndDialogTitle => 'Fin de la franja';
 
   @override
   String get mentalSleepEnough => 'Dormí lo suficiente';
@@ -1949,7 +1950,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navMore => 'Más';
 
   @override
-  String get navTrade => 'Comercio';
+  String get navTrade => 'Trades';
 
   @override
   String get tradePageIntro => 'Diario, filtros y fichas de trades.';
@@ -1958,8 +1959,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ok => 'DE ACUERDO';
 
   @override
-  String get perf0Sub =>
-      'Impacto del estrés y la fatiga en la tasa de victorias';
+  String get perf0Sub => 'Impacto del estrés y la fatiga en el WR';
 
   @override
   String get perf0Title => 'Psicología: Emociones y sueño';
@@ -2013,8 +2013,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get perf8Title => 'Estrategia: Concepto de dinero inteligente (SMC)';
 
   @override
-  String get perf9Sub =>
-      'Impacto del riesgo financiero en la tasa de ganancias';
+  String get perf9Sub => 'Impacto del riesgo financiero en el WR';
 
   @override
   String get perf9Title => 'Volumen y tamaño del lote';
@@ -2114,13 +2113,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get plusMyStrategy => 'mi estrategia';
 
   @override
-  String get plusPerformance => 'Actuación';
+  String get plusPerformance => 'Rendimiento';
 
   @override
   String get plusSettings => 'Ajustes';
 
   @override
-  String get plusTrade => 'Comercio';
+  String get plusTrade => 'Trades';
 
   @override
   String get paychekAccessDeniedTitle => 'Access restricted';
@@ -2135,7 +2134,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get portfolioNameMissing =>
-      'Introduzca un nombre de cartera (por ejemplo, corredor).';
+      'Introduce un nombre de portafolio (p. ej. broker).';
 
   @override
   String get portfoliosLabel => 'Portafolios';
@@ -2224,7 +2223,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get q3o1t => 'FUERA DE LA MONTAÑA RUSA';
 
   @override
-  String get q3o2s => 'Mejore la tasa de ganancias y la precisión de entrada.';
+  String get q3o2s => 'Mejore el WR y la precisión de entrada.';
 
   @override
   String get q3o2s2 =>
@@ -2239,7 +2238,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get q3o3s2 =>
-      'Para eliminar el comercio impulsivo y seguir su plan al 100%.';
+      'Para eliminar el trading impulsivo y seguir tu plan al 100%.';
 
   @override
   String get q3o3t => 'MANTENTE FRÍO';
@@ -2295,7 +2294,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get q4o4s2 => 'Si no hago clic, siento que no estoy trabajando.';
 
   @override
-  String get q4o4t => 'SOBRECOMERCIO';
+  String get q4o4t => 'SOBRETRADING';
 
   @override
   String get q4o5s => 'Pensando que eres invencible.';
@@ -2329,7 +2328,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reglagePortfolioSheetSubtitle => 'Capital de cuenta y moneda';
 
   @override
-  String get reglagePortfolioSheetTitle => 'Capital y carteras';
+  String get reglagePortfolioSheetTitle => 'Capital y portafolios';
 
   @override
   String get resultDontWorry => 'No te preocupes';
@@ -3130,7 +3129,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get supportFaqWhereDataA =>
-      'Tus datos están en este dispositivo (preferencias, diario, carteras) y se sincronizan con tu cuenta si has iniciado sesión. Exporta PDFs si necesitas archivos. Cerrar sesión no borra la nube: vuelve a iniciar sesión para recuperarlos.';
+      'Tus datos están en este dispositivo (preferencias, diario, portafolios) y se sincronizan con tu cuenta si has iniciado sesión. Exporta PDFs si necesitas archivos. Cerrar sesión no borra la nube: vuelve a iniciar sesión para recuperarlos.';
 
   @override
   String get supportFaqFeatureQ => '¿Necesitas una función nueva?';
@@ -3339,10 +3338,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get strategieTimeframes => 'PLAZOS';
 
   @override
-  String get strategieZoneNoTrade => 'No hay intercambio';
+  String get strategieZoneNoTrade => 'Sin operar';
 
   @override
-  String get strategieZoneTrade => 'Comercio';
+  String get strategieZoneTrade => 'Trade';
 
   @override
   String get strategieZoneType => 'TIPO DE ZONA';
@@ -3624,7 +3623,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeColTotalGainPct => '% de ganancia total';
 
   @override
-  String get tradeColTrade => 'Comercio #';
+  String get tradeColTrade => 'Trade n.º';
 
   @override
   String get tradeDeleteConfirmBody => 'Esta acción es permanente.';
@@ -3643,7 +3642,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String tradeDayTradeNumber(int n) {
-    return 'Opere #$n hoy';
+    return 'Trade n.º $n hoy';
   }
 
   @override
@@ -3669,7 +3668,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeFilterAll => 'Todo';
 
   @override
-  String get tradeFilterBreakeven => 'Punto de equilibrio';
+  String get tradeFilterBreakeven => 'Breakeven';
 
   @override
   String get tradeFilterLoser => 'Perdedores';
@@ -3719,68 +3718,68 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tradePlanAnalysisMissingAll =>
-      'Aucun trade n\'a de plan Mon Analyse lié. Ouvrez un trade (modifier) et associez un rapport pour afficher le % Plan.';
+      'Ningún trade tiene un plan Mon Analyse vinculado. Abre un trade (editar) y asocia un informe para ver el % Plan.';
 
   @override
   String tradePlanAnalysisMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans plan Mon Analyse — associez un rapport depuis Ajouter / modifier trade.';
+    return '$missing trade(s) de $total sin plan Mon Analyse — asocia un informe desde Añadir / editar trade.';
   }
 
   @override
   String get performancePlanAnalysisMissingBanner =>
-      'Les statistiques « Analyse (plan) » ne comptent que les trades avec un rapport Mon Analyse lié. Sur cette période, aucun trade qualifié — associez un plan depuis le journal.';
+      'Las estadísticas « Análisis (plan) » solo incluyen trades con un informe de Mon Analyse vinculado. Ninguno en este periodo — vincula un plan desde el diario.';
 
   @override
   String get performancePlanAnalysisSectionEmpty =>
-      'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.';
+      'Ningún trade con plan vinculado. Asocia un informe Mon Analyse a tus trades para ver el WR según el cumplimiento del plan.';
 
   @override
   String get tradeStrategieExecutionNoData => '—';
 
   @override
   String get tradeStrategieExecutionMissingAll =>
-      'Aucun trade n\'a de stratégie renseignée (setup + slider). Modifiez un trade dans Ajouter trade pour afficher le % Stratégie.';
+      'Ningún trade tiene estrategia indicada (setup + slider). Edita un trade en Añadir trade para ver el % Estrategia.';
 
   @override
   String tradeStrategieExecutionMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans stratégie renseignée — choisissez un setup et le slider lors de l\'enregistrement.';
+    return '$missing trade(s) de $total sin estrategia indicada — elige un setup y el slider al guardar.';
   }
 
   @override
   String get performanceStrategieExecutionSectionEmpty =>
-      'Aucun trade avec stratégie renseignée (slider / setup). Les cartes Horaires et Gestion du risque plus haut restent calculées automatiquement.';
+      'Ningún trade con estrategia indicada (slider / setup). Las tarjetas Horarios y Gestión del riesgo arriba siguen calculándose automáticamente.';
 
   @override
   String get tradeChecklistNoData => '—';
 
   @override
   String get tradeChecklistMissingAll =>
-      'Aucun trade n\'a de checklist cochée pour le jour d\'entrée. Cochez des cases sur la page Checklist (ou rétroaction sur le trade).';
+      'Ningún trade tiene checklist marcada el día de entrada. Marca casillas en Checklist (o retroalimentación en el trade).';
 
   @override
   String tradeChecklistMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans checklist renseignée pour le jour d\'entrée.';
+    return '$missing trade(s) de $total sin checklist el día de entrada.';
   }
 
   @override
   String get performanceChecklistSectionEmpty =>
-      'Aucun trade avec checklist cochée le jour d\'entrée. Les stats ne comptent que les trades liés à une checklist remplie.';
+      'Ningún trade con checklist marcada el día de entrada. Las estadísticas solo incluyen trades vinculados a una checklist completada.';
 
   @override
   String get tradeEtatNoData => '—';
 
   @override
   String get tradeEtatMissingAll =>
-      'Aucun trade n\'a d\'état mental réglé pour le jour d\'entrée. Renseignez la page État mental (ou rétroaction sur le trade).';
+      'Ningún trade tiene estado mental definido el día de entrada. Complétalo en Estado mental (o retroalimentación en el trade).';
 
   @override
   String tradeEtatMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans état mental réglé pour le jour d\'entrée.';
+    return '$missing trade(s) de $total sin estado mental el día de entrada.';
   }
 
   @override
   String get performanceEtatSectionEmpty =>
-      'Aucun trade avec état mental réglé pour le jour d\'entrée. Les cartes Horaires / Gestion du risque restent calculées automatiquement.';
+      'Ningún trade con estado mental definido para el día de entrada. Las tarjetas Horarios / Gestión del riesgo arriba siguen calculándose automáticamente.';
 
   @override
   String get tradeLabelSession => 'Sesión';
@@ -3887,7 +3886,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradePdfTrades => 'Vientos alisios';
 
   @override
-  String get tradePdfWinRate => 'Tasa de ganancia';
+  String get tradePdfWinRate => 'WR';
 
   @override
   String tradePctOfCapital(String percent) {
@@ -3931,7 +3930,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeSessionUs => 'A NOSOTROS';
 
   @override
-  String get tradeSideBreakevenShort => 'DESPERDICIO';
+  String get tradeSideBreakevenShort => 'BREAKEVEN';
 
   @override
   String get tradeSideBuyLong => 'Comprar';
@@ -3952,7 +3951,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeSummaryTrades => 'VIENTOS ALISIOS';
 
   @override
-  String get tradeSummaryWinRate => 'TASA DE GANANCIA';
+  String get tradeSummaryWinRate => 'WR';
 
   @override
   String get tradeTotalUpper => 'TOTAL';
@@ -3973,7 +3972,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tradeWinDayRingSubtitle => 'GANAR (día)';
 
   @override
-  String get tradeWinrateLabel => 'Tasa de ganancia';
+  String get tradeWinrateLabel => 'WR';
 
   @override
   String get settingsTradingWeek5 => '5 días (lun–vie)';
@@ -4003,7 +4002,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDashOpenHomeButton => 'Ver inicio';
 
   @override
-  String get settingsDashSectionCapital => 'Capital y win rate';
+  String get settingsDashSectionCapital => 'Capital y WR';
 
   @override
   String get settingsDashSectionChecklist => 'Lista de verificación';
@@ -4027,7 +4026,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDashSectionLens => 'Paychek Lens';
 
   @override
-  String get tradingSection => 'Comercio';
+  String get tradingSection => 'Trading';
 
   @override
   String get settingsCgvSection => 'Condiciones';
@@ -4149,5 +4148,5 @@ class AppLocalizationsEs extends AppLocalizations {
   String get validate => 'Confirmar';
 
   @override
-  String get winrate => 'Tasa de ganancia';
+  String get winrate => 'WR';
 }

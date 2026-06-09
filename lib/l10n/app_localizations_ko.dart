@@ -38,7 +38,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ajouterTradeScreenshotHelp => '차트 또는 셋업 스크린샷 추가(선택).';
 
   @override
-  String get ajouterTradeCsvChooseSoftware => 'Choisir un logiciel';
+  String get ajouterTradeCsvChooseSoftware => '플랫폼 선택';
 
   @override
   String get ajouterTradeAnalyseCardTitle => '분석';
@@ -1116,7 +1116,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calcLabelTradesShort => '거래';
 
   @override
-  String get calcLabelWinRateShort => '승률';
+  String get calcLabelWinRateShort => 'WR';
 
   @override
   String get calcLoss => '손실';
@@ -1167,7 +1167,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calcErrorTradesRange => '거래 수는 1~2000 사이여야 합니다.';
 
   @override
-  String get calcErrorWinRateRange => '승률은 0~100 사이여야 합니다.';
+  String get calcErrorWinRateRange => 'WR은 0~100 사이여야 합니다.';
 
   @override
   String get calcErrorRiskRange => '리스크(%)는 0~100 사이여야 합니다.';
@@ -1361,53 +1361,52 @@ class AppLocalizationsKo extends AppLocalizations {
   String get checklistSectionRisque => '리스크 관리';
 
   @override
-  String get checklistScheduleTitle => 'Item reminder';
+  String get checklistScheduleTitle => '항목 알림';
 
   @override
-  String get checklistScheduleDefaultHeading => '1 · Default rule';
+  String get checklistScheduleDefaultHeading => '1 · 기본 규칙';
 
   @override
-  String get checklistScheduleModeDaily => 'Every day';
+  String get checklistScheduleModeDaily => '매일';
 
   @override
-  String get checklistScheduleModeWeekly => 'Once a week';
+  String get checklistScheduleModeWeekly => '주 1회';
 
   @override
-  String get checklistScheduleModeSpecificDate => 'Specific date';
+  String get checklistScheduleModeSpecificDate => '특정 날짜';
 
   @override
-  String get checklistScheduleUserDateHeading => '2 · Chosen date';
+  String get checklistScheduleUserDateHeading => '2 · 선택한 날짜';
 
   @override
-  String get checklistSchedulePickDate => 'Pick a date';
+  String get checklistSchedulePickDate => '날짜 선택';
 
   @override
-  String get checklistScheduleWeekHeading => '3 · Day of week';
+  String get checklistScheduleWeekHeading => '3 · 요일';
 
   @override
   String checklistScheduleNextOccurrence(String date) {
-    return 'Next date: $date';
+    return '다음 날짜: $date';
   }
 
   @override
-  String get checklistScheduleWarningHeading => '4 · Alert time';
+  String get checklistScheduleWarningHeading => '4 · 알림 시간';
 
   @override
-  String get checklistSchedulePickTime => 'Pick time';
+  String get checklistSchedulePickTime => '시간 선택';
 
   @override
-  String get checklistScheduleCalendarTooltip => 'Date and reminder settings';
+  String get checklistScheduleCalendarTooltip => '날짜 및 알림 설정';
 
   @override
-  String get settingsChecklistRemindersTitle => 'Checklist reminders';
+  String get settingsChecklistRemindersTitle => '체크리스트 알림';
 
   @override
-  String get settingsChecklistRemindersSubtitle =>
-      'Notify at the time set on each row (Edit → calendar).';
+  String get settingsChecklistRemindersSubtitle => '각 행에 설정한 시간에 알림(편집 → 캘린더).';
 
   @override
   String get checklistScheduleNotificationHint =>
-      'On mobile, a local notification is sent at this time (permission required).';
+      '모바일에서는 이 시간에 로컬 알림이 전송됩니다(권한 필요).';
 
   @override
   String get clearAll => '모두 지우기';
@@ -1429,7 +1428,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dashboardAiCoachBody =>
-      '«분석»을 눌러 주간 통계(승률, 시간, 요인)를 AI가 검토하고 맞춤 심리 조언을 받으세요.';
+      '«분석»을 눌러 주간 통계(WR, 시간, 요인)를 AI가 검토하고 맞춤 심리 조언을 받으세요.';
 
   @override
   String get dashboardAiCoachTitle => 'PAYCHEK AI 코치';
@@ -1463,7 +1462,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String dashboardPerfHourWinRate(int percent) {
-    return '$percent% 승률';
+    return '$percent% WR';
   }
 
   @override
@@ -1494,7 +1493,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dashboardSuccessFactorSample => '세션 전 운동';
 
   @override
-  String get dashboardSuccessFactorsSubtitle => '습관이 승률에 미치는 영향을 추적하세요.';
+  String get dashboardSuccessFactorsSubtitle => '습관이 WR에 미치는 영향을 추적하세요.';
 
   @override
   String get dashboardSuccessFactorsTitle => '성공 요인';
@@ -1777,22 +1776,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mentalGlobalScoreCalendarTitle => '일별 전체 점수';
 
   @override
-  String get mentalCalendarDayStartDialogTitle => 'Début';
+  String get mentalCalendarDayStartDialogTitle => '시작';
 
   @override
-  String get mentalCalendarDayWindowStartLabel => 'Début';
+  String get mentalCalendarDayWindowStartLabel => '시작';
 
   @override
-  String get mentalCalendarDayWindowEndLabel => 'Fin';
+  String get mentalCalendarDayWindowEndLabel => '종료';
 
   @override
-  String get mentalCalendarDayWindowSettingsTooltip => 'Plage 24 h';
+  String get mentalCalendarDayWindowSettingsTooltip => '24시간 구간';
 
   @override
-  String get mentalCalendarDayWindowDialogTitle => 'Plage horaire du score';
+  String get mentalCalendarDayWindowDialogTitle => '점수 시간 구간';
 
   @override
-  String get mentalCalendarDayEndDialogTitle => 'Fin de la plage';
+  String get mentalCalendarDayEndDialogTitle => '구간 종료';
 
   @override
   String get mentalSleepEnough => '충분한 수면';
@@ -1883,7 +1882,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ok => '확인';
 
   @override
-  String get perf0Sub => '스트레스와 피로가 승률에 미치는 영향';
+  String get perf0Sub => '스트레스와 피로가 WR에 미치는 영향';
 
   @override
   String get perf0Title => '심리: 감정 & 수면';
@@ -1937,7 +1936,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get perf8Title => '전략: 스마트 머니 컨셉(SMC)';
 
   @override
-  String get perf9Sub => '금융 리스크가 승률에 미치는 영향';
+  String get perf9Sub => '금융 리스크가 WR에 미치는 영향';
 
   @override
   String get perf9Title => '거래량 & 로트 크기';
@@ -2134,7 +2133,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get q3o1t => '롤러코스터에서 내려오기';
 
   @override
-  String get q3o2s => '승률과 진입 정확도 향상.';
+  String get q3o2s => 'WR과 진입 정확도 향상.';
 
   @override
   String get q3o2s2 => '더 나은 거래를 고르고 자주 이기고 싶은 분.';
@@ -3528,7 +3527,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tradeEditMenu => '편집';
 
   @override
-  String get tradeLinkedAnalyseOpenPdf => 'Ouvrir le PDF d’analyse';
+  String get tradeLinkedAnalyseOpenPdf => '분석 PDF 열기';
 
   @override
   String get tradeExportPdfTooltip => 'PDF 내보내기';
@@ -3587,68 +3586,68 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get tradePlanAnalysisMissingAll =>
-      'Aucun trade n\'a de plan Mon Analyse lié. Ouvrez un trade (modifier) et associez un rapport pour afficher le % Plan.';
+      '내 분석 플랜이 연결된 트레이드가 없습니다. 트레이드를 열어(수정) 보고서를 연결하면 플랜 %가 표시됩니다.';
 
   @override
   String tradePlanAnalysisMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans plan Mon Analyse — associez un rapport depuis Ajouter / modifier trade.';
+    return '$total개 중 $missing개 트레이드에 내 분석 플랜 없음 — 트레이드 추가/수정에서 보고서를 연결하세요.';
   }
 
   @override
   String get performancePlanAnalysisMissingBanner =>
-      'Les statistiques « Analyse (plan) » ne comptent que les trades avec un rapport Mon Analyse lié. Sur cette période, aucun trade qualifié — associez un plan depuis le journal.';
+      '「분석(플랜)」 통계는 내 분석 보고서가 연결된 트레이드만 포함합니다. 이 기간에는 없음 — 저널에서 플랜을 연결하세요.';
 
   @override
   String get performancePlanAnalysisSectionEmpty =>
-      'Aucun trade avec plan lié. Associez un rapport Mon Analyse à vos trades pour voir le winrate par respect du plan.';
+      '연결된 플랜이 있는 트레이드가 없습니다. 내 분석 보고서를 연결하면 플랜 준수별 승률을 볼 수 있습니다.';
 
   @override
   String get tradeStrategieExecutionNoData => '—';
 
   @override
   String get tradeStrategieExecutionMissingAll =>
-      'Aucun trade n\'a de stratégie renseignée (setup + slider). Modifiez un trade dans Ajouter trade pour afficher le % Stratégie.';
+      '전략(셋업+슬라이더)이 입력된 트레이드가 없습니다. 트레이드 추가에서 수정하면 전략 %가 표시됩니다.';
 
   @override
   String tradeStrategieExecutionMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans stratégie renseignée — choisissez un setup et le slider lors de l\'enregistrement.';
+    return '$total개 중 $missing개 트레이드에 전략 없음 — 저장 시 셋업과 슬라이더를 선택하세요.';
   }
 
   @override
   String get performanceStrategieExecutionSectionEmpty =>
-      'Aucun trade avec stratégie renseignée (slider / setup). Les cartes Horaires et Gestion du risque plus haut restent calculées automatiquement.';
+      '전략(슬라이더/셋업)이 입력된 트레이드가 없습니다. 위의 시간대·리스크 관리 카드는 자동으로 계산됩니다.';
 
   @override
   String get tradeChecklistNoData => '—';
 
   @override
   String get tradeChecklistMissingAll =>
-      'Aucun trade n\'a de checklist cochée pour le jour d\'entrée. Cochez des cases sur la page Checklist (ou rétroaction sur le trade).';
+      '진입일에 체크리스트가 체크된 트레이드가 없습니다. 체크리스트 페이지에서 항목을 체크하세요(또는 트레이드 피드백).';
 
   @override
   String tradeChecklistMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans checklist renseignée pour le jour d\'entrée.';
+    return '$total개 중 $missing개 트레이드에 진입일 체크리스트 없음.';
   }
 
   @override
   String get performanceChecklistSectionEmpty =>
-      'Aucun trade avec checklist cochée le jour d\'entrée. Les stats ne comptent que les trades liés à une checklist remplie.';
+      '진입일에 체크리스트가 체크된 트레이드가 없습니다. 통계는 작성된 체크리스트가 연결된 트레이드만 포함합니다.';
 
   @override
   String get tradeEtatNoData => '—';
 
   @override
   String get tradeEtatMissingAll =>
-      'Aucun trade n\'a d\'état mental réglé pour le jour d\'entrée. Renseignez la page État mental (ou rétroaction sur le trade).';
+      '진입일에 멘탈 상태가 설정된 트레이드가 없습니다. 멘탈 상태 페이지에서 입력하세요(또는 트레이드 피드백).';
 
   @override
   String tradeEtatMissingPartial(int missing, int total) {
-    return '$missing trade(s) sur $total sans état mental réglé pour le jour d\'entrée.';
+    return '$total개 중 $missing개 트레이드에 진입일 멘탈 상태 없음.';
   }
 
   @override
   String get performanceEtatSectionEmpty =>
-      'Aucun trade avec état mental réglé pour le jour d\'entrée. Les cartes Horaires / Gestion du risque restent calculées automatiquement.';
+      '진입일에 멘탈 상태가 설정된 트레이드가 없습니다. 위의 시간대/리스크 관리 카드는 자동으로 계산됩니다.';
 
   @override
   String get tradeLabelSession => '세션';
@@ -3755,7 +3754,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tradePdfTrades => '거래';
 
   @override
-  String get tradePdfWinRate => '승률';
+  String get tradePdfWinRate => 'WR';
 
   @override
   String tradePctOfCapital(String percent) {
@@ -3819,7 +3818,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tradeSummaryTrades => '거래';
 
   @override
-  String get tradeSummaryWinRate => '승률';
+  String get tradeSummaryWinRate => 'WR';
 
   @override
   String get tradeTotalUpper => '합계';
@@ -3840,7 +3839,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tradeWinDayRingSubtitle => '승(일)';
 
   @override
-  String get tradeWinrateLabel => '승률';
+  String get tradeWinrateLabel => 'WR';
 
   @override
   String get settingsTradingWeek5 => '5일 (월–금)';
@@ -3869,7 +3868,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsDashOpenHomeButton => '홈 보기';
 
   @override
-  String get settingsDashSectionCapital => '자본 및 승률';
+  String get settingsDashSectionCapital => '자본 및 WR';
 
   @override
   String get settingsDashSectionChecklist => '체크리스트';
