@@ -126,9 +126,44 @@ abstract final class ChecklistNotificationService {
     return true;
   }
 
+  /// Prochaine occurrence **future** : si l’heure du jour est déjà passée,
+  /// reporter à demain (quotidien) ou +7 jours (hebdo). `zonedSchedule` rejette
+  /// les dates passées — sans ce report, ouvrir l’app après l’heure du rappel
+  /// faisait échouer la planification puis annulait la répétition existante.
   static tz.TZDateTime _nextTzDateTime(ChecklistItemSchedule sched) {
     final next = ChecklistItemSchedule.nextOccurrenceDateTime(sched);
-    return tz.TZDateTime.from(next, tz.local);
+    var when = tz.TZDateTime(
+      tz.local,
+      next.year,
+      next.month,
+      next.day,
+      next.hour,
+      next.minute,
+    );
+    if (when.isAfter(tz.TZDateTime.now(tz.local))) return when;
+    switch (sched.displayMode) {
+      case ChecklistScheduleMode.daily:
+        when = tz.TZDateTime(
+          tz.local,
+          next.year,
+          next.month,
+          next.day + 1,
+          next.hour,
+          next.minute,
+        );
+      case ChecklistScheduleMode.weekly:
+        when = tz.TZDateTime(
+          tz.local,
+          next.year,
+          next.month,
+          next.day + 7,
+          next.hour,
+          next.minute,
+        );
+      case ChecklistScheduleMode.specificDate:
+        break; // Passé : l’appelant ignore l’élément.
+    }
+    return when;
   }
 
   static DateTimeComponents? _matchComponents(ChecklistScheduleMode mode) {
@@ -181,10 +216,9 @@ abstract final class ChecklistNotificationService {
 
         final sched = item.schedule!.normalized();
         final when = _nextTzDateTime(sched);
-        if (when.isBefore(tz.TZDateTime.now(tz.local))) {
-          if (sched.displayMode == ChecklistScheduleMode.specificDate) {
-            continue;
-          }
+        if (!when.isAfter(tz.TZDateTime.now(tz.local))) {
+          // Seule une date précise peut rester dans le passé après report.
+          continue;
         }
 
         final title = copy.title;

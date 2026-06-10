@@ -137,23 +137,18 @@ Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
       }
     }
 
-    final localMs = await ReglageLanguagePrefs.loadUpdatedAtMillis();
-    final localCode = await ReglageLanguagePrefs.loadCode();
-    final hasScoped = await ReglageLanguagePrefs.hasAccountScopedLanguage();
-
+    // Le compte a une langue cloud (choix Réglages) : elle fait foi à la connexion.
+    // La landing / le navigateur ne doivent jamais l’écraser ; tout changement
+    // Réglages est poussé immédiatement vers Firestore, donc le cloud est à jour.
     if (cloudCode != null) {
-      final takeCloud = cloudMs > localMs ||
-          !hasScoped ||
-          (cloudMs == 0 && localMs == 0 && cloudCode != localCode);
-      if (takeCloud) {
-        final ms = cloudMs > 0
-            ? cloudMs
-            : DateTime.now().millisecondsSinceEpoch;
-        await ReglageLanguagePrefs.save(cloudCode, updatedAtMillis: ms);
-      }
+      final ms = cloudMs > 0
+          ? cloudMs
+          : DateTime.now().millisecondsSinceEpoch;
+      await ReglageLanguagePrefs.save(cloudCode, updatedAtMillis: ms);
       return;
     }
 
+    // Aucune langue cloud = première inscription : reprendre le choix landing (guest).
     final guestPromoted =
         await ReglageLanguagePrefs.promoteGuestLanguageToCurrentAccountIfNeeded();
     if (guestPromoted) {
@@ -171,7 +166,8 @@ Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
 /// `subscriptionTier` (hors création), [kPaychekUserFieldTrialFreemiumOverrideUntil],
 /// [kPaychekUserFieldSubscriptionTierUpdatedAt], etc.
 /// Écrit [kPaychekUserFieldAppOpenDatesUtcV1] (historique d’ouverture par jour UTC, borné).
-/// Écrit `appLanguageCode` (choix Réglages) à chaque sync.
+/// Écrit `appLanguageCode` uniquement si le doc n’en a pas (première inscription) ;
+/// ensuite seul Réglages le met à jour via [paychekPushUserAppLanguageToFirestore].
 ///
 /// [firstName] / [lastName] : passés `null` (défaut) = ne pas écraser prénom/nom sauf déduction
 /// depuis `displayName` lorsque ces champs sont encore vides (réparation + Google, etc.).
@@ -307,19 +303,28 @@ Future<void> syncPaychekUserDocument(
       payload['birthDate'] = Timestamp.fromDate(utc);
     }
 
-    try {
-      var lang = await ReglageLanguagePrefs.loadCode();
-      if (!ReglageLanguagePrefs.availableCodes.contains(lang)) {
-        lang = ReglageLanguagePrefs.defaultCode;
+    // Langue : n’écrire que si le doc n’en a pas encore (première inscription).
+    // Sinon le cloud (choix Réglages) fait foi — voir [paychekMergeAppLanguageFromFirestore] ;
+    // écrire la langue locale ici écrasait le choix fait sur un autre appareil.
+    final cloudLangRaw = snap.data()?['appLanguageCode'];
+    final hasCloudLang = cloudLangRaw is String &&
+        ReglageLanguagePrefs.availableCodes
+            .contains(cloudLangRaw.trim().toLowerCase());
+    if (!hasCloudLang) {
+      try {
+        var lang = await ReglageLanguagePrefs.loadCode();
+        if (!ReglageLanguagePrefs.availableCodes.contains(lang)) {
+          lang = ReglageLanguagePrefs.defaultCode;
+        }
+        payload['appLanguageCode'] = lang;
+        final langMs = await ReglageLanguagePrefs.loadUpdatedAtMillis();
+        if (langMs > 0) {
+          payload['appLanguageUpdatedAt'] =
+              Timestamp.fromMillisecondsSinceEpoch(langMs);
+        }
+      } catch (_) {
+        payload['appLanguageCode'] = ReglageLanguagePrefs.defaultCode;
       }
-      payload['appLanguageCode'] = lang;
-      final langMs = await ReglageLanguagePrefs.loadUpdatedAtMillis();
-      if (langMs > 0) {
-        payload['appLanguageUpdatedAt'] =
-            Timestamp.fromMillisecondsSinceEpoch(langMs);
-      }
-    } catch (_) {
-      payload['appLanguageCode'] = ReglageLanguagePrefs.defaultCode;
     }
 
     // Merge write au lieu de runTransaction — évite crash codec Firestore sur certains desktops (Windows).
