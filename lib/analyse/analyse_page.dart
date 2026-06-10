@@ -123,10 +123,10 @@ class _AnalysePageState extends State<AnalysePage> {
   }
 
   /// Un rapport démo figé sous le générateur ; le contrôleur reste vierge (modifiable).
-  void _seedDemoReportOnly() {
+  void _seedDemoReportOnly([Locale? locale]) {
     _reportEntries = [
       AnalyseStackedReportEntry(
-        snapshot: buildAnalyseDashboardPreviewSnapshot(),
+        snapshot: buildAnalyseDashboardPreviewSnapshot(locale: locale),
         embedKey: _nextReportEmbedKey++,
       ),
     ];
@@ -150,16 +150,21 @@ class _AnalysePageState extends State<AnalysePage> {
       return;
     }
     if (!eurGraduated) {
-      setState(_seedDemoReportOnly);
+      setState(
+        () => _seedDemoReportOnly(
+          mounted ? Localizations.localeOf(context) : null,
+        ),
+      );
     } else {
       setState(() => _reportEntries = []);
     }
   }
 
   Future<void> _persistCurrentReports() async {
-    await AnalyseReportsStorage.saveAll(
-      [for (final e in _reportEntries) e.snapshot],
-    );
+    var snapshots = [for (final e in _reportEntries) e.snapshot];
+    final userOnly = analyseReportsWithoutDemoFallbacks(snapshots);
+    if (userOnly.isNotEmpty) snapshots = userOnly;
+    await AnalyseReportsStorage.saveAll(snapshots);
     // Fire-and-forget : sync cloud.
     AnalyseFirestoreSync.pushIfSignedIn();
     // Liste disque alignée : autres écrans peuvent relire sans course avec l’étoile.
@@ -264,7 +269,7 @@ class _AnalysePageState extends State<AnalysePage> {
       }
       _reportEntries = [
         for (final e in _reportEntries)
-          if (!isAnalyseEuroUsdDemoSnapshot(e.snapshot)) e,
+          if (!isAnalyseAjouterTradeDemoFallbackSnapshot(e.snapshot)) e,
       ];
     });
 

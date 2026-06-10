@@ -125,7 +125,6 @@ class StrategieSetupCard extends StatelessWidget {
   final VoidCallback? onToggleDashboardStar;
 
   static const Color _starActive = StrategieTokens.horairesGold;
-  static const Color _webRuleHeadingGold = AnalyseTokens.zinc400;
 
   @override
   Widget build(BuildContext context) {
@@ -396,12 +395,8 @@ class _RuleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headingColor = webDashboardPreview
-        ? StrategieSetupCard._webRuleHeadingGold
-        : StrategieSetupRuleStyles.headingColorForIcon(r.icon);
-    final iconColor = webDashboardPreview
-        ? StrategieSetupCard._webRuleHeadingGold
-        : StrategieSetupRuleStyles.iconColorForIcon(r.icon);
+    final headingColor = StrategieSetupRuleStyles.headingColorForIcon(r.icon);
+    final iconColor = StrategieSetupRuleStyles.iconColorForIcon(r.icon);
     final headingText =
         (webDashboardPreview || maquetteStyle) ? r.heading.toUpperCase() : r.heading;
     return Row(

@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "Paychek Blog | Trading journal, analytics and psychology",
+    "description": "The Paychek blog: practical guides to keep a trading journal, analyze performance, master psychology and import trades (MT4, MT5, CSV).",
+    "keywords": "trading journal, trade analysis, trading psychology, trading discipline, performance stats, MT4, MT5, CSV import, trading plan",
+    "ogDescription": "Practical guides to journal your trades, analyze performance and improve sustainably.",
+    "ogLocale": "en_US"
+  },
+  "nav": {
+    "pricing": "Pricing",
+    "openApp": "Open app"
+  },
+  "hero": {
+    "chip": "The disciplined trader's blog",
+    "titleHtml": "Turn your <span class=\"gradient-text\">data</span> into decisions",
+    "subtitle": "Concrete guides to keep a useful trading journal, read your stats honestly, and build the discipline that separates profitable traders from the rest."
+  },
+  "readMoreHtml": "Read article <i class=\"fas fa-arrow-right ml-1\"></i>",
+  "cards": {
+    "journal": {
+      "chip": "Fundamentals",
+      "title": "Why a trading journal changes everything",
+      "desc": "A journal isn't admin busywork — it's the only objective mirror of your trading."
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "How to analyze your trades and actually improve",
+      "desc": "Win rate, risk/reward, expectancy: the metrics that matter and the ones that mislead."
+    },
+    "psychologie": {
+      "chip": "Psychology",
+      "title": "Trader psychology: discipline before strategy",
+      "desc": "The best strategy fails without emotional control. How to measure and fix your discipline."
+    },
+    "import": {
+      "chip": "Practice",
+      "title": "Import your trades (MT4, MT5, CSV) without wasting time",
+      "desc": "Automate entry so you spend energy on analysis, not copy-paste."
+    }
+  },
+  "articles": {
+    "journal": {
+      "chip": "Fundamentals",
+      "title": "Why a trading journal changes everything",
+      "bodyHtml": "<p>Most losing traders don't fail from lack of strategy — they fail because they have no reliable memory of their decisions. Without a journal, every trade is an isolated anecdote. With a structured <strong>trading journal</strong>, your trades become data — and data reveals patterns your memory systematically hides.</p><p>Your brain remembers spectacular wins and erases small repeated mistakes. That's the opposite of what you need to improve. A journal fixes this bias by recording <strong>every</strong> entry, exit, position size and emotion felt.</p><h3>What a good journal gives you</h3><ul><li><strong>Objectivity</strong>: you judge your trading on numbers, not gut feel.</li><li><strong>Leak detection</strong>: setups that look good but cost you money over 50 trades.</li><li><strong>Reinforcing what works</strong>: you find your real edge and focus capital there.</li><li><strong>Accountability</strong>: hard to lie to yourself with a timestamped history.</li></ul><h3>Essential fields to log</h3><p>An effective journal isn't just P&amp;L. Log the asset, session, setup, planned risk/reward, whether you followed your plan, and your mental state at entry. It's the combination of these dimensions that makes analysis powerful.</p><p>With Paychek, these fields are prefilled and standardized: you journal in seconds instead of maintaining a fragile spreadsheet abandoned after two weeks.</p>"
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "How to analyze your trades and actually improve",
+      "bodyHtml": "<p>Keeping a journal is step one; <strong>analysis</strong> turns history into progress. But beware: some metrics flatter your ego without reflecting real profitability.</p><h3>Metrics that matter</h3><ul><li><strong>Expectancy</strong>: average expected gain per trade. The queen metric — it combines win rate and R/R.</li><li><strong>Risk/reward ratio</strong>: how much you make when right vs. lose when wrong.</li><li><strong>Win rate by setup</strong>: a global rate means nothing; segment by strategy and session.</li><li><strong>Max drawdown</strong>: the worst losing streak your psychology must survive.</li></ul><h3>The win rate trap</h3><p>A 70% win rate can hide an emptying account if losses are three times larger than wins. Conversely, a trader at 40% with a 1:3 ratio is highly profitable. Never look at win rate alone — always pair it with R/R and expectancy.</p><h3>Segment, segment, segment</h3><p>Real progress comes from segmentation. Are you better in the morning or afternoon? On forex or indices? On breakouts or mean reversion? A journal that filters stats by asset, session and setup shows exactly where to focus capital — and what to stop immediately.</p>"
+    },
+    "psychologie": {
+      "chip": "Psychology",
+      "title": "Trader psychology: discipline before strategy",
+      "bodyHtml": "<p>Most avoidable losses come not from bad analysis but undisciplined execution: entering too early, moving stops, doubling down on losers, cutting winners from fear. <strong>Psychology</strong> isn't fluff — it's the decisive factor.</p><h3>Emotions that destroy accounts</h3><ul><li><strong>Fear</strong>: you cut winners too early and miss your best trades.</li><li><strong>Greed</strong>: you oversize positions and ignore your plan.</li><li><strong>Revenge</strong>: after a loss, you trade to \"get even\" and the spiral accelerates.</li><li><strong>Boredom</strong>: you take mediocre trades just to be in a position.</li></ul><h3>Measure discipline, not just feelings</h3><p>You only fix what you measure. By noting for each trade whether you <strong>followed your plan</strong> and your mental state, you get a discipline score. Over weeks, you see clearly how emotional slips correlate with losses — often more effective than any advice.</p><p>Paychek includes mindset tracking and a discipline audit: your emotions become measurable — and improvable — data.</p>"
+    },
+    "import": {
+      "chip": "Practice",
+      "title": "Import your trades (MT4, MT5, CSV) without wasting time",
+      "bodyHtml": "<p>The best journal is the one you actually keep. If entry is painful, you'll quit. That's why <strong>automatic import</strong> is a game-changer: it removes friction and keeps data consistent.</p><h3>Manual entry vs import</h3><p>Manual entry still helps for context (your reasoning, mental state, chart screenshot). But for factual data — entry, exit, size, P&amp;L — importing from your broker statement is faster and more reliable.</p><h3>Supported formats</h3><ul><li><strong>MT4 / MT5</strong>: import statements and let the app rebuild each position.</li><li><strong>CSV</strong>: most brokers and platforms (futures, crypto, equities) export standard CSV.</li><li><strong>FIFO reconstruction</strong>: partial fills are grouped into coherent trades automatically.</li></ul><h3>Save time for what matters</h3><p>The goal isn't an hour copying numbers — it's analysis and improvement. By automating import, you keep a complete journal effortlessly and turn data collection into lasting statistical edge.</p>"
+    }
+  },
+  "cta": {
+    "title": "Ready to journal like a pro?",
+    "subtitle": "Start free. 7 days of full Pro access, then stay on Lite if you prefer.",
+    "button": "Start my journal"
+  },
+  "footer": {
+    "home": "Home",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

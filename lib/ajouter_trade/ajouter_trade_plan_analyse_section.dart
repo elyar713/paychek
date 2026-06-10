@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../dashboard/dashboard_tokens.dart';
+import '../l10n/app_localizations.dart';
 
-/// Libellé **PLAN D’ANALYSE** + champ déroulant + panneau dessous (comme STRATÉGIE).
+/// Libellé plan d’analyse (i18n) + champ déroulant + panneau dessous (comme STRATÉGIE).
 class AjouterTradePlanAnalyseSection extends StatelessWidget {
   const AjouterTradePlanAnalyseSection({
     super.key,
@@ -17,12 +18,13 @@ class AjouterTradePlanAnalyseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
         Text(
-          'PLAN D’ANALYSE',
+          l.ajouterTradeDisciplinePlanTitle.toUpperCase(),
           style: (labelStyle ??
                   const TextStyle(
                     color: DashboardTokens.onMatteEmphasis,

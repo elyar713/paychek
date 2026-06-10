@@ -1,0 +1,367 @@
+================================================================================
+PAYCHEK — DESCRIPTIONS COMPLÈTES STORES (copier-coller)
+App Store Connect + Google Play Console · max 4000 caractères par langue
+Version 1.2.1 · pro.paychek.app
+================================================================================
+
+Conseil ASO :
+- App Store : texte brut, sauts de ligne OK (pas de markdown **)
+- Google Play : même texte ; les • et sauts de ligne s'affichent bien
+- Compteur : =LEN() ou wordcounter.net
+
+================================================================================
+🇺🇸 ENGLISH — Full description
+================================================================================
+
+Stop trading blindly. Paychek is the professional trading journal built for active traders who demand precision, discipline, and a psychological edge — on any market. Whether you are scaling a funded account or managing personal capital, Paychek turns your raw trade data into clear, actionable insights.
+
+Paychek is more than a trade log. It is a complete trading journal app for every market you trade: forex, indices, futures, crypto, stocks, and commodities — EUR/USD, NASDAQ, NQ, BTC, AAPL, gold, oil and more. Built for day traders and swing traders across all asset classes.
+
+LOG EVERY TRADE
+Record your execution in seconds. Attach your strategy documents, tag psychology (FOMO, tilt, hesitation), link your analysis plan, and keep a consistent trade history. Every trade counts — master your decision-making over time.
+
+PLAN BEFORE YOU ENTER
+Define your trade plan before you open a position. Setup, key levels, confluence, risk/reward — document your edge before the market opens. Codify your rules and build a repeatable blueprint for success.
+
+YOUR MENTAL STATE
+Trading psychology matters. From focus and sleep to emotions and stress, monitor the internal factors that drive your market performance. Track your mental state daily and connect mindset to results.
+
+ONE INTUITIVE DASHBOARD
+Every trade, every result, every emotion — mapped in one place. Track your progress, master your mindset, and eliminate uncertainty. Your home screen shows what matters before the session starts.
+
+PRE-TRADE CHECKLIST
+Follow your checklist, build your routine, and watch your progress grow in real time. Custom sections, scheduled reminders, and daily validation — stay disciplined session after session.
+
+MY STRATEGY
+Take control of every trade. Define your strategy, risk parameters, trading sessions, rules, and setup models in one structured workspace. Risk management and schedule compliance built in.
+
+MY ANALYSIS
+Prepare each session with structured pre-trade analysis. Key zones, indicators, context, and chart patterns — align your plan before execution.
+
+PERFORMANCE & STATS
+Deep trading statistics: win rate, P&L, discipline lens, time slots, duration buckets, volume, news timing, and Paychek Lens insights. See patterns you cannot spot in a spreadsheet.
+
+TRADING CALENDAR
+Visual calendar of your trading days. Review daily results, streaks, and objectives at a glance.
+
+IMPORT YOUR HISTORY
+Import trades from MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS and more via CSV or statement files. Stop retyping — sync your broker history into your journal.
+
+EXPORT PDF
+Turn your trading history into a clear, professional PDF report. Share or archive your performance with one tap.
+
+MULTI-PORTFOLIO
+Separate funded accounts and personal capital. Switch portfolios without mixing your data.
+
+RISK CALCULATOR
+Built-in calculator for position sizing, risk/reward simulation, and ratio tools.
+
+AI COACH (Pro)
+Get insights from your journal data with Paychek AI Coach.
+
+LANGUAGES
+English, French, Spanish, German, Portuguese, Korean.
+
+Paychek Pro unlocks unlimited journal access, advanced performance stats, full strategy and analysis tools, PDF export, and more. Subscription optional — free tier available to get started.
+
+Terms of Service: https://paychek.pro/terms
+Privacy Policy: https://paychek.pro/privacy
+
+Keywords: trading journal, forex, futures, crypto, stocks, trade log, day trading, trading psychology, discipline, checklist, win rate, MT5, Tradovate, risk management, multi-market, funded account.
+
+
+================================================================================
+🇫🇷 FRANÇAIS — Description complète
+================================================================================
+
+Arrêtez de trader à l'aveugle. Paychek est le journal de trading professionnel conçu pour les traders actifs exigeant précision, discipline et maîtrise psychologique — sur tous les marchés. Que vous fassiez grandir un compte financé ou que vous gériez votre capital personnel, Paychek transforme vos données brutes en insights actionnables.
+
+Paychek va bien au-delà d'un simple carnet de trades. Application journal complète pour chaque marché : forex, indices, futures, crypto, actions et matières premières — EUR/USD, NASDAQ, NQ, BTC, actions, or, pétrole et plus. Pour day traders et swing traders, tous actifs confondus.
+
+ENREGISTREZ CHAQUE TRADE
+Consignez votre exécution en quelques secondes. Joignez vos documents de stratégie, taguez la psychologie (FOMO, tilt, hésitation), liez votre plan d'analyse et gardez un historique cohérent. Chaque trade compte — maîtrisez vos prises de décision dans le temps.
+
+PLANIFIEZ AVANT D'ENTRER
+Définissez votre plan de trade avant d'ouvrir une position. Setup, niveaux clés, confluence, risk/reward — documentez votre edge avant l'ouverture du marché. Formalisez vos règles et créez un plan reproductible.
+
+VOTRE ÉTAT MENTAL
+La psychologie du trading compte. De la concentration et du sommeil aux émotions et au stress, suivez les facteurs internes qui déterminent vos performances. Connectez mindset et résultats au quotidien.
+
+UN DASHBOARD INTUITIF
+Chaque trade, chaque résultat, chaque émotion — réunis au même endroit. Suivez vos progrès, maîtrisez votre mindset et éliminez l'incertitude.
+
+CHECKLIST PRÉ-SESSION
+Suivez votre checklist, construisez votre routine et voyez vos progrès évoluer en temps réel. Sections personnalisables, rappels programmés et validation quotidienne.
+
+MA STRATÉGIE
+Reprenez le contrôle de chaque trade. Règles, gestion du risque, sessions de trading, setups et modèles dans un espace structuré.
+
+MON ANALYSE
+Préparez chaque session avec une analyse structurée. Zones clés, indicateurs, contexte et chartisme — alignez votre plan avant l'exécution.
+
+PERFORMANCE & STATS
+Statistiques avancées : winrate, P&L, lens discipline, créneaux horaires, durée des trades, volume, news et insights Paychek Lens. Repérez des patterns invisibles dans Excel.
+
+CALENDRIER TRADING
+Calendrier visuel de vos journées de trading. Résultats, séries et objectifs en un coup d'œil.
+
+IMPORT DE L'HISTORIQUE
+Importez vos trades depuis MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS et plus (CSV, relevés). Fini la ressaisie manuelle.
+
+EXPORT PDF
+Transformez votre historique en rapport PDF clair et professionnel.
+
+MULTI-PORTEFEUILLES
+Comptes financés et capital personnel séparés. Basculez sans mélanger vos données.
+
+CALCULATRICE
+Calculateur intégré : taille de position, simulation risk/reward, ratios.
+
+AI COACH (Pro)
+Insights sur vos données journal avec le Coach IA Paychek.
+
+LANGUES
+Français, anglais, espagnol, allemand, portugais, coréen.
+
+Paychek Pro : journal illimité, stats avancées, stratégie et analyse complètes, export PDF. Abonnement optionnel — version gratuite pour démarrer.
+
+CGU : https://paychek.pro/terms
+Confidentialité : https://paychek.pro/privacy
+
+Mots-clés : journal trading, forex, futures, crypto, actions, carnet de trades, day trading, psychologie trading, discipline, checklist, winrate, MT5, Tradovate, multi-marchés, gestion du risque, compte financé.
+
+
+================================================================================
+🇪🇸 ESPAÑOL — Descripción completa
+================================================================================
+
+Deja de operar a ciegas. Paychek es el diario de trading profesional para traders activos que exigen precisión, disciplina y ventaja psicológica — en cualquier mercado. Ya sea que estés escalando una cuenta financiada o gestionando capital personal, Paychek convierte tus datos en insights accionables.
+
+Paychek es mucho más que un registro de operaciones. App journal completa para todos los mercados: forex, índices, futuros, cripto, acciones y materias primas — EUR/USD, NASDAQ, NQ, BTC, acciones, oro, petróleo y más. Para day traders y swing traders en todos los activos.
+
+REGISTRA CADA OPERACIÓN
+Registra tu ejecución en segundos. Adjunta documentos de estrategia, etiqueta psicología (FOMO, tilt), vincula tu plan de análisis y mantén un historial coherente. Domina tu toma de decisiones.
+
+PLANIFICA ANTES DE ENTRAR
+Define tu plan antes de abrir la posición. Setup, niveles clave, confluencia, riesgo/beneficio — documenta tu ventaja antes del mercado.
+
+TU ESTADO MENTAL
+La psicología del trading importa. Del enfoque y sueño a emociones y estrés, monitoriza los factores internos de tu rendimiento.
+
+UN PANEL INTUITIVO
+Cada operación, cada resultado, cada emoción — en un solo lugar. Sigue tu progreso y elimina la incertidumbre.
+
+CHECKLIST PRE-SESIÓN
+Sigue tu checklist, crea tu rutina y mira tu progreso crecer en tiempo real.
+
+MI ESTRATEGIA
+Toma el control de cada operación. Reglas, gestión del riesgo, sesiones y setups en un espacio estructurado.
+
+MI ANÁLISIS
+Prepara cada sesión con análisis estructurado. Zonas clave, indicadores, contexto y chartismo.
+
+RENDIMIENTO Y ESTADÍSTICAS
+Win rate, P&L, lens de disciplina, franjas horarias, duración, volumen e insights Paychek Lens.
+
+CALENDARIO DE TRADING
+Calendario visual de tus días de trading.
+
+IMPORTAR HISTORIAL
+Importa desde MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS (CSV, extractos).
+
+EXPORTAR PDF
+Convierte tu historial en un informe PDF profesional.
+
+MULTI-CARTERA
+Cuentas financiadas y capital personal separados.
+
+CALCULADORA
+Calculadora integrada: tamaño de posición, simulación risk/reward.
+
+AI COACH (Pro)
+Insights con Coach IA Paychek.
+
+IDIOMAS
+Español, inglés, francés, alemán, portugués, coreano.
+
+Paychek Pro : diario ilimitado, stats avanzadas, estrategia, PDF. Suscripción opcional — versión gratuita disponible.
+
+Términos : https://paychek.pro/terms
+Privacidad : https://paychek.pro/privacy
+
+
+================================================================================
+🇩🇪 DEUTSCH — Vollständige Beschreibung
+================================================================================
+
+Höre auf, blind zu traden. Paychek ist das professionelle Trading-Tagebuch für aktive Trader, die Präzision, Disziplin und psychologischen Vorteil verlangen — auf allen Märkten. Ob finanziertes Konto oder Eigenkapital — Paychek verwandelt Rohdaten in umsetzbare Erkenntnisse.
+
+Paychek ist mehr als ein Trade-Log. Eine komplette Journal-App für jeden Markt: Forex, Indizes, Futures, Krypto, Aktien und Rohstoffe — EUR/USD, NASDAQ, NQ, BTC, Aktien, Gold, Öl und mehr.
+
+JEDEN TRADE ERFASSEN
+Erfasse deine Ausführung in Sekunden. Strategie-Dokumente anhängen, Psychologie taggen (FOMO, Tilt), Analyseplan verknüpfen, konsistente Historie.
+
+PLAN VOR DEM EINSTIEG
+Trade-Plan vor Positionseröffnung. Setup, Levels, Confluence, Risk/Reward — Edge dokumentieren.
+
+DEIN MENTALER ZUSTAND
+Trading-Psychologie zählt. Fokus, Schlaf, Emotionen, Stress — innere Faktoren überwachen.
+
+EIN INTUITIVES DASHBOARD
+Jeder Trade, jedes Ergebnis, jede Emotion — an einem Ort.
+
+CHECKLISTE
+Checkliste folgen, Routine aufbauen, Fortschritt in Echtzeit.
+
+MEINE STRATEGIE
+Kontrolle über jeden Trade. Regeln, Risiko, Sessions, Setups.
+
+MEINE ANALYSE
+Strukturierte Vorbereitung: Zonen, Indikatoren, Kontext, Chartmuster.
+
+PERFORMANCE & STATS
+Winrate, P&L, Disziplin-Lens, Zeitfenster, Dauer, Volumen, Paychek Lens.
+
+TRADING-KALENDER
+Visueller Kalender deiner Handelstage.
+
+IMPORT
+Import von MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS (CSV).
+
+PDF-EXPORT
+Professioneller PDF-Bericht deiner Historie.
+
+MULTI-PORTFOLIO
+Finanzierte Konten und Eigenkapital getrennt.
+
+Rechner
+Positionsgröße, Risk/Reward-Simulation.
+
+AI COACH (Pro)
+Insights mit Paychek AI Coach.
+
+SPRACHEN
+Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Koreanisch.
+
+Paychek Pro : unbegrenztes Journal, erweiterte Stats, Strategie, PDF. Abo optional.
+
+AGB : https://paychek.pro/terms
+Datenschutz : https://paychek.pro/privacy
+
+
+================================================================================
+🇵🇹 PORTUGUÊS — Descrição completa
+================================================================================
+
+Pare de operar às cegas. Paychek é o diário de trading profissional para traders ativos que exigem precisão, disciplina e vantagem psicológica — em qualquer mercado. Quer escale uma conta financiada ou gira capital pessoal, Paychek transforma dados brutos em insights acionáveis.
+
+Paychek é muito mais que um registo de trades. App journal completa para todos os mercados: forex, índices, futuros, cripto, ações e matérias-primas — EUR/USD, NASDAQ, NQ, BTC, ações, ouro, petróleo e mais.
+
+REGISTE CADA TRADE
+Registe a execução em segundos. Anexe documentos de estratégia, etiquete psicologia (FOMO, tilt), ligue o plano de análise, histórico consistente.
+
+PLANEIE ANTES DE ENTRAR
+Plano de trade antes de abrir a posição. Setup, níveis, confluência, risco/recompensa.
+
+O SEU ESTADO MENTAL
+Psicologia do trading. Foco, sono, emoções, stress — fatores internos do desempenho.
+
+UM PAINEL INTUITIVO
+Cada trade, cada resultado, cada emoção — num só lugar.
+
+CHECKLIST PRÉ-SESSÃO
+Siga a checklist, construa a rotina, progresso em tempo real.
+
+A MINHA ESTRATÉGIA
+Controlo em cada trade. Regras, risco, sessões, setups.
+
+A MINHA ANÁLISE
+Análise estruturada: zonas, indicadores, contexto, chartismo.
+
+PERFORMANCE E ESTATÍSTICAS
+Win rate, P&L, lens de disciplina, horários, duração, Paychek Lens.
+
+CALENDÁRIO DE TRADING
+Calendário visual dos seus dias de trading.
+
+IMPORTAR HISTÓRICO
+Import MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS (CSV).
+
+EXPORTAR PDF
+Relatório PDF profissional do histórico.
+
+MULTI-PORTFÓLIO
+Contas financiadas e capital pessoal separados.
+
+CALCULADORA
+Tamanho de posição, simulação risk/reward.
+
+AI COACH (Pro)
+Insights com Coach IA Paychek.
+
+IDIOMAS
+Português, inglês, francês, espanhol, alemão, coreano.
+
+Paychek Pro : diário ilimitado, stats avançadas, estratégia, PDF. Subscrição opcional.
+
+Termos : https://paychek.pro/terms
+Privacidade : https://paychek.pro/privacy
+
+
+================================================================================
+🇰🇷 한국어 — 전체 설명
+================================================================================
+
+맹목적으로 트레이딩하지 마세요. Paychek는 모든 시장에서 정밀함, 규율, 심리적 우위를 원하는 활성 트레이더를 위한 전문 트레이딩 저널입니다. 자금 지원 계좌를 키우든 개인 자본을 운용하든, Paychek가 원시 데이터를 실행 가능한 인사이트로 바꿔 드립니다.
+
+Paychek는 단순 트레이드 로그가 아닙니다. 외환, 지수, 선물, 암호화폐, 주식, 원자재 등 모든 시장을 위한 완전한 저널 앱 — EUR/USD, NASDAQ, NQ, BTC, 주식, 금, 원유 등.
+
+모든 트레이드 기록
+몇 초 만에 실행 내역을 기록하세요. 전략 문서 첨부, 심리 태그(FOMO, 틸트), 분석 플랜 연결, 일관된 히스토리.
+
+진입 전 플랜
+포지션 오픈 전 트레이드 플랜 정의. 셋업, 핵심 레벨, 컨플루언스, 리스크/리워드.
+
+나의 멘탈 상태
+트레이딩 심리. 집중, 수면, 감정, 스트레스 — 시장 성과를 좌우하는 내면 요인.
+
+직관적인 대시보드
+모든 트레이드, 결과, 감정 — 한곳에서.
+
+체크리스트
+체크리스트를 따르고, 루틴을 만들고, 실시간 진행 상황 확인.
+
+내 전략
+모든 트레이드 통제. 규칙, 리스크, 세션, 셋업.
+
+내 분석
+구조화된 사전 분석: 존, 지표, 컨텍스트, 차트 패턴.
+
+성과 & 통계
+승률, P&L, 디시플린 렌즈, 시간대, Paychek Lens.
+
+트레이딩 캘린더
+트레이딩 일정 시각화.
+
+가져오기
+MT4, MT5, TradingView, Tradovate, cTrader, NinjaTrader, ATAS (CSV).
+
+PDF 내보내기
+전문 PDF 리포트.
+
+멀티 포트폴리오
+자금 지원 계좌와 개인 자본 분리.
+
+계산기
+포지션 사이징, 리스크/리워드 시뮬레이션.
+
+AI COACH (Pro)
+Paychek AI 코치 인사이트.
+
+언어
+한국어, 영어, 프랑스어, 스페인어, 독일어, 포르투갈어.
+
+Paychek Pro : 무제한 저널, 고급 통계, 전략, PDF. 구독 선택 — 무료 티어 제공.
+
+약관 : https://paychek.pro/terms
+개인정보 : https://paychek.pro/privacy

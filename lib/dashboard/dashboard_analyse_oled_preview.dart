@@ -9,16 +9,19 @@ class DashboardAnalyseOledPreviewContent extends StatelessWidget {
     super.key,
     required this.snapshot,
     required this.onPrepToggle,
+    this.topBar,
   });
 
   final AnalyseReportSnapshot snapshot;
   final ValueChanged<String> onPrepToggle;
+  final Widget? topBar;
 
   @override
   Widget build(BuildContext context) {
     return AnalyseReportBody(
       snapshot: snapshot,
       onPrepToggle: onPrepToggle,
+      topBar: topBar,
     );
   }
 }

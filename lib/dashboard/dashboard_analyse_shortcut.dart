@@ -37,29 +37,22 @@ class DashboardAnalyseShortcut extends StatelessWidget {
     }
     final l = AppLocalizations.of(context)!;
     final s = snapshot;
-
-    return DashboardSectionShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          DashboardAnalyseShortcutHeader(
-            title: l.dashboardAnalyseShortcutTitle,
-            onOpenAnalyse: onOpenAnalyse,
-          ),
-          if (s != null) ...[
-            const SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap),
-            DashboardAnalyseOledPreviewContent(
-              snapshot: s,
-              onPrepToggle: onPrepToggle,
-            ),
-          ],
-        ],
-      ),
+    final header = DashboardAnalyseShortcutHeader(
+      title: l.dashboardAnalyseShortcutTitle,
+      onOpenAnalyse: onOpenAnalyse,
     );
+
+    return s == null
+        ? DashboardSectionShell(child: header)
+        : DashboardAnalyseOledPreviewContent(
+            snapshot: s,
+            onPrepToggle: onPrepToggle,
+            topBar: header,
+          );
   }
 }
 
-/// En-tête partagé mobile / web (titre + chevron).
+/// En-tête partagé mobile / web (titre + chevron), intégré en haut de la carte OLED.
 class DashboardAnalyseShortcutHeader extends StatelessWidget {
   const DashboardAnalyseShortcutHeader({
     super.key,

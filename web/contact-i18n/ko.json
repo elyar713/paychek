@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "title": "문의 및 피드백 | Paychek",
+    "description": "Paychek 문의: 지원, 제품 피드백, 제안 및 제휴 프로그램. 모든 메시지에 답변드립니다."
+  },
+  "nav": { "back": "돌아가기" },
+  "hero": {
+    "chip": "모든 메시지를 읽습니다",
+    "titleHtml": "문의 & <span class=\"gradient-text\">피드백</span>",
+    "subtitle": "질문, 버그, Paychek 개선 아이디어가 있으신가요? 여러분의 피드백이 제품을 만듭니다. 이메일로 빠르게 답변드립니다."
+  },
+  "form": {
+    "title": "메시지 보내기",
+    "subtitle": "설정의 지원 및 피드백과 동일한 경로입니다. 여기에서 확인 메시지를 볼 수 있습니다.",
+    "nameLabel": "이름",
+    "namePh": "이름",
+    "emailLabel": "이메일",
+    "emailPh": "you@email.com",
+    "subjectLabel": "제목",
+    "subjects": {
+      "support": "지원 / 도움",
+      "bug": "버그 신고",
+      "suggestion": "제안 / 피드백",
+      "affiliate": "제휴 프로그램",
+      "other": "기타"
+    },
+    "messageLabel": "메시지",
+    "messagePh": "메시지를 입력하세요...",
+    "submit": "메시지 보내기",
+    "hint": "요청은 안전하게 저장되며 앱 티켓과 동일하게 팀에 알림됩니다.",
+    "sending": "전송 중…",
+    "success": "감사합니다! 요청이 전송되었습니다. 참조 번호: {ref}. 곧 이메일로 답변드리겠습니다.",
+    "errorGeneric": "전송할 수 없습니다. 연결을 확인하거나 contact@paychek.pro 로 문의하세요.",
+    "errorValidation": "유효한 이메일과 메시지(최소 8자)를 입력해 주세요."
+  },
+  "direct": {
+    "title": "직접 문의",
+    "emailLabel": "이메일",
+    "appHintHtml": "이미 Paychek을 사용 중이신가요? <strong class=\"text-gray-300\">설정 → 지원 및 피드백</strong>에서 계정과 연결된 티켓을 열 수 있습니다."
+  },
+  "affiliate": {
+    "chip": "제휴 프로그램",
+    "title": "Paychek을 추천하고 보상 받기",
+    "body": "콘텐츠 크리에이터, 멘토 또는 트레이딩 커뮤니티이신가요? 제휴 프로그램에 참여하고 추천 Pro 구독마다 수수료를 받으세요.",
+    "cta": "제휴 파트너 되기",
+    "mailtoSubject": "Paychek 제휴 프로그램"
+  },
+  "footer": {
+    "home": "홈",
+    "blog": "블로그",
+    "privacy": "개인정보",
+    "terms": "약관",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

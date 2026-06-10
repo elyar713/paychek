@@ -29,11 +29,12 @@ void _absorbPlanReportRows(
   }
 }
 
-/// Union des lignes de tous les [planReport] des trades + rapport démo GOLD (structure complète).
+/// Union des lignes plan d'analyse (id → libellé) : trades, rapports Mon Analyse, démo seulement si vide.
 PerformanceCustomLensPlanIndex buildPerformanceCustomLensPlanIndex({
   required List<Trade> trades,
   required AppLocalizations l,
   required Locale locale,
+  List<AnalyseReportSnapshot> storedPlanReports = const [],
 }) {
   final labels = <String, String>{};
 
@@ -42,11 +43,17 @@ PerformanceCustomLensPlanIndex buildPerformanceCustomLensPlanIndex({
     if (report != null) _absorbPlanReportRows(report, l, labels);
   }
 
-  _absorbPlanReportRows(
-    buildAnalyseDashboardPreviewSnapshot(locale: locale),
-    l,
-    labels,
-  );
+  for (final report in storedPlanReports) {
+    _absorbPlanReportRows(report, l, labels);
+  }
+
+  if (labels.isEmpty) {
+    _absorbPlanReportRows(
+      buildAnalyseDashboardPreviewSnapshot(locale: locale),
+      l,
+      labels,
+    );
+  }
 
   return PerformanceCustomLensPlanIndex(labels);
 }

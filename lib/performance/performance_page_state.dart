@@ -28,6 +28,8 @@ class _PerformancePageState extends State<PerformancePage>
   AjouterTradeAssetClass _volumeSectionMarche = AjouterTradeAssetClass.forex;
   AjouterTradeAssetClass _mostTradedSectionMarche =
       AjouterTradeAssetClass.forex;
+  bool _volumeSectionMarcheUserPicked = false;
+  bool _mostTradedSectionMarcheUserPicked = false;
 
   late final AnimationController _pulseCtrl;
 
@@ -132,7 +134,41 @@ class _PerformancePageState extends State<PerformancePage>
   void _applyTradeSource() {
     if (!mounted) return;
     final items = activeJournalTradesOrDemo(context);
-    setState(() => _trades = performanceTradesFromJournal(items));
+    setState(() {
+      _trades = performanceTradesFromJournal(items);
+      _syncMarketSectionsFromVisibleTrades();
+    });
+    _syncKpiToDashboard();
+  }
+
+  void _resetMarketSectionUserOverrides() {
+    _volumeSectionMarcheUserPicked = false;
+    _mostTradedSectionMarcheUserPicked = false;
+  }
+
+  void _syncMarketSectionsFromVisibleTrades() {
+    final trades = _visibleTrades;
+    final dominant = dominantAssetClassFromTrades(trades);
+    if (!_volumeSectionMarcheUserPicked ||
+        tradeCountForAssetClass(trades, _volumeSectionMarche) == 0) {
+      _volumeSectionMarche = dominant;
+    }
+    if (!_mostTradedSectionMarcheUserPicked ||
+        tradeCountForAssetClass(trades, _mostTradedSectionMarche) == 0) {
+      _mostTradedSectionMarche = dominant;
+    }
+  }
+
+  void _onPeriodFilterChanged(
+    PerformancePeriodFilter period, {
+    DateTime? customStart,
+  }) {
+    setState(() {
+      _periodFilter = period;
+      if (customStart != null) _customStartDate = customStart;
+      _resetMarketSectionUserOverrides();
+      _syncMarketSectionsFromVisibleTrades();
+    });
     _syncKpiToDashboard();
   }
 
@@ -178,11 +214,10 @@ class _PerformancePageState extends State<PerformancePage>
       },
     );
     if (picked == null || !mounted) return;
-    setState(() {
-      _periodFilter = PerformancePeriodFilter.custom;
-      _customStartDate = picked;
-    });
-    _syncKpiToDashboard();
+    _onPeriodFilterChanged(
+      PerformancePeriodFilter.custom,
+      customStart: picked,
+    );
   }
 
   Widget _buildPeriodFilterBar() {
@@ -264,12 +299,7 @@ class _PerformancePageState extends State<PerformancePage>
           'Todo o histórico',
           '전체 기록',
         ),
-        onPressed: () {
-          setState(() {
-            _periodFilter = PerformancePeriodFilter.all;
-          });
-          _syncKpiToDashboard();
-        },
+        onPressed: () => _onPeriodFilterChanged(PerformancePeriodFilter.all),
         icon: Icon(
           Icons.filter_list_off_rounded,
           size: 20,
@@ -286,10 +316,7 @@ class _PerformancePageState extends State<PerformancePage>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            setState(() => _periodFilter = period);
-            _syncKpiToDashboard();
-          },
+          onTap: () => _onPeriodFilterChanged(period),
           borderRadius: BorderRadius.circular(20),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -587,11 +614,17 @@ class _PerformancePageState extends State<PerformancePage>
   }
 
   void _setVolumeSectionMarche(AjouterTradeAssetClass m) {
-    setState(() => _volumeSectionMarche = m);
+    setState(() {
+      _volumeSectionMarche = m;
+      _volumeSectionMarcheUserPicked = true;
+    });
   }
 
   void _setMostTradedSectionMarche(AjouterTradeAssetClass m) {
-    setState(() => _mostTradedSectionMarche = m);
+    setState(() {
+      _mostTradedSectionMarche = m;
+      _mostTradedSectionMarcheUserPicked = true;
+    });
   }
 
   Future<void> _exportPerformancePdf() async {

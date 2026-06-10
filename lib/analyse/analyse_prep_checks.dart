@@ -36,6 +36,20 @@ abstract final class AnalysePrepCheckIds {
   static const volNote = 'vol_note';
 }
 
+/// Valeur vide ou placeholder rapport OLED (`—`).
+bool analyseReportOledValueIsEmpty(String? raw) {
+  final t = (raw ?? '').trim();
+  return t.isEmpty || t == '—';
+}
+
+bool analyseReportSmcFieldIsEmpty(String main, List<String> extras) {
+  if (!analyseReportOledValueIsEmpty(main)) return false;
+  for (final e in extras) {
+    if (!analyseReportOledValueIsEmpty(e)) return false;
+  }
+  return true;
+}
+
 /// Critères cochables visibles (générateur + rapport figé OLED).
 List<String> _applicablePrepCheckIds({
   required bool contextEnabled,
@@ -49,6 +63,22 @@ List<String> _applicablePrepCheckIds({
   required String noteSmc,
   required String noteVolume,
   required String smcFibOteLabel,
+  required String structureTf,
+  required String chartisme,
+  required String support,
+  required String resistance,
+  required String indicatorsTf,
+  required String indicateursOutils,
+  required String smcOb,
+  required List<String> smcObExtras,
+  required String smcFvg,
+  required List<String> smcFvgExtras,
+  required String smcLiq,
+  required List<String> smcLiqExtras,
+  required String smcFibPrice,
+  required String poc,
+  required String vah,
+  required String val,
 }) {
   final ids = <String>[];
   if (contextEnabled) {
@@ -66,27 +96,43 @@ List<String> _applicablePrepCheckIds({
     }
   }
   if (structureEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.structTf,
-      AnalysePrepCheckIds.structChartisme,
-      AnalysePrepCheckIds.structSupport,
-      AnalysePrepCheckIds.structResistance,
-    ]);
+    if (!analyseReportOledValueIsEmpty(structureTf)) {
+      ids.add(AnalysePrepCheckIds.structTf);
+    }
+    if (!analyseReportOledValueIsEmpty(chartisme)) {
+      ids.add(AnalysePrepCheckIds.structChartisme);
+    }
+    if (!analyseReportOledValueIsEmpty(support)) {
+      ids.add(AnalysePrepCheckIds.structSupport);
+    }
+    if (!analyseReportOledValueIsEmpty(resistance)) {
+      ids.add(AnalysePrepCheckIds.structResistance);
+    }
   }
   if (indicatorsEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.indTf,
-      AnalysePrepCheckIds.indOutils,
-      AnalysePrepCheckIds.indNote,
-    ]);
+    if (!analyseReportOledValueIsEmpty(indicatorsTf)) {
+      ids.add(AnalysePrepCheckIds.indTf);
+    }
+    if (!analyseReportOledValueIsEmpty(indicateursOutils)) {
+      ids.add(AnalysePrepCheckIds.indOutils);
+    }
+    if (noteIndicators.trim().isNotEmpty) {
+      ids.add(AnalysePrepCheckIds.indNote);
+    }
   }
   if (smcEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.smcOb,
-      AnalysePrepCheckIds.smcFvg,
-      AnalysePrepCheckIds.smcLiq,
-      AnalysePrepCheckIds.smcFibPrix,
-    ]);
+    if (!analyseReportSmcFieldIsEmpty(smcOb, smcObExtras)) {
+      ids.add(AnalysePrepCheckIds.smcOb);
+    }
+    if (!analyseReportSmcFieldIsEmpty(smcFvg, smcFvgExtras)) {
+      ids.add(AnalysePrepCheckIds.smcFvg);
+    }
+    if (!analyseReportSmcFieldIsEmpty(smcLiq, smcLiqExtras)) {
+      ids.add(AnalysePrepCheckIds.smcLiq);
+    }
+    if (!analyseReportOledValueIsEmpty(smcFibPrice)) {
+      ids.add(AnalysePrepCheckIds.smcFibPrix);
+    }
     if (smcFibOteLabel.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.smcOte);
     }
@@ -95,11 +141,15 @@ List<String> _applicablePrepCheckIds({
     }
   }
   if (volumeEnabled) {
-    ids.addAll([
-      AnalysePrepCheckIds.volPoc,
-      AnalysePrepCheckIds.volVah,
-      AnalysePrepCheckIds.volVal,
-    ]);
+    if (!analyseReportOledValueIsEmpty(poc)) {
+      ids.add(AnalysePrepCheckIds.volPoc);
+    }
+    if (!analyseReportOledValueIsEmpty(vah)) {
+      ids.add(AnalysePrepCheckIds.volVah);
+    }
+    if (!analyseReportOledValueIsEmpty(val)) {
+      ids.add(AnalysePrepCheckIds.volVal);
+    }
     if (noteVolume.trim().isNotEmpty) {
       ids.add(AnalysePrepCheckIds.volNote);
     }
@@ -123,6 +173,28 @@ List<String> applicablePrepCheckIdsFromController(AnalyseController c) {
     noteSmc: c.notesSmc,
     noteVolume: c.notesVolumeProfile,
     smcFibOteLabel: oteLabel,
+    structureTf: c.structureTf,
+    chartisme: c.structureDernierPoint,
+    support: c.structureSupportMaj,
+    resistance: c.structureResistanceMaj,
+    indicatorsTf: c.indicatorsTf,
+    indicateursOutils: [
+      for (final n in c.indicators)
+        if (c.indicatorSetupIsSelected(n)) n,
+    ].join(' + '),
+    smcOb: () {
+      final z = c.smcZone.trim();
+      return z.isNotEmpty ? z : c.smcTf.trim();
+    }(),
+    smcObExtras: c.smcZoneExtras,
+    smcFvg: c.smcFvg,
+    smcFvgExtras: c.smcFvgExtras,
+    smcLiq: c.smcLiquidityPools,
+    smcLiqExtras: c.smcLiquidityExtras,
+    smcFibPrice: c.smcFibPrice,
+    poc: c.volumeProfilePoc,
+    vah: c.volumeProfileVah,
+    val: c.volumeProfileVal,
   );
 }
 
@@ -139,6 +211,22 @@ List<String> applicablePrepCheckIdsFromSnapshot(AnalyseReportSnapshot s) {
     noteSmc: s.noteSmc,
     noteVolume: s.noteVolume,
     smcFibOteLabel: s.smcFibOteLabel,
+    structureTf: s.structureTf,
+    chartisme: s.chartisme,
+    support: s.support,
+    resistance: s.resistance,
+    indicatorsTf: s.indicatorsTf,
+    indicateursOutils: s.indicateursOutils,
+    smcOb: s.smcOb,
+    smcObExtras: s.smcObExtras,
+    smcFvg: s.smcFvg,
+    smcFvgExtras: s.smcFvgExtras,
+    smcLiq: s.smcLiq,
+    smcLiqExtras: s.smcLiquidityExtras,
+    smcFibPrice: s.smcFibPrice,
+    poc: s.poc,
+    vah: s.vah,
+    val: s.val,
   );
 }
 

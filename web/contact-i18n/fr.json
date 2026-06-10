@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "title": "Contact & Feedback | Paychek",
+    "description": "Contactez Paychek : support, retours produit, suggestions et programme d'affiliation. Nous répondons à chaque message."
+  },
+  "nav": { "back": "Retour" },
+  "hero": {
+    "chip": "Nous lisons chaque message",
+    "titleHtml": "Contact & <span class=\"gradient-text\">Feedback</span>",
+    "subtitle": "Une question, un bug, une idée pour améliorer Paychek ? Votre retour façonne le produit. Nous répondons rapidement par e-mail."
+  },
+  "form": {
+    "title": "Envoyer un message",
+    "subtitle": "Même circuit que Support & Feedback dans Réglages. Vous verrez une confirmation ici.",
+    "nameLabel": "Nom",
+    "namePh": "Votre nom",
+    "emailLabel": "E-mail",
+    "emailPh": "vous@email.com",
+    "subjectLabel": "Sujet",
+    "subjects": {
+      "support": "Support / aide",
+      "bug": "Signaler un bug",
+      "suggestion": "Suggestion / feedback",
+      "affiliate": "Programme d'affiliation",
+      "other": "Autre"
+    },
+    "messageLabel": "Message",
+    "messagePh": "Votre message...",
+    "submit": "Envoyer le message",
+    "hint": "Votre demande est enregistrée — l'équipe est notifiée comme pour les tickets in-app.",
+    "sending": "Envoi en cours…",
+    "success": "Merci ! Votre demande a bien été envoyée. Référence : {ref}. Nous vous répondrons à votre e-mail sous peu.",
+    "errorGeneric": "Envoi impossible. Vérifiez votre connexion ou écrivez à contact@paychek.pro.",
+    "errorValidation": "Indiquez un e-mail valide et un message (8 caractères minimum)."
+  },
+  "direct": {
+    "title": "Nous joindre directement",
+    "emailLabel": "E-mail",
+    "appHintHtml": "Vous utilisez déjà Paychek ? Ouvrez <strong class=\"text-gray-300\">Réglages → Support & Feedback</strong> pour un ticket suivi depuis votre compte."
+  },
+  "affiliate": {
+    "chip": "Programme d'affiliation",
+    "title": "Recommandez Paychek, soyez récompensé",
+    "body": "Créateur de contenu, mentor ou communauté de traders ? Rejoignez notre programme d'affiliation et touchez une commission sur chaque abonnement Pro apporté.",
+    "cta": "Devenir affilié",
+    "mailtoSubject": "Programme d'affiliation Paychek"
+  },
+  "footer": {
+    "home": "Accueil",
+    "blog": "Blog",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

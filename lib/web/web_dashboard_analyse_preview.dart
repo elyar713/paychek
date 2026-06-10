@@ -6,7 +6,7 @@ import '../dashboard/dashboard_analyse_shortcut.dart';
 import '../l10n/app_localizations.dart';
 import 'paychek_web_tokens.dart';
 
-/// Aperçu « Mon analyse » web : en-tête maquette + rapport OLED (test).
+/// Aperçu « Mon analyse » web : titre + chevron fusionnés dans la carte OLED.
 class WebDashboardAnalysePreview extends StatelessWidget {
   const WebDashboardAnalysePreview({
     super.key,
@@ -30,6 +30,21 @@ class WebDashboardAnalysePreview extends StatelessWidget {
     final l = AppLocalizations.of(context)!;
     final s = snapshot;
     final bg = cardBackgroundColor ?? Colors.transparent;
+    final header = DashboardAnalyseShortcutHeader(
+      title: l.dashboardAnalyseShortcutTitle,
+      onOpenAnalyse: onOpenAnalyse,
+      leadingIcon: Icons.show_chart_rounded,
+      titleUppercase: true,
+      iconSize: 16,
+      chevronSize: 20,
+      iconColor: PaychekWebTokens.textGray500,
+      titleStyle: TextStyle(
+        fontSize: 9,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+        color: PaychekWebTokens.textGray500,
+      ),
+    );
 
     return ColoredBox(
       color: bg,
@@ -43,33 +58,13 @@ class WebDashboardAnalysePreview extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: SizedBox(
                 width: innerW,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    DashboardAnalyseShortcutHeader(
-                      title: l.dashboardAnalyseShortcutTitle,
-                      onOpenAnalyse: onOpenAnalyse,
-                      leadingIcon: Icons.show_chart_rounded,
-                      titleUppercase: true,
-                      iconSize: 16,
-                      chevronSize: 20,
-                      iconColor: PaychekWebTokens.textGray500,
-                      titleStyle: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: PaychekWebTokens.textGray500,
-                      ),
-                    ),
-                    if (s != null) ...[
-                      const SizedBox(height: 14),
-                      DashboardAnalyseOledPreviewContent(
+                child: s == null
+                    ? header
+                    : DashboardAnalyseOledPreviewContent(
                         snapshot: s,
                         onPrepToggle: onPrepToggle,
+                        topBar: header,
                       ),
-                    ],
-                  ],
-                ),
               ),
             );
           },

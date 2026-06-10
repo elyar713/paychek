@@ -126,6 +126,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
       _visibleTrades,
       _volumeSectionMarche,
     );
+    final volumeMarkets = assetClassesOrderedByTradeCount(_visibleTrades);
 
     return _dashCard(
       child: Column(
@@ -147,8 +148,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final m in AjouterTradeAssetClass.values)
-                _volumeMarcheChip(m),
+              for (final m in volumeMarkets) _volumeMarcheChip(m),
             ],
           ),
           const SizedBox(height: 16),
@@ -338,6 +338,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
     final maxCount = stats.isEmpty
         ? 1
         : stats.map((e) => e.count).reduce((a, b) => a > b ? a : b);
+    final mostTradedMarkets = assetClassesOrderedByTradeCount(_visibleTrades);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -361,8 +362,7 @@ extension _PerformancePageUiBottom on _PerformancePageState {
             spacing: 6,
             runSpacing: 6,
             children: [
-              for (final m in AjouterTradeAssetClass.values)
-                _mostTradedMarcheChip(m),
+              for (final m in mostTradedMarkets) _mostTradedMarcheChip(m),
             ],
           ),
           const SizedBox(height: 12),

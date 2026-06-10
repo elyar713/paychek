@@ -67,7 +67,8 @@ service cloud.firestore {
 
     // Clés Stripe (pk / sk) — admin uniquement (ne pas exposer sk aux clients).
     match /paychek_app_config/stripe_keys {
-      allow read, create, update: if request.auth != null && request.auth.token.admin == true
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow create, update: if request.auth != null && request.auth.token.admin == true
         && request.resource.data.keys().hasOnly([
           'stripePublishableKey',
           'stripeSecretKey',

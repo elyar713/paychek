@@ -124,6 +124,8 @@ Future<bool> submitPaychekSupportTicket({
   /// Octets lus au moment du choix du fichier (surtout Web : [PlatformFile.bytes]
   /// peut être vide plus tard).
   Uint8List? attachmentBytes,
+  /// Langue UI au moment de l’envoi (prioritaire sur [ReglageLanguagePrefs.loadCode]).
+  String? appLanguageCode,
 }) async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) throw StateError('FirebaseAuth.instance.currentUser is null');
@@ -188,12 +190,16 @@ Future<bool> submitPaychekSupportTicket({
     }
   }
 
-  final appLang = await ReglageLanguagePrefs.loadCode();
+  final langCandidate = (appLanguageCode ?? await ReglageLanguagePrefs.loadCode())
+      .trim()
+      .toLowerCase();
+  final appLang = ReglageLanguagePrefs.availableCodes.contains(langCandidate)
+      ? langCandidate
+      : ReglageLanguagePrefs.defaultCode;
   final ticketPayload = <String, dynamic>{
     'userId': uid,
     'ticketRef': paychekSupportNewTicketRef(),
-    if (ReglageLanguagePrefs.availableCodes.contains(appLang))
-      'appLanguageCode': appLang,
+    'appLanguageCode': appLang,
     if (dn != null && dn.isNotEmpty) 'replyDisplayName': dn,
     if (replyFirstName.isNotEmpty) 'replyFirstName': replyFirstName,
     if (replyLastName.isNotEmpty) 'replyLastName': replyLastName,

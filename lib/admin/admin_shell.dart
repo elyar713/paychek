@@ -29,7 +29,7 @@ class _PaychekShellTab {
 
 List<_PaychekShellTab> _shellTabs(bool superadmin) => [
       _PaychekShellTab(
-        title: 'Vue d’ensemble',
+        title: 'Dashboard',
         icon: Icons.dashboard_outlined,
         page: const AdminOverviewPage(),
       ),
@@ -100,7 +100,8 @@ class _AdminShellState extends State<AdminShell> {
 
         final safeIdx = _index.clamp(0, n - 1).toInt();
         final current = tabs[safeIdx];
-        final embedPageTitleBar = current.page is AdminUsersPage;
+        final embedPageTitleBar =
+            current.page is AdminUsersPage || current.page is AdminOverviewPage;
 
         return Scaffold(
           body: Row(

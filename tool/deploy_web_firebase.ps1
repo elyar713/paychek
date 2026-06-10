@@ -10,7 +10,7 @@ flutter build web --release --no-wasm-dry-run
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # Fichiers SEO statiques (sinon le rewrite SPA renvoie index.html et Google voit une erreur sitemap).
-$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'privacy.html', 'terms.html')
+$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'privacy.html', 'terms.html', 'contact.html', 'blog.html', 'contact-i18n.js')
 foreach ($name in $seoFiles) {
   $src = Join-Path $root "web\$name"
   $dst = Join-Path $root "build\web\$name"

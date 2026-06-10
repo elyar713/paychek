@@ -2,6 +2,10 @@ import 'dart:async' show unawaited;
 
 import 'package:flutter/material.dart';
 
+import '../analyse/analyse_realtime_notifier.dart';
+import '../analyse/analyse_reports_demo_filter.dart';
+import '../analyse/analyse_report_snapshot.dart';
+import '../analyse/analyse_reports_storage.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_sections_storage.dart';
 import '../reglage/user_portfolio_scope.dart';
@@ -45,6 +49,7 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
       PerformanceCustomLensConfig.defaults();
   List<PerformanceCustomLensSavedCard> _customLensSavedCards = const [];
   List<ChecklistSectionData> _checklistSections = defaultNouveauTradeSections();
+  List<AnalyseReportSnapshot> _storedPlanReports = const [];
 
   List<Trade> get _disciplineVisibleTrades =>
       _trades.where((t) => !t.performanceLite).toList();
@@ -54,6 +59,17 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
     super.initState();
     _loadCustomLensSavedCards();
     _loadChecklistSectionsForLens();
+    _loadStoredPlanReportsForLens();
+    AnalyseRealtimeNotifier.reportsTick.addListener(_onAnalyseReportsChanged);
+  }
+
+  void _onAnalyseReportsChanged() => unawaited(_loadStoredPlanReportsForLens());
+
+  Future<void> _loadStoredPlanReportsForLens() async {
+    final storedRaw = await AnalyseReportsStorage.loadAll();
+    final visible = await analyseReportsForDisplay(storedRaw);
+    if (!mounted) return;
+    setState(() => _storedPlanReports = visible);
   }
 
   Future<void> _loadChecklistSectionsForLens() async {
@@ -93,6 +109,7 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
 
   @override
   void dispose() {
+    AnalyseRealtimeNotifier.reportsTick.removeListener(_onAnalyseReportsChanged);
     _journalStore?.removeListener(_onJournalChanged);
     _portfolioStore?.removeListener(_onJournalChanged);
     super.dispose();
@@ -162,6 +179,7 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
       trades: trades,
       config: saved.config,
       checklistSections: _checklistSections,
+      storedPlanReports: _storedPlanReports,
       readOnly: true,
       chrome: widget.cardChrome,
       onRemove: () => _onCustomLensRemoveSaved(saved.id),
@@ -228,6 +246,7 @@ class _PaychekLensSectionState extends State<PaychekLensSection> {
           config: _customLensDraft,
           onConfigChanged: _onCustomLensDraftChanged,
           checklistSections: _checklistSections,
+          storedPlanReports: _storedPlanReports,
           chrome: widget.cardChrome,
           onAdd: widget.showAddButton ? _onCustomLensAdd : null,
           onReset: _onCustomLensReset,

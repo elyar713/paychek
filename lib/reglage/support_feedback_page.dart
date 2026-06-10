@@ -15,6 +15,7 @@ import '../l10n/app_localizations.dart';
 import '../web/paychek_web_tokens.dart';
 import '../widgets/paychek_page_header.dart';
 import 'paychek_support_ticket_submit.dart';
+import 'reglage_language_prefs.dart';
 import 'support_feedback_config.dart';
 
 enum _SupportFormKind { account, billing, feature, other }
@@ -48,7 +49,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
   bool _submitting = false;
   String? _inlineSubmitStatus;
 
-  void _clearInlineSubmitStatus() {
+  void _clearInlineSubmitStatusOnUserEdit() {
     if (_inlineSubmitStatus == null) return;
     setState(() => _inlineSubmitStatus = null);
   }
@@ -61,14 +62,10 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
     if (addr != null && addr.isNotEmpty) {
       _emailCtrl.text = addr;
     }
-    _emailCtrl.addListener(_clearInlineSubmitStatus);
-    _descCtrl.addListener(_clearInlineSubmitStatus);
   }
 
   @override
   void dispose() {
-    _emailCtrl.removeListener(_clearInlineSubmitStatus);
-    _descCtrl.removeListener(_clearInlineSubmitStatus);
     _emailCtrl.dispose();
     _descCtrl.dispose();
     super.dispose();
@@ -243,6 +240,9 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
           description: desc,
           attachment: _attachment,
           attachmentBytes: _attachmentBytes,
+          appLanguageCode: ReglageLanguagePrefs.codeFromLocale(
+            Localizations.localeOf(context),
+          ),
         );
         if (!mounted) return;
         final hadFile = _attachment != null;
@@ -519,6 +519,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
           const SizedBox(height: 8),
           TextField(
             controller: _emailCtrl,
+            onChanged: (_) => _clearInlineSubmitStatusOnUserEdit(),
             keyboardType: TextInputType.emailAddress,
             scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),
             style: GoogleFonts.plusJakartaSans(
@@ -560,6 +561,7 @@ class _SupportFeedbackPageState extends State<SupportFeedbackPage> {
           const SizedBox(height: 8),
           TextField(
             controller: _descCtrl,
+            onChanged: (_) => _clearInlineSubmitStatusOnUserEdit(),
             minLines: 4,
             maxLines: 8,
             scrollPadding: PaychekKeyboardInsets.fieldScrollPadding(context),

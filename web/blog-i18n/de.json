@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "Paychek Blog | Trading-Tagebuch, Analyse und Psychologie",
+    "description": "Der Paychek-Blog: praktische Guides für ein Trading-Tagebuch, Performance-Analyse, Psychologie und Trade-Import (MT4, MT5, CSV).",
+    "keywords": "Trading-Tagebuch, Trade-Analyse, Trading-Psychologie, Disziplin, Performance-Statistiken, MT4, MT5, CSV-Import, Trading-Plan",
+    "ogDescription": "Praktische Guides für Ihr Trading-Tagebuch, Performance-Analyse und nachhaltige Verbesserung.",
+    "ogLocale": "de_DE"
+  },
+  "nav": {
+    "pricing": "Preise",
+    "openApp": "App öffnen"
+  },
+  "hero": {
+    "chip": "Der Blog für disziplinierte Trader",
+    "titleHtml": "Verwandeln Sie Ihre <span class=\"gradient-text\">Daten</span> in Entscheidungen",
+    "subtitle": "Konkrete Guides für ein nützliches Trading-Tagebuch, ehrliche Statistiken und die Disziplin, die profitable Trader auszeichnet."
+  },
+  "readMoreHtml": "Artikel lesen <i class=\"fas fa-arrow-right ml-1\"></i>",
+  "cards": {
+    "journal": {
+      "chip": "Grundlagen",
+      "title": "Warum ein Trading-Tagebuch alles verändert",
+      "desc": "Ein Tagebuch ist keine Bürokratie — es ist der einzige objektive Spiegel Ihres Tradings."
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "Trades analysieren und wirklich besser werden",
+      "desc": "Winrate, Chance-Risiko-Verhältnis, Expectancy: die Metriken, die zählen — und die täuschen."
+    },
+    "psychologie": {
+      "chip": "Psychologie",
+      "title": "Trader-Psychologie: Disziplin vor Strategie",
+      "desc": "Die beste Strategie scheitert ohne Emotionskontrolle. Disziplin messen und verbessern."
+    },
+    "import": {
+      "chip": "Praxis",
+      "title": "Trades importieren (MT4, MT5, CSV) ohne Zeitverlust",
+      "desc": "Automatisieren Sie die Erfassung und investieren Sie Energie in Analyse statt Copy-Paste."
+    }
+  },
+  "articles": {
+    "journal": {
+      "chip": "Grundlagen",
+      "title": "Warum ein Trading-Tagebuch alles verändert",
+      "bodyHtml": "<p>Die meisten Verlierer scheitern nicht an fehlender Strategie, sondern an fehlender Erinnerung an ihre Entscheidungen. Ohne Tagebuch ist jeder Trade eine isolierte Anekdote. Mit einem strukturierten <strong>Trading-Tagebuch</strong> werden Trades zu Daten — und Daten enthüllen Muster, die Ihr Gedächtnis systematisch ausblendet.</p><p>Das Gehirn behält spektakuläre Gewinne und löscht kleine wiederholte Fehler. Genau das Gegenteil dessen, was Sie zum Fortschritt brauchen. Das Tagebuch korrigiert diesen Bias, indem es <strong>jede</strong> Entry, Exit, Positionsgröße und Emotion festhält.</p><h3>Was ein gutes Tagebuch bringt</h3><ul><li><strong>Objektivität</strong>: Sie bewerten Trading an Zahlen, nicht an Gefühl.</li><li><strong>Lecks erkennen</strong>: Setups, die gut aussehen, aber über 50 Trades Geld kosten.</li><li><strong>Verstärken, was funktioniert</strong>: Ihren echten Edge finden und Kapital dort bündeln.</li><li><strong>Verantwortung</strong>: Schwer, sich mit historischem Protokoll anzulügen.</li></ul><h3>Wesentliche Felder</h3><p>Ein effektives Tagebuch ist nicht nur P&amp;L. Notieren Sie Asset, Session, Setup, geplantes CRV, Plan-Einhaltung und mentalen Zustand beim Entry. Die Kombination dieser Dimensionen macht Analyse mächtig.</p><p>Mit Paychek sind diese Felder vorausgefüllt und standardisiert: Journal in Sekunden statt fragiler Excel-Datei, die nach zwei Wochen vergessen wird.</p>"
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "Trades analysieren und wirklich besser werden",
+      "bodyHtml": "<p>Tagebuch führen ist Schritt eins; <strong>Analyse</strong> macht aus der Historie Fortschritt. Vorsicht: manche Metriken schmeicheln dem Ego ohne echte Rentabilität.</p><h3>Metriken, die zählen</h3><ul><li><strong>Expectancy</strong>: erwarteter Durchschnittsgewinn pro Trade — kombiniert Winrate und CRV.</li><li><strong>Chance-Risiko-Verhältnis</strong>: Gewinn bei Recht vs. Verlust bei Unrecht.</li><li><strong>Winrate pro Setup</strong>: globaler Wert bedeutet nichts — segmentieren Sie.</li><li><strong>Max Drawdown</strong>: die schlimmste Verlustserie für Ihre Psychologie.</li></ul><h3>Die Winrate-Falle</h3><p>70 % Winrate kann ein leer laufendes Konto verbergen, wenn Verluste dreimal größer sind als Gewinne. Umgekehrt: 40 % mit 1:3 CRV ist sehr profitabel. Nie Winrate allein betrachten — immer mit CRV und Expectancy.</p><h3>Segmentieren, segmentieren, segmentieren</h3><p>Echter Fortschritt kommt durch Segmentierung. Morgens oder nachmittags besser? Forex oder Indizes? Breakouts oder Mean Reversion? Ein Journal mit Filtern nach Asset, Session und Setup zeigt, wo Kapital hin gehört — und was sofort stoppen muss.</p>"
+    },
+    "psychologie": {
+      "chip": "Psychologie",
+      "title": "Trader-Psychologie: Disziplin vor Strategie",
+      "bodyHtml": "<p>Die meisten vermeidbaren Verluste kommen nicht von schlechter Analyse, sondern undisziplinierter Ausführung: zu früh einsteigen, Stop verschieben, Verlierer verdoppeln, Gewinner aus Angst schließen. <strong>Psychologie</strong> ist kein Extra — sie ist entscheidend.</p><h3>Emotionen, die Konten zerstören</h3><ul><li><strong>Angst</strong>: Gewinner zu früh schließen, beste Trades verpassen.</li><li><strong>Gier</strong>: Positionen überdimensionieren, Plan ignorieren.</li><li><strong>Rache</strong>: nach Verlust „zurückholen“ — die Spirale beschleunigt sich.</li><li><strong>Langeweile</strong>: mittelmäßige Trades nur um in Position zu sein.</li></ul><h3>Disziplin messen, nicht nur fühlen</h3><p>Man verbessert nur, was man misst. Pro Trade notieren, ob Sie <strong>Ihren Plan eingehalten</strong> haben und Ihr mentaler Zustand — so entsteht ein Disziplin-Score. Über Wochen sehen Sie klar, wie emotionale Abweichungen mit Verlusten korrelieren.</p><p>Paychek bietet Mental-Tracking und Disziplin-Audit: Emotionen werden messbare, verbesserbare Daten.</p>"
+    },
+    "import": {
+      "chip": "Praxis",
+      "title": "Trades importieren (MT4, MT5, CSV) ohne Zeitverlust",
+      "bodyHtml": "<p>Das beste Tagebuch ist das, das Sie wirklich führen. Ist Erfassung mühsam, brechen Sie ab. Deshalb ist <strong>Auto-Import</strong> ein Game-Changer: weniger Reibung, konsistente Daten.</p><h3>Manuell vs Import</h3><p>Manuell bleibt sinnvoll für Kontext (Begründung, Mental State, Chart). Für Fakten — Entry, Exit, Größe, P&amp;L — ist Broker-Import schneller und zuverlässiger.</p><h3>Unterstützte Formate</h3><ul><li><strong>MT4 / MT5</strong>: Statements importieren, App rekonstruiert Positionen.</li><li><strong>CSV</strong>: die meisten Broker und Plattformen (Futures, Krypto, Aktien).</li><li><strong>FIFO-Rekonstruktion</strong>: Teilfills werden automatisch zu kohärenten Trades gruppiert.</li></ul><h3>Zeit für das Wesentliche</h3><p>Nicht eine Stunde Zahlen kopieren — sondern analysieren und verbessern. Mit automatischem Import behalten Sie ein vollständiges Journal mühelos und machen Datensammlung zu dauerhaftem statistischem Vorteil.</p>"
+    }
+  },
+  "cta": {
+    "title": "Bereit, wie ein Profi zu journalisieren?",
+    "subtitle": "Kostenlos starten. 7 Tage voller Pro-Zugang, danach Lite wenn Sie möchten.",
+    "button": "Mein Journal starten"
+  },
+  "footer": {
+    "home": "Startseite",
+    "contact": "Kontakt",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

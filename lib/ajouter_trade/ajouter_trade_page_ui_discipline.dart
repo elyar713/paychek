@@ -568,7 +568,11 @@ extension _AjouterTradePageUiDiscipline on _AjouterTradePageState {
                                           if (s.id != sectionId) continue;
                                           for (final it in s.items) {
                                             if (it.id == itemId) {
-                                              return it.label;
+                                              return checklistItemLabel(
+                                                l,
+                                                itemId,
+                                                it.label,
+                                              );
                                             }
                                           }
                                         }

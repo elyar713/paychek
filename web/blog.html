@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Paychek | Journal de trading, analyse et psychologie</title>
+    <meta name="description" content="Le blog Paychek : guides pratiques pour tenir un journal de trading, analyser vos performances, maîtriser votre psychologie et importer vos trades (MT4, MT5, CSV).">
+    <meta name="keywords" content="journal de trading, analyse trading, psychologie trading, discipline trading, statistiques trading, MT4, MT5, import CSV, plan de trading">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Paychek">
+    <link rel="canonical" href="https://paychek.pro/blog.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Paychek">
+    <meta property="og:title" content="Blog Paychek | Journal de trading, analyse et psychologie">
+    <meta property="og:description" content="Guides pratiques pour tenir un journal de trading, analyser vos performances et progresser durablement.">
+    <meta property="og:url" content="https://paychek.pro/blog.html">
+    <meta property="og:locale" content="fr_FR">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog Paychek | Journal de trading, analyse et psychologie">
+    <meta name="twitter:description" content="Guides pratiques pour tenir un journal de trading, analyser vos performances et progresser durablement.">
+
+    <link rel="stylesheet" href="css/paychek-tailwind.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        :root { --pure-black: #000; --soft-black: #050505; --card-black: #0a0a0a; }
+        * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        body { background: var(--pure-black); color: #e5e5e5; -webkit-font-smoothing: antialiased; }
+        .gradient-text {
+            background: linear-gradient(135deg, #FFE0B2 0%, #FBBF24 45%, #D4A359 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .article-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: border-color .3s ease, transform .3s ease, background .3s ease;
+        }
+        .article-card:hover {
+            border-color: rgba(245,158,11,0.35);
+            background: rgba(245,158,11,0.03);
+            transform: translateY(-3px);
+        }
+        .prose-paychek h2 { color: #fff; font-weight: 800; font-size: 1.4rem; margin: 2.5rem 0 1rem; letter-spacing: -0.01em; }
+        .prose-paychek h3 { color: #fff; font-weight: 700; font-size: 1.1rem; margin: 1.75rem 0 .65rem; }
+        .prose-paychek p { color: #9ca3af; line-height: 1.75; margin: 0 0 1.1rem; }
+        .prose-paychek ul { color: #9ca3af; line-height: 1.7; margin: 0 0 1.2rem; padding-left: 1.25rem; }
+        .prose-paychek li { margin-bottom: .5rem; }
+        .prose-paychek strong { color: #fcd34d; font-weight: 600; }
+        .chip {
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #fbbf24; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            padding: 4px 10px; border-radius: 999px;
+        }
+        .glass-nav { background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .cta-gold {
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+            color: #000; font-weight: 800;
+        }
+        .cta-gold:hover { transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="landing.html" class="flex items-center gap-3 group">
+                <img src="images/paychek-logo.svg" alt="Paychek" class="w-8 h-8 transition-transform group-hover:scale-110" width="32" height="32" decoding="async">
+                <span class="text-lg font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="landing.html#pricing" class="hidden sm:inline text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" data-i18n="nav.pricing">Tarifs</a>
+                <a href="landing.html" class="cta-gold px-5 py-2 rounded-full text-[10px] uppercase tracking-widest transition" data-i18n="nav.openApp">Ouvrir l'app</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-36 pb-16 px-6">
+        <div class="max-w-3xl mx-auto text-center">
+            <span class="chip" data-i18n="hero.chip">Le blog des traders disciplinés</span>
+            <h1 class="mt-6 text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight" data-i18n-html="hero.titleHtml">
+                Transformez vos <span class="gradient-text">données</span> en décisions
+            </h1>
+            <p class="mt-5 text-gray-400 text-base leading-relaxed max-w-2xl mx-auto" data-i18n="hero.subtitle">
+                Des guides concrets pour tenir un journal de trading utile, lire vos statistiques sans vous mentir, et construire la discipline qui sépare les traders rentables des autres.
+            </p>
+        </div>
+    </header>
+
+    <section class="px-6 pb-8">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a href="#journal" class="article-card p-7 rounded-3xl flex flex-col">
+                <span class="chip self-start" data-i18n="cards.journal.chip">Fondamentaux</span>
+                <h2 class="mt-4 text-xl font-bold text-white" data-i18n="cards.journal.title">Pourquoi tenir un journal de trading change tout</h2>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed" data-i18n="cards.journal.desc">Le journal n'est pas une corvée administrative : c'est le seul miroir objectif de votre trading.</p>
+                <span class="mt-4 text-[11px] font-bold uppercase tracking-widest text-amber-400" data-i18n-html="readMoreHtml">Lire l'article <i class="fas fa-arrow-right ml-1"></i></span>
+            </a>
+            <a href="#analyse" class="article-card p-7 rounded-3xl flex flex-col">
+                <span class="chip self-start" data-i18n="cards.analyse.chip">Performance</span>
+                <h2 class="mt-4 text-xl font-bold text-white" data-i18n="cards.analyse.title">Comment analyser vos trades pour vraiment progresser</h2>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed" data-i18n="cards.analyse.desc">Win rate, ratio risque/rendement, expectancy : les métriques qui comptent et celles qui trompent.</p>
+                <span class="mt-4 text-[11px] font-bold uppercase tracking-widest text-amber-400" data-i18n-html="readMoreHtml">Lire l'article <i class="fas fa-arrow-right ml-1"></i></span>
+            </a>
+            <a href="#psychologie" class="article-card p-7 rounded-3xl flex flex-col">
+                <span class="chip self-start" data-i18n="cards.psychologie.chip">Psychologie</span>
+                <h2 class="mt-4 text-xl font-bold text-white" data-i18n="cards.psychologie.title">La psychologie du trader : discipline avant stratégie</h2>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed" data-i18n="cards.psychologie.desc">La meilleure stratégie échoue sans contrôle émotionnel. Comment mesurer et corriger votre discipline.</p>
+                <span class="mt-4 text-[11px] font-bold uppercase tracking-widest text-amber-400" data-i18n-html="readMoreHtml">Lire l'article <i class="fas fa-arrow-right ml-1"></i></span>
+            </a>
+            <a href="#import" class="article-card p-7 rounded-3xl flex flex-col">
+                <span class="chip self-start" data-i18n="cards.import.chip">Pratique</span>
+                <h2 class="mt-4 text-xl font-bold text-white" data-i18n="cards.import.title">Importer vos trades (MT4, MT5, CSV) sans perdre de temps</h2>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed" data-i18n="cards.import.desc">Automatisez la saisie pour consacrer votre énergie à l'analyse, pas au copier-coller.</p>
+                <span class="mt-4 text-[11px] font-bold uppercase tracking-widest text-amber-400" data-i18n-html="readMoreHtml">Lire l'article <i class="fas fa-arrow-right ml-1"></i></span>
+            </a>
+        </div>
+    </section>
+
+    <main class="px-6 py-12">
+        <div class="max-w-3xl mx-auto prose-paychek">
+
+            <article id="journal" class="scroll-mt-24 pt-12 border-t border-white/5">
+                <span class="chip" data-i18n="articles.journal.chip">Fondamentaux</span>
+                <h2 class="!mt-5 !text-3xl" data-i18n="articles.journal.title">Pourquoi tenir un journal de trading change tout</h2>
+                <div data-i18n-html="articles.journal.bodyHtml"></div>
+            </article>
+
+            <article id="analyse" class="scroll-mt-24 pt-12 mt-12 border-t border-white/5">
+                <span class="chip" data-i18n="articles.analyse.chip">Performance</span>
+                <h2 class="!mt-5 !text-3xl" data-i18n="articles.analyse.title">Comment analyser vos trades pour vraiment progresser</h2>
+                <div data-i18n-html="articles.analyse.bodyHtml"></div>
+            </article>
+
+            <article id="psychologie" class="scroll-mt-24 pt-12 mt-12 border-t border-white/5">
+                <span class="chip" data-i18n="articles.psychologie.chip">Psychologie</span>
+                <h2 class="!mt-5 !text-3xl" data-i18n="articles.psychologie.title">La psychologie du trader : discipline avant stratégie</h2>
+                <div data-i18n-html="articles.psychologie.bodyHtml"></div>
+            </article>
+
+            <article id="import" class="scroll-mt-24 pt-12 mt-12 border-t border-white/5">
+                <span class="chip" data-i18n="articles.import.chip">Pratique</span>
+                <h2 class="!mt-5 !text-3xl" data-i18n="articles.import.title">Importer vos trades (MT4, MT5, CSV) sans perdre de temps</h2>
+                <div data-i18n-html="articles.import.bodyHtml"></div>
+            </article>
+
+        </div>
+    </main>
+
+    <section class="px-6 py-16">
+        <div class="max-w-2xl mx-auto text-center article-card rounded-3xl p-10">
+            <h2 class="text-2xl font-extrabold text-white" data-i18n="cta.title">Prêt à journaliser comme un pro ?</h2>
+            <p class="mt-3 text-gray-400 text-sm leading-relaxed" data-i18n="cta.subtitle">Commencez gratuitement. 7 jours d'accès complet à toutes les fonctionnalités Pro, puis restez en Lite si vous préférez.</p>
+            <a href="landing.html" class="cta-gold inline-block mt-6 px-8 py-4 rounded-full text-[11px] uppercase tracking-widest transition" data-i18n="cta.button">Démarrer mon journal</a>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/5 py-12 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <a href="landing.html" class="flex items-center gap-3">
+                <img src="images/paychek-logo.svg" alt="Paychek" class="w-8 h-8" width="32" height="32" decoding="async">
+                <span class="text-lg font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+            </a>
+            <div class="flex items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                <a href="landing.html" class="hover:text-white transition" data-i18n="footer.home">Accueil</a>
+                <a href="contact.html" class="hover:text-white transition" data-i18n="footer.contact">Contact</a>
+                <a href="privacy.html" class="hover:text-white transition" data-i18n="footer.privacy">Confidentialité</a>
+                <a href="terms.html" class="hover:text-white transition" data-i18n="footer.terms">Conditions</a>
+            </div>
+            <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.3em]" data-i18n="footer.copyright">© 2026 PAYCHEK</p>
+        </div>
+    </footer>
+
+    <script src="blog-i18n.js"></script>
+</body>
+</html>

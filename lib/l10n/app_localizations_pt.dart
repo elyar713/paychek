@@ -430,7 +430,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Configuração, feedback';
 
   @override
-  String get ajouterTradeDisciplinePlanTitle => 'Analysis plan';
+  String get ajouterTradeDisciplinePlanTitle => 'Plano de análise';
 
   @override
   String get ajouterTradeDisciplineConfidencePlanTitle => 'Plano de confiança';

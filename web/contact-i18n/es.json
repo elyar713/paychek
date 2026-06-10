@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "title": "Contacto y feedback | Paychek",
+    "description": "Contacta con Paychek: soporte, feedback, sugerencias y programa de afiliados. Respondemos a cada mensaje."
+  },
+  "nav": { "back": "Volver" },
+  "hero": {
+    "chip": "Leemos cada mensaje",
+    "titleHtml": "Contacto & <span class=\"gradient-text\">Feedback</span>",
+    "subtitle": "¿Pregunta, bug o idea para mejorar Paychek? Tu feedback define el producto. Respondemos rápido por email."
+  },
+  "form": {
+    "title": "Enviar mensaje",
+    "subtitle": "Mismo flujo que Soporte y feedback en Ajustes. Verás la confirmación aquí.",
+    "nameLabel": "Nombre",
+    "namePh": "Tu nombre",
+    "emailLabel": "Email",
+    "emailPh": "tu@email.com",
+    "subjectLabel": "Asunto",
+    "subjects": {
+      "support": "Soporte / ayuda",
+      "bug": "Reportar un bug",
+      "suggestion": "Sugerencia / feedback",
+      "affiliate": "Programa de afiliados",
+      "other": "Otro"
+    },
+    "messageLabel": "Mensaje",
+    "messagePh": "Tu mensaje...",
+    "submit": "Enviar mensaje",
+    "hint": "Tu solicitud se guarda de forma segura — el equipo recibe la misma notificación que en la app.",
+    "sending": "Enviando…",
+    "success": "¡Gracias! Tu solicitud fue enviada. Referencia: {ref}. Responderemos a tu email pronto.",
+    "errorGeneric": "No se pudo enviar. Revisa tu conexión o escribe a contact@paychek.pro.",
+    "errorValidation": "Indica un email válido y un mensaje (mínimo 8 caracteres)."
+  },
+  "direct": {
+    "title": "Contacto directo",
+    "emailLabel": "Email",
+    "appHintHtml": "¿Ya usas Paychek? Abre <strong class=\"text-gray-300\">Ajustes → Soporte y feedback</strong> para un ticket vinculado a tu cuenta."
+  },
+  "affiliate": {
+    "chip": "Programa de afiliados",
+    "title": "Recomienda Paychek, gana recompensas",
+    "body": "¿Creador de contenido, mentor o comunidad de trading? Únete al programa de afiliados y gana comisión por cada suscripción Pro referida.",
+    "cta": "Ser afiliado",
+    "mailtoSubject": "Programa de afiliados Paychek"
+  },
+  "footer": {
+    "home": "Inicio",
+    "blog": "Blog",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

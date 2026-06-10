@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "Blog Paychek | Journal de trading, analyse et psychologie",
+    "description": "Le blog Paychek : guides pratiques pour tenir un journal de trading, analyser vos performances, maîtriser votre psychologie et importer vos trades (MT4, MT5, CSV).",
+    "keywords": "journal de trading, analyse trading, psychologie trading, discipline trading, statistiques trading, MT4, MT5, import CSV, plan de trading",
+    "ogDescription": "Guides pratiques pour tenir un journal de trading, analyser vos performances et progresser durablement.",
+    "ogLocale": "fr_FR"
+  },
+  "nav": {
+    "pricing": "Tarifs",
+    "openApp": "Ouvrir l'app"
+  },
+  "hero": {
+    "chip": "Le blog des traders disciplinés",
+    "titleHtml": "Transformez vos <span class=\"gradient-text\">données</span> en décisions",
+    "subtitle": "Des guides concrets pour tenir un journal de trading utile, lire vos statistiques sans vous mentir, et construire la discipline qui sépare les traders rentables des autres."
+  },
+  "readMoreHtml": "Lire l'article <i class=\"fas fa-arrow-right ml-1\"></i>",
+  "cards": {
+    "journal": {
+      "chip": "Fondamentaux",
+      "title": "Pourquoi tenir un journal de trading change tout",
+      "desc": "Le journal n'est pas une corvée administrative : c'est le seul miroir objectif de votre trading."
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "Comment analyser vos trades pour vraiment progresser",
+      "desc": "Win rate, ratio risque/rendement, expectancy : les métriques qui comptent et celles qui trompent."
+    },
+    "psychologie": {
+      "chip": "Psychologie",
+      "title": "La psychologie du trader : discipline avant stratégie",
+      "desc": "La meilleure stratégie échoue sans contrôle émotionnel. Comment mesurer et corriger votre discipline."
+    },
+    "import": {
+      "chip": "Pratique",
+      "title": "Importer vos trades (MT4, MT5, CSV) sans perdre de temps",
+      "desc": "Automatisez la saisie pour consacrer votre énergie à l'analyse, pas au copier-coller."
+    }
+  },
+  "articles": {
+    "journal": {
+      "chip": "Fondamentaux",
+      "title": "Pourquoi tenir un journal de trading change tout",
+      "bodyHtml": "<p>La plupart des traders perdants ne perdent pas par manque de stratégie : ils perdent parce qu'ils n'ont aucune mémoire fiable de leurs décisions. Sans journal, chaque trade est une anecdote isolée. Avec un <strong>journal de trading</strong> structuré, vos trades deviennent des données — et les données révèlent des schémas que votre mémoire occulte systématiquement.</p><p>Notre cerveau retient les gains spectaculaires et efface les petites erreurs répétées. C'est précisément l'inverse de ce qu'il faudrait pour progresser. Le journal corrige ce biais en enregistrant <strong>chaque</strong> entrée, sortie, taille de position et émotion ressentie.</p><h3>Ce qu'un bon journal vous apporte</h3><ul><li><strong>Objectivité</strong> : vous jugez votre trading sur des chiffres, pas sur une impression.</li><li><strong>Détection des fuites</strong> : ces setups qui ont l'air bons mais qui vous coûtent de l'argent sur 50 trades.</li><li><strong>Renforcement de ce qui marche</strong> : vous identifiez votre véritable edge et vous y concentrez votre capital.</li><li><strong>Responsabilité</strong> : difficile de se mentir face à un historique horodaté.</li></ul><h3>Les champs essentiels à journaliser</h3><p>Un journal efficace ne se limite pas au profit et à la perte. Notez l'actif, la session, le setup, le ratio risque/rendement planifié, le respect (ou non) de votre plan, et votre état mental au moment de l'entrée. C'est la combinaison de ces dimensions qui rend l'analyse puissante.</p><p>Avec Paychek, ces champs sont préremplis et standardisés : vous journalisez en quelques secondes au lieu de bricoler un fichier Excel fragile qui finit abandonné après deux semaines.</p>"
+    },
+    "analyse": {
+      "chip": "Performance",
+      "title": "Comment analyser vos trades pour vraiment progresser",
+      "bodyHtml": "<p>Tenir un journal est la première étape ; l'<strong>analyse</strong> est celle qui transforme l'historique en progression. Mais attention : certaines métriques flattent l'ego sans rien dire de votre rentabilité réelle.</p><h3>Les métriques qui comptent</h3><ul><li><strong>Expectancy (espérance)</strong> : le gain moyen attendu par trade. C'est la métrique reine, car elle combine win rate et ratio R/R.</li><li><strong>Ratio risque/rendement</strong> : combien vous gagnez quand vous avez raison par rapport à ce que vous perdez quand vous avez tort.</li><li><strong>Win rate par setup</strong> : un taux global ne veut rien dire ; segmentez par stratégie et par session.</li><li><strong>Drawdown maximal</strong> : la pire série de pertes que votre psychologie devra encaisser.</li></ul><h3>Le piège du win rate</h3><p>Un win rate de 70 % peut masquer un compte qui se vide, si vos pertes sont trois fois plus grosses que vos gains. À l'inverse, un trader à 40 % de réussite avec un ratio 1:3 est largement rentable. Ne regardez jamais le win rate seul : regardez-le <strong>toujours</strong> avec votre ratio R/R et votre expectancy.</p><h3>Segmentez, segmentez, segmentez</h3><p>La vraie progression vient de la segmentation. Êtes-vous meilleur le matin ou l'après-midi ? Sur le forex ou les indices ? Sur les cassures ou les retours à la moyenne ? Un journal qui filtre vos statistiques par actif, session et setup vous montre exactement où concentrer votre capital — et quoi arrêter immédiatement.</p>"
+    },
+    "psychologie": {
+      "chip": "Psychologie",
+      "title": "La psychologie du trader : discipline avant stratégie",
+      "bodyHtml": "<p>On estime qu'une majorité des pertes évitables vient non pas d'une mauvaise analyse, mais d'une exécution indisciplinée : entrer trop tôt, déplacer son stop, doubler une position perdante, couper un gain par peur. La <strong>psychologie</strong> n'est pas un supplément d'âme : c'est le facteur déterminant.</p><h3>Les émotions qui détruisent les comptes</h3><ul><li><strong>La peur</strong> : vous coupez vos gains trop tôt et ratez vos meilleurs trades.</li><li><strong>L'avidité</strong> : vous surdimensionnez vos positions et ignorez votre plan.</li><li><strong>La revanche</strong> : après une perte, vous tradez pour « vous refaire », et la spirale s'accélère.</li><li><strong>L'ennui</strong> : vous prenez des trades médiocres simplement pour être en position.</li></ul><h3>Mesurer la discipline, pas seulement le ressenti</h3><p>On ne corrige que ce que l'on mesure. En notant pour chaque trade si vous avez <strong>respecté votre plan</strong> et votre état mental du moment, vous obtenez un score de discipline. Au fil des semaines, vous voyez noir sur blanc la corrélation entre vos écarts émotionnels et vos pertes. C'est souvent un électrochoc plus efficace que n'importe quel conseil.</p><p>Paychek intègre un suivi de l'état mental et un audit de discipline : vos émotions deviennent une donnée mesurable, et donc améliorable.</p>"
+    },
+    "import": {
+      "chip": "Pratique",
+      "title": "Importer vos trades (MT4, MT5, CSV) sans perdre de temps",
+      "bodyHtml": "<p>Le meilleur journal est celui que vous tenez réellement. Si la saisie est pénible, vous abandonnerez. C'est pourquoi l'<strong>import automatique</strong> de vos trades est un game-changer : il supprime la friction et garantit la cohérence de vos données.</p><h3>Saisie manuelle vs import</h3><p>La saisie manuelle reste utile pour annoter le contexte (votre raisonnement, votre état mental, une capture du graphique). Mais pour les données factuelles — prix d'entrée, sortie, taille, profit/perte — l'import depuis votre relevé de courtier est plus rapide et plus fiable.</p><h3>Formats supportés</h3><ul><li><strong>MT4 / MT5</strong> : importez vos relevés et laissez l'app reconstituer chaque position.</li><li><strong>CSV</strong> : la plupart des courtiers et plateformes (futures, crypto, actions) exportent un CSV standard.</li><li><strong>Reconstruction FIFO</strong> : les exécutions partielles sont regroupées en trades cohérents automatiquement.</li></ul><h3>Gagnez du temps pour ce qui compte</h3><p>L'objectif n'est pas de passer une heure à recopier des chiffres, mais de consacrer ce temps à l'analyse et à l'amélioration. En automatisant l'import, vous gardez un journal complet sans effort, et vous transformez enfin la collecte de données en avantage statistique durable.</p>"
+    }
+  },
+  "cta": {
+    "title": "Prêt à journaliser comme un pro ?",
+    "subtitle": "Commencez gratuitement. 7 jours d'accès complet à toutes les fonctionnalités Pro, puis restez en Lite si vous préférez.",
+    "button": "Démarrer mon journal"
+  },
+  "footer": {
+    "home": "Accueil",
+    "contact": "Contact",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

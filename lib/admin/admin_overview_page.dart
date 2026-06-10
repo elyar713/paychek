@@ -475,7 +475,7 @@ class _OverviewHeader extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Vue d’ensemble',
+                  'Dashboard',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 28,
                     fontWeight: FontWeight.w900,

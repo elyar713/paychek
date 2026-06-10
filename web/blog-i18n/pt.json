@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "title": "Blog Paychek | Diário de trading, análise e psicologia",
+    "description": "O blog Paychek: guias práticos para manter um diário de trading, analisar desempenho, dominar psicologia e importar trades (MT4, MT5, CSV).",
+    "keywords": "diário de trading, análise de trades, psicologia do trading, disciplina, estatísticas, MT4, MT5, importar CSV, plano de trading",
+    "ogDescription": "Guias práticos para manter um diário de trading, analisar desempenho e evoluir de forma sustentável.",
+    "ogLocale": "pt_BR"
+  },
+  "nav": {
+    "pricing": "Planos",
+    "openApp": "Abrir app"
+  },
+  "hero": {
+    "chip": "O blog do trader disciplinado",
+    "titleHtml": "Transforme seus <span class=\"gradient-text\">dados</span> em decisões",
+    "subtitle": "Guias concretos para um diário útil, ler estatísticas com honestidade e construir a disciplina que separa traders rentáveis dos demais."
+  },
+  "readMoreHtml": "Ler artigo <i class=\"fas fa-arrow-right ml-1\"></i>",
+  "cards": {
+    "journal": {
+      "chip": "Fundamentos",
+      "title": "Por que um diário de trading muda tudo",
+      "desc": "O diário não é burocracia — é o único espelho objetivo do seu trading."
+    },
+    "analyse": {
+      "chip": "Desempenho",
+      "title": "Como analisar trades e evoluir de verdade",
+      "desc": "Win rate, risco/retorno, expectancy: métricas que importam e as que enganam."
+    },
+    "psychologie": {
+      "chip": "Psicologia",
+      "title": "Psicologia do trader: disciplina antes da estratégia",
+      "desc": "A melhor estratégia falha sem controle emocional. Como medir e corrigir sua disciplina."
+    },
+    "import": {
+      "chip": "Prática",
+      "title": "Importar trades (MT4, MT5, CSV) sem perder tempo",
+      "desc": "Automatize a entrada e foque energia na análise, não no copiar-colar."
+    }
+  },
+  "articles": {
+    "journal": {
+      "chip": "Fundamentos",
+      "title": "Por que um diário de trading muda tudo",
+      "bodyHtml": "<p>A maioria dos traders perdedores não falha por falta de estratégia, mas por não ter memória confiável das decisões. Sem diário, cada trade é anedota isolada. Com um <strong>diário de trading</strong> estruturado, suas operações viram dados — e dados revelam padrões que sua memória oculta sistematicamente.</p><p>O cérebro retém ganhos espetaculares e apaga pequenos erros repetidos. O oposto do que você precisa para evoluir. O diário corrige esse viés registrando <strong>cada</strong> entrada, saída, tamanho e emoção.</p><h3>O que um bom diário oferece</h3><ul><li><strong>Objetividade</strong>: você julga o trading por números, não por feeling.</li><li><strong>Detecção de vazamentos</strong>: setups que parecem bons mas custam dinheiro em 50 trades.</li><li><strong>Reforço do que funciona</strong>: identifica seu edge real e concentra capital.</li><li><strong>Responsabilidade</strong>: difícil mentir para si com histórico datado.</li></ul><h3>Campos essenciais</h3><p>Diário eficaz não é só P&amp;L. Anote ativo, sessão, setup, risco/retorno planejado, cumprimento do plano e estado mental na entrada. A combinação dessas dimensões torna a análise poderosa.</p><p>Com Paychek, campos pré-preenchidos e padronizados: journal em segundos em vez de planilha frágil abandonada em duas semanas.</p>"
+    },
+    "analyse": {
+      "chip": "Desempenho",
+      "title": "Como analisar trades e evoluir de verdade",
+      "bodyHtml": "<p>Manter diário é o primeiro passo; a <strong>análise</strong> transforma histórico em progresso. Cuidado: algumas métricas bajam o ego sem refletir rentabilidade real.</p><h3>Métricas que importam</h3><ul><li><strong>Expectancy</strong>: ganho médio esperado por trade — combina win rate e R/R.</li><li><strong>Risco/retorno</strong>: quanto ganha acertando vs. perde errando.</li><li><strong>Win rate por setup</strong>: taxa global não diz nada; segmente por estratégia e sessão.</li><li><strong>Drawdown máximo</strong>: pior sequência que sua psicologia deve aguentar.</li></ul><h3>A armadilha do win rate</h3><p>70 % pode esconder conta esvaziando se perdas forem três vezes maiores que ganhos. Inversamente, 40 % com ratio 1:3 é muito rentável. Nunca olhe só win rate — sempre com R/R e expectancy.</p><h3>Segmente, segmente, segmente</h3><p>Progresso real vem da segmentação. Melhor de manhã ou tarde? Forex ou índices? Rompimentos ou reversão à média? Diário com filtros por ativo, sessão e setup mostra onde concentrar capital — e o que parar já.</p>"
+    },
+    "psychologie": {
+      "chip": "Psicologia",
+      "title": "Psicologia do trader: disciplina antes da estratégia",
+      "bodyHtml": "<p>A maioria das perdas evitáveis vem não de análise ruim, mas execução indisciplinada: entrar cedo, mover stop, dobrar perdedoras, cortar ganhadoras por medo. <strong>Psicologia</strong> não é extra — é fator decisivo.</p><h3>Emoções que destroem contas</h3><ul><li><strong>Medo</strong>: corta ganhos cedo e perde melhores trades.</li><li><strong>Ganância</strong>: oversize e ignora o plano.</li><li><strong>Revanche</strong>: após perda, opera para «recuperar» e a espiral acelera.</li><li><strong>Tédio</strong>: pega trades medíocres só para estar posicionado.</li></ul><h3>Medir disciplina, não só sentir</h3><p>Só corrige o que mede. Anotando se <strong>cumpriu o plano</strong> e estado mental por trade, obtém score de disciplina. Em semanas vê correlação entre desvios emocionais e perdas — muitas vezes mais eficaz que qualquer conselho.</p><p>Paychek inclui rastreio mental e auditoria de disciplina: emoções viram dados mensuráveis e melhoráveis.</p>"
+    },
+    "import": {
+      "chip": "Prática",
+      "title": "Importar trades (MT4, MT5, CSV) sem perder tempo",
+      "bodyHtml": "<p>O melhor diário é o que você realmente mantém. Se entrada for penosa, abandona. Por isso <strong>import automático</strong> muda o jogo: remove fricção e garante dados coerentes.</p><h3>Manual vs import</h3><p>Entrada manual ainda serve para contexto (raciocínio, estado mental, print). Para fatos — entrada, saída, tamanho, P&amp;L — import do broker é mais rápido e confiável.</p><h3>Formatos suportados</h3><ul><li><strong>MT4 / MT5</strong>: importe extratos e o app reconstrói cada posição.</li><li><strong>CSV</strong>: maioria dos brokers e plataformas (futuros, cripto, ações).</li><li><strong>Reconstrução FIFO</strong>: execuções parciais agrupadas em trades coerentes.</li></ul><h3>Tempo para o que importa</h3><p>Não uma hora copiando números — mas analisar e melhorar. Automatizando import, mantém diário completo sem esforço e transforma coleta de dados em vantagem estatística duradoura.</p>"
+    }
+  },
+  "cta": {
+    "title": "Pronto para journalizar como um pro?",
+    "subtitle": "Comece grátis. 7 dias de acesso Pro completo, depois fique no Lite se preferir.",
+    "button": "Iniciar meu diário"
+  },
+  "footer": {
+    "home": "Início",
+    "contact": "Contato",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

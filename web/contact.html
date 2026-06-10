@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Feedback | Paychek</title>
+    <meta name="description" content="Contact Paychek: support, product feedback, suggestions and affiliate program.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://paychek.pro/contact.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Paychek">
+    <meta property="og:title" content="Contact & Feedback | Paychek">
+    <meta property="og:url" content="https://paychek.pro/contact.html">
+
+    <link rel="stylesheet" href="css/paychek-tailwind.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        :root { --pure-black: #000; }
+        * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        body { background: var(--pure-black); color: #e5e5e5; -webkit-font-smoothing: antialiased; }
+        .gradient-text {
+            background: linear-gradient(135deg, #FFE0B2 0%, #FBBF24 45%, #D4A359 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .glass-nav { background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .field {
+            background: #0a0a0a; border: 1px solid rgba(255,255,255,0.08);
+            color: #fff; border-radius: 12px; padding: 12px 14px; width: 100%; font-size: 14px;
+            transition: border-color .2s ease;
+        }
+        .field:focus { outline: none; border-color: rgba(245,158,11,0.5); }
+        .field::placeholder { color: #6b7280; }
+        label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; }
+        .cta-gold {
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+            color: #000; font-weight: 800;
+        }
+        .cta-gold:hover { transform: translateY(-1px); }
+        .cta-gold:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .chip {
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #fbbf24; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            padding: 4px 10px; border-radius: 999px;
+        }
+        #contact-form-status {
+            display: none;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.45;
+            font-weight: 600;
+        }
+        #contact-form-status.contact-form-status--success {
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        #contact-form-status.contact-form-status--error {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-white/5">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="landing.html" target="_top" class="flex items-center gap-3 group">
+                <img src="images/paychek-logo.svg" alt="Paychek" class="w-8 h-8 transition-transform group-hover:scale-110" width="32" height="32" decoding="async">
+                <span class="text-lg font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+            </a>
+            <a href="landing.html" target="_top" class="text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">
+                <i class="fas fa-arrow-left mr-2"></i><span data-i18n="nav.back">Back</span>
+            </a>
+        </div>
+    </nav>
+
+    <header class="pt-36 pb-12 px-6">
+        <div class="max-w-2xl mx-auto text-center">
+            <span class="chip" data-i18n="hero.chip">We read every message</span>
+            <h1 class="mt-6 text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight" data-i18n-html="hero.titleHtml">
+                Contact & <span class="gradient-text">Feedback</span>
+            </h1>
+            <p class="mt-5 text-gray-400 text-base leading-relaxed" data-i18n="hero.subtitle">
+                A question, a bug, an idea to improve Paychek? Your feedback shapes the product.
+            </p>
+        </div>
+    </header>
+
+    <main class="px-6 pb-20">
+        <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="panel rounded-3xl p-7">
+                <h2 class="text-lg font-bold text-white mb-1" data-i18n="form.title">Send a message</h2>
+                <p class="text-xs text-gray-500 mb-6" data-i18n="form.subtitle">Same pipeline as in-app Support & Feedback.</p>
+                <form id="contact-form" class="flex flex-col gap-4" novalidate>
+                    <div>
+                        <label for="cf-name" data-i18n="form.nameLabel">Name</label>
+                        <input id="cf-name" type="text" class="field mt-2" data-i18n-placeholder="form.namePh" placeholder="Your name" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="cf-email" data-i18n="form.emailLabel">Email</label>
+                        <input id="cf-email" type="email" class="field mt-2" data-i18n-placeholder="form.emailPh" placeholder="you@email.com" autocomplete="email" required>
+                    </div>
+                    <div>
+                        <label for="cf-subject" data-i18n="form.subjectLabel">Subject</label>
+                        <select id="cf-subject" class="field mt-2">
+                            <option value="Support" data-subject-key="support">Support / help</option>
+                            <option value="Bug" data-subject-key="bug">Report a bug</option>
+                            <option value="Suggestion" data-subject-key="suggestion">Suggestion / feedback</option>
+                            <option value="Affiliation" data-subject-key="affiliate">Affiliate program</option>
+                            <option value="Autre" data-subject-key="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cf-message" data-i18n="form.messageLabel">Message</label>
+                        <textarea id="cf-message" rows="5" class="field mt-2" data-i18n-placeholder="form.messagePh" placeholder="Your message..." required minlength="8"></textarea>
+                    </div>
+                    <button type="submit" class="cta-gold mt-2 py-3.5 rounded-full text-[11px] uppercase tracking-widest transition" data-i18n="form.submit">
+                        Send message
+                    </button>
+                    <p id="contact-form-status" class="hidden" role="status" aria-live="polite" aria-hidden="true"></p>
+                    <p class="text-[10px] text-gray-600 text-center" data-i18n="form.hint">Your request is saved securely.</p>
+                </form>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                <div class="panel rounded-3xl p-7">
+                    <h2 class="text-lg font-bold text-white mb-4" data-i18n="direct.title">Contact us directly</h2>
+                    <a href="mailto:contact@paychek.pro" class="flex items-center gap-4 group">
+                        <span class="w-11 h-11 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <div>
+                            <div class="text-[10px] uppercase tracking-widest text-gray-500 font-bold" data-i18n="direct.emailLabel">Email</div>
+                            <div class="text-sm text-white group-hover:text-amber-400 transition">contact@paychek.pro</div>
+                        </div>
+                    </a>
+                    <p class="mt-5 text-xs text-gray-500 leading-relaxed" data-i18n-html="direct.appHintHtml">
+                        Already using Paychek? Open <strong class="text-gray-300">Settings → Support & Feedback</strong>.
+                    </p>
+                </div>
+
+                <div id="affiliation" class="panel rounded-3xl p-7 scroll-mt-24">
+                    <span class="chip" data-i18n="affiliate.chip">Affiliate program</span>
+                    <h2 class="text-lg font-bold text-white mt-4 mb-2" data-i18n="affiliate.title">Recommend Paychek, get rewarded</h2>
+                    <p class="text-xs text-gray-500 leading-relaxed mb-4" data-i18n="affiliate.body">
+                        Content creator, mentor or trading community? Join our affiliate program.
+                    </p>
+                    <button type="button" id="affiliate-mail-btn" class="cta-gold inline-block px-6 py-3 rounded-full text-[10px] uppercase tracking-widest transition" data-i18n="affiliate.cta">
+                        Become an affiliate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-white/5 py-12 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <a href="landing.html" target="_top" class="flex items-center gap-3">
+                <img src="images/paychek-logo.svg" alt="Paychek" class="w-8 h-8" width="32" height="32" decoding="async">
+                <span class="text-lg font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+            </a>
+            <div class="flex items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                <a href="landing.html" target="_top" class="hover:text-white transition" data-i18n="footer.home">Home</a>
+                <a href="blog.html" target="_top" class="hover:text-white transition" data-i18n="footer.blog">Blog</a>
+                <a href="privacy.html" target="_top" class="hover:text-white transition" data-i18n="footer.privacy">Privacy</a>
+                <a href="terms.html" target="_top" class="hover:text-white transition" data-i18n="footer.terms">Terms</a>
+            </div>
+            <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.3em]" data-i18n="footer.copyright">© 2026 PAYCHEK</p>
+        </div>
+    </footer>
+
+    <script src="contact-i18n.js"></script>
+    <script src="js/contact-page.js"></script>
+</body>
+</html>

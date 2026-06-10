@@ -74,10 +74,10 @@ class AdminOverviewData {
       (totalUsers - usersWithProTier - usersWithLiteTier)
           .clamp(0, 999999999);
 
-  /// `total tickets` − `status == answered` (les tickets sans champ `status` comptent dans le total comme non répondus).
+  /// Tickets non clôturés (`status != closed` : ouverts, répondus, en attente client, etc.).
   final int ticketsPendingApprox;
 
-  /// Tickets non répondus (`kind == account` − `account` avec `status == answered`).
+  /// Tickets non clôturés avec `kind == account`.
   final int supportTicketsPendingKindAccount;
 
   /// Idem `kind == billing`.
@@ -86,7 +86,7 @@ class AdminOverviewData {
   /// Idem `kind == feature`.
   final int supportTicketsPendingKindFeature;
 
-  /// Autres sujets / kind absent : reste des tickets en attente (cohérent avec [ticketsPendingApprox]).
+  /// Autres sujets / kind absent : reste des tickets non clôturés.
   final int supportTicketsPendingKindOther;
 
   /// Nombre total de tickets support (= somme des quatre lignes ci-dessous si cohérent).
@@ -192,8 +192,8 @@ Future<AdminOverviewData> fetchAdminOverviewData({
       .get();
 
   final ticketsTotalFut = ticketsCol.count().get();
-  final ticketsAnsweredFut =
-      ticketsCol.where('status', isEqualTo: 'answered').count().get();
+  final ticketsClosedFut =
+      ticketsCol.where('status', isEqualTo: 'closed').count().get();
 
   final ticketsKindAccountFut =
       ticketsCol.where('kind', isEqualTo: 'account').count().get();
@@ -202,19 +202,19 @@ Future<AdminOverviewData> fetchAdminOverviewData({
   final ticketsKindFeatureFut =
       ticketsCol.where('kind', isEqualTo: 'feature').count().get();
 
-  final ticketsAnsweredAccountFut = ticketsCol
+  final ticketsClosedAccountFut = ticketsCol
       .where('kind', isEqualTo: 'account')
-      .where('status', isEqualTo: 'answered')
+      .where('status', isEqualTo: 'closed')
       .count()
       .get();
-  final ticketsAnsweredBillingFut = ticketsCol
+  final ticketsClosedBillingFut = ticketsCol
       .where('kind', isEqualTo: 'billing')
-      .where('status', isEqualTo: 'answered')
+      .where('status', isEqualTo: 'closed')
       .count()
       .get();
-  final ticketsAnsweredFeatureFut = ticketsCol
+  final ticketsClosedFeatureFut = ticketsCol
       .where('kind', isEqualTo: 'feature')
-      .where('status', isEqualTo: 'answered')
+      .where('status', isEqualTo: 'closed')
       .count()
       .get();
 
@@ -295,7 +295,7 @@ Future<AdminOverviewData> fetchAdminOverviewData({
     signupLastFut,
     signupPrevFut,
     ticketsTotalFut,
-    ticketsAnsweredFut,
+    ticketsClosedFut,
     ticketsKindAccountFut,
     ticketsKindBillingFut,
     ticketsKindFeatureFut,
@@ -310,9 +310,9 @@ Future<AdminOverviewData> fetchAdminOverviewData({
     paidAppleIap24Fut,
     paidGoogle24Fut,
     paidGooglePlay24Fut,
-    ticketsAnsweredAccountFut,
-    ticketsAnsweredBillingFut,
-    ticketsAnsweredFeatureFut,
+    ticketsClosedAccountFut,
+    ticketsClosedBillingFut,
+    ticketsClosedFeatureFut,
     signups24Fut,
   ]);
 
@@ -325,7 +325,7 @@ Future<AdminOverviewData> fetchAdminOverviewData({
   final usersCreatedPrev30d =
       _requireCount(results[4] as AggregateQuerySnapshot);
   final ticketsTotal = _requireCount(results[5] as AggregateQuerySnapshot);
-  final ticketsAnswered =
+  final ticketsClosed =
       _requireCount(results[6] as AggregateQuerySnapshot);
   final kindAccount =
       _requireCount(results[7] as AggregateQuerySnapshot);
@@ -351,11 +351,11 @@ Future<AdminOverviewData> fetchAdminOverviewData({
       _requireCount(results[19] as AggregateQuerySnapshot);
   final paidGooglePlay24 =
       _requireCount(results[20] as AggregateQuerySnapshot);
-  final answeredKindAccount =
+  final closedKindAccount =
       _requireCount(results[21] as AggregateQuerySnapshot);
-  final answeredKindBilling =
+  final closedKindBilling =
       _requireCount(results[22] as AggregateQuerySnapshot);
-  final answeredKindFeature =
+  final closedKindFeature =
       _requireCount(results[23] as AggregateQuerySnapshot);
   final signups24 =
       _requireCount(results[24] as AggregateQuerySnapshot);
@@ -365,20 +365,20 @@ Future<AdminOverviewData> fetchAdminOverviewData({
   final kindOtherBundled = (ticketsTotal - kindAccount - kindBilling - kindFeature)
       .clamp(0, 999999999);
 
-  final answeredOtherBundled = (ticketsAnswered -
-          answeredKindAccount -
-          answeredKindBilling -
-          answeredKindFeature)
+  final closedOtherBundled = (ticketsClosed -
+          closedKindAccount -
+          closedKindBilling -
+          closedKindFeature)
       .clamp(0, 999999999);
 
   final pendingKindAccount =
-      (kindAccount - answeredKindAccount).clamp(0, 999999999);
+      (kindAccount - closedKindAccount).clamp(0, 999999999);
   final pendingKindBilling =
-      (kindBilling - answeredKindBilling).clamp(0, 999999999);
+      (kindBilling - closedKindBilling).clamp(0, 999999999);
   final pendingKindFeature =
-      (kindFeature - answeredKindFeature).clamp(0, 999999999);
+      (kindFeature - closedKindFeature).clamp(0, 999999999);
   final pendingKindOther =
-      (kindOtherBundled - answeredOtherBundled).clamp(0, 999999999);
+      (kindOtherBundled - closedOtherBundled).clamp(0, 999999999);
 
   double? growthPct;
   if (usersCreatedPrev30d > 0) {
@@ -391,7 +391,7 @@ Future<AdminOverviewData> fetchAdminOverviewData({
       totalUsers > 0 ? (100.0 * active24h / totalUsers) : 0.0;
 
   final ticketsPendingApprox =
-      (ticketsTotal - ticketsAnswered).clamp(0, 999999999);
+      (ticketsTotal - ticketsClosed).clamp(0, 999999999);
 
   final buckets = List<double>.filled(30, 0);
   for (final doc in histSnap.docs) {
@@ -465,8 +465,10 @@ List<AdminLiveFeedItem> _buildTicketFeed({
     Color dot;
     final st = d['staffUnread'] == true;
     final sta = '${d['status']}'.trim().toLowerCase();
-    if (sta == 'answered') {
+    if (sta == 'closed') {
       dot = const Color(0xFF64748B);
+    } else if (sta == 'answered') {
+      dot = const Color(0xFFF97316);
     } else if (st || sta.isEmpty || sta == 'open' || sta == 'nouveau') {
       dot = const Color(0xFFEAB308);
     } else {

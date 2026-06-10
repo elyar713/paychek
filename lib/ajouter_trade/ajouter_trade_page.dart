@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
+import '../l10n/checklist_localizations.dart';
 import '../dashboard/dashboard_main_bottom_nav.dart';
 import '../checklist/checklist_news_trade_classifier.dart';
 import '../checklist/checklist_page_controller.dart';

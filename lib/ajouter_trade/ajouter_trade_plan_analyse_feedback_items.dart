@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../analyse/analyse_phase_locale.dart';
 import '../analyse/analyse_report_snapshot.dart';
 import '../l10n/app_localizations.dart';
+import 'ajouter_trade_feedback_category_buttons.dart';
 
 /// Entrée dans la liste (en-tête de section ou ligne cochable).
 sealed class PlanAnalyseFeedbackEntry {
@@ -51,6 +52,39 @@ void _flushSection(
   if (rows.isEmpty) return;
   out.add(PlanAnalyseFeedbackSectionHeader(title));
   out.addAll(rows);
+}
+
+List<String> _parseIndicateursToolNames(String raw) {
+  final t = raw.trim();
+  if (t.isEmpty || t == '—') return const [];
+  return [
+    for (final part in raw.split(RegExp(r'\s*\+\s*')))
+      if (part.trim().isNotEmpty) part.trim(),
+  ];
+}
+
+/// Un bouton par signal/outil sélectionné (séparateur rapport : « + »).
+void _pushIndicateurOutilRows(
+  List<PlanAnalyseFeedbackRow> buf, {
+  required String idPrefix,
+  required AppLocalizations l,
+  required String display,
+}) {
+  final tools = _parseIndicateursToolNames(display);
+  if (tools.isEmpty) {
+    final d = _dash(display);
+    if (d != '—') {
+      _pushRow(buf, '${idPrefix}_outils', l.ajouterTradePlanRowOutils, d);
+    }
+    return;
+  }
+  if (tools.length == 1) {
+    _pushRow(buf, '${idPrefix}_outils', tools.single, null);
+    return;
+  }
+  for (var i = 0; i < tools.length; i++) {
+    _pushRow(buf, '${idPrefix}_outil_$i', tools[i], null);
+  }
 }
 
 /// Liste ordonnée : en-têtes de section + lignes (valeurs en hint).
@@ -186,7 +220,12 @@ List<PlanAnalyseFeedbackEntry> planAnalyseFeedbackEntriesFor(
   if (s.gaugeIndicatorsEnabled) {
     final main = <PlanAnalyseFeedbackRow>[];
     _pushRow(main, 'ind_tf', l.analyseTimeframeLabelShort, s.indicatorsTf);
-    _pushRow(main, 'ind_outils', l.ajouterTradePlanRowOutils, s.indicateursOutils);
+    _pushIndicateurOutilRows(
+      main,
+      idPrefix: 'ind',
+      l: l,
+      display: s.indicateursOutils,
+    );
     final ni = s.noteIndicators.trim();
     if (ni.isNotEmpty) {
       _pushRow(main, 'ind_note', l.ajouterTradePlanRowNotes, ni);
@@ -200,7 +239,12 @@ List<PlanAnalyseFeedbackEntry> planAnalyseFeedbackEntriesFor(
         final p = i + 1;
         final block = <PlanAnalyseFeedbackRow>[];
         _pushRow(block, 'ind_c${p}_tf', l.analyseTimeframeLabelShort, c.indicatorsTf);
-        _pushRow(block, 'ind_c${p}_outils', l.ajouterTradePlanRowOutils, c.indicateursOutils);
+        _pushIndicateurOutilRows(
+          block,
+          idPrefix: 'ind_c$p',
+          l: l,
+          display: c.indicateursOutils,
+        );
         final n = c.noteIndicators.trim();
         if (n.isNotEmpty) {
           _pushRow(block, 'ind_c${p}_note', l.ajouterTradePlanRowNotes, n);
@@ -262,4 +306,139 @@ List<PlanAnalyseFeedbackEntry> planAnalyseFeedbackEntriesFor(
   }
 
   return out;
+}
+
+enum _PlanAnalyseOledPillar { fundamental, keyZone, smc, entry }
+
+_PlanAnalyseOledPillar _planAnalysePillarForRowId(String id) {
+  if (id.startsWith('ctx_') || id.startsWith('vol_')) {
+    return _PlanAnalyseOledPillar.fundamental;
+  }
+  if (id.startsWith('struct_')) {
+    return _PlanAnalyseOledPillar.keyZone;
+  }
+  if (id.startsWith('smc_')) {
+    return _PlanAnalyseOledPillar.smc;
+  }
+  if (id.startsWith('ind_')) {
+    return _PlanAnalyseOledPillar.entry;
+  }
+  return _PlanAnalyseOledPillar.fundamental;
+}
+
+/// Fondamental · Zone clé · SMC · Entrée (+ copies entrée si plusieurs blocs).
+List<AjouterTradeFeedbackCategory> planAnalyseFeedbackCategoriesFor(
+  AnalyseReportSnapshot s,
+  AppLocalizations l,
+) {
+  final entries = planAnalyseFeedbackEntriesFor(s, l);
+  final fundamental = <AjouterTradeFeedbackItem>[];
+  final keyZone = <AjouterTradeFeedbackItem>[];
+  final smc = <AjouterTradeFeedbackItem>[];
+  final entryCategoryOrder = <String>[];
+  final entryBySection = <String, List<AjouterTradeFeedbackItem>>{};
+  String? currentSection;
+
+  void addEntryItem(AjouterTradeFeedbackItem item) {
+    final key = currentSection ?? '';
+    if (!entryBySection.containsKey(key)) {
+      entryCategoryOrder.add(key);
+      entryBySection[key] = <AjouterTradeFeedbackItem>[];
+    }
+    entryBySection[key]!.add(item);
+  }
+
+  for (final e in entries) {
+    switch (e) {
+      case PlanAnalyseFeedbackSectionHeader(:final title):
+        currentSection = title;
+      case PlanAnalyseFeedbackRow(:final id, :final label, :final hint):
+        final subtitle = _planAnalyseFeedbackSubtitle(
+          section: currentSection,
+          hint: hint,
+        );
+        final item = AjouterTradeFeedbackItem(
+          id: id,
+          label: label,
+          subtitle: subtitle,
+        );
+        switch (_planAnalysePillarForRowId(id)) {
+          case _PlanAnalyseOledPillar.fundamental:
+            fundamental.add(item);
+          case _PlanAnalyseOledPillar.keyZone:
+            keyZone.add(item);
+          case _PlanAnalyseOledPillar.smc:
+            smc.add(item);
+          case _PlanAnalyseOledPillar.entry:
+            addEntryItem(item);
+        }
+    }
+  }
+
+  final out = <AjouterTradeFeedbackCategory>[
+    if (fundamental.isNotEmpty)
+      AjouterTradeFeedbackCategory(
+        id: 'oled_fundamental',
+        title: l.analyseReportOledSectionFundamental,
+        items: fundamental,
+      ),
+    if (keyZone.isNotEmpty)
+      AjouterTradeFeedbackCategory(
+        id: 'oled_key_zone',
+        title: l.analyseOledKeyZoneToggle,
+        items: keyZone,
+      ),
+    if (smc.isNotEmpty)
+      AjouterTradeFeedbackCategory(
+        id: 'oled_smc',
+        title: l.analyseReportOledSectionSmc,
+        items: smc,
+      ),
+  ];
+
+  for (final sectionKey in entryCategoryOrder) {
+    final items = entryBySection[sectionKey];
+    if (items == null || items.isEmpty) continue;
+    final copySuffix = _planAnalyseSectionCopySuffix(
+      sectionKey.isEmpty ? null : sectionKey,
+    );
+    final title = copySuffix ?? l.analyseReportOledSectionEntry;
+    final id = copySuffix != null
+        ? 'oled_entry_${copySuffix.hashCode}'
+        : 'oled_entry';
+    out.add(
+      AjouterTradeFeedbackCategory(
+        id: id,
+        title: title,
+        items: items,
+      ),
+    );
+  }
+
+  return out;
+}
+
+String? _planAnalyseSectionCopySuffix(String? section) {
+  if (section == null) return null;
+  final sec = section.trim();
+  final idx = sec.indexOf(' — ');
+  if (idx < 0) return null;
+  final suffix = sec.substring(idx + 3).trim();
+  return suffix.isEmpty ? null : suffix;
+}
+
+String? _planAnalyseFeedbackSubtitle({
+  required String? section,
+  required String? hint,
+}) {
+  var h = hint?.trim() ?? '';
+  if (h == '—') h = '';
+
+  final copySuffix = _planAnalyseSectionCopySuffix(section);
+  if (copySuffix != null) {
+    if (h.isNotEmpty) return '$copySuffix · $h';
+    return copySuffix;
+  }
+  if (h.isNotEmpty) return h;
+  return null;
 }

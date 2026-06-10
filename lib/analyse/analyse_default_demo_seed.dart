@@ -40,11 +40,15 @@ bool isAnalyseEuroUsdDemoSnapshot(AnalyseReportSnapshot s) {
 bool isAnalyseAjouterTradeDemoFallbackSnapshot(AnalyseReportSnapshot s) =>
     isAnalyseDefaultGoldDemoAsset(s) || isAnalyseEuroUsdDemoSnapshot(s);
 
-/// Rapport par défaut (dashboard, plan d’analyse…) : GOLD / XAU si présent, sinon le premier.
+/// Rapport par défaut (dashboard, plan d’analyse…) : dernier rapport utilisateur, sinon démo GOLD.
 AnalyseReportSnapshot? pickStoredAnalyseReportDefaultPreferGold(
   List<AnalyseReportSnapshot> stored,
 ) {
   if (stored.isEmpty) return null;
+  final userOnly = stored
+      .where((s) => !isAnalyseAjouterTradeDemoFallbackSnapshot(s))
+      .toList(growable: false);
+  if (userOnly.isNotEmpty) return userOnly.first;
   for (final s in stored) {
     if (isAnalyseDefaultGoldDemoAsset(s)) return s;
   }
@@ -91,8 +95,8 @@ int resolvePlanGlobalConfidencePercent(
 /// Rapport OLED démo figé (EUR/USD) — **sans** remplir le [AnalyseController] du générateur.
 /// Le contenu (titres, notes, biais…) est toujours en anglais ([kAnalyseDemoReportContentLocale]).
 AnalyseReportSnapshot buildAnalyseDashboardPreviewSnapshot({Locale? locale}) {
+  final loc = locale ?? kAnalyseDemoReportContentLocale;
   final c = AnalyseController();
-  const loc = kAnalyseDemoReportContentLocale;
   applyAnalyseDefaultOledFullDemo(c, locale: loc);
   final snap = AnalyseReportSnapshot.fromController(c, locale: loc);
   c.dispose();

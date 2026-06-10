@@ -41,6 +41,8 @@ ios/Flutter/Signing.xcconfig.save
 
 # Cloud Functions (Firebase)
 functions/node_modules/
+web/node_modules/
+web/tools/
 functions/.env
 whsec.txt
 sk.txt

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../checklist/checklist_models.dart';
+import '../analyse/analyse_report_snapshot.dart';
 import '../dashboard/dashboard_tokens.dart';
 import '../strategie/strategie_tokens.dart';
 import '../l10n/app_localizations.dart';
@@ -44,6 +45,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
     required this.trades,
     required this.config,
     required this.checklistSections,
+    this.storedPlanReports = const [],
     this.onConfigChanged,
     this.onAdd,
     this.onReset,
@@ -55,6 +57,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
   final List<Trade> trades;
   final PerformanceCustomLensConfig config;
   final List<ChecklistSectionData> checklistSections;
+  final List<AnalyseReportSnapshot> storedPlanReports;
   final ValueChanged<PerformanceCustomLensConfig>? onConfigChanged;
   final VoidCallback? onAdd;
   final VoidCallback? onReset;
@@ -83,6 +86,7 @@ class PerformanceCustomLensCard extends StatelessWidget {
       trades: trades,
       l: l,
       locale: locale,
+      storedPlanReports: storedPlanReports,
     );
     for (final t in trades) {
       if ((t.strategieTitle ?? '').isNotEmpty) {

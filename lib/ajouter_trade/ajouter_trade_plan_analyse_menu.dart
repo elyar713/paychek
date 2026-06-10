@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'dart:async' show unawaited;
+
 import '../analyse/analyse_controller.dart';
 import '../analyse/analyse_default_demo_seed.dart';
 import '../analyse/analyse_report_snapshot.dart';
+import '../analyse/analyse_realtime_notifier.dart';
 import '../analyse/analyse_reports_demo_filter.dart';
 import '../analyse/analyse_reports_storage.dart';
 import '../shared/paychek_demo_graduation_prefs.dart';
@@ -82,6 +85,15 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
   @override
   void initState() {
     super.initState();
+    AnalyseRealtimeNotifier.reportsTick.addListener(_onAnalyseReportsChanged);
+  }
+
+  void _onAnalyseReportsChanged() {
+    if (!widget.showDemoReports || !mounted) return;
+    final locale =
+        Localizations.maybeLocaleOf(context) ??
+        WidgetsBinding.instance.platformDispatcher.locale;
+    unawaited(_reloadReports(locale));
   }
 
   @override
@@ -179,12 +191,20 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
     return _selectedIdx.clamp(0, _reports.length - 1);
   }
 
+  String _reportDate(AnalyseReportSnapshot snap) {
+    return snap.contexteDateLabel?.trim() ?? '';
+  }
+
   String _fieldLabel(BuildContext context) {
     if (!widget.showDemoReports) return '—';
     if (_showChoosePlaceholder) {
       return AppLocalizations.of(context)!.ajouterTradeAnalyseChooseReport;
     }
-    return _currentSnapshot?.actif ?? '—';
+    final snap = _currentSnapshot;
+    if (snap == null) return '—';
+    final date = _reportDate(snap);
+    if (date.isEmpty) return snap.actif;
+    return '${snap.actif} · $date';
   }
 
   void _closeOverlay() {
@@ -324,6 +344,26 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
                                                     fontSize: 11,
                                                   ),
                                                 ),
+                                                if (_reportDate(_reports[i])
+                                                    .isNotEmpty) ...[
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    _reportDate(_reports[i]),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: DashboardTokens
+                                                          .muted
+                                                          .withValues(
+                                                        alpha: 0.85,
+                                                      ),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                ],
                                               ],
                                             ),
                                           ),
@@ -365,6 +405,7 @@ class _AjouterTradePlanAnalyseMenuState extends State<AjouterTradePlanAnalyseMen
 
   @override
   void dispose() {
+    AnalyseRealtimeNotifier.reportsTick.removeListener(_onAnalyseReportsChanged);
     _closeOverlay();
     super.dispose();
   }

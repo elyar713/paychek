@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "title": "Kontakt & Feedback | Paychek",
+    "description": "Paychek kontaktieren: Support, Produktfeedback, Vorschläge und Partnerprogramm. Wir antworten auf jede Nachricht."
+  },
+  "nav": { "back": "Zurück" },
+  "hero": {
+    "chip": "Wir lesen jede Nachricht",
+    "titleHtml": "Kontakt & <span class=\"gradient-text\">Feedback</span>",
+    "subtitle": "Frage, Bug oder Idee für Paychek? Ihr Feedback formt das Produkt. Wir antworten schnell per E-Mail."
+  },
+  "form": {
+    "title": "Nachricht senden",
+    "subtitle": "Gleicher Ablauf wie Support & Feedback in den Einstellungen. Bestätigung erscheint hier.",
+    "nameLabel": "Name",
+    "namePh": "Ihr Name",
+    "emailLabel": "E-Mail",
+    "emailPh": "sie@email.com",
+    "subjectLabel": "Betreff",
+    "subjects": {
+      "support": "Support / Hilfe",
+      "bug": "Bug melden",
+      "suggestion": "Vorschlag / Feedback",
+      "affiliate": "Partnerprogramm",
+      "other": "Sonstiges"
+    },
+    "messageLabel": "Nachricht",
+    "messagePh": "Ihre Nachricht...",
+    "submit": "Nachricht senden",
+    "hint": "Ihre Anfrage wird sicher gespeichert — unser Team wird wie bei In-App-Tickets benachrichtigt.",
+    "sending": "Wird gesendet…",
+    "success": "Danke! Ihre Anfrage wurde gesendet. Referenz: {ref}. Wir antworten in Kürze per E-Mail.",
+    "errorGeneric": "Senden fehlgeschlagen. Verbindung prüfen oder contact@paychek.pro schreiben.",
+    "errorValidation": "Bitte gültige E-Mail und Nachricht (mind. 8 Zeichen) angeben."
+  },
+  "direct": {
+    "title": "Direkt kontaktieren",
+    "emailLabel": "E-Mail",
+    "appHintHtml": "Paychek bereits im Einsatz? Öffnen Sie <strong class=\"text-gray-300\">Einstellungen → Support & Feedback</strong> für ein verfolgtes Ticket aus Ihrem Konto."
+  },
+  "affiliate": {
+    "chip": "Partnerprogramm",
+    "title": "Paychek empfehlen, belohnt werden",
+    "body": "Content Creator, Mentor oder Trading-Community? Werden Sie Partner und verdienen Sie Provision auf jedes vermittelte Pro-Abo.",
+    "cta": "Partner werden",
+    "mailtoSubject": "Paychek Partnerprogramm"
+  },
+  "footer": {
+    "home": "Start",
+    "blog": "Blog",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "copyright": "© 2026 PAYCHEK"
+  }
+}

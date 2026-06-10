@@ -75,6 +75,53 @@ List<DurationBucketStat> durationBucketWinRates(List<Trade> trades) {
   }).toList();
 }
 
+/// Classe d’actif effective d’un trade (défaut Forex si non renseigné).
+AjouterTradeAssetClass performanceTradeAssetClass(Trade t) =>
+    t.assetClass ?? AjouterTradeAssetClass.forex;
+
+Map<AjouterTradeAssetClass, int> countTradesByAssetClass(List<Trade> trades) {
+  final counts = <AjouterTradeAssetClass, int>{};
+  for (final t in trades) {
+    final c = performanceTradeAssetClass(t);
+    counts[c] = (counts[c] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/// Marché le plus tradé sur la période (priorité utilisateur pour les cartes Volume / Actifs).
+AjouterTradeAssetClass dominantAssetClassFromTrades(
+  List<Trade> trades, {
+  AjouterTradeAssetClass fallback = AjouterTradeAssetClass.forex,
+}) {
+  final counts = countTradesByAssetClass(trades);
+  if (counts.isEmpty) return fallback;
+  var best = fallback;
+  var bestN = -1;
+  for (final e in counts.entries) {
+    if (e.value > bestN) {
+      bestN = e.value;
+      best = e.key;
+    }
+  }
+  return best;
+}
+
+/// Marchés avec au moins un trade, du plus au moins tradé (chips Volume / Actifs).
+List<AjouterTradeAssetClass> assetClassesOrderedByTradeCount(List<Trade> trades) {
+  final counts = countTradesByAssetClass(trades);
+  if (counts.isEmpty) return [AjouterTradeAssetClass.forex];
+  final keys = counts.keys.toList()
+    ..sort((a, b) {
+      final byCount = counts[b]!.compareTo(counts[a]!);
+      if (byCount != 0) return byCount;
+      return a.index.compareTo(b.index);
+    });
+  return keys;
+}
+
+int tradeCountForAssetClass(List<Trade> trades, AjouterTradeAssetClass marche) =>
+    countTradesByAssetClass(trades)[marche] ?? 0;
+
 /// Actif agrégé pour le diagramme en barres (page Performance).
 class AssetTradeBarStat {
   const AssetTradeBarStat({
@@ -96,7 +143,7 @@ List<AssetTradeBarStat> computeTopAssetBarStats(
 }) {
   final map = <String, List<Trade>>{};
   for (final t in trades) {
-    if (marche != null && t.assetClass != marche) continue;
+    if (marche != null && performanceTradeAssetClass(t) != marche) continue;
     final p = t.pair?.trim();
     if (p == null || p.isEmpty) continue;
     map.putIfAbsent(p, () => []).add(t);

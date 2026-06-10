@@ -14,7 +14,7 @@ class WebDashboardPairedCard extends StatelessWidget {
 
   final Widget child;
 
-  /// Sans cadre gris (ex. « Mon analyse » : seul le rapport OLED garde sa carte).
+  /// Sans cadre gris (ex. « Mon analyse » : une seule carte OLED titre + rapport).
   final bool bare;
 
   @override
@@ -120,7 +120,7 @@ class _WebDashboardChecklistAnalysePairState
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              WebDashboardPairedCard(child: widget.analyseChild),
+              WebDashboardPairedCard(bare: true, child: widget.analyseChild),
               const SizedBox(height: 16),
               WebDashboardPairedCard(child: widget.checklistChild),
             ],

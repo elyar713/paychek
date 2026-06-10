@@ -1,0 +1,7 @@
+{
+  "name": "paychek-web-static",
+  "private": true,
+  "scripts": {
+    "build:css": "node ../tool/build-paychek-tailwind.cjs"
+  }
+}
