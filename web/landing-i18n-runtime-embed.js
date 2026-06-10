@@ -62,9 +62,143 @@ function setPricingLiText(liEl, labelText) {
 
 function applyFAQ(s) { if (!s || !s.faq || !s.faq.items) return; var flagged = Array.prototype.slice.call(document.querySelectorAll("[data-faq-index]")); flagged.forEach(function (node, idxFb) { var idxRaw = node.getAttribute("data-faq-index"); var j = typeof idxRaw === "string" && idxRaw.length ? parseInt(idxRaw, 10) : idxFb; var it = typeof j === "number" && s.faq.items[j] ? s.faq.items[j] : null; if (!it) return; var trig = node.querySelector("[data-faq-trigger]") || node.querySelector(".faq-trigger span"); var cnt = node.querySelector("[data-faq-content]") || node.querySelector(".faq-content"); if (!trig) { var ft = node.querySelector(".faq-trigger"); trig = ft && ft.children.length ? ft.children[0] : null; } if (trig) trig.textContent = it.q || ""; if (cnt && it.aHtml != null) cnt.innerHTML = it.aHtml; }); if (flagged.length) return; Array.prototype.slice.call(document.querySelectorAll(".faq-item")).forEach(function (el, idx) { var item = s.faq.items[idx]; if (!item) return; var tr = el.querySelector(".faq-trigger span"); var cw = el.querySelector(".faq-content"); if (tr) tr.textContent = item.q || ""; if (cw && item.aHtml != null) cw.innerHTML = item.aHtml; }); }
 
-function applyPricingFeatures(strings) { if (!strings || !strings.pricing) return; document.querySelectorAll("[data-paychek-pricing=\"lite\"] li,#pricing-lite-features li").forEach(function (li, ix) { var path = li.getAttribute("data-i18n"); var lx = li.getAttribute("data-pricing-lite-index"); if (lx != null) ix = parseInt(lx, 10); var lbl = path ? getAtPath(strings, path) : null; if (lbl == null && strings.pricing.featuresLite && strings.pricing.featuresLite[ix] != null) lbl = strings.pricing.featuresLite[ix]; if (lbl != null) setPricingLiText(li, lbl); }); document.querySelectorAll("[data-paychek-pricing=\"pro\"] li,#pricing-pro-features li").forEach(function (li, ix) { var path = li.getAttribute("data-i18n"); var lx = li.getAttribute("data-pricing-pro-index"); if (lx != null) ix = parseInt(lx, 10); var lbl = path ? getAtPath(strings, path) : null; if (lbl == null && strings.pricing.featuresPro && strings.pricing.featuresPro[ix] != null) lbl = strings.pricing.featuresPro[ix]; if (lbl != null) setPricingLiText(li, lbl); }); if (document.querySelector("[data-paychek-pricing=lite],[data-paychek-pricing=pro],#pricing-lite-features,#pricing-pro-features")) return; var cards = Array.prototype.slice.call(document.querySelectorAll("#pricing .pricing-card")); if (cards.length < 2) return; var liteRows = cards[0].querySelectorAll("ul li"); var proRows = cards[1].querySelectorAll("ul li"); var fl = strings.pricing.featuresLite; var fp = strings.pricing.featuresPro; var i; if (fl) { for (i = 0; i < liteRows.length && i < fl.length; i++) { if (liteRows[i].querySelector("i")) setPricingLiText(liteRows[i], fl[i]); } } if (fp) { for (i = 0; i < proRows.length && i < fp.length; i++) { if (proRows[i].querySelector("i")) setPricingLiText(proRows[i], fp[i]); } } }
+var _paychekPricingStrings = null;
+var _paychekPricingSelected = "1y";
+var _paychekPricingPlansBound = false;
 
-function bindDataAttrs(s){ if(!s) return; Array.prototype.slice.call(document.querySelectorAll("[data-i18n]")).forEach(function(el){var p=el.getAttribute("data-i18n"); if(!p) return; if(el.closest&&el.closest("#pricing ul"))return; var v=getAtPath(s,p); if(typeof v==="string") el.textContent=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-html]")).forEach(function(el){var p=el.getAttribute("data-i18n-html");var v=getAtPath(s,p); if(typeof v==="string") el.innerHTML=v; }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-aria]")).forEach(function(el){var p=el.getAttribute("data-i18n-aria");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("aria-label",v); }); Array.prototype.slice.call(document.querySelectorAll("[data-i18n-title]")).forEach(function(el){var p=el.getAttribute("data-i18n-title");var v=getAtPath(s,p); if(typeof v==="string") el.setAttribute("title",v); }); }
+var _paychekPricingRowSpecs = [
+  ["trades", "rowTrades", "liteTrades", "proTrades"],
+  ["entry", "rowEntry", "liteEntry", "proEntry"],
+  ["calendar", "rowCalendar", "liteCalendar", "proCalendar"],
+  ["checklist", "rowChecklist", "liteAbsent", "proChecklist"],
+  ["analysis", "rowAnalysis", "liteAbsent", "proAnalysis"],
+  ["strategy", "rowStrategy", "liteAbsent", "proStrategy"],
+  ["performance", "rowPerformance", "liteAbsent", "proPerformance"],
+  ["psychology", "rowPsychology", "liteAbsent", "proPsychology"],
+  ["reports", "rowReports", "liteAbsent", "proReports"]
+];
+
+function paychekSelectPricingPlan(period) {
+  _paychekPricingSelected = period;
+  document.querySelectorAll(".paychek-plan-card").forEach(function (card) {
+    var active = card.getAttribute("data-pricing-period") === period;
+    card.classList.toggle("paychek-plan-selected", active);
+    card.setAttribute("aria-checked", active ? "true" : "false");
+  });
+  paychekUpdatePricingMainCta();
+}
+
+function paychekUpdatePricingMainCta() {
+  var btn = document.getElementById("paychek-pricing-main-cta");
+  var p = _paychekPricingStrings && _paychekPricingStrings.pricing;
+  if (!btn || !p || !p.periods) return;
+  var period = p.periods[_paychekPricingSelected];
+  if (period && period.cta != null) btn.textContent = period.cta;
+}
+
+function initPaychekPricingPlans() {
+  if (_paychekPricingPlansBound) return;
+  var root = document.getElementById("paychek-pricing-plans");
+  if (!root) return;
+  _paychekPricingPlansBound = true;
+  root.querySelectorAll(".paychek-plan-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      paychekSelectPricingPlan(card.getAttribute("data-pricing-period"));
+    });
+  });
+}
+
+function applyPricingPlans(p) {
+  if (!p || !p.periods) return;
+  var titleKeys = { "1y": "period1y", "3m": "period3m", "1m": "period1m" };
+  var badgeKeys = { "1y": "badgeSave44", "3m": "badgeSave22", "1m": null };
+  Object.keys(titleKeys).forEach(function (key) {
+    var card = document.querySelector('.paychek-plan-card[data-pricing-period="' + key + '"]');
+    var period = p.periods[key];
+    if (!card || !period) return;
+    var titleEl = card.querySelector('[data-pricing-field="title"]');
+    var savingEl = card.querySelector('[data-pricing-field="saving"]');
+    var priceEl = card.querySelector('[data-pricing-field="price"]');
+    var labelEl = card.querySelector('[data-pricing-field="label"]');
+    var badgeEl = card.querySelector("[data-pricing-badge]");
+    if (titleEl && p[titleKeys[key]] != null) titleEl.textContent = p[titleKeys[key]];
+    if (savingEl && period.saving != null) savingEl.textContent = period.saving;
+    if (priceEl && period.price != null) priceEl.textContent = period.price;
+    if (labelEl && period.label != null) labelEl.textContent = period.label;
+    if (badgeEl) {
+      var badgeKey = badgeKeys[key];
+      if (!badgeKey) {
+        badgeEl.classList.add("is-hidden");
+        badgeEl.classList.remove("is-muted");
+      } else {
+        badgeEl.classList.remove("is-hidden");
+        badgeEl.textContent = p[badgeKey] || "";
+        if (key === "1y") {
+          badgeEl.classList.remove("is-muted");
+        } else {
+          badgeEl.classList.add("is-muted");
+        }
+      }
+    }
+  });
+  paychekUpdatePricingMainCta();
+}
+
+function applyPricingCompare(p) {
+  if (!p) return;
+  _paychekPricingRowSpecs.forEach(function (spec) {
+    var row = document.querySelector('[data-pricing-row="' + spec[0] + '"]');
+    if (!row) return;
+    var rowLabel = p[spec[1]] || "";
+    var liteVal = p[spec[2]];
+    var proVal = p[spec[3]] || "";
+    row.querySelectorAll('[data-pricing-cell="label"]').forEach(function (el) {
+      el.textContent = rowLabel;
+    });
+    var liteCell = row.querySelector('[data-pricing-cell="lite"]');
+    var proCell = row.querySelector('[data-pricing-cell="pro"]');
+    if (liteCell) {
+      var absent = spec[2] === "liteAbsent" || liteVal === "×";
+      liteCell.textContent = absent ? "×" : liteVal || "";
+      liteCell.classList.toggle("is-absent", absent);
+    }
+    if (proCell) {
+      proCell.textContent = proVal;
+      proCell.classList.remove("is-absent");
+    }
+  });
+}
+
+function applyPricingFeatures(strings) {
+  if (!document.getElementById("paychek-pricing-compare")) return;
+  if (strings && strings.pricing) applyPricingCompare(strings.pricing);
+}
+
+function bindDataAttrs(s) {
+  if (!s) return;
+  Array.prototype.slice.call(document.querySelectorAll("[data-i18n]")).forEach(function (el) {
+    var p = el.getAttribute("data-i18n");
+    if (!p) return;
+    if (el.closest && el.closest("#paychek-pricing-compare .paychek-compare-row")) return;
+    var v = getAtPath(s, p);
+    if (typeof v === "string") el.textContent = v;
+  });
+  Array.prototype.slice.call(document.querySelectorAll("[data-i18n-html]")).forEach(function (el) {
+    var p = el.getAttribute("data-i18n-html");
+    var v = getAtPath(s, p);
+    if (typeof v === "string") el.innerHTML = v;
+  });
+  Array.prototype.slice.call(document.querySelectorAll("[data-i18n-aria]")).forEach(function (el) {
+    var p = el.getAttribute("data-i18n-aria");
+    var v = getAtPath(s, p);
+    if (typeof v === "string") el.setAttribute("aria-label", v);
+  });
+  Array.prototype.slice.call(document.querySelectorAll("[data-i18n-title]")).forEach(function (el) {
+    var p = el.getAttribute("data-i18n-title");
+    var v = getAtPath(s, p);
+    if (typeof v === "string") el.setAttribute("title", v);
+  });
+}
 
 function refreshExplorerTabs(s){ if(!s||!s.tabs) return; Object.keys(s.tabs).forEach(function(k){ var tb=document.getElementById("tab-"+k); var lab=s.tabs[k]; if(tb!=null&&lab!=null) tb.textContent=lab; }); }
 
@@ -177,9 +311,26 @@ function applyProcess(proc) {
   }
 } 
 
-function applyPricingTexts(s){ if(!s||!s.pricing)return; var pc=document.getElementById("pricing"); if(!pc)return; var head=pc.querySelector(".text-center"); if(head){ var hz=head.querySelector("h3"); if(hz&&s.pricing.title!=null) hz.textContent=s.pricing.title;var ps=head.querySelectorAll("p"); if(ps[0]&&s.pricing.subtitle!=null) ps[0].textContent=s.pricing.subtitle;} var cards=pc.querySelectorAll(".pricing-card"); if(cards[0]){ var rl=cards[0].querySelector(".mb-8 .flex.items-center span.text-\[10px\]"); if(rl&&s.pricing.liteLabel!=null) rl.textContent=s.pricing.liteLabel;var sfxL=cards[0].querySelectorAll("span.text-gray-600"); if(sfxL[0]&&s.pricing.perLife!=null) sfxL[0].textContent=s.pricing.perLife; var bt0=cards[0].querySelector("button.btn-secondary"); if(bt0&&s.pricing.ctaLite!=null) bt0.textContent=s.pricing.ctaLite;} if(cards[1]){ var po=document.querySelector("#pricing .pricing-card.featured .absolute.bg-blue-600"); if(po&&s.pricing.popular!=null) po.textContent=s.pricing.popular; var rp=cards[1].querySelector(".mb-8 .flex.items-center span.text-\[10px\]"); if(rp&&s.pricing.proLabel!=null) rp.textContent=s.pricing.proLabel;var sfxP=cards[1].querySelectorAll("span.text-gray-600"); if(sfxP[0]&&s.pricing.perYear!=null) sfxP[0].textContent=s.pricing.perYear; var nm=cards[1].querySelector("span.text-\[9px\]"); if(nm&&s.pricing.noCommitment!=null) nm.textContent=s.pricing.noCommitment; var bp=cards[1].querySelector("button.btn-primary"); if(bp&&s.pricing.ctaPro!=null) bp.textContent=s.pricing.ctaPro;} var trial=document.querySelector("#pricing .btn-trial"); if(trial){ var q=trial.querySelectorAll("p"); if(q[0]&&s.pricing.trialMain!=null) q[0].textContent=s.pricing.trialMain;if(q[1]&&s.pricing.trialSub!=null) q[1].textContent=s.pricing.trialSub;} } 
+function applyPricingTexts(s) {
+  if (!s || !s.pricing) return;
+  _paychekPricingStrings = s;
+  var pc = document.getElementById("pricing");
+  if (!pc) return;
+  if (document.getElementById("paychek-pricing-plans")) {
+    applyPricingPlans(s.pricing);
+    applyPricingCompare(s.pricing);
+    initPaychekPricingPlans();
+  }
+  var trial = document.querySelector("#pricing .btn-trial");
+  if (trial) {
+    var q = trial.querySelectorAll("p");
+    if (q[0] && s.pricing.trialMain != null) q[0].textContent = s.pricing.trialMain;
+    if (q[1] && s.pricing.trialSub != null) q[1].textContent = s.pricing.trialSub;
+  }
+}
 
-function applyFooter(f){ if(!f)return;var slog=document.querySelector("footer > div.max-w-7xl > div > div.flex.flex-col.gap-6 > p"); if(!slog) slog=document.querySelector("footer > div.max-w-7xl > div p.text-gray-500"); if(!slog) slog=document.querySelector("footer p.text-\[10px\].font-bold.uppercase"); if(slog&&f.slogan!=null) slog.textContent=f.slogan;var hn=document.querySelectorAll("footer ul.flex.flex-col.gap-4"); var tn=document.querySelectorAll("footer h6.uppercase"); if(tn.length>=4){ if(f.columnProduct!=null) tn[0].textContent=f.columnProduct; if(f.columnCompany!=null) tn[1].textContent=f.columnCompany;if(f.columnResources!=null) tn[2].textContent=f.columnResources;if(f.columnLegal!=null) tn[3].textContent=f.columnLegal;} if(hn.length>=4){ var a=hn[0].querySelectorAll("a"); var o=[f.feat,f.pricing,f.faq,f.updates];for(var i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[1].querySelectorAll("a"); o=[f.about,f.careers,f.affiliate,f.contact];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[2].querySelectorAll("a"); o=[f.blog,f.guideTrading,f.webinars,f.documentation];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; a=hn[3].querySelectorAll("a"); o=[f.privacy,f.terms,f.security,f.cookies];for(i=0;i<4;i++) if(a[i]&&o[i]!=null) a[i].textContent=o[i]; } var crs=document.querySelectorAll("footer > div.flex.flex-col > div.mt-32 p"); if(crs.length<2) crs=document.querySelectorAll("footer .border-white\/5 p"); if(crs[0]&&f.copyright!=null) crs[0].textContent=f.copyright;if(crs[1]&&f.designedFor!=null) crs[1].textContent=f.designedFor;} 
+// Footer : tout le texte porte des attributs [data-i18n] (footer.*), traités par bindDataAttrs.
+function applyFooter(_f){ return; }
 
 function applyModals(m){ if(!m)return;var lh=document.querySelector("#login-modal h2"); var sh=document.querySelector("#signup-modal h2"); if(lh&&m.loginTitle!=null) lh.textContent=m.loginTitle; if(sh&&m.signupTitle!=null) sh.textContent=m.signupTitle;var sn=document.querySelector("#signup-modal p.text-\[9px\]"); if(sn&&m.trialNoteHtml!=null) sn.innerHTML=m.trialNoteHtml; var lin=document.querySelectorAll("#login-modal input"); if(lin[0]&&m.emailPh!=null) lin[0].placeholder=m.emailPh; if(lin[1]&&m.passwordPh!=null) lin[1].placeholder=m.passwordPh;var sin=document.querySelectorAll("#signup-modal input"); if(sin[0]&&m.fullNamePh!=null) sin[0].placeholder=m.fullNamePh; if(sin[1]&&m.emailPh!=null) sin[1].placeholder=m.emailPh; if(sin[2]&&m.passwordPh!=null) sin[2].placeholder=m.passwordPh; var lb=document.querySelector("#login-modal .btn-primary"); var sb=document.querySelector("#signup-modal .btn-primary"); if(lb&&m.loginSubmit!=null) lb.textContent=m.loginSubmit; if(sb&&m.signupSubmit!=null) sb.textContent=m.signupSubmit;} 
 

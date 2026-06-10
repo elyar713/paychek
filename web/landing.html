@@ -221,16 +221,319 @@
             background: linear-gradient(to top, var(--pure-black), transparent);
         }
 
-        /* Pricing Styles */
-        .pricing-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
+        /* Pricing v2 — aligné paywall mobile (noir & or) */
+        .paychek-pricing-v2 {
+            max-width: 28rem;
         }
 
-        .pricing-card.featured {
-            border-color: rgba(59, 130, 246, 0.5);
-            background: rgba(59, 130, 246, 0.02);
+        .paychek-plan-card {
+            position: relative;
+            display: block;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 12px;
+            border: 2px solid #262626;
+            background: #0B0C10;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: border-color 0.28s ease, box-shadow 0.28s ease, transform 0.28s ease;
+        }
+
+        .paychek-plan-card:hover {
+            border-color: #404040;
+        }
+
+        .paychek-plan-card.paychek-plan-selected {
+            border-color: rgba(245, 158, 11, 0.85);
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.05);
+            transform: scale(1.02);
+        }
+
+        .paychek-plan-badge {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #000;
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .paychek-plan-badge.is-muted {
+            color: #fff;
+            background: #262626;
+            box-shadow: none;
+        }
+
+        .paychek-plan-badge.is-hidden {
+            display: none;
+        }
+
+        .paychek-plan-inner {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .paychek-plan-radio {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            border-radius: 50%;
+            border: 2px solid #525252;
+            position: relative;
+        }
+
+        .paychek-plan-selected .paychek-plan-radio {
+            border-color: #F59E0B;
+        }
+
+        .paychek-plan-selected .paychek-plan-radio::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: #F59E0B;
+        }
+
+        .paychek-plan-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .paychek-plan-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .paychek-plan-saving {
+            margin-top: 2px;
+            font-size: 10px;
+            font-weight: 500;
+            color: #A3A3A3;
+            line-height: 1.35;
+        }
+
+        .paychek-plan-selected .paychek-plan-saving {
+            color: #FBBF24;
+            font-weight: 700;
+        }
+
+        .paychek-plan-price-col {
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .paychek-plan-total {
+            font-size: 14px;
+            font-weight: 900;
+            color: #E5E5E5;
+            line-height: 1.2;
+        }
+
+        .paychek-plan-selected .paychek-plan-total {
+            color: #fff;
+        }
+
+        .paychek-plan-period {
+            margin-top: 2px;
+            font-size: 9px;
+            font-weight: 500;
+            color: #737373;
+        }
+
+        .paychek-compare-table {
+            margin-top: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(38, 38, 38, 0.85);
+            background: #000;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(217, 119, 6, 0.12);
+        }
+
+        .paychek-compare-headers,
+        .paychek-compare-row,
+        .paychek-compare-foot {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .paychek-compare-headers > div,
+        .paychek-compare-row > div,
+        .paychek-compare-foot > div {
+            padding: 14px 10px;
+        }
+
+        .paychek-compare-headers > div:first-child {
+            background: rgba(10, 10, 10, 0.55);
+        }
+
+        .paychek-compare-headers > div:last-child {
+            background: linear-gradient(180deg, rgba(69, 26, 3, 0.35) 0%, transparent 100%);
+            border-left: 1px solid rgba(217, 119, 6, 0.25);
+            position: relative;
+        }
+
+        .paychek-compare-pro-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #F59E0B;
+            color: #000;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .paychek-compare-cap {
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #737373;
+        }
+
+        .paychek-compare-cap.pro {
+            color: #FBBF24;
+        }
+
+        .paychek-compare-plan-name {
+            margin-top: 2px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .paychek-compare-lite-free {
+            margin-top: 6px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .paychek-compare-row {
+            border-top: 1px solid rgba(38, 38, 38, 0.45);
+        }
+
+        .paychek-compare-row > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 2px;
+            min-height: 52px;
+        }
+
+        .paychek-compare-row > div:first-child {
+            background: rgba(10, 10, 10, 0.12);
+        }
+
+        .paychek-compare-row > div:last-child {
+            background: rgba(245, 158, 11, 0.04);
+            border-left: 1px solid rgba(217, 119, 6, 0.22);
+        }
+
+        .paychek-compare-row-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #737373;
+        }
+
+        .paychek-compare-row > div:last-child .paychek-compare-row-label {
+            color: #F59E0B;
+        }
+
+        .paychek-compare-row-value {
+            font-size: 11px;
+            font-weight: 500;
+            color: #D4D4D4;
+            line-height: 1.2;
+        }
+
+        .paychek-compare-row > div:last-child .paychek-compare-row-value {
+            font-weight: 700;
+            color: #FCD34D;
+        }
+
+        .paychek-compare-row-value.is-absent {
+            font-size: 13px;
+            color: #525252;
+        }
+
+        .paychek-compare-foot {
+            border-top: 1px solid rgba(38, 38, 38, 0.6);
+        }
+
+        .paychek-compare-foot > div {
+            padding: 10px;
+        }
+
+        .paychek-compare-lite-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #262626;
+            background: #0A0A0A;
+            color: #737373;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .paychek-pricing-main-cta {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+            color: #000;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .paychek-pricing-main-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(245, 158, 11, 0.18);
+        }
+
+        .paychek-compare-pro-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 6px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
         }
 
         /* FAQ Styles */
@@ -314,17 +617,21 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .btn-trial {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #FBBF24;
             transition: all 0.3s ease;
         }
 
         .btn-trial:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(245, 158, 11, 0.14);
+            border-color: rgba(245, 158, 11, 0.45);
             color: #ffffff;
             transform: scale(1.02);
+        }
+
+        .btn-trial .paychek-trial-icon {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
         }
 
         footer a {
@@ -579,118 +886,133 @@
                 </div>
             </div>
 
-            <!-- SECTION : TARIFS -->
-            <section id="pricing" class="max-w-4xl mx-auto pt-20 scroll-mt-32">
-                <div class="text-center mb-16">
-                    <h3 class="text-2xl font-bold uppercase tracking-[0.3em] mb-4" data-i18n="pricing.title">Prêt à passer au niveau supérieur ?</h3>
-                    <p class="text-gray-500 text-sm" data-i18n="pricing.subtitle">Choisissez le plan qui correspond à votre ambition.</p>
+            <!-- SECTION : TARIFS (paywall v2 — noir & or) -->
+            <section id="pricing" class="paychek-pricing-v2 mx-auto pt-20 scroll-mt-32 px-4">
+                <div class="text-center mb-8">
+                    <h3 class="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em] mb-3 leading-snug" data-i18n-html="pricing.titleHtml">Choisissez votre formule <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">Pro</span></h3>
+                    <p class="text-gray-500 text-sm max-w-md mx-auto" data-i18n="pricing.subtitle">Comparez nos fonctionnalités et débloquez la puissance maximale de vos analyses.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Lite Plan -->
-                    <div class="pricing-card p-10 rounded-[3rem] flex flex-col">
-                        <div class="mb-8">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-gray-500"></span>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest" data-i18n="pricing.liteLabel">Lite</span>
+                <div id="paychek-pricing-plans" role="radiogroup" aria-label="Plans Pro">
+                    <button type="button" class="paychek-plan-card paychek-plan-selected" data-pricing-period="1y" aria-checked="true">
+                        <span class="paychek-plan-badge" data-pricing-badge="save44">ÉCO. 44%</span>
+                        <div class="paychek-plan-inner">
+                            <span class="paychek-plan-radio" aria-hidden="true"></span>
+                            <div class="paychek-plan-body">
+                                <div class="paychek-plan-title" data-pricing-field="title">1 An</div>
+                                <div class="paychek-plan-saving" data-pricing-field="saving">Soit environ 4,99 $ / mois</div>
                             </div>
-                            <div class="flex items-baseline gap-1 mt-2">
-                                <span class="text-5xl font-bold">0$</span>
-                                <span class="text-gray-600 text-xs uppercase font-bold tracking-widest" data-i18n="pricing.perLife">/ à vie</span>
+                            <div class="paychek-plan-price-col">
+                                <div class="paychek-plan-total" data-pricing-field="price">59,99 $</div>
+                                <div class="paychek-plan-period" data-pricing-field="label">/ an</div>
                             </div>
                         </div>
-                        <ul class="space-y-4 mb-10 flex-grow" data-paychek-pricing="lite">
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> 30 trades / mois maximum
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> Saisie manuelle uniquement
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400">
-                                <i class="fas fa-check text-blue-500"></i> Calendrier standard
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Checklist
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Générateur d'analyse
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Page Stratégie
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Statistiques performance
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> État mental
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-gray-400 opacity-30">
-                                <i class="fas fa-times"></i> Export PDF
-                            </li>
-                        </ul>
-                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-secondary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest" data-i18n="pricing.ctaLite">Commencer gratuitement</button>
+                    </button>
+
+                    <button type="button" class="paychek-plan-card" data-pricing-period="3m" aria-checked="false">
+                        <span class="paychek-plan-badge is-muted" data-pricing-badge="save22">-22%</span>
+                        <div class="paychek-plan-inner">
+                            <span class="paychek-plan-radio" aria-hidden="true"></span>
+                            <div class="paychek-plan-body">
+                                <div class="paychek-plan-title" data-pricing-field="title">3 Mois</div>
+                                <div class="paychek-plan-saving" data-pricing-field="saving">Soit environ 6,99 $ / mois</div>
+                            </div>
+                            <div class="paychek-plan-price-col">
+                                <div class="paychek-plan-total" data-pricing-field="price">20,97 $</div>
+                                <div class="paychek-plan-period" data-pricing-field="label">/ 3 mois</div>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button type="button" class="paychek-plan-card" data-pricing-period="1m" aria-checked="false">
+                        <span class="paychek-plan-badge is-hidden" data-pricing-badge="none"></span>
+                        <div class="paychek-plan-inner">
+                            <span class="paychek-plan-radio" aria-hidden="true"></span>
+                            <div class="paychek-plan-body">
+                                <div class="paychek-plan-title" data-pricing-field="title">1 Mois</div>
+                                <div class="paychek-plan-saving" data-pricing-field="saving">Facturé mensuellement</div>
+                            </div>
+                            <div class="paychek-plan-price-col">
+                                <div class="paychek-plan-total" data-pricing-field="price">8,99 $</div>
+                                <div class="paychek-plan-period" data-pricing-field="label">/ mois</div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                <div id="paychek-pricing-compare" class="paychek-compare-table">
+                    <div class="paychek-compare-headers">
+                        <div>
+                            <div class="paychek-compare-cap" data-i18n="pricing.liteStandard">STANDARD</div>
+                            <div class="paychek-compare-plan-name" data-i18n="pricing.liteLabel">Lite</div>
+                            <div class="paychek-compare-lite-free" data-i18n="pricing.liteFree">Gratuit</div>
+                        </div>
+                        <div>
+                            <span class="paychek-compare-pro-badge" data-i18n="pricing.proBadge">PRO</span>
+                            <div class="paychek-compare-cap pro" data-i18n="pricing.proUnlimited">ILLIMITÉ</div>
+                            <div class="paychek-compare-plan-name" data-i18n="pricing.proLabel">Pro</div>
+                        </div>
                     </div>
 
-                    <!-- Pro Plan -->
-                    <div class="pricing-card featured p-10 rounded-[3rem] flex flex-col relative overflow-hidden">
-                        <div class="absolute top-6 right-8 bg-blue-600 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest" data-i18n="pricing.popular">Populaire</div>
-                        <div class="mb-8">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest" data-i18n="pricing.proLabel">Pro</span>
-                            </div>
-                            <div class="flex flex-col gap-1 mt-2">
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-5xl font-bold">49.90$</span>
-                                    <span class="text-gray-600 text-xs uppercase font-bold tracking-widest" data-i18n="pricing.perYear">/ an</span>
-                                </div>
-                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500/80 ml-1 mt-1" data-i18n="pricing.noCommitment">Sans engagement</span>
-                            </div>
+                    <div class="paychek-compare-row" data-pricing-row="trades">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Trades / mois</span><span class="paychek-compare-row-value" data-pricing-cell="lite">30 Trades / mois</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Trades / mois</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Illimité</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="entry">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Saisie</span><span class="paychek-compare-row-value" data-pricing-cell="lite">Saisie manuelle uniquement</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Saisie</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Import CSV + saisie manuelle</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="calendar">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Calendrier</span><span class="paychek-compare-row-value" data-pricing-cell="lite">Calendrier standard</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Calendrier</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Calendrier Pro</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="checklist">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Checklist</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Checklist</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Checklist</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="analysis">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Analyse</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Analyse</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Générateur d'analyse</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="strategy">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Stratégie</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Stratégie</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Page Stratégie</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="performance">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Performances</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Performances</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Statistiques performance</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="psychology">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Psychologie</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Psychologie</span><span class="paychek-compare-row-value" data-pricing-cell="pro">État mental</span></div>
+                    </div>
+                    <div class="paychek-compare-row" data-pricing-row="reports">
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Rapports</span><span class="paychek-compare-row-value is-absent" data-pricing-cell="lite">×</span></div>
+                        <div><span class="paychek-compare-row-label" data-pricing-cell="label">Rapports</span><span class="paychek-compare-row-value" data-pricing-cell="pro">Export PDF</span></div>
+                    </div>
+
+                    <div class="paychek-compare-foot">
+                        <div>
+                            <span class="paychek-compare-lite-btn" data-i18n="pricing.ctaCurrent">ACTUEL</span>
                         </div>
-                        <ul class="space-y-4 mb-10 flex-grow" data-paychek-pricing="pro">
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Trades illimités
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Import CSV + saisie manuelle
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Calendrier Pro
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Checklist
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Générateur d'analyse
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Page Stratégie
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Statistiques performance
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> État mental
-                            </li>
-                            <li class="flex items-center gap-3 text-xs text-white">
-                                <i class="fas fa-check text-blue-400"></i> Export PDF
-                            </li>
-                        </ul>
-                        <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary w-full py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-white/10" data-i18n="pricing.ctaPro">Devenir Pro</button>
+                        <div>
+                            <button type="button" onclick="paychekNotifyParentAuth('signup')" class="paychek-compare-pro-btn" data-i18n="pricing.ctaSubscribe">S'ABONNER MAINTENANT</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Bouton d'essai gratuit -->
-                <div class="mt-12 flex flex-col items-center">
+                <button type="button" id="paychek-pricing-main-cta" onclick="paychekNotifyParentAuth('signup')" class="paychek-pricing-main-cta">S'ABONNER - 1 AN</button>
+
+                <div class="mt-10 flex flex-col items-center">
                     <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-trial px-8 py-4 rounded-full flex items-center gap-4 group">
-                        <span class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="paychek-trial-icon w-8 h-8 rounded-full flex items-center justify-center">
                             <i class="fas fa-play text-white text-[10px] ml-0.5"></i>
                         </span>
                         <div class="text-left">
                             <p class="text-[10px] font-black uppercase tracking-widest text-white leading-none mb-1" data-i18n="pricing.trialMain">Démarrer mon essai gratuit</p>
-                            <p class="text-[9px] font-bold uppercase tracking-widest text-blue-400/80 leading-none" data-i18n="pricing.trialSub">Accès complet pendant 7 jours</p>
+                            <p class="text-[9px] font-bold uppercase tracking-widest text-amber-400/80 leading-none" data-i18n="pricing.trialSub">Accès complet pendant 7 jours</p>
                         </div>
-                        <i class="fas fa-arrow-right text-blue-400 text-xs ml-4 transition-transform group-hover:translate-x-1"></i>
+                        <i class="fas fa-arrow-right text-amber-400 text-xs ml-4 transition-transform group-hover:translate-x-1"></i>
                     </button>
                 </div>
             </section>
@@ -778,10 +1100,10 @@
         </section>
     </header>
 
-    <!-- FOOTER RÉORGANISÉ -->
-    <footer class="pt-32 pb-20 border-t border-white/5 mt-32 bg-black">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+    <!-- FOOTER -->
+    <footer class="pt-24 pb-16 border-t border-white/5 mt-32 bg-black">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <!-- Gauche : Logo & Slogan -->
                 <div class="flex flex-col gap-6">
                     <div class="flex items-center gap-3 group cursor-pointer">
@@ -791,63 +1113,44 @@
                     <p class="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3em] leading-loose max-w-sm" data-i18n="footer.slogan">
                         Le terminal ultime pour les traders sérieux qui souhaitent transformer leurs données en stratégie rentable.
                     </p>
-                    <div class="flex gap-4 mt-4">
-                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-twitter text-xs"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-discord text-xs"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:border-white/30 hover:text-white transition"><i class="fab fa-instagram text-xs"></i></a>
-                    </div>
                 </div>
 
                 <!-- Droite : Liens colonnes -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-10">
                     <!-- Produit -->
-                    <div class="flex flex-col gap-6">
-                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Produit</h6>
+                    <div class="flex flex-col gap-5">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white" data-i18n="footer.columnProduct">Produit</h6>
                         <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                            <li><a href="#preview-section">Fonctionnalités</a></li>
-                            <li><a href="#pricing">Tarifs</a></li>
-                            <li><a href="#faq">FAQ</a></li>
-                            <li><a href="#">Mises à jour</a></li>
-                        </ul>
-                    </div>
-                    <!-- Entreprise -->
-                    <div class="flex flex-col gap-6">
-                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Société</h6>
-                        <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                            <li><a href="#">À propos</a></li>
-                            <li><a href="#">Carrières</a></li>
-                            <li><a href="#">Affiliation</a></li>
-                            <li><a href="#">Contact</a></li>
+                            <li><a href="#preview-section" data-i18n="footer.feat">Fonctionnalités</a></li>
+                            <li><a href="#pricing" data-i18n="footer.pricing">Tarifs</a></li>
+                            <li><a href="#faq" data-i18n="footer.faq">FAQ</a></li>
                         </ul>
                     </div>
                     <!-- Ressources -->
-                    <div class="flex flex-col gap-6">
-                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Ressources</h6>
+                    <div class="flex flex-col gap-5">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white" data-i18n="footer.columnResources">Ressources</h6>
                         <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                            <li><a href="#">Blog</a></li>
-                            <li><a href="#">Guide Trading</a></li>
-                            <li><a href="#">Webinaires</a></li>
-                            <li><a href="#">Documentation</a></li>
+                            <li><a href="blog.html" data-i18n="footer.blog">Blog</a></li>
+                            <li><a href="contact.html" data-i18n="footer.contact">Contact</a></li>
+                            <li><a href="contact.html#affiliation" data-i18n="footer.affiliate">Affiliation</a></li>
                         </ul>
                     </div>
                     <!-- Légal -->
-                    <div class="flex flex-col gap-6">
-                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white">Légal</h6>
+                    <div class="flex flex-col gap-5">
+                        <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white" data-i18n="footer.columnLegal">Légal</h6>
                         <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                            <li><a href="privacy.html">Confidentialité</a></li>
-                            <li><a href="terms.html">Conditions</a></li>
-                            <li><a href="#">Sécurité</a></li>
-                            <li><a href="#">Cookies</a></li>
+                            <li><a href="privacy.html" data-i18n="footer.privacy">Confidentialité</a></li>
+                            <li><a href="terms.html" data-i18n="footer.terms">Conditions</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="text-gray-800 text-[9px] font-bold uppercase tracking-[0.4em]">
-                    © 2024 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.
+            <div class="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.4em]" data-i18n="footer.copyright">
+                    © 2026 PAYCHEK TERMINAL — ALL RIGHTS RESERVED.
                 </p>
-                <p class="text-gray-800 text-[9px] font-bold uppercase tracking-[0.4em]">
+                <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.4em]" data-i18n="footer.designedFor">
                     DESIGNED FOR PERFORMANCE.
                 </p>
             </div>

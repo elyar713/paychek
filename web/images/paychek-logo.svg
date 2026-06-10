@@ -1,5 +1,15 @@
 ﻿<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none">
-  <circle cx="50" cy="50" r="34" stroke="#1EB48A" stroke-width="9"/>
-  <circle cx="50" cy="50" r="18" stroke="#1EB48A" stroke-width="9"/>
-  <circle cx="50" cy="50" r="6" fill="#1EB48A"/>
+  <defs>
+    <filter id="pk-glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="pk-glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="38" stroke="#1DB98A" stroke-width="8" opacity="0.6" filter="url(#pk-glow-soft)"/>
+  <circle cx="50" cy="50" r="24" stroke="#1DB98A" stroke-width="8" opacity="0.85" filter="url(#pk-glow-soft)"/>
+  <circle cx="50" cy="50" r="10" stroke="#2EFFA8" stroke-width="7" filter="url(#pk-glow-strong)"/>
 </svg>

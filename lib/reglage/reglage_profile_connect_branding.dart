@@ -35,9 +35,12 @@ class PaychekBrandLogoMark extends StatelessWidget {
   }
 }
 
-/// Reproduit `assets/branding/app_icon.svg` (viewBox 0 0 100 100).
+/// Reproduit `assets/branding/app_icon.svg` (viewBox 0 0 100 100) :
+/// 3 anneaux concentriques, halo léger, anneau central plus lumineux.
 class _PaychekLogoMarkPainter extends CustomPainter {
   const _PaychekLogoMarkPainter({required this.color});
+
+  static const Color _innerBright = Color(0xFF2EFFA8);
 
   final Color color;
 
@@ -45,17 +48,35 @@ class _PaychekLogoMarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final scale = size.width / 100;
     final center = Offset(size.width / 2, size.height / 2);
-    final stroke = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 9 * scale;
-    final fill = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+    final inner = color == PaychekBrandLogoMark.brandEmerald
+        ? _innerBright
+        : color;
 
-    canvas.drawCircle(center, 34 * scale, stroke);
-    canvas.drawCircle(center, 18 * scale, stroke);
-    canvas.drawCircle(center, 6 * scale, fill);
+    void ring(double r, double w, Color c, double opacity, double blur) {
+      if (blur > 0) {
+        canvas.drawCircle(
+          center,
+          r * scale,
+          Paint()
+            ..color = c.withValues(alpha: opacity * 0.7)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = w * scale
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur * scale),
+        );
+      }
+      canvas.drawCircle(
+        center,
+        r * scale,
+        Paint()
+          ..color = c.withValues(alpha: opacity)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = w * scale,
+      );
+    }
+
+    ring(38, 8, color, 0.6, 2);
+    ring(24, 8, color, 0.85, 2);
+    ring(10, 7, inner, 1.0, 3);
   }
 
   @override
