@@ -42,8 +42,10 @@ const String _kAppleServicesIdFromEnv = String.fromEnvironment(
   defaultValue: '',
 );
 
-/// Aligné sur Firebase Console → Auth → Apple → **ID de service** (`pro.paychek.web`).
-const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.web';
+/// Aligné sur Firebase Console → Auth → Apple → **ID de service**.
+/// `pro.paychek.app` = Bundle ID iOS (flux natif). Laisser vide = idem.
+/// Pour le web uniquement : `pro.paychek.web` (flux OAuth sur iOS).
+const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.app';
 
 /// **Services ID** Firebase (Auth → Apple). Diffère du Bundle ID `pro.paychek.app` :
 /// iOS utilise le flux OAuth avec ce Services ID pour matcher l’audience du jeton.
