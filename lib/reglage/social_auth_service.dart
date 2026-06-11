@@ -1,49 +1,10 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show debugPrint, kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'social_auth_config.dart';
-
-String _generateAppleSignInNonce([int length = 32]) {
-  const charset =
-      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-  final random = Random.secure();
-  return List.generate(
-    length,
-    (_) => charset[random.nextInt(charset.length)],
-  ).join();
-}
-
-String _sha256NonceForApple(String input) {
-  return sha256.convert(utf8.encode(input)).toString();
-}
-
-Future<void> _applyAppleDisplayNameIfNeeded(
-  User? user,
-  AuthorizationCredentialAppleID appleCredential,
-) async {
-  if (user == null) return;
-  if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
-    return;
-  }
-  final given = appleCredential.givenName?.trim() ?? '';
-  final family = appleCredential.familyName?.trim() ?? '';
-  final name = '$given $family'.trim();
-  if (name.isEmpty) return;
-  try {
-    await user.updateDisplayName(name);
-    await user.reload();
-  } catch (e, st) {
-    debugPrint('[Paychek] Apple updateDisplayName: $e\n$st');
-  }
-}
 
 bool _isFirebaseWebPopupCancelled(FirebaseAuthException e) {
   final c = e.code.toLowerCase();
@@ -152,8 +113,8 @@ Future<UserCredential?> signInWithFacebook() async {
 
 /// Apple → Firebase.
 /// **Web** : popup Firebase.
-/// **iOS / macOS** : [SignInWithApple.getAppleIDCredential] + OAuth.
-/// **Android** : non branché ici (configuration spécifique) — l’appelant doit afficher un message.
+/// **iOS / macOS** : [AppleAuthProvider] natif (évite l’erreur audience bundle vs Services ID).
+/// **Android** : non branché ici — l’appelant doit afficher un message.
 Future<UserCredential?> signInWithApple() async {
   if (kIsWeb) {
     try {
@@ -182,43 +143,19 @@ Future<UserCredential?> signInWithApple() async {
     throw UnsupportedError('apple_sign_in_native');
   }
 
-  final available = await SignInWithApple.isAvailable();
-  if (!available) {
-    throw SignInWithAppleNotSupportedException(
-      message: 'Sign in with Apple is not available on this OS version.',
-    );
-  }
-
   try {
-    // Un seul flux : sign_in_with_apple + credential Firebase (nonce + authorizationCode).
-    final rawNonce = _generateAppleSignInNonce();
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: _sha256NonceForApple(rawNonce),
-    );
-    final idToken = appleCredential.identityToken;
-    if (idToken == null || idToken.isEmpty) {
-      debugPrint('[Paychek] Apple Sign-In: identityToken null');
-      throw StateError('apple_no_id_token');
-    }
-    final oauthCredential = OAuthProvider('apple.com').credential(
-      idToken: idToken,
-      rawNonce: rawNonce,
-      accessToken: appleCredential.authorizationCode,
-    );
-    final cred = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    // Flux natif Firebase : le SDK iOS gère Sign in with Apple sans mismatch
+    // « audience id token (pro.paychek.app) ≠ expected audience (Services ID) ».
+    final provider = AppleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('name');
+    final cred = await FirebaseAuth.instance.signInWithProvider(provider);
     debugPrint('[Paychek] Apple Sign-In Firebase OK uid=${cred.user?.uid}');
-    await _applyAppleDisplayNameIfNeeded(cred.user, appleCredential);
     return cred;
-  } on SignInWithAppleAuthorizationException catch (e) {
-    if (e.code == AuthorizationErrorCode.canceled) {
+  } on FirebaseAuthException catch (e) {
+    if (_isFirebaseWebPopupCancelled(e)) {
       return null;
     }
-    rethrow;
-  } on FirebaseAuthException catch (e) {
     debugPrint(
       '[Paychek] Apple Sign-In FirebaseAuthException: ${e.code} ${e.message}',
     );
