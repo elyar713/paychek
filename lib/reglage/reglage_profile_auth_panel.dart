@@ -126,7 +126,38 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
         backgroundColor: const Color(0xFF2A2A2A),
         content: Text(message, style: const TextStyle(color: Colors.white)),
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  /// TestFlight : erreur Firebase visible (snackbar parfois manquée sur fond sombre).
+  Future<void> _alertAuthDiagnostic(String title, String detail) async {
+    if (!mounted || kIsWeb) return;
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            detail,
+            style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
@@ -272,7 +303,12 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
 
   void _snackAuthFailure(Object error, AppLocalizations l10n) {
     if (error is FirebaseAuthException) {
-      _snack(_firebaseAuthMessage(error, l10n));
+      final msg = _firebaseAuthMessage(error, l10n);
+      _snack(msg);
+      unawaited(_alertAuthDiagnostic(
+        'Firebase Auth',
+        'Code: ${error.code}\n${error.message ?? msg}',
+      ));
       return;
     }
     if (error is PlatformException &&
@@ -462,7 +498,12 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       _snack(e.message);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      _snack(_firebaseAuthMessage(e, l10n));
+      final msg = _firebaseAuthMessage(e, l10n);
+      _snack(msg);
+      unawaited(_alertAuthDiagnostic(
+        'Sign in with Apple',
+        'Code: ${e.code}\n${e.message ?? msg}',
+      ));
     } catch (e) {
       if (!mounted) return;
       _snackAuthFailure(e, l10n);

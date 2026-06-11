@@ -190,27 +190,7 @@ Future<UserCredential?> signInWithApple() async {
   }
 
   try {
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.macOS) {
-      try {
-        final provider = AppleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('name');
-        return await FirebaseAuth.instance.signInWithProvider(provider);
-      } on FirebaseAuthException catch (e) {
-        if (_isFirebaseWebPopupCancelled(e)) {
-          return null;
-        }
-        debugPrint(
-          '[Paychek] Apple signInWithProvider: ${e.code} ${e.message}',
-        );
-        // Repli : flux sign_in_with_apple + credential OAuth ci-dessous.
-      } catch (e, st) {
-        debugPrint('[Paychek] Apple signInWithProvider: $e\n$st');
-      }
-    }
-
-    // Firebase exige un nonce (hash SHA-256 côté Apple, brut côté OAuth).
+    // Un seul flux : sign_in_with_apple + credential Firebase (nonce + authorizationCode).
     final rawNonce = _generateAppleSignInNonce();
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
@@ -230,12 +210,18 @@ Future<UserCredential?> signInWithApple() async {
       accessToken: appleCredential.authorizationCode,
     );
     final cred = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    debugPrint('[Paychek] Apple Sign-In Firebase OK uid=${cred.user?.uid}');
     await _applyAppleDisplayNameIfNeeded(cred.user, appleCredential);
     return cred;
   } on SignInWithAppleAuthorizationException catch (e) {
     if (e.code == AuthorizationErrorCode.canceled) {
       return null;
     }
+    rethrow;
+  } on FirebaseAuthException catch (e) {
+    debugPrint(
+      '[Paychek] Apple Sign-In FirebaseAuthException: ${e.code} ${e.message}',
+    );
     rethrow;
   }
 }
