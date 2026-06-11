@@ -32,6 +32,8 @@ class MobileMandatoryAuthScreen extends StatelessWidget {
                     showAuthEyebrow: false,
                     dense: false,
                     premiumTerminalChrome: true,
+                    /// Ne pas attendre Firestore : [MobileRootGate] bascule dès Firebase Auth OK.
+                    closeImmediatelyOnSuccess: true,
                     onAuthSuccess: () {
                       // [MobileRootGate] reconstruit sur session Firebase.
                     },

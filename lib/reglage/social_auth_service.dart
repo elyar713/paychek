@@ -25,6 +25,26 @@ String _sha256NonceForApple(String input) {
   return sha256.convert(utf8.encode(input)).toString();
 }
 
+Future<void> _applyAppleDisplayNameIfNeeded(
+  User? user,
+  AuthorizationCredentialAppleID appleCredential,
+) async {
+  if (user == null) return;
+  if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
+    return;
+  }
+  final given = appleCredential.givenName?.trim() ?? '';
+  final family = appleCredential.familyName?.trim() ?? '';
+  final name = '$given $family'.trim();
+  if (name.isEmpty) return;
+  try {
+    await user.updateDisplayName(name);
+    await user.reload();
+  } catch (e, st) {
+    debugPrint('[Paychek] Apple updateDisplayName: $e\n$st');
+  }
+}
+
 bool _isFirebaseWebPopupCancelled(FirebaseAuthException e) {
   final c = e.code.toLowerCase();
   return c.contains('popup-closed-by-user') ||
@@ -170,6 +190,26 @@ Future<UserCredential?> signInWithApple() async {
   }
 
   try {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      try {
+        final provider = AppleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('name');
+        return await FirebaseAuth.instance.signInWithProvider(provider);
+      } on FirebaseAuthException catch (e) {
+        if (_isFirebaseWebPopupCancelled(e)) {
+          return null;
+        }
+        debugPrint(
+          '[Paychek] Apple signInWithProvider: ${e.code} ${e.message}',
+        );
+        // Repli : flux sign_in_with_apple + credential OAuth ci-dessous.
+      } catch (e, st) {
+        debugPrint('[Paychek] Apple signInWithProvider: $e\n$st');
+      }
+    }
+
     // Firebase exige un nonce (hash SHA-256 côté Apple, brut côté OAuth).
     final rawNonce = _generateAppleSignInNonce();
     final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -189,7 +229,9 @@ Future<UserCredential?> signInWithApple() async {
       rawNonce: rawNonce,
       accessToken: appleCredential.authorizationCode,
     );
-    return FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    final cred = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    await _applyAppleDisplayNameIfNeeded(cred.user, appleCredential);
+    return cred;
   } on SignInWithAppleAuthorizationException catch (e) {
     if (e.code == AuthorizationErrorCode.canceled) {
       return null;

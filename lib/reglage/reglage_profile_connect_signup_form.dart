@@ -158,14 +158,18 @@ class ReglageProfileSignupForm extends StatelessWidget {
             nom: nom,
             email: email,
           );
-          await syncPaychekUserDocument(
-            syncedUser,
-            firstName: prenom,
-            lastName: nom,
-          );
           if (!context.mounted) return;
           popBackToSettingsAfterAuth();
-          unawaited(paychekMergeProfileFromFirestore(syncedUser));
+          unawaited(() async {
+            try {
+              await syncPaychekUserDocument(
+                syncedUser,
+                firstName: prenom,
+                lastName: nom,
+              );
+              await paychekMergeProfileFromFirestore(syncedUser);
+            } catch (_) {}
+          }());
           return;
         }
         await syncPaychekUserDocument(
