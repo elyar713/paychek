@@ -42,7 +42,7 @@ class DashboardHomeStrategieTeaser extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final s = previewSetup;
-    final webDash = WebDashboardConfig.useLeftRail;
+    final webDash = WebDashboardConfig.useLeftRailOf(context);
 
     if (s == null) {
       if (webDash) {

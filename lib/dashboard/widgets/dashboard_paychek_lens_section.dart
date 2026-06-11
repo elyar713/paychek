@@ -60,7 +60,7 @@ class DashboardPaychekLensSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final webDash = WebDashboardConfig.useLeftRail;
+    final webDash = WebDashboardConfig.useLeftRailOf(context);
 
     final lens = PaychekLensSection(
       showAddButton: false,

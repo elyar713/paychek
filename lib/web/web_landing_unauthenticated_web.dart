@@ -17,6 +17,8 @@ const _kPaychekAuthMessageType = 'paychek-auth';
 const _kPaychekLocaleMessageType = 'paychek-locale';
 const _kPaychekReadyMessageType = 'paychek-ready';
 const _kPaychekLocaleSyncType = 'paychek-locale-sync';
+const _kPaychekLandingHeightType = 'paychek-landing-height';
+const _kPaychekLandingWheelType = 'paychek-landing-wheel';
 const _kIframeViewTypePrefix = 'paychek-landing-html-iframe';
 
 int _nextLandingViewTypeId = 0;
@@ -50,9 +52,26 @@ class _WebLandingUnauthenticatedWebState
   late final String _viewType;
   html.IFrameElement? _iframe;
   bool _iframeVisible = false;
+  final ScrollController _scrollController = ScrollController();
+  late double _landingContentHeight;
+  bool _redirectingToStandaloneLanding = false;
 
   /// Invalide les [addPostFrameCallback] / microtasks après [dispose] ou hot reload.
   int _uiGeneration = 0;
+
+  /// Landing marketing en page HTML directe (évite iframe + scroll fantôme).
+  bool _tryRedirectToStandaloneLanding() {
+    try {
+      final path = html.window.location.pathname ?? '';
+      if (path.isNotEmpty && path != '/') return false;
+      final search = html.window.location.search ?? '';
+      if (search.contains('auth=')) return false;
+      html.window.location.replace('landing.html?stay=1${html.window.location.hash}');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
   static void _purgeStaleLandingIframes() {
     for (final el in html.document.querySelectorAll(
@@ -65,6 +84,11 @@ class _WebLandingUnauthenticatedWebState
   @override
   void initState() {
     super.initState();
+    if (_tryRedirectToStandaloneLanding()) {
+      _redirectingToStandaloneLanding = true;
+      return;
+    }
+    _landingContentHeight = html.window.innerHeight?.toDouble() ?? 900;
     _purgeStaleLandingIframes();
     _viewType = '$_kIframeViewTypePrefix-${_nextLandingViewTypeId++}';
     _registerIframeViewFactory();
@@ -104,9 +128,10 @@ class _WebLandingUnauthenticatedWebState
         ..src = 'landing.html'
         ..style.border = 'none'
         ..style.width = '100%'
-        ..style.height = '100%'
+        ..style.height = '${_landingContentHeight.ceil()}px'
         ..style.display = 'block'
         ..style.transform = 'translateZ(0)'
+        ..setAttribute('scrolling', 'no')
         ..setAttribute('title', 'PAYCHEK — landing');
       _iframe = iframe;
       return iframe;
@@ -182,6 +207,40 @@ class _WebLandingUnauthenticatedWebState
       return;
     }
 
+    if (type == _kPaychekLandingHeightType) {
+      if (eventOrigin != null && eventOrigin != html.window.location.origin) {
+        return;
+      }
+      final raw = map['height'];
+      final next = raw is num ? raw.toDouble() : double.tryParse('$raw');
+      if (next == null || next < 400) return;
+      if ((next - _landingContentHeight).abs() < 12) return;
+      _iframe?.style.height = '${next.ceil()}px';
+      if (mounted && !_tearDown) {
+        setState(() => _landingContentHeight = next);
+      }
+      return;
+    }
+
+    if (type == _kPaychekLandingWheelType) {
+      if (eventOrigin != null && eventOrigin != html.window.location.origin) {
+        return;
+      }
+      if (!_scrollController.hasClients) return;
+      final rawDy = map['deltaY'];
+      final dy = rawDy is num ? rawDy.toDouble() : double.tryParse('$rawDy');
+      if (dy == null || dy == 0) return;
+      final position = _scrollController.position;
+      if (dy > 0 && position.pixels >= position.maxScrollExtent) return;
+      if (dy < 0 && position.pixels <= position.minScrollExtent) return;
+      final target = (position.pixels + dy).clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      _scrollController.jumpTo(target);
+      return;
+    }
+
     if (type == _kPaychekAuthMessageType) {
       final mode = map['mode']?.toString().toLowerCase();
       _runLandingUiAction(() {
@@ -233,6 +292,7 @@ class _WebLandingUnauthenticatedWebState
     _iframeVisible = false;
     _pendingMessages.clear();
     _sub?.cancel();
+    _scrollController.dispose();
     WebLandingIframeSuppress.attachIframeDomHooks(
       blockPointerOnIframe: () {},
       unblockPointerOnIframe: () {},
@@ -248,10 +308,32 @@ class _WebLandingUnauthenticatedWebState
   @override
   Widget build(BuildContext context) {
     assert(kIsWeb);
+    if (_redirectingToStandaloneLanding) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: ColoredBox(color: Colors.black),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: _iframeVisible
-          ? HtmlElementView(viewType: _viewType)
+          ? LayoutBuilder(
+              builder: (context, constraints) {
+                final viewportHeight = MediaQuery.sizeOf(context).height;
+                final iframeHeight = _landingContentHeight < viewportHeight
+                    ? viewportHeight
+                    : _landingContentHeight;
+                return SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const ClampingScrollPhysics(),
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    height: iframeHeight,
+                    child: HtmlElementView(viewType: _viewType),
+                  ),
+                );
+              },
+            )
           : const ColoredBox(color: Colors.black),
     );
   }

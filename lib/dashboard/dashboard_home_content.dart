@@ -78,10 +78,8 @@ class DashboardHomeContent extends StatefulWidget {
 class _DashboardHomeContentState extends State<DashboardHomeContent> {
   void _onLiteTap() => widget.onLiteFreemiumRestrictedTap?.call();
 
-  /// Carte Capital : web rail → « Tous » ; web étroit → jour ; mobile → « Tous » (courbe fusionnée).
-  int _capitalTimeframe = WebDashboardConfig.useLeftRail
-      ? 3
-      : (kIsWeb ? 0 : 3);
+  /// Carte Capital : web rail → « Tous » ; web étroit / mobile → jour ou « Tous » (voir build).
+  int _capitalTimeframe = 3;
 
   /// Évolution du capital (web) : « Tous » par défaut.
   int _evolutionTimeframe = 3;
@@ -108,8 +106,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           onOpenTradeDayKey: kIsWeb || widget.liteFreemiumRestricted
               ? null
               : widget.onOpenTradeDayKey,
-          hideTimeframePills: WebDashboardConfig.useLeftRail,
-          cardDecoration: WebDashboardConfig.useLeftRail
+          hideTimeframePills: WebDashboardConfig.useLeftRailOf(context),
+          cardDecoration: WebDashboardConfig.useLeftRailOf(context)
               ? PaychekWebTokens.shellCardDecoration()
               : null,
           webPairStretch: webPairStretch,
@@ -125,8 +123,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           onOpenChecklist: widget.onOpenChecklist,
           liteInteractionLocked: widget.liteFreemiumRestricted,
           onLiteInteractionLockedTap: widget.onLiteFreemiumRestrictedTap,
-          includeRiskSectionPreview: WebDashboardConfig.useLeftRail,
-          cardBackgroundColor: WebDashboardConfig.useLeftRail
+          includeRiskSectionPreview: WebDashboardConfig.useLeftRailOf(context),
+          cardBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
               ? Colors.transparent
               : null,
         );
@@ -135,7 +133,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           snapshot: widget.analysePreviewSnapshot,
           onOpenAnalyse: widget.onOpenAnalyse,
           onPrepToggle: widget.onToggleAnalysePrepCheck,
-          cardBackgroundColor: WebDashboardConfig.useLeftRail
+          cardBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
               ? Colors.transparent
               : null,
         );
@@ -144,10 +142,10 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           onOpenEtatMental: widget.onOpenEtatMental,
           liteInteractionLocked: widget.liteFreemiumRestricted,
           onLiteInteractionLockedTap: widget.onLiteFreemiumRestrictedTap,
-          contentPadding: WebDashboardConfig.useLeftRail
+          contentPadding: WebDashboardConfig.useLeftRailOf(context)
               ? const EdgeInsets.symmetric(horizontal: 28, vertical: 24)
               : null,
-          cardBackgroundColor: WebDashboardConfig.useLeftRail
+          cardBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
               ? Colors.transparent
               : null,
         );
@@ -155,19 +153,19 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
         return DashboardHomeStrategieTeaser(
           previewSetup: widget.strategiePreviewSetup,
           onOpenStrategie: widget.onOpenStrategie,
-          contentPadding: WebDashboardConfig.useLeftRail
+          contentPadding: WebDashboardConfig.useLeftRailOf(context)
               ? const EdgeInsets.symmetric(horizontal: 28, vertical: 24)
               : null,
-          cardBackgroundColor: WebDashboardConfig.useLeftRail
+          cardBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
               ? Colors.transparent
               : null,
         );
       case DashboardHomeLayoutKeys.paychekLens:
         return DashboardPaychekLensSection(
-          contentPadding: WebDashboardConfig.useLeftRail
+          contentPadding: WebDashboardConfig.useLeftRailOf(context)
               ? const EdgeInsets.symmetric(horizontal: 28, vertical: 24)
               : null,
-          cardBackgroundColor: WebDashboardConfig.useLeftRail
+          cardBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
               ? Colors.transparent
               : null,
         );
@@ -178,7 +176,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
               ? (_) => _onLiteTap()
               : (i) => setState(() {
                   _evolutionTimeframe = i;
-                  if (WebDashboardConfig.useLeftRail) {
+                  if (WebDashboardConfig.useLeftRailOf(context)) {
                     _capitalTimeframe = i;
                   }
                 }),
@@ -186,8 +184,8 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           onOpenTradeDayKey: widget.liteFreemiumRestricted
               ? null
               : widget.onOpenTradeDayKey,
-          hideTimeframePills: WebDashboardConfig.useLeftRail || !kIsWeb,
-          cardDecoration: WebDashboardConfig.useLeftRail
+          hideTimeframePills: WebDashboardConfig.useLeftRailOf(context) || !kIsWeb,
+          cardDecoration: WebDashboardConfig.useLeftRailOf(context)
               ? PaychekWebTokens.shellCardDecoration()
               : null,
           webPairStretch: webPairStretch,
@@ -334,7 +332,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
         (showCapitalRow ||
             showCheckAnalyseRow ||
             showEtatStratRow ||
-            WebDashboardConfig.useLeftRail);
+            WebDashboardConfig.useLeftRailOf(context));
 
     /// Ligne capital + évolution : capital ~27 %, évolution ~73 %.
     const webCapitalRowFlex = 10;
@@ -413,7 +411,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
           LayoutBuilder(
             builder: (context, constraints) {
               final wide = constraints.maxWidth >= 720;
-              final webRail = WebDashboardConfig.useLeftRail;
+              final webRail = WebDashboardConfig.useLeftRailOf(context);
               /// Web large + rail : gauche = État mental, puis Stratégie ; droite = Calendrier.
               if (webRail && wide && hasEtat && hasStrat) {
                 return Row(
@@ -520,7 +518,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
             },
           ),
         if (gapAfterEtatStrat) const SizedBox(height: 20),
-        if (WebDashboardConfig.useLeftRail)
+        if (WebDashboardConfig.useLeftRailOf(context))
           LayoutBuilder(
             builder: (context, constraints) {
               final calendarInEtatStratColumn = showEtatStratRow &&
@@ -566,7 +564,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
     final l10n = AppLocalizations.of(context)!;
     final layoutStore = DashboardHomeLayoutScope.of(context);
     final profileStore = UserProfileScope.of(context);
-    final web = WebDashboardConfig.useLeftRail;
+    final web = WebDashboardConfig.useLeftRailOf(context);
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -615,7 +613,7 @@ class _DashboardHomeContentState extends State<DashboardHomeContent> {
                   listenable: layoutStore,
                   builder: (context, _) {
                     final ids = layoutStore.orderedVisibleIds.toList();
-                    if (WebDashboardConfig.useLeftRail) {
+                    if (WebDashboardConfig.useLeftRailOf(context)) {
                       return _buildWebHomeSections(ids);
                     }
                     return _buildMobileHomeSections(ids);

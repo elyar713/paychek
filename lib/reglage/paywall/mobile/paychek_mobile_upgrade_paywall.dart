@@ -11,6 +11,8 @@ import '../../paychek_regional_price_defaults.dart';
 import '../../paychek_store_plan_pricing.dart';
 import '../../paywall_compare_rows.dart';
 import '../paywall_unified_gold_compare_table.dart';
+import '../paychek_paywall_legal_footer.dart';
+import '../../paychek_subscription_platform.dart';
 import 'paywall_mobile_compare_table.dart';
 import 'paywall_mobile_tokens.dart';
 
@@ -163,6 +165,13 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
             if (widget.footerActions != null) ...[
               const SizedBox(height: 16),
               widget.footerActions!,
+            ],
+            if (paychekUsesNativeStoreIap) ...[
+              const SizedBox(height: 16),
+              PaychekPaywallLegalFooter(
+                textColor: PaywallMobileTokens.neutral500,
+                linkColor: PaywallMobileTokens.neutral400,
+              ),
             ],
           ],
         ),

@@ -215,13 +215,75 @@ function paychekIsEmbeddedInApp() {
     }
 }
 
-/** Hors iframe : ouvre l’app Flutter à la racine avec la modale auth (voir WebAuthGate ?auth=). */
-function paychekGoToAppAuth(mode) {
+var _paychekAuthOverlayEsc = null;
+
+/** Overlay auth sur la landing (évite écran noir plein page). */
+function paychekEnsureAuthOverlay() {
+    var el = document.getElementById('paychek-auth-overlay');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'paychek-auth-overlay';
+    el.className = 'paychek-auth-overlay';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.innerHTML =
+        '<div class="paychek-auth-overlay-backdrop" aria-hidden="true"></div>' +
+        '<iframe class="paychek-auth-overlay-frame" title="PAYCHEK — connexion" src="about:blank"></iframe>';
+    document.body.appendChild(el);
+    return el;
+}
+
+function paychekCloseAuthOverlay() {
+    var overlay = document.getElementById('paychek-auth-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
+    document.body.classList.remove('paychek-auth-overlay-open');
+    document.body.style.overflow = '';
+    var iframe = overlay.querySelector('.paychek-auth-overlay-frame');
+    if (iframe) iframe.src = 'about:blank';
+}
+
+function paychekOpenAuthOverlay(mode) {
     var m = (mode === 'login' || mode === 'signin' || mode === 'connexion')
         ? 'login'
         : 'signup';
+    var overlay = paychekEnsureAuthOverlay();
+    var iframe = overlay.querySelector('.paychek-auth-overlay-frame');
+    overlay.classList.add('is-open');
+    document.body.classList.add('paychek-auth-overlay-open');
+    document.body.style.overflow = 'hidden';
     var base = window.location.origin || '';
-    window.location.href = base + '/?auth=' + encodeURIComponent(m);
+    iframe.src = base + '/?auth=' + encodeURIComponent(m) + '&overlay=1';
+    if (!_paychekAuthOverlayEsc) {
+        _paychekAuthOverlayEsc = function (ev) {
+            if (ev.key === 'Escape') paychekCloseAuthOverlay();
+        };
+        document.addEventListener('keydown', _paychekAuthOverlayEsc);
+    }
+}
+
+function paychekOnAuthOverlayMessage(event) {
+    var data = event.data;
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (e) {
+            return;
+        }
+    }
+    if (!data || typeof data !== 'object') return;
+    if (data.type === 'paychek-auth-overlay-close') {
+        paychekCloseAuthOverlay();
+    }
+}
+
+/** Hors iframe Flutter : overlay auth ; en iframe : postMessage vers l’app. */
+function paychekGoToAppAuth(mode) {
+    if (paychekIsEmbeddedInApp()) {
+        paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
+        return;
+    }
+    paychekOpenAuthOverlay(mode);
 }
 
 function paychekPostToFlutterHost(payload) {
@@ -243,6 +305,108 @@ function paychekPostToFlutterHost(payload) {
     }
 }
 
+var _landingHeightTimer = null;
+var _landingHeightLastSent = 0;
+
+function paychekMeasureLandingHeight() {
+    var doc = document.documentElement;
+    var scrollTop = window.pageYOffset || (doc ? doc.scrollTop : 0) || 0;
+
+    // Ancré sur le footer : scrollHeight ment quand l’iframe est plus haute que le contenu.
+    var footer = document.querySelector('footer');
+    if (footer) {
+        return Math.ceil(footer.getBoundingClientRect().bottom + scrollTop) + 8;
+    }
+
+    var body = document.body;
+    if (!body) return 0;
+    return Math.ceil(body.getBoundingClientRect().bottom + scrollTop) + 8;
+}
+
+function paychekReportLandingHeight() {
+    if (!paychekIsEmbeddedInApp()) return;
+    var height = paychekMeasureLandingHeight();
+    if (!height || height < 400) return;
+    if (Math.abs(height - _landingHeightLastSent) < 12) return;
+    _landingHeightLastSent = height;
+    paychekPostToFlutterHost(JSON.stringify({
+        type: 'paychek-landing-height',
+        height: height
+    }));
+}
+
+function paychekScheduleLandingHeightReport() {
+    if (!paychekIsEmbeddedInApp()) return;
+    if (_landingHeightTimer) clearTimeout(_landingHeightTimer);
+    _landingHeightTimer = setTimeout(paychekReportLandingHeight, 80);
+}
+
+function paychekNotifyParentScroll(deltaY, deltaX) {
+    if (!paychekIsEmbeddedInApp()) return;
+    paychekPostToFlutterHost(JSON.stringify({
+        type: 'paychek-landing-wheel',
+        deltaY: deltaY,
+        deltaX: deltaX || 0
+    }));
+}
+
+function paychekInitEmbeddedHostBridge() {
+    if (!paychekIsEmbeddedInApp()) return;
+    try {
+        document.documentElement.classList.add('paychek-in-app-shell');
+        document.body.classList.add('paychek-in-app-shell');
+    } catch (e) {}
+
+    if (typeof ResizeObserver !== 'undefined') {
+        try {
+            var ro = new ResizeObserver(function () {
+                paychekScheduleLandingHeightReport();
+            });
+            ro.observe(document.body);
+            ro.observe(document.documentElement);
+            var footer = document.querySelector('footer');
+            if (footer) ro.observe(footer);
+        } catch (e) {}
+    }
+
+    window.addEventListener('resize', paychekScheduleLandingHeightReport);
+    window.addEventListener('load', paychekScheduleLandingHeightReport);
+
+    var burstTicks = 0;
+    var burstId = setInterval(function () {
+        paychekReportLandingHeight();
+        burstTicks++;
+        if (burstTicks >= 24) clearInterval(burstId);
+    }, 250);
+
+    window.addEventListener('wheel', function (e) {
+        try {
+            e.preventDefault();
+            paychekNotifyParentScroll(e.deltaY, e.deltaX);
+        } catch (err) {}
+    }, { passive: false, capture: true });
+
+    var lastTouchY = 0;
+    document.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        lastTouchY = e.touches[0].clientY;
+    }, { passive: true, capture: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (e.touches.length !== 1) return;
+        var y = e.touches[0].clientY;
+        var deltaY = lastTouchY - y;
+        lastTouchY = y;
+        if (Math.abs(deltaY) < 0.5) return;
+        try {
+            paychekNotifyParentScroll(deltaY, 0);
+            e.preventDefault();
+        } catch (err) {}
+    }, { passive: false, capture: true });
+
+    paychekScheduleLandingHeightReport();
+}
+
 function previewCarouselApplyIndex() {
     if (!previewCarouselKey) return;
     var d = previewData[previewCarouselKey];
@@ -260,11 +424,7 @@ function previewCarouselApplyIndex() {
 }
 
 function paychekNotifyParentAuth(mode) {
-    if (!paychekIsEmbeddedInApp()) {
-        paychekGoToAppAuth(mode);
-        return;
-    }
-    paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
+    paychekGoToAppAuth(mode);
 }
 
 /** Codes alignés sur l’app Flutter ([ReglageLanguagePrefs.availableCodes]). */
@@ -307,6 +467,46 @@ function paychekNotifyParentLocale(code) {
     paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-locale', code: code }));
 }
 
+function paychekCloseLangMenu() {
+    var wrap = document.getElementById('lang-picker-wrap');
+    var menu = document.getElementById('lang-dropdown-menu');
+    var btn = document.getElementById('lang-trigger-btn');
+    if (wrap) wrap.classList.remove('is-open');
+    if (menu) menu.classList.remove('is-open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function paychekToggleLangMenu(ev) {
+    if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
+    var wrap = document.getElementById('lang-picker-wrap');
+    var menu = document.getElementById('lang-dropdown-menu');
+    var btn = document.getElementById('lang-trigger-btn');
+    if (!wrap || !menu) return;
+    var open = !wrap.classList.contains('is-open');
+    if (open) {
+        wrap.classList.add('is-open');
+        menu.classList.add('is-open');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+    } else {
+        paychekCloseLangMenu();
+    }
+}
+
+function initLandingLangPicker() {
+    var wrap = document.getElementById('lang-picker-wrap');
+    if (!wrap) return;
+    document.addEventListener('pointerdown', function (ev) {
+        if (wrap.contains(ev.target)) return;
+        paychekCloseLangMenu();
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape') paychekCloseLangMenu();
+    });
+}
+
 function landingSelectLang(code, ev) {
     if (ev) {
         ev.preventDefault();
@@ -320,6 +520,8 @@ function landingSelectLang(code, ev) {
         applyLandingTranslations(normalized);
     }
     paychekNotifyParentLocale(normalized);
+    paychekCloseLangMenu();
+    paychekScheduleLandingHeightReport();
 }
 
 window.addEventListener('message', function (event) {
@@ -334,6 +536,7 @@ window.addEventListener('message', function (event) {
         if (typeof applyLandingTranslations === 'function') {
             applyLandingTranslations(normalized);
         }
+        paychekScheduleLandingHeightReport();
     } catch (e) {}
 });
 
@@ -383,12 +586,10 @@ function initPreviewTabsDragScroll() {
     window.addEventListener('blur', onUp);
 }
 
+window.addEventListener('message', paychekOnAuthOverlayMessage);
+
 window.addEventListener('DOMContentLoaded', function () {
-    try {
-        if (window.parent !== window) {
-            document.body.classList.add('paychek-in-app-shell');
-        }
-    } catch (e) {}
+    paychekInitEmbeddedHostBridge();
     var initialLocale = typeof landingDetectInitialLocale === 'function'
         ? landingDetectInitialLocale()
         : 'en';
@@ -412,6 +613,8 @@ window.addEventListener('DOMContentLoaded', function () {
         setPreviewCarouselControlsVisible(false);
     }
     initPreviewTabsDragScroll();
+    initLandingLangPicker();
+    paychekScheduleLandingHeightReport();
 });
 
 function setPreviewCarouselControlsVisible(show) {
@@ -561,6 +764,7 @@ function switchPreview(key) {
         
         imgContainer.style.opacity = '1';
         textContainer.style.opacity = '1';
+        paychekScheduleLandingHeightReport();
     }, 300);
 }
 
@@ -624,4 +828,5 @@ function toggleFaq(element) {
     if (!isActive) {
         element.classList.add('active');
     }
+    paychekScheduleLandingHeightReport();
 }

@@ -118,7 +118,7 @@ class _DashboardEtatMomentSectionState extends State<DashboardEtatMomentSection>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final c = MentalStateController.instance;
-    final webDash = WebDashboardConfig.useLeftRail;
+    final webDash = WebDashboardConfig.useLeftRailOf(context);
 
     return ListenableBuilder(
       listenable: c,

@@ -1,15 +1,16 @@
 import 'dart:async' show StreamSubscription, unawaited;
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../auth/post_auth_gate.dart';
 import '../reglage/app_locale_scope.dart';
 import '../shared/paychek_boot_splash.dart';
-import '../shared/paychek_frame_callbacks.dart';
-import 'web_landing_auth_dialogs.dart';
+import 'web_landing_auth_query_host.dart';
 import 'web_landing_unauthenticated.dart';
+import 'web_return_to_landing_stub.dart'
+    if (dart.library.html) 'web_return_to_landing_web.dart';
 
 /// Web :
 /// - non connecté → landing HTML (`web/landing.html` dans une iframe) ;
@@ -26,7 +27,6 @@ class WebAuthGate extends StatefulWidget {
 }
 
 class _WebAuthGateState extends State<WebAuthGate> {
-  bool _openedUrlAuth = false;
   bool _authReady = false;
   User? _user;
   StreamSubscription<User?>? _authSub;
@@ -35,25 +35,28 @@ class _WebAuthGateState extends State<WebAuthGate> {
   void initState() {
     super.initState();
     unawaited(_bootstrapAuth());
-    PaychekFrameCallbacks.runPostFrame(() {
-      if (!mounted || !kIsWeb || _openedUrlAuth) return;
-      final auth = Uri.base.queryParameters['auth']?.toLowerCase().trim();
-      if (auth == null) return;
-      _openedUrlAuth = true;
-      if (auth == 'signup' || auth == 'register' || auth == 'inscription') {
-        showWebLandingSignupDialog(context);
-      } else if (auth == 'login' || auth == 'signin' || auth == 'connexion') {
-        showWebLandingLoginDialog(context);
-      }
-    }, context: context);
+  }
+
+  static bool _isSignupAuthQuery(String? auth) {
+    final a = auth?.toLowerCase().trim();
+    return a == 'signup' || a == 'register' || a == 'inscription';
+  }
+
+  static bool _hasAuthIntentQuery() {
+    final auth = Uri.base.queryParameters['auth']?.trim();
+    return auth != null && auth.isNotEmpty;
   }
 
   /// Évite le flash landing → app quand Firebase Web restaure la session (null puis User).
   Future<void> _bootstrapAuth() async {
     final auth = FirebaseAuth.instance;
-    User? resolved = await auth.authStateChanges().first;
-    resolved ??= auth.currentUser;
-    if (resolved == null) {
+    final fastAuthIntent = _hasAuthIntentQuery();
+    User? resolved = fastAuthIntent ? auth.currentUser : null;
+    if (!fastAuthIntent) {
+      resolved = await auth.authStateChanges().first;
+      resolved ??= auth.currentUser;
+    }
+    if (resolved == null && !fastAuthIntent) {
       try {
         resolved = await auth
             .authStateChanges()
@@ -73,7 +76,11 @@ class _WebAuthGateState extends State<WebAuthGate> {
     });
     _authSub = auth.authStateChanges().skip(1).listen((u) {
       if (!mounted) return;
+      final wasSignedIn = _user != null;
       setState(() => _user = u);
+      if (kIsWeb && wasSignedIn && u == null) {
+        paychekReturnToLandingAfterLogout();
+      }
     });
   }
 
@@ -90,6 +97,13 @@ class _WebAuthGateState extends State<WebAuthGate> {
     }
     final u = _user;
     if (u == null) {
+      final auth = Uri.base.queryParameters['auth']?.toLowerCase().trim();
+      final authOnly = auth != null && auth.isNotEmpty;
+      if (authOnly) {
+        return WebLandingAuthQueryHost(
+          signup: _isSignupAuthQuery(auth),
+        );
+      }
       return Builder(
         builder: (dialogContext) => buildWebLandingUnauthenticated(
           dialogContext,

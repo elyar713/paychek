@@ -22,7 +22,6 @@ import 'subscription_launch_helper.dart';
 const Color _kEmerald500 = Color(0xFF10B981);
 const Color _kSlate500 = Color(0xFF64748B);
 const Color _kSlate400 = Color(0xFF94A3B8);
-const Color _kSlate700 = Color(0xFF334155);
 const Color _kPaywallBg = Color(0xFF000000);
 const double _kMaxContentWidth = 448;
 
@@ -281,29 +280,7 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
   }
 
   Widget _trialFooterWithLegal(BuildContext context, AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _trialFooterActions(context, l10n),
-        if (kIsWeb || paychekUsesNativeStoreIap) ...[
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              paychekPaywallLegalFooterLabel(l10n).toUpperCase(),
-              textAlign: TextAlign.center,
-              style: _font(
-                size: 9,
-                weight: FontWeight.w500,
-                color: _kSlate700,
-                height: 1.45,
-                letterSpacing: -0.2,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
+    return _trialFooterActions(context, l10n);
   }
 
   @override

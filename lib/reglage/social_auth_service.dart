@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show debugPrint, kIsWeb, defaultTargetPlatform, TargetPlatform;
@@ -6,6 +10,20 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'social_auth_config.dart';
+
+String _generateAppleSignInNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = Random.secure();
+  return List.generate(
+    length,
+    (_) => charset[random.nextInt(charset.length)],
+  ).join();
+}
+
+String _sha256NonceForApple(String input) {
+  return sha256.convert(utf8.encode(input)).toString();
+}
 
 bool _isFirebaseWebPopupCancelled(FirebaseAuthException e) {
   final c = e.code.toLowerCase();
@@ -152,11 +170,14 @@ Future<UserCredential?> signInWithApple() async {
   }
 
   try {
+    // Firebase exige un nonce (hash SHA-256 côté Apple, brut côté OAuth).
+    final rawNonce = _generateAppleSignInNonce();
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
         AppleIDAuthorizationScopes.fullName,
       ],
+      nonce: _sha256NonceForApple(rawNonce),
     );
     final idToken = appleCredential.identityToken;
     if (idToken == null || idToken.isEmpty) {
@@ -165,6 +186,7 @@ Future<UserCredential?> signInWithApple() async {
     }
     final oauthCredential = OAuthProvider('apple.com').credential(
       idToken: idToken,
+      rawNonce: rawNonce,
       accessToken: appleCredential.authorizationCode,
     );
     return FirebaseAuth.instance.signInWithCredential(oauthCredential);

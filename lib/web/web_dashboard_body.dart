@@ -38,8 +38,10 @@ class WebDashboardBody extends StatelessWidget {
         leftRail,
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: WebDashboardConfig.mainContentHorizontalPaddingPx,
+            padding: EdgeInsets.symmetric(
+              horizontal: WebDashboardConfig.mainContentHorizontalPaddingOf(
+                context,
+              ),
             ),
             child: stack,
           ),

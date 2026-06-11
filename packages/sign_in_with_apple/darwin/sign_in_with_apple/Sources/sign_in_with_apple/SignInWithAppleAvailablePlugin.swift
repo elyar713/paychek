@@ -4,6 +4,7 @@ import AuthenticationServices
 import FlutterMacOS
 #elseif os(iOS)
 import Flutter
+import UIKit
 #endif
 
 let methodChannelName = "com.aboutyou.dart_packages.sign_in_with_apple"
@@ -104,7 +105,7 @@ public class SignInWithAppleAvailablePlugin: NSObject, FlutterPlugin {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-class SignInWithAppleAuthorizationController: NSObject, ASAuthorizationControllerDelegate {
+class SignInWithAppleAuthorizationController: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     var callback: FlutterResult
     
     init(_ callback: @escaping FlutterResult) {
@@ -179,8 +180,28 @@ class SignInWithAppleAuthorizationController: NSObject, ASAuthorizationControlle
         )
 
         authorizationController.delegate = self
+        #if os(iOS)
+        authorizationController.presentationContextProvider = self
+        #endif
         authorizationController.performRequests()
     }
+
+    #if os(iOS)
+    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+        if let window = scenes
+            .first(where: { $0.activationState == .foregroundActive })?
+            .windows
+            .first(where: { $0.isKeyWindow }) {
+            return window
+        }
+        if let window = scenes.flatMap(\.windows).first(where: { $0.isKeyWindow }) {
+            return window
+        }
+        return scenes.flatMap(\.windows).first ?? ASPresentationAnchor()
+    }
+    #endif
     
     private func parseData(data: Data?) -> String? {
         if let data = data {

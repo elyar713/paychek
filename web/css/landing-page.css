@@ -61,6 +61,7 @@ body > footer {
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: visible;
 }
 
 .btn-primary {
@@ -568,6 +569,18 @@ body > footer {
     border: 1px solid rgba(255,255,255,0.1);
 }
 
+/* Menu langue : même design partout ; ouverture au tap sur mobile */
+.paychek-lang-picker-wrap {
+    position: relative;
+    z-index: 70;
+    flex-shrink: 0;
+}
+
+.paychek-lang-picker-wrap.is-open .paychek-lang-menu-panel {
+    visibility: visible;
+    opacity: 1;
+}
+
 /* Barre d’onglets : scroll horizontal sans barre visible + glisser à la souris */
 .preview-tabs-scroll {
     overflow-x: auto;
@@ -616,6 +629,16 @@ footer a {
 
 footer a:hover {
     color: #ffffff;
+}
+
+/* Iframe Flutter : hauteur = contenu, scroll géré par la page parente. */
+html.paychek-in-app-shell,
+html.paychek-in-app-shell body {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    min-height: 100%;
+    overscroll-behavior: none;
 }
 
 /* Iframe + Flutter : le blur de la nav peut corrompre les calques du texte en dessous. */
@@ -683,4 +706,43 @@ body.paychek-in-app-shell .glass-nav {
 .paychek-store-badge-google img {
     transform: scale(1.6692);
     transform-origin: center center;
+}
+
+/* Overlay auth : la landing reste visible, pas d’écran noir plein page. */
+.paychek-auth-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.paychek-auth-overlay.is-open {
+    display: flex;
+}
+
+.paychek-auth-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.paychek-auth-overlay-frame {
+    position: relative;
+    z-index: 1;
+    border: none;
+    width: 100%;
+    max-width: 480px;
+    height: min(92vh, 760px);
+    background: transparent;
+    color-scheme: dark;
+}
+
+body.paychek-auth-overlay-open {
+    overflow: hidden;
 }

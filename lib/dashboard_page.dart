@@ -499,7 +499,7 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   void _onBottomNavTap(int index) {
-    if (index == 4 && WebDashboardConfig.useLeftRail) {
+    if (index == 4 && WebDashboardConfig.useLeftRailOf(context)) {
       return;
     }
     if (_liteRestricted && index == 1) {
@@ -724,13 +724,13 @@ class _DashboardPageState extends State<DashboardPage>
       data: base.copyWith(
         textTheme: textTheme,
         primaryTextTheme: primaryTextTheme,
-        scaffoldBackgroundColor: WebDashboardConfig.useLeftRail
+        scaffoldBackgroundColor: WebDashboardConfig.useLeftRailOf(context)
             ? PaychekWebTokens.scaffoldBg
             : DashboardTokens.scaffoldMatte,
-        canvasColor: WebDashboardConfig.useLeftRail
+        canvasColor: WebDashboardConfig.useLeftRailOf(context)
             ? PaychekWebTokens.scaffoldBg
             : DashboardTokens.scaffoldMatte,
-        colorScheme: WebDashboardConfig.useLeftRail
+        colorScheme: WebDashboardConfig.useLeftRailOf(context)
             ? base.colorScheme.copyWith(
                 primary: PaychekWebTokens.accentMint,
                 surface: PaychekWebTokens.scaffoldBg,
@@ -741,7 +741,7 @@ class _DashboardPageState extends State<DashboardPage>
         builder: (context) {
           final mq = MediaQuery.of(context);
           final bottomInset = mq.padding.bottom;
-          final useWebRail = WebDashboardConfig.useLeftRail;
+          final useWebRail = WebDashboardConfig.useLeftRailOf(context);
           // Mobile : barre du bas fixe. Web : navigation uniquement dans le rail gauche — pas de doublon en bas.
           final navTotal = useWebRail
               ? bottomInset
@@ -750,7 +750,8 @@ class _DashboardPageState extends State<DashboardPage>
           // dans chaque page (Scaffold / scroll). Ne pas soustraire viewInsets ici :
           // sinon la zone utile se compresse deux fois (écran noir sur Mon analyse).
           final overlayBottom = navTotal;
-          final overlayLeftInset = WebDashboardConfig.overlayLeftInsetPx;
+          final overlayLeftInset =
+              WebDashboardConfig.overlayLeftInsetOf(context);
 
           void closePlus() => _closePlusMenu();
 

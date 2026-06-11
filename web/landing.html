@@ -9,6 +9,8 @@
                 if (window.parent !== window) return;
                 var path = window.location.pathname || '';
                 if (!/\/landing\.html$/i.test(path)) return;
+                var params = new URLSearchParams(window.location.search || '');
+                if (params.get('stay') === '1') return;
                 var target = (window.location.origin || '') + '/'
                     + (window.location.search || '')
                     + (window.location.hash || '');
@@ -17,6 +19,18 @@
         })();
     </script>
     <link rel="canonical" href="https://paychek.pro/">
+    <script>
+        (function () {
+            try {
+                if (new URLSearchParams(window.location.search || '').get('stay') === '1') {
+                    var m = document.createElement('meta');
+                    m.name = 'robots';
+                    m.content = 'noindex, follow';
+                    document.head.appendChild(m);
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAYCHEK | Transformez vos données en profits</title>
     <link rel="stylesheet" href="css/paychek-tailwind.css">
@@ -34,7 +48,7 @@
                 <img src="images/paychek-logo.svg" alt="" class="w-10 h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
                 <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
             </div>
-            
+
             <div class="hidden lg:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
                 <a href="#preview-section" class="hover:text-white transition" data-i18n="nav.preview">Aperçu</a>
                 <a href="#processus" class="hover:text-white transition" data-i18n="nav.process">Processus</a>
@@ -43,15 +57,14 @@
             </div>
 
             <div class="flex items-center gap-4 sm:gap-5 shrink-0">
-                <!-- Langue + auth regroupés (même bloc visuel) -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <div class="relative group hidden sm:block">
-                        <button type="button" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn">
+                    <div class="relative group paychek-lang-picker-wrap" id="lang-picker-wrap">
+                        <button type="button" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown-menu" onclick="paychekToggleLangMenu(event)">
                             <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
                             <span id="lang-trigger-code">EN</span>
-                            <i class="fas fa-chevron-down text-[8px] opacity-50"></i>
+                            <i class="fas fa-chevron-down text-[8px] opacity-50" aria-hidden="true"></i>
                         </button>
-                        <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]">
+                        <div id="lang-dropdown-menu" class="paychek-lang-menu-panel invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]" role="menu">
                             <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
                                 <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
                             </a>

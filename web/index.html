@@ -21,8 +21,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Paychek — journal de trading, checklist, état mental et analyse de performance. Master the mind, Master the trade.">
-  <meta name="robots" content="index, follow">
+  <meta id="paychek-robots" name="robots" content="index, follow">
   <link rel="canonical" href="https://paychek.pro/">
+  <script>
+    (function () {
+      try {
+        var q = window.location.search || '';
+        if (q.indexOf('auth=') >= 0 || q.indexOf('overlay=') >= 0) {
+          var m = document.getElementById('paychek-robots');
+          if (m) m.setAttribute('content', 'noindex, nofollow');
+          var c = document.querySelector('link[rel="canonical"]');
+          if (c && c.parentNode) c.parentNode.removeChild(c);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Paychek">
   <meta property="og:title" content="Paychek — Journal de trading">

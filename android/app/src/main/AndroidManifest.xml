@@ -5,14 +5,14 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <!-- Politique Google Play photos/vidéos : accès ponctuel uniquement → photo picker système
-         (image_picker / file_picker via SAF), pas de permission media. `tools:node="remove"`
-         supprime aussi toute déclaration fusionnée depuis un plugin. -->
+    <!-- Politique Google Play photos/vidéos : accès ponctuel via photo picker / SAF
+         (file_picker, image_picker) — aucune permission media persistante. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
     <application
         android:label="Paychek"
         android:name="${applicationName}"

@@ -9,8 +9,8 @@ Write-Host ">> flutter build web --release --no-wasm-dry-run" -ForegroundColor C
 flutter build web --release --no-wasm-dry-run
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-# Fichiers SEO statiques (sinon le rewrite SPA renvoie index.html et Google voit une erreur sitemap).
-$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'privacy.html', 'terms.html', 'contact.html', 'blog.html', 'contact-i18n.js')
+# Fichiers marketing / SEO : toujours recopier (évite build Flutter stale + cache navigateur).
+$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'privacy.html', 'terms.html', 'contact.html', 'blog.html', 'contact-i18n.js', 'landing-i18n.js')
 foreach ($name in $seoFiles) {
   $src = Join-Path $root "web\$name"
   $dst = Join-Path $root "build\web\$name"
@@ -18,10 +18,18 @@ foreach ($name in $seoFiles) {
     Write-Host "WARN: web\$name manquant" -ForegroundColor Yellow
     continue
   }
-  if (-not (Test-Path $dst)) {
-    Copy-Item $src $dst -Force
-    Write-Host ">> copie web\$name -> build\web\" -ForegroundColor Yellow
-  }
+  Copy-Item $src $dst -Force
+  Write-Host ">> copie web\$name -> build\web\" -ForegroundColor DarkGray
+}
+
+$marketingDirs = @('css', 'js', 'images')
+foreach ($dir in $marketingDirs) {
+  $srcDir = Join-Path $root "web\$dir"
+  $dstDir = Join-Path $root "build\web\$dir"
+  if (-not (Test-Path $srcDir)) { continue }
+  if (-not (Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }
+  Copy-Item (Join-Path $srcDir '*') $dstDir -Recurse -Force
+  Write-Host ">> sync web\$dir -> build\web\$dir" -ForegroundColor DarkGray
 }
 
 Write-Host ">> firebase deploy --only hosting" -ForegroundColor Cyan

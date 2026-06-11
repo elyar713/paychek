@@ -69,9 +69,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Permet d’ajouter une photo au rapport d’analyse.</string>
+	<string>Paychek needs camera access so you can attach a chart or setup photo to a trade or analysis report.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Permet de choisir une image dans la galerie pour le rapport.</string>
+	<string>Paychek needs photo library access so you can choose an image to attach to a trade or analysis report.</string>
 	<key>FacebookAppID</key>
 	<string>967493382672804</string>
 	<key>FacebookClientToken</key>
