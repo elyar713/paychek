@@ -29,3 +29,26 @@ String get kGoogleOAuthWebClientId {
   if (fromEnv.isNotEmpty) return fromEnv;
   return kGoogleOAuthWebClientIdDefault;
 }
+
+/// Bundle iOS Paychek (audience du jeton Apple en flux natif).
+const String kPaychekIosBundleId = 'pro.paychek.app';
+
+/// Callback OAuth Apple pour Firebase (web + flux iOS « Services ID »).
+const String kPaychekFirebaseAppleRedirectUri =
+    'https://paychek-trading.firebaseapp.com/__/auth/handler';
+
+const String _kAppleServicesIdFromEnv = String.fromEnvironment(
+  'PAYCHEK_APPLE_SERVICES_ID',
+  defaultValue: '',
+);
+
+/// **Services ID** saisi dans Firebase Console → Auth → Apple (section OAuth).
+///
+/// - Si **vide** : flux natif iOS ; Firebase doit avoir **Services ID = [kPaychekIosBundleId]**.
+/// - Si **renseigné** (≠ bundle) : flux OAuth web sur iOS (audience = ce Services ID).
+///
+/// Surcharge CI : `--dart-define=PAYCHEK_APPLE_SERVICES_ID=xxx`
+String get kPaychekAppleFirebaseServicesId {
+  final fromEnv = _kAppleServicesIdFromEnv.trim();
+  return fromEnv;
+}

@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'
     show debugPrint, kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'social_auth_config.dart';
 
@@ -13,10 +18,26 @@ bool _isFirebaseWebPopupCancelled(FirebaseAuthException e) {
       c == 'web-context-cancelled';
 }
 
+bool _isAppleAudienceMismatch(FirebaseAuthException e) {
+  final msg = '${e.code} ${e.message}'.toLowerCase();
+  return msg.contains('audience') && msg.contains('id token');
+}
+
+String _generateAppleSignInNonce([int length = 32]) {
+  const charset =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+  final random = Random.secure();
+  return List.generate(
+    length,
+    (_) => charset[random.nextInt(charset.length)],
+  ).join();
+}
+
+String _sha256NonceForApple(String input) {
+  return sha256.convert(utf8.encode(input)).toString();
+}
+
 /// Connexion Google → Firebase. Retourne `null` si l’utilisateur a annulé.
-///
-/// **Web** : [FirebaseAuth.signInWithPopup] (pas besoin de `kGoogleOAuthWebClientId`).
-/// **Mobile / macOS** : plugin `google_sign_in` + jeton vers Firebase.
 Future<UserCredential?> signInWithGoogle() async {
   if (kIsWeb) {
     try {
@@ -39,8 +60,6 @@ Future<UserCredential?> signInWithGoogle() async {
     throw UnsupportedError('google_sign_in');
   }
 
-  // [main] initialise déjà ; en cas d’échec silencieux ou hot restart, on réessaie ici
-  // pour que `authenticate()` renvoie bien un idToken (Android / iOS / macOS).
   final webClientId = kGoogleOAuthWebClientId.trim();
   if (webClientId.isNotEmpty) {
     try {
@@ -74,10 +93,6 @@ Future<UserCredential?> signInWithGoogle() async {
   }
 }
 
-/// Connexion Facebook → Firebase. Retourne `null` si l’utilisateur a annulé.
-///
-/// **Web** : [FirebaseAuth.signInWithPopup] (configure Facebook dans la console Firebase).
-/// **Autres** : SDK `flutter_facebook_auth`.
 Future<UserCredential?> signInWithFacebook() async {
   if (kIsWeb) {
     try {
@@ -111,10 +126,54 @@ Future<UserCredential?> signInWithFacebook() async {
   return FirebaseAuth.instance.signInWithCredential(credential);
 }
 
+/// Flux OAuth Apple via **Services ID** Firebase (audience du jeton = Services ID).
+Future<UserCredential?> _signInWithAppleOAuthServicesFlow(String servicesId) async {
+  final available = await SignInWithApple.isAvailable();
+  if (!available) {
+    throw SignInWithAppleNotSupportedException(
+      message: 'Sign in with Apple is not available on this OS version.',
+    );
+  }
+
+  final rawNonce = _generateAppleSignInNonce();
+  final appleCredential = await SignInWithApple.getAppleIDCredential(
+    scopes: [
+      AppleIDAuthorizationScopes.email,
+      AppleIDAuthorizationScopes.fullName,
+    ],
+    nonce: _sha256NonceForApple(rawNonce),
+    webAuthenticationOptions: WebAuthenticationOptions(
+      clientId: servicesId,
+      redirectUri: Uri.parse(kPaychekFirebaseAppleRedirectUri),
+    ),
+  );
+  final idToken = appleCredential.identityToken;
+  if (idToken == null || idToken.isEmpty) {
+    throw StateError('apple_no_id_token');
+  }
+  final oauthCredential = OAuthProvider('apple.com').credential(
+    idToken: idToken,
+    rawNonce: rawNonce,
+    accessToken: appleCredential.authorizationCode,
+  );
+  final cred = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+  debugPrint(
+    '[Paychek] Apple OAuth Services ID flow OK uid=${cred.user?.uid} servicesId=$servicesId',
+  );
+  return cred;
+}
+
+/// Flux natif iOS (audience jeton = Bundle ID `pro.paychek.app`).
+Future<UserCredential?> _signInWithAppleNativeProvider() async {
+  final provider = AppleAuthProvider();
+  provider.addScope('email');
+  provider.addScope('name');
+  final cred = await FirebaseAuth.instance.signInWithProvider(provider);
+  debugPrint('[Paychek] Apple native provider OK uid=${cred.user?.uid}');
+  return cred;
+}
+
 /// Apple → Firebase.
-/// **Web** : popup Firebase.
-/// **iOS / macOS** : [AppleAuthProvider] natif (évite l’erreur audience bundle vs Services ID).
-/// **Android** : non branché ici — l’appelant doit afficher un message.
 Future<UserCredential?> signInWithApple() async {
   if (kIsWeb) {
     try {
@@ -143,18 +202,28 @@ Future<UserCredential?> signInWithApple() async {
     throw UnsupportedError('apple_sign_in_native');
   }
 
+  final servicesId = kPaychekAppleFirebaseServicesId.trim();
+  final useOAuthServicesFlow = servicesId.isNotEmpty &&
+      servicesId != kPaychekIosBundleId;
+
   try {
-    // Flux natif Firebase : le SDK iOS gère Sign in with Apple sans mismatch
-    // « audience id token (pro.paychek.app) ≠ expected audience (Services ID) ».
-    final provider = AppleAuthProvider();
-    provider.addScope('email');
-    provider.addScope('name');
-    final cred = await FirebaseAuth.instance.signInWithProvider(provider);
-    debugPrint('[Paychek] Apple Sign-In Firebase OK uid=${cred.user?.uid}');
-    return cred;
+    if (useOAuthServicesFlow) {
+      return await _signInWithAppleOAuthServicesFlow(servicesId);
+    }
+    return await _signInWithAppleNativeProvider();
+  } on SignInWithAppleAuthorizationException catch (e) {
+    if (e.code == AuthorizationErrorCode.canceled) {
+      return null;
+    }
+    rethrow;
   } on FirebaseAuthException catch (e) {
     if (_isFirebaseWebPopupCancelled(e)) {
       return null;
+    }
+    // Mismatch audience : Firebase attend le Services ID OAuth, pas le Bundle ID.
+    if (_isAppleAudienceMismatch(e) && servicesId.isNotEmpty) {
+      debugPrint('[Paychek] Apple native audience mismatch → OAuth Services ID flow');
+      return _signInWithAppleOAuthServicesFlow(servicesId);
     }
     debugPrint(
       '[Paychek] Apple Sign-In FirebaseAuthException: ${e.code} ${e.message}',
@@ -163,7 +232,6 @@ Future<UserCredential?> signInWithApple() async {
   }
 }
 
-/// Apple : Web (popup) + iOS/macOS natif. Android : bouton visible mais message côté UI si non supporté.
 bool isAppleSignInAvailableOnThisPlatform() {
   if (kIsWeb) return true;
   switch (defaultTargetPlatform) {
@@ -178,10 +246,6 @@ bool isAppleSignInAvailableOnThisPlatform() {
   }
 }
 
-/// `true` si le bouton Google peut lancer le flux (plugin enregistré et [authenticate] supporté).
-///
-/// Sur Windows/Linux il n’y a pas d’implémentation `google_sign_in` : la plateforme par défaut
-/// lève [UnimplementedError] — on renvoie `false` sans faire planter l’app.
 bool isGoogleSignInAvailableOnThisPlatform() {
   if (kIsWeb) return true;
   try {
@@ -191,8 +255,6 @@ bool isGoogleSignInAvailableOnThisPlatform() {
   }
 }
 
-/// Facebook via `flutter_facebook_auth` : Android, iOS, Web, **macOS** (desktop).
-/// Pas de plugin Windows/Linux → éviter d’ouvrir un flux voué à l’échec.
 bool isFacebookSignInAvailableOnThisPlatform() {
   if (kIsWeb) return true;
   switch (defaultTargetPlatform) {
@@ -207,10 +269,6 @@ bool isFacebookSignInAvailableOnThisPlatform() {
   }
 }
 
-/// Déconnexion Firebase + Google / Facebook pour que le prochain login ne réutilise pas la session SSO.
-///
-/// Les erreurs réseau / plugin sont **capturées** : l’effacement du profil en local doit quand même
-/// s’exécuter ensuite (voir [ReglagePage]).
 Future<void> signOutEverywhere() async {
   const netTimeout = Duration(seconds: 5);
   try {
@@ -218,8 +276,6 @@ Future<void> signOutEverywhere() async {
   } catch (e, st) {
     debugPrint('[Paychek] FirebaseAuth.signOut: $e\n$st');
   }
-  // Sur le Web le SSO passe par Firebase (popup) : pas de SDK Google/Facebook à couper ici
-  // (GoogleSignIn.signOut sur web peut rester bloqué → timeouts dans la console).
   if (!kIsWeb && isFacebookSignInAvailableOnThisPlatform()) {
     try {
       await FacebookAuth.instance.logOut().timeout(netTimeout);

@@ -500,10 +500,15 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       if (!mounted) return;
       final msg = _firebaseAuthMessage(e, l10n);
       _snack(msg);
-      unawaited(_alertAuthDiagnostic(
-        'Sign in with Apple',
-        'Code: ${e.code}\n${e.message ?? msg}',
-      ));
+      var detail = 'Code: ${e.code}\n${e.message ?? msg}';
+      if ('${e.message}'.toLowerCase().contains('audience')) {
+        detail +=
+            '\n\nFix Firebase Console → Authentication → Apple → '
+            'Services ID must be exactly:\npro.paychek.app\n'
+            '(Bundle ID, not a separate Apple Services ID).\n'
+            'Save, wait 1 min, retry.';
+      }
+      unawaited(_alertAuthDiagnostic('Sign in with Apple', detail));
     } catch (e) {
       if (!mounted) return;
       _snackAuthFailure(e, l10n);
