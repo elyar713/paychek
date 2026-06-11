@@ -42,13 +42,15 @@ const String _kAppleServicesIdFromEnv = String.fromEnvironment(
   defaultValue: '',
 );
 
-/// **Services ID** saisi dans Firebase Console → Auth → Apple (section OAuth).
-///
-/// - Si **vide** : flux natif iOS ; Firebase doit avoir **Services ID = [kPaychekIosBundleId]**.
-/// - Si **renseigné** (≠ bundle) : flux OAuth web sur iOS (audience = ce Services ID).
+/// Aligné sur Firebase Console → Auth → Apple → **ID de service** (`pro.paychek.web`).
+const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.web';
+
+/// **Services ID** Firebase (Auth → Apple). Diffère du Bundle ID `pro.paychek.app` :
+/// iOS utilise le flux OAuth avec ce Services ID pour matcher l’audience du jeton.
 ///
 /// Surcharge CI : `--dart-define=PAYCHEK_APPLE_SERVICES_ID=xxx`
 String get kPaychekAppleFirebaseServicesId {
   final fromEnv = _kAppleServicesIdFromEnv.trim();
-  return fromEnv;
+  if (fromEnv.isNotEmpty) return fromEnv;
+  return kPaychekAppleFirebaseServicesIdDefault;
 }
