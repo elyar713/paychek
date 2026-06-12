@@ -512,6 +512,324 @@ function googlePlayApiErrorMessage(e) {
 }
 
 /**
+ * @param {string} productId
+ * @return {string}
+ */
+function paychekGooglePlayCycleHint(productId) {
+  const id = `${productId || ""}`.toLowerCase();
+  if (id.includes("annual")) return "1 an";
+  if (id.includes("quarterly")) return "3 mois";
+  if (id.includes("monthly")) return "1 mois";
+  return "";
+}
+
+/**
+ * @param {object|null} money { units, nanos, currencyCode }
+ * @return {{major: number, currency: string}}
+ */
+function playMoneyToMajor(money) {
+  if (!money || typeof money !== "object") {
+    return {major: 0, currency: "usd"};
+  }
+  const units = Number(money.units) || 0;
+  const nanos = Number(money.nanos) || 0;
+  const cur = `${money.currencyCode || "usd"}`.trim().toLowerCase();
+  return {major: units + nanos / 1e9, currency: cur || "usd"};
+}
+
+/**
+ * @param {object} sub SubscriptionPurchaseV2
+ * @param {object|null} legacy legacy subscriptions.get
+ * @return {string}
+ */
+function paychekGoogleSubscriptionDisplayStatus(sub, legacy = null) {
+  const state = `${sub?.subscriptionState || ""}`;
+  if (state === "SUBSCRIPTION_STATE_EXPIRED") return "Expiré";
+  if (state === "SUBSCRIPTION_STATE_CANCELED") return "Annulé";
+  if (state === "SUBSCRIPTION_STATE_ON_HOLD") return "En attente";
+  if (state === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD") return "Période de grâce";
+  if (state === "SUBSCRIPTION_STATE_PENDING") return "En attente";
+  if (ACTIVE_SUBSCRIPTION_STATES.has(state)) return "Actif";
+  if (legacy?.paymentState === 0) return "Paiement en attente";
+  const cancelReason = legacy?.cancelReason;
+  if (cancelReason === 1) return "Annulé (système)";
+  if (cancelReason === 2) return "Remplacé";
+  if (cancelReason === 3) return "Annulé (développeur)";
+  return "Réussi";
+}
+
+/**
+ * @param {object} opts
+ * @return {object}
+ */
+function paychekGooglePaymentRowFromSubscription(opts) {
+  const {
+    sub,
+    legacy = null,
+    productId,
+    purchaseToken,
+    orderId = "",
+    chainIndex = 0,
+  } = opts;
+  const lineItems = Array.isArray(sub?.lineItems) ? sub.lineItems : [];
+  const primary =
+    lineItems.find((i) => `${i.productId || ""}` === productId) ||
+    lineItems[0] ||
+    {};
+  const pid = `${primary.productId || productId || ""}`.trim();
+  const startMs =
+    parsePlayExpiryMillis(primary.startTime) ||
+    parsePlayExpiryMillis(sub?.startTime) ||
+    (legacy?.startTimeMillis ?
+      Number.parseInt(`${legacy.startTimeMillis}`, 10) :
+      null) ||
+    Date.now();
+  const expiryMs =
+    parsePlayExpiryMillis(primary.expiryTime) ||
+    googleSubscriptionExpiryMillis(sub || {}) ||
+  legacySubscriptionExpiryMillis(legacy || {});
+
+  let major = 0;
+  let currency = "usd";
+  const recurring = primary.autoRenewingPlan?.recurringPrice;
+  if (recurring) {
+    const m = playMoneyToMajor(recurring);
+    major = m.major;
+    currency = m.currency;
+  } else if (legacy?.priceAmountMicros) {
+    const micros = Number.parseInt(`${legacy.priceAmountMicros}`, 10);
+    if (!Number.isNaN(micros) && micros > 0) {
+      major = micros / 1_000_000;
+      currency = `${legacy.priceCurrencyCode || "usd"}`.toLowerCase();
+    }
+  }
+
+  const oid =
+    `${orderId || primary.latestSuccessfulOrderId || legacy?.orderId || ""}`.trim();
+  const txId = oid || `${purchaseToken}`.slice(0, 24);
+  const isLinked = chainIndex > 0;
+  let displayStatus = paychekGoogleSubscriptionDisplayStatus(sub, legacy);
+  if (isLinked && displayStatus === "Actif") {
+    displayStatus = "Ancien achat (lié)";
+  }
+
+  return {
+    provider: "google_play",
+    transactionId: txId,
+    originalTransactionId: `${purchaseToken}`.trim(),
+    productId: pid,
+    amountTotal: Math.round(major * 100),
+    amountMajor: major,
+    amountRefunded: 0,
+    currency,
+    paymentStatus: `${sub?.subscriptionState || legacy?.paymentState || ""}`,
+    sessionStatus: sub?.testPurchase ? "Test Play" : "Production",
+    displayStatus,
+    cycleHint: paychekGooglePlayCycleHint(pid),
+    failureMessage: "",
+    email: "",
+    created: Math.floor(startMs / 1000),
+    expiresDate: expiryMs ? Math.floor(expiryMs / 1000) : 0,
+    environment: sub?.testPurchase ? "Test" : "",
+  };
+}
+
+/**
+ * @param {object} ent
+ * @return {object|null}
+ */
+function paychekGooglePaymentFromStoredEntitlement(ent) {
+  const purchaseToken = `${ent.googlePlayPurchaseToken || ""}`.trim();
+  const productId = `${ent.googlePlayProductId || ""}`.trim();
+  if (!purchaseToken || !productId) return null;
+  const proSince =
+    ent.proSinceUtc && typeof ent.proSinceUtc.toMillis === "function" ?
+      ent.proSinceUtc.toMillis() :
+      Date.now();
+  const periodEnd =
+    ent.currentPeriodEnd && typeof ent.currentPeriodEnd.toMillis === "function" ?
+      ent.currentPeriodEnd.toMillis() :
+      null;
+  return {
+    provider: "google_play",
+    transactionId:
+      `${ent.googlePlayOrderId || purchaseToken}`.trim().slice(0, 64),
+    originalTransactionId: purchaseToken,
+    productId,
+    amountTotal: 0,
+    amountMajor: 0,
+    amountRefunded: 0,
+    currency: "usd",
+    paymentStatus: "",
+    sessionStatus: "Firestore",
+    displayStatus:
+      ent.active === true ?
+        "Enregistré (serveur)" :
+        "Inactif (serveur)",
+    cycleHint: paychekGooglePlayCycleHint(productId),
+    failureMessage:
+      "Historique Play indisponible — dernière transaction Firestore.",
+    email: "",
+    created: Math.floor(proSince / 1000),
+    expiresDate: periodEnd ? Math.floor(periodEnd / 1000) : 0,
+    environment: "",
+  };
+}
+
+/**
+ * Chaîne linkedPurchaseToken (réabonnement / changement de formule).
+ * @param {string} packageName
+ * @param {string} startToken
+ * @param {import("firebase-functions/params").SecretParam} secretParam
+ * @param {string} productId
+ * @return {Promise<string[]>}
+ */
+async function collectGooglePurchaseTokenChain(
+    packageName,
+    startToken,
+    secretParam,
+    productId,
+) {
+  const ordered = [];
+  const seen = new Set();
+  let token = `${startToken || ""}`.trim();
+  let depth = 0;
+  while (token && !seen.has(token) && depth < 10) {
+    seen.add(token);
+    ordered.push(token);
+    let linked = "";
+    try {
+      const sub = await fetchGoogleSubscription(packageName, token, secretParam);
+      linked = `${sub.linkedPurchaseToken || ""}`.trim();
+    } catch (e) {
+      try {
+        const legacy = await fetchGoogleSubscriptionLegacy(
+            packageName,
+            productId,
+            token,
+            secretParam,
+        );
+        linked = `${legacy.linkedPurchaseToken || ""}`.trim();
+      } catch (_) {
+        break;
+      }
+    }
+    if (!linked || seen.has(linked)) break;
+    token = linked;
+    depth++;
+  }
+  return ordered;
+}
+
+/**
+ * Historique Google Play pour la console admin.
+ *
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {import("firebase-functions/params").SecretParam} secretParam
+ * @return {Promise<{configured: boolean, payments: object[], error: string|null}>}
+ */
+async function paychekAdminFetchGoogleBillingHistory(db, uid, secretParam) {
+  const id = `${uid ?? ""}`.trim();
+  if (!id) {
+    return {configured: false, payments: [], error: null};
+  }
+
+  const entSnap = await db.collection("subscriber_entitlements").doc(id).get();
+  const ent = entSnap.exists ? entSnap.data() || {} : {};
+  const purchaseToken = `${ent.googlePlayPurchaseToken || ""}`.trim();
+  const productId = `${ent.googlePlayProductId || ""}`.trim();
+  const storedOrderId = `${ent.googlePlayOrderId || ""}`.trim();
+
+  let configured = false;
+  try {
+    const raw = `${secretParam.value() || ""}`.trim();
+    configured = raw.length > 0;
+  } catch (_) {
+    configured = false;
+  }
+
+  if (!configured) {
+    const fallback = paychekGooglePaymentFromStoredEntitlement(ent);
+    return {
+      configured: false,
+      payments: fallback ? [fallback] : [],
+      error: purchaseToken ?
+        "API Google Play non configurée (PAYCHEK_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON)." :
+        null,
+    };
+  }
+
+  if (!purchaseToken || !productId) {
+    return {configured: true, payments: [], error: null};
+  }
+
+  try {
+    const tokens = await collectGooglePurchaseTokenChain(
+        PAYCHEK_ANDROID_PACKAGE,
+        purchaseToken,
+        secretParam,
+        productId,
+    );
+    const payments = [];
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      let sub = null;
+      let legacy = null;
+      try {
+        sub = await fetchGoogleSubscription(
+            PAYCHEK_ANDROID_PACKAGE,
+            token,
+            secretParam,
+        );
+      } catch (e) {
+        console.warn("paychekAdminGoogle subv2", token.slice(0, 12), e);
+      }
+      try {
+        legacy = await fetchGoogleSubscriptionLegacy(
+            PAYCHEK_ANDROID_PACKAGE,
+            productId,
+            token,
+            secretParam,
+        );
+      } catch (e) {
+        console.warn("paychekAdminGoogle legacy", token.slice(0, 12), e);
+      }
+      if (!sub && !legacy) continue;
+      const row = paychekGooglePaymentRowFromSubscription({
+        sub,
+        legacy,
+        productId,
+        purchaseToken: token,
+        orderId: i === 0 ? storedOrderId : "",
+        chainIndex: i,
+      });
+      if (row) payments.push(row);
+    }
+
+    payments.sort((a, b) => b.created - a.created);
+    if (payments.length === 0) {
+      const fallback = paychekGooglePaymentFromStoredEntitlement(ent);
+      return {
+        configured: true,
+        payments: fallback ? [fallback] : [],
+        error: "Aucune transaction Play — affichage Firestore.",
+      };
+    }
+    return {configured: true, payments, error: null};
+  } catch (e) {
+    console.error("paychekAdminFetchGoogleBillingHistory", e);
+    const fallback = paychekGooglePaymentFromStoredEntitlement(ent);
+    const msg = googlePlayApiErrorMessage(e);
+    return {
+      configured: true,
+      payments: fallback ? [fallback] : [],
+      error: msg,
+    };
+  }
+}
+
+/**
  * @param {object} deps
  * @return {object} named Cloud Function exports
  */
@@ -856,6 +1174,8 @@ module.exports = {
   inferGooglePlayPeriodEndMillis,
   resolveGooglePlayPeriodEndMillis,
   legacySubscriptionGrantsPro,
+  paychekAdminFetchGoogleBillingHistory,
+  paychekGooglePlayCycleHint,
   PAYCHEK_ANDROID_PACKAGE,
   DEFAULT_PRODUCT_IDS,
 };

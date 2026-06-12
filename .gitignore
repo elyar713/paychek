@@ -1,4 +1,7 @@
 # Miscellaneous
+# Apple App Store Connect API (.p8) — ne jamais committer
+AuthKey_*.p8
+*.p8
 *.class
 *.log
 *.pyc

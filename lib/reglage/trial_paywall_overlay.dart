@@ -13,11 +13,11 @@ import 'paychek_apple_iap_service.dart';
 import 'paychek_google_entitlement_sync.dart';
 import 'paychek_google_play_iap_checkout.dart';
 import 'paychek_google_play_iap_service.dart';
-import 'stripe_entitlement_sync.dart';
 import 'paywall_subscription_feedback.dart';
 import 'paychek_subscription_flow_result.dart';
 import 'paychek_subscription_platform.dart';
 import 'subscription_launch_helper.dart';
+import 'paywall/paychek_restore_purchases_button.dart';
 
 const Color _kEmerald500 = Color(0xFF10B981);
 const Color _kSlate500 = Color(0xFF64748B);
@@ -226,40 +226,12 @@ class _TrialPaywallOverlayState extends State<TrialPaywallOverlay> {
     final dismiss = widget.onDismissLite;
     return Column(
       children: [
-        TextButton(
-          onPressed: () async {
-            _setBanner(null);
-            if (paychekUsesNativeAppleIap) {
-              final restored = await restoreProOnMobileStore();
-              if (restored == PaychekAppleIapPurchaseOutcome.success) {
-                final stillLite = await widget.onReloadTrialGate();
-                if (!context.mounted) return;
-                if (!stillLite) return;
-              }
-            } else if (paychekUsesNativeGooglePlayIap) {
-              final restored = await restoreProOnAndroidStore();
-              if (restored == PaychekGooglePlayIapPurchaseOutcome.success) {
-                final stillLite = await widget.onReloadTrialGate();
-                if (!context.mounted) return;
-                if (!stillLite) return;
-              }
-            } else if (!paychekIsIosWeb) {
-              await PaychekStripeEntitlementSync.syncFromStripe(maxAttempts: 3);
-            }
-            final stillLite = await widget.onReloadTrialGate();
-            if (!context.mounted) return;
-            if (stillLite) {
-              _setBanner(l10n.paywallRestoreNothingFound);
+        PaychekRestorePurchasesButton(
+          onAfterRestore: (restored) async {
+            if (restored) {
+              await widget.onReloadTrialGate();
             }
           },
-          child: Text(
-            l10n.paywallRestoreButton,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: PaywallMobileTokens.amber400,
-            ),
-          ),
         ),
         if (dismiss != null)
           TextButton(

@@ -13,6 +13,7 @@ import '../../paywall_compare_rows.dart';
 import '../paywall_unified_gold_compare_table.dart';
 import '../paychek_paywall_legal_footer.dart';
 import '../../paychek_subscription_platform.dart';
+import '../paychek_restore_purchases_button.dart';
 import 'paywall_mobile_compare_table.dart';
 import 'paywall_mobile_tokens.dart';
 
@@ -165,6 +166,11 @@ class _PaychekMobileUpgradePaywallState extends State<PaychekMobileUpgradePaywal
             if (widget.footerActions != null) ...[
               const SizedBox(height: 16),
               widget.footerActions!,
+            ] else if (paychekUsesNativeStoreIap) ...[
+              const SizedBox(height: 12),
+              Center(
+                child: PaychekRestorePurchasesButton(compact: true),
+              ),
             ],
             if (paychekUsesNativeStoreIap) ...[
               const SizedBox(height: 16),

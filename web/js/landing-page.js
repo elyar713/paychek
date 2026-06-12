@@ -1,3 +1,4 @@
+// PAYCHEK landing-page.js — auth OAuth : redirection top-level /?auth= (pas iframe overlay).
 const previewData = {
     'dashboard': {
         title: 'Dashboard',
@@ -247,19 +248,9 @@ function paychekOpenAuthOverlay(mode) {
     var m = (mode === 'login' || mode === 'signin' || mode === 'connexion')
         ? 'login'
         : 'signup';
-    var overlay = paychekEnsureAuthOverlay();
-    var iframe = overlay.querySelector('.paychek-auth-overlay-frame');
-    overlay.classList.add('is-open');
-    document.body.classList.add('paychek-auth-overlay-open');
-    document.body.style.overflow = 'hidden';
     var base = window.location.origin || '';
-    iframe.src = base + '/?auth=' + encodeURIComponent(m) + '&overlay=1';
-    if (!_paychekAuthOverlayEsc) {
-        _paychekAuthOverlayEsc = function (ev) {
-            if (ev.key === 'Escape') paychekCloseAuthOverlay();
-        };
-        document.addEventListener('keydown', _paychekAuthOverlayEsc);
-    }
+    // Fenêtre principale : Firebase OAuth (Google / Apple / Facebook) bloque les popups en iframe.
+    window.location.href = base + '/?auth=' + encodeURIComponent(m);
 }
 
 function paychekOnAuthOverlayMessage(event) {

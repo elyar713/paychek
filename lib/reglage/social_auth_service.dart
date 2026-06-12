@@ -10,6 +10,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'social_auth_config.dart';
+import 'social_auth_web_context_stub.dart'
+    if (dart.library.html) 'social_auth_web_context_web.dart';
 
 bool _isFirebaseWebPopupCancelled(FirebaseAuthException e) {
   final c = e.code.toLowerCase();
@@ -37,17 +39,35 @@ String _sha256NonceForApple(String input) {
   return sha256.convert(utf8.encode(input)).toString();
 }
 
+bool _isFirebaseWebPopupBlocked(FirebaseAuthException e) {
+  final c = e.code.toLowerCase();
+  return c.contains('popup-blocked') || c.contains('popup-closed');
+}
+
+/// Firebase Auth web : redirect (prod / iframe) ou popup (localhost).
+Future<UserCredential?> _webSignInWithAuthProvider(AuthProvider provider) async {
+  if (paychekWebSocialAuthPrefersRedirect()) {
+    await paychekWebSignInWithRedirect(provider);
+    return null;
+  }
+  try {
+    return await FirebaseAuth.instance.signInWithPopup(provider);
+  } on FirebaseAuthException catch (e) {
+    if (_isFirebaseWebPopupCancelled(e)) {
+      return null;
+    }
+    if (_isFirebaseWebPopupBlocked(e)) {
+      await paychekWebSignInWithRedirect(provider);
+      return null;
+    }
+    rethrow;
+  }
+}
+
 /// Connexion Google → Firebase. Retourne `null` si l’utilisateur a annulé.
 Future<UserCredential?> signInWithGoogle() async {
   if (kIsWeb) {
-    try {
-      return await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
-    } on FirebaseAuthException catch (e) {
-      if (_isFirebaseWebPopupCancelled(e)) {
-        return null;
-      }
-      rethrow;
-    }
+    return _webSignInWithAuthProvider(GoogleAuthProvider());
   }
 
   bool supported;
@@ -93,21 +113,31 @@ Future<UserCredential?> signInWithGoogle() async {
   }
 }
 
+Future<void> ensurePaychekFacebookWebSdkInitialized() async {
+  if (!kIsWeb) return;
+  if (FacebookAuth.instance.isWebSdkInitialized) return;
+  await FacebookAuth.instance.webAndDesktopInitialize(
+    appId: kPaychekFacebookAppId,
+    cookie: true,
+    xfbml: true,
+    version: 'v19.0',
+  );
+}
+
 Future<UserCredential?> signInWithFacebook() async {
   if (kIsWeb) {
-    try {
-      return await FirebaseAuth.instance
-          .signInWithPopup(FacebookAuthProvider());
-    } on FirebaseAuthException catch (e) {
-      if (_isFirebaseWebPopupCancelled(e)) {
-        return null;
-      }
-      rethrow;
+    await ensurePaychekFacebookWebSdkInitialized();
+    if (!FacebookAuth.instance.isWebSdkInitialized) {
+      throw StateError(
+        'facebook_web_sdk_not_initialized: Meta → Facebook Login → '
+        '« Se connecter avec le SDK JavaScript » = Oui, domaine paychek.pro',
+      );
     }
   }
 
   final result = await FacebookAuth.instance.login(
     permissions: const ['email', 'public_profile'],
+    loginTracking: kIsWeb ? LoginTracking.enabled : LoginTracking.limited,
   );
   switch (result.status) {
     case LoginStatus.cancelled:
@@ -176,15 +206,7 @@ Future<UserCredential?> _signInWithAppleNativeProvider() async {
 /// Apple → Firebase.
 Future<UserCredential?> signInWithApple() async {
   if (kIsWeb) {
-    try {
-      final provider = OAuthProvider('apple.com');
-      return await FirebaseAuth.instance.signInWithPopup(provider);
-    } on FirebaseAuthException catch (e) {
-      if (_isFirebaseWebPopupCancelled(e)) {
-        return null;
-      }
-      rethrow;
-    }
+    return _signInWithAppleOAuthServicesFlow(kPaychekAppleWebServicesIdForAuth);
   }
 
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -233,7 +255,9 @@ Future<UserCredential?> signInWithApple() async {
 }
 
 bool isAppleSignInAvailableOnThisPlatform() {
-  if (kIsWeb) return true;
+  // Web : désactivé tant que Firebase reste sur pro.paychek.app (build iOS en revue).
+  // Réactiver après App Store + Firebase aligné sur pro.paychek.signin.
+  if (kIsWeb) return false;
   switch (defaultTargetPlatform) {
     case TargetPlatform.iOS:
     case TargetPlatform.macOS:
@@ -276,7 +300,7 @@ Future<void> signOutEverywhere() async {
   } catch (e, st) {
     debugPrint('[Paychek] FirebaseAuth.signOut: $e\n$st');
   }
-  if (!kIsWeb && isFacebookSignInAvailableOnThisPlatform()) {
+  if (isFacebookSignInAvailableOnThisPlatform()) {
     try {
       await FacebookAuth.instance.logOut().timeout(netTimeout);
     } catch (e, st) {

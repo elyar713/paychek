@@ -75,8 +75,8 @@ Paychek Pro unlocks unlimited journal access, advanced stats, strategy tools, PD
 
 Terms : https://paychek.pro/terms · Privacy : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,journal,forex,futures,crypto,stocks,checklist,strategy,performance,mental,MT5,Tradovate,risk`
+## Mots-clés App Store (100 car. — sans espaces après les virgules)
+`logbook,tradelog,checklist,psychology,winrate,propfirm,funded,forex,futures,MT5,Tradovate,risk,stats`
 
 ---
 
@@ -136,8 +136,8 @@ Paychek Pro : journal illimité, stats avancées, stratégie, export PDF. Abonne
 
 CGU : https://paychek.pro/terms · Confidentialité : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,journal,forex,futures,crypto,actions,checklist,stratégie,performance,mental,MT5,Tradovate`
+## Mots-clés App Store (99 car.)
+`carnet,historique,checklist,psychologie,winrate,propfirm,financé,forex,futures,bourse,MT5,Tradovate`
 
 ---
 
@@ -193,8 +193,8 @@ Paychek Pro : diario ilimitado, stats avanzadas, estrategia, PDF. Suscripción o
 
 Términos : https://paychek.pro/terms · Privacidad : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,diario,futuros,checklist,estrategia,rendimiento,mental,MT5,Tradovate,NQ,ES`
+## Mots-clés App Store (100 car.)
+`diario,registro,historial,checklist,estrategia,rendimiento,forex,futuros,winrate,MT5,Tradovate,prop`
 
 ---
 
@@ -250,8 +250,8 @@ Paychek Pro : unbegrenztes Journal, erweiterte Stats, Strategie, PDF. Abo option
 
 AGB : https://paychek.pro/terms · Datenschutz : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,tagebuch,futures,checklist,strategie,performance,mental,MT5,Tradovate,NQ,ES`
+## Mots-clés App Store (98 car.)
+`tagebuch,protokoll,historie,checklist,strategie,disziplin,mental,prop,finanziert,forex,futures,MT5`
 
 ---
 
@@ -307,8 +307,8 @@ Paychek Pro : diário ilimitado, stats avançadas, estratégia, PDF. Subscriçã
 
 Termos : https://paychek.pro/terms · Privacidade : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,diário,futuros,checklist,estratégia,performance,mental,MT5,Tradovate,NQ,ES`
+## Mots-clés App Store (99 car.)
+`diário,registo,histórico,checklist,estratégia,performance,mental,propfirm,forex,futuros,MT5,winrate`
 
 ---
 
@@ -364,8 +364,8 @@ Paychek Pro : 무제한 저널, 고급 통계, 전략, PDF. 구독 선택.
 
 약관 : https://paychek.pro/terms · 개인정보 : https://paychek.pro/privacy
 
-## Mots-clés App Store (≤ 100)
-`trading,journal,futures,checklist,strategy,performance,mental,MT5,Tradovate,NQ,ES`
+## Mots-clés App Store (80 car.)
+`저널,매매일지,체크리스트,전략,승률,멘탈,리스크,기록,통계,MT5,forex,futures,prop,Tradovate,선물,주식,propfirm`
 
 ---
 

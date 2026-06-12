@@ -24,7 +24,10 @@ import 'reglage_profile_connect_signup_form.dart';
 import 'reglage_profile_connect_terminal_chrome.dart';
 import 'reglage_profile_connect_tokens.dart';
 import 'reglage_profile_prefs.dart';
+import 'social_auth_config.dart';
 import 'social_auth_service.dart';
+import 'social_auth_web_context_stub.dart'
+    if (dart.library.html) 'social_auth_web_context_web.dart';
 import 'user_profile_scope.dart';
 
 /// Présentation du bloc connexion / inscription (onglets ou formulaire unique).
@@ -133,7 +136,11 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
 
   /// TestFlight : erreur Firebase visible (snackbar parfois manquée sur fond sombre).
   Future<void> _alertAuthDiagnostic(String title, String detail) async {
-    if (!mounted || kIsWeb) return;
+    if (!mounted) return;
+    if (kIsWeb) {
+      _snack('$title — $detail');
+      return;
+    }
     if (defaultTargetPlatform != TargetPlatform.iOS &&
         defaultTargetPlatform != TargetPlatform.android) {
       return;
@@ -289,6 +296,9 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       case 'network-request-failed':
       case 'web-context-cancelled':
         return l10n.accountAuthErrorNetwork;
+      case 'unauthorized-domain':
+        return '${l10n.accountAuthErrorWithFirebaseCode(e.code)} '
+            '(paychek.pro → Firebase Auth → Authorized domains)';
       case 'operation-not-allowed':
       case 'too-many-requests':
       case 'internal-error':
@@ -396,6 +406,21 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     }
   }
 
+  Future<void> _completeSocialAuthSuccess(UserCredential cred) async {
+    final user = cred.user;
+    if (user == null) return;
+    await _markQuestionnaireIfNewUser(cred);
+    if (widget.closeImmediatelyOnSuccess) {
+      _afterAuthOk();
+      unawaited(syncPaychekUserDocumentAndMergeProfile(user));
+      return;
+    }
+    await syncPaychekUserDocument(user);
+    await _mergeFirebaseUserIntoLocalProfile(user);
+    if (!mounted) return;
+    _afterAuthOk();
+  }
+
   Future<void> _signInWithGoogle(AppLocalizations l10n) async {
     if (!isGoogleSignInAvailableOnThisPlatform()) {
       _snack(l10n.accountSocialGoogleUnavailableDesktop);
@@ -403,23 +428,21 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     }
     try {
       final cred = await signInWithGoogle();
-      if (cred == null || cred.user == null) return;
-      await _markQuestionnaireIfNewUser(cred);
-      if (widget.closeImmediatelyOnSuccess) {
-        _afterAuthOk();
-        unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));
+      if (cred == null || cred.user == null) {
+        if (kIsWeb && paychekWebOAuthRedirectInProgress()) return;
         return;
       }
-      await syncPaychekUserDocument(cred.user!);
-      await _mergeFirebaseUserIntoLocalProfile(cred.user!);
-      if (!mounted) return;
-      _afterAuthOk();
+      await _completeSocialAuthSuccess(cred);
     } on UnsupportedError catch (_) {
       if (!mounted) return;
       _snack(l10n.accountSocialGoogleUnavailableDesktop);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      _snack(_firebaseAuthMessage(e, l10n));
+      final msg = _firebaseAuthMessage(e, l10n);
+      _snack(msg);
+      if (kIsWeb) {
+        unawaited(_alertAuthDiagnostic('Google sign-in', '${e.code}\n${e.message ?? msg}'));
+      }
     } on GoogleSignInException catch (e) {
       if (!mounted) return;
       final detail = e.description?.trim();
@@ -445,22 +468,47 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     }
     try {
       final cred = await signInWithFacebook();
-      if (cred == null || cred.user == null) return;
-      await _markQuestionnaireIfNewUser(cred);
-      if (widget.closeImmediatelyOnSuccess) {
-        _afterAuthOk();
-        unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));
+      if (cred == null || cred.user == null) {
+        if (kIsWeb && paychekWebOAuthRedirectInProgress()) return;
         return;
       }
-      await syncPaychekUserDocument(cred.user!);
-      await _mergeFirebaseUserIntoLocalProfile(cred.user!);
-      if (!mounted) return;
-      _afterAuthOk();
+      await _completeSocialAuthSuccess(cred);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       _snack(_firebaseAuthMessage(e, l10n));
+      if (kIsWeb) {
+        unawaited(
+          _alertAuthDiagnostic(
+            'Facebook (web)',
+            'Code: ${e.code}\n${e.message ?? ''}\n\n'
+            'Si Meta affiche « ID d’app non valide », l’App ID dans '
+            'Firebase Console → Authentication → Facebook doit être '
+            'exactement :\n$kPaychekFacebookAppId\n\n'
+            'Recopiez aussi le App secret depuis Meta → Settings → Basic '
+            '(Show), puis Enregistrer.',
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
+      final msg = e is StateError ? e.message : e.toString();
+      if (kIsWeb && msg.contains('facebook')) {
+        _snack(l10n.accountAuthErrorGeneric);
+        unawaited(
+          _alertAuthDiagnostic(
+            'Facebook (web)',
+            '$msg\n\n'
+            'Checklist Meta (developers.facebook.com) :\n'
+            '1. Settings → Basic → App ID = $kPaychekFacebookAppId\n'
+            '2. Facebook Login → Settings :\n'
+            '   • Se connecter avec le SDK JavaScript = Oui\n'
+            '   • Domaines SDK JS = paychek.pro\n'
+            '   • URI redirect = https://paychek.pro/\n'
+            '3. Firebase → Auth → Facebook : même App ID + App secret Meta',
+          ),
+        );
+        return;
+      }
       _snackAuthFailure(e, l10n);
     }
   }
@@ -468,17 +516,11 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
   Future<void> _signInWithApple(AppLocalizations l10n) async {
     try {
       final cred = await signInWithApple();
-      if (cred == null || cred.user == null) return;
-      await _markQuestionnaireIfNewUser(cred);
-      if (widget.closeImmediatelyOnSuccess) {
-        _afterAuthOk();
-        unawaited(syncPaychekUserDocumentAndMergeProfile(cred.user!));
+      if (cred == null || cred.user == null) {
+        if (kIsWeb && paychekWebOAuthRedirectInProgress()) return;
         return;
       }
-      await syncPaychekUserDocument(cred.user!);
-      await _mergeFirebaseUserIntoLocalProfile(cred.user!);
-      if (!mounted) return;
-      _afterAuthOk();
+      await _completeSocialAuthSuccess(cred);
     } on UnsupportedError catch (e) {
       if (!mounted) return;
       if (e.message == 'apple_sign_in_native') {
@@ -501,7 +543,12 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       final msg = _firebaseAuthMessage(e, l10n);
       _snack(msg);
       var detail = 'Code: ${e.code}\n${e.message ?? msg}';
-      if ('${e.message}'.toLowerCase().contains('audience')) {
+      if (kIsWeb) {
+        detail +=
+            '\n\nWeb : Apple Developer → Services ID pro.paychek.signin '
+            'avec domaine paychek.pro et return URL '
+            'https://paychek-trading.firebaseapp.com/__/auth/handler';
+      } else if ('${e.message}'.toLowerCase().contains('audience')) {
         detail +=
             '\n\nFix Firebase Console → Authentication → Apple → '
             'Services ID must be exactly:\npro.paychek.app\n'
@@ -672,11 +719,13 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
           onTap: () => _signInWithGoogle(l10n),
           child: const ReglageProfileGoogleBrandMark(size: 22),
         ),
-        const SizedBox(width: 14),
-        PaychekTerminalSocialTile(
-          onTap: () => _signInWithApple(l10n),
-          child: const Icon(Icons.apple, color: Colors.white, size: 22),
-        ),
+        if (isAppleSignInAvailableOnThisPlatform()) ...[
+          const SizedBox(width: 14),
+          PaychekTerminalSocialTile(
+            onTap: () => _signInWithApple(l10n),
+            child: const Icon(Icons.apple, color: Colors.white, size: 22),
+          ),
+        ],
         const SizedBox(width: 14),
         PaychekTerminalSocialTile(
           onTap: () => _signInWithFacebook(l10n),
@@ -814,10 +863,11 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
               const ReglageProfileGoogleBrandMark(size: 28),
               () => _signInWithGoogle(l10n),
             ),
-            _socialIconTap(
-              const Icon(Icons.apple, color: Colors.white, size: 28),
-              () => _signInWithApple(l10n),
-            ),
+            if (isAppleSignInAvailableOnThisPlatform())
+              _socialIconTap(
+                const Icon(Icons.apple, color: Colors.white, size: 28),
+                () => _signInWithApple(l10n),
+              ),
             _socialIconTap(
               const ReglageProfileFacebookBrandMark(size: 28),
               () => _signInWithFacebook(l10n),

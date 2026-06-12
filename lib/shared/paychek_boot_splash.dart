@@ -8,7 +8,16 @@ class PaychekBootSplash extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Colors.black,
-      body: SizedBox.shrink(),
+      body: Center(
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Color(0xFF34D399),
+          ),
+        ),
+      ),
     );
   }
 }

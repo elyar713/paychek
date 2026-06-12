@@ -14,6 +14,8 @@ import 'l10n/app_localizations.dart';
 import 'reglage/paychek_apple_iap_service.dart';
 import 'reglage/social_auth_config.dart';
 import 'reglage/social_auth_service.dart';
+import 'reglage/social_auth_web_context_stub.dart'
+    if (dart.library.html) 'reglage/social_auth_web_context_web.dart';
 import 'reglage/app_locale_scope.dart';
 import 'reglage/trading_week_scope.dart';
 import 'reglage/trading_week_firestore_sync.dart';
@@ -99,6 +101,16 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Web : reprendre Google/Apple/Facebook redirect AVANT tout authStateChanges
+  // (MyApp.initState écoute déjà la session — sinon compte jamais créé).
+  if (kIsWeb) {
+    try {
+      await paychekWebPrimeFirebaseAuthRedirect();
+    } catch (e, st) {
+      debugPrint('[Paychek] paychekWebPrimeFirebaseAuthRedirect: $e\n$st');
+    }
+  }
 
   if (!kIsWeb) {
     unawaited(PaychekAppleIapService.ensureInitialized());
@@ -253,6 +265,28 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
     }
     _dashboardHomeLayoutOrCreate();
 
+    if (kIsWeb) {
+      // Redirect Google consommé dans main() ; attacher l’écoute au frame suivant.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _attachFirebaseAuthAccountListener();
+      });
+    } else {
+      _attachFirebaseAuthAccountListener();
+    }
+    PaychekFrameCallbacks.runPostFrame(() {
+      unawaited(_bootstrapAfterFirstFrame());
+    });
+    widget.capitalStore.addListener(_scheduleCapitalPortfolioCloudPush);
+    widget.portfolioStore.addListener(_scheduleCapitalPortfolioCloudPush);
+    _tradingWeek.addListener(_scheduleTradingWeekCloudPush);
+    MentalStateController.instance.addListener(_scheduleMentalStateCloudPush);
+    StrategieSetupsStore.notifier.addListener(_scheduleStrategieCloudPush);
+    StrategieSetupUsageStore.notifier.addListener(_scheduleStrategieCloudPush);
+  }
+
+  void _attachFirebaseAuthAccountListener() {
+    if (_authSub != null) return;
     _lastAuthUid = FirebaseAuth.instance.currentUser?.uid;
     _authSub = FirebaseAuth.instance.authStateChanges().listen((u) {
       final uid = u?.uid;
@@ -265,15 +299,6 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
         ),
       );
     });
-    PaychekFrameCallbacks.runPostFrame(() {
-      unawaited(_bootstrapAfterFirstFrame());
-    });
-    widget.capitalStore.addListener(_scheduleCapitalPortfolioCloudPush);
-    widget.portfolioStore.addListener(_scheduleCapitalPortfolioCloudPush);
-    _tradingWeek.addListener(_scheduleTradingWeekCloudPush);
-    MentalStateController.instance.addListener(_scheduleMentalStateCloudPush);
-    StrategieSetupsStore.notifier.addListener(_scheduleStrategieCloudPush);
-    StrategieSetupUsageStore.notifier.addListener(_scheduleStrategieCloudPush);
   }
 
   Future<void> _bootstrapAfterFirstFrame() async {

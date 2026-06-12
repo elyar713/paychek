@@ -2784,6 +2784,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get paywallRestoreButton => '이미 구독 중입니다';
 
   @override
+  String get paywallRestorePurchasesButton => 'Restaurer les achats';
+
+  @override
+  String get paywallRestorePurchasesSuccess => 'Achats restaurés.';
+
+  @override
   String get paywallStoreNotConfigured =>
       'Stripe 결제 링크가 없습니다. Admin → Config → Payment Link(https://…) 설정, 결제 활성화 후 로그인 상태에서 다시 시도하세요.';
 
@@ -4005,6 +4011,36 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsDataResetSuccess => '로컬 데이터가 삭제되었습니다. 필요하면 앱을 다시 시작하세요.';
+
+  @override
+  String get settingsDeleteAccountSection => 'Compte';
+
+  @override
+  String get settingsDeleteAccountDescription =>
+      'Supprime définitivement ton compte Paychek et tes données cloud (journal, profil, abonnement côté app). Action irréversible.';
+
+  @override
+  String get settingsDeleteAccountButton => 'Supprimer mon compte';
+
+  @override
+  String get settingsDeleteAccountDialogTitle => 'Supprimer le compte ?';
+
+  @override
+  String get settingsDeleteAccountDialogBody =>
+      'Ton compte et tes données Paychek seront supprimés de façon permanente. Tu ne pourras pas annuler cette action.';
+
+  @override
+  String get settingsDeleteAccountDialogCancel => 'Annuler';
+
+  @override
+  String get settingsDeleteAccountDialogConfirm => 'Supprimer définitivement';
+
+  @override
+  String get settingsDeleteAccountSuccess => 'Compte supprimé.';
+
+  @override
+  String get settingsDeleteAccountErrorRecentLogin =>
+      'Pour des raisons de sécurité, déconnecte-toi puis reconnecte-toi, et réessaie.';
 
   @override
   String get validate => '확인';

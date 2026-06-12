@@ -54,8 +54,36 @@
 
   <title>Paychek — Journal de trading</title>
   <link rel="manifest" href="manifest.json">
+  <!-- Facebook Login (web) — App ID Meta = Android/iOS. SDK JS requis (Meta → Facebook Login → Settings). -->
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '967493382672804',
+        cookie: true,
+        xfbml: true,
+        version: 'v19.0'
+      });
+    };
+  </script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 </head>
 <body>
+  <div id="fb-root"></div>
+  <div id="paychek-auth-boot" hidden style="display:none;position:fixed;inset:0;z-index:9999;background:#000;color:#e5e5e5;font-family:system-ui,sans-serif;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+    <div style="width:28px;height:28px;border:2px solid #1f2937;border-top-color:#34d399;border-radius:50%;animation:paychek-spin .8s linear infinite;"></div>
+    <p style="margin:0;font-size:13px;color:#9ca3af;">Paychek</p>
+  </div>
+  <style>@keyframes paychek-spin{to{transform:rotate(360deg)}}</style>
+  <script>
+    (function () {
+      try {
+        if ((location.search || '').indexOf('auth=') >= 0) {
+          var el = document.getElementById('paychek-auth-boot');
+          if (el) { el.hidden = false; el.style.display = 'flex'; }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <noscript>
     <div style="max-width:42rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;color:#e5e5e5;background:#000;">
       <h1 style="color:#fff;font-size:1.5rem;">Paychek — Journal de trading</h1>

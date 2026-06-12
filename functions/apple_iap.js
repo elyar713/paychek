@@ -3,13 +3,19 @@
  *
  * Secrets Firebase (console ou CLI) :
  *   PAYCHEK_APPLE_IAP_PRIVATE_KEY  — contenu du fichier .p8 (App Store Connect API)
+ *   PAYCHEK_APPLE_IAP_KEY_ID        — Key ID de la clé API (Users and Access → Keys)
+ *   PAYCHEK_APPLE_IAP_ISSUER_ID     — Issuer ID (Users and Access, en haut de page)
  * Bundle validé : pro.paychek.app (voir PAYCHEK_IOS_BUNDLE_ID).
  */
 
 const fs = require("fs");
 const path = require("path");
 const {
+  AppStoreServerAPIClient,
   Environment,
+  GetTransactionHistoryVersion,
+  Order,
+  ProductType,
   SignedDataVerifier,
 } = require("@apple/app-store-server-library");
 
@@ -387,6 +393,281 @@ async function resyncProFromStoredAppleEntitlement(
 }
 
 /**
+ * @param {string} raw
+ * @return {string}
+ */
+function normalizeApplePrivateKey(raw) {
+  let key = `${raw ?? ""}`.trim();
+  if (!key) return "";
+  if (!key.includes("\n") && key.includes("\\n")) {
+    key = key.replace(/\\n/g, "\n");
+  }
+  return key;
+}
+
+/**
+ * @param {{privateKey?: () => string, keyId?: () => string, issuerId?: () => string}|null} getters
+ * @return {{privateKey: string, keyId: string, issuerId: string}|null}
+ */
+function readAppleApiCredentials(getters) {
+  const privateKey = normalizeApplePrivateKey(
+      typeof getters?.privateKey === "function" ?
+        getters.privateKey() :
+        process.env.PAYCHEK_APPLE_IAP_PRIVATE_KEY,
+  );
+  const keyId = `${typeof getters?.keyId === "function" ?
+    getters.keyId() :
+    process.env.PAYCHEK_APPLE_IAP_KEY_ID ?? ""}`.trim();
+  const issuerId = `${typeof getters?.issuerId === "function" ?
+    getters.issuerId() :
+    process.env.PAYCHEK_APPLE_IAP_ISSUER_ID ?? ""}`.trim();
+  if (!privateKey || !keyId || !issuerId) return null;
+  return {privateKey, keyId, issuerId};
+}
+
+/**
+ * @param {string} productId
+ * @return {string}
+ */
+function paychekAppleCycleHintFromProductId(productId) {
+  const id = `${productId || ""}`.toLowerCase();
+  if (id.includes("annual")) return "1 an";
+  if (id.includes("quarterly")) return "3 mois";
+  if (id.includes("monthly") || id.includes(".month")) return "1 mois";
+  return "";
+}
+
+/**
+ * @param {object} tx decoded JWS transaction
+ * @return {string}
+ */
+function paychekAppleTransactionDisplayStatus(tx) {
+  if (tx.revocationDate != null) return "Remboursé";
+  const reason = `${tx.transactionReason || ""}`.toUpperCase();
+  if (reason === "RENEWAL") return "Renouvellement";
+  if (reason === "PURCHASE") return "Réussi";
+  const expires = tx.expiresDate;
+  if (expires != null && typeof expires === "number" && expires <= Date.now()) {
+    return "Expiré";
+  }
+  return "Réussi";
+}
+
+/**
+ * @param {{tx: object, environment: string}} entry
+ * @return {object|null}
+ */
+function paychekApplePaymentRowFromTx(entry) {
+  const tx = entry?.tx;
+  if (!tx || typeof tx !== "object") return null;
+  const transactionId = `${tx.transactionId || ""}`.trim();
+  if (!transactionId) return null;
+  const productId = `${tx.productId || ""}`.trim();
+  const purchaseMs =
+    typeof tx.purchaseDate === "number" ? tx.purchaseDate : Date.now();
+  const priceMilli = typeof tx.price === "number" ? tx.price : 0;
+  const cur = `${tx.currency || "usd"}`.trim().toLowerCase();
+  const amountMajor = priceMilli > 0 ? priceMilli / 1000 : 0;
+  const envLabel =
+    entry.environment === Environment.SANDBOX ? "Sandbox" : "Production";
+
+  return {
+    provider: "apple_iap",
+    transactionId,
+    originalTransactionId:
+      `${tx.originalTransactionId || transactionId}`.trim(),
+    productId,
+    amountTotal: Math.round(amountMajor * 100),
+    amountMajor,
+    amountRefunded: 0,
+    currency: cur,
+    paymentStatus: `${tx.transactionReason || ""}`.trim(),
+    sessionStatus: envLabel,
+    displayStatus: paychekAppleTransactionDisplayStatus(tx),
+    cycleHint: paychekAppleCycleHintFromProductId(productId),
+    failureMessage: "",
+    email: "",
+    created: Math.floor(purchaseMs / 1000),
+    expiresDate:
+      typeof tx.expiresDate === "number" ?
+        Math.floor(tx.expiresDate / 1000) :
+        0,
+    environment: envLabel,
+  };
+}
+
+/**
+ * @param {object} ent subscriber_entitlements document
+ * @return {object|null}
+ */
+function paychekApplePaymentFromStoredEntitlement(ent) {
+  const transactionId = `${ent.appleTransactionId || ""}`.trim();
+  const productId = `${ent.appleProductId || ""}`.trim();
+  if (!transactionId || !productId) return null;
+  const proSince =
+    ent.proSinceUtc && typeof ent.proSinceUtc.toMillis === "function" ?
+      ent.proSinceUtc.toMillis() :
+      Date.now();
+  const periodEnd =
+    ent.currentPeriodEnd && typeof ent.currentPeriodEnd.toMillis === "function" ?
+      ent.currentPeriodEnd.toMillis() :
+      null;
+  return {
+    provider: "apple_iap",
+    transactionId,
+    originalTransactionId:
+      `${ent.appleOriginalTransactionId || transactionId}`.trim(),
+    productId,
+    amountTotal: 0,
+    amountMajor: 0,
+    amountRefunded: 0,
+    currency: "usd",
+    paymentStatus: "",
+    sessionStatus: "Firestore",
+    displayStatus:
+      ent.active === true ?
+        "Enregistré (serveur)" :
+        "Inactif (serveur)",
+    cycleHint: paychekAppleCycleHintFromProductId(productId),
+    failureMessage:
+      "Historique App Store indisponible — dernière transaction Firestore.",
+    email: "",
+    created: Math.floor(proSince / 1000),
+    expiresDate: periodEnd ? Math.floor(periodEnd / 1000) : 0,
+    environment: "",
+  };
+}
+
+/**
+ * @param {string} anyTransactionId original or latest transaction id
+ * @param {{privateKey: string, keyId: string, issuerId: string}} apiCreds
+ * @return {Promise<Array<{tx: object, environment: string}>>}
+ */
+async function paychekFetchAppleTransactionHistoryDecoded(
+    anyTransactionId,
+    apiCreds,
+) {
+  const id = `${anyTransactionId || ""}`.trim();
+  if (!id) return [];
+
+  /** @type {Map<string, {tx: object, environment: string}>} */
+  const byTxId = new Map();
+  let lastError = null;
+
+  for (const environment of [Environment.SANDBOX, Environment.PRODUCTION]) {
+    try {
+      const client = new AppStoreServerAPIClient(
+          apiCreds.privateKey,
+          apiCreds.keyId,
+          apiCreds.issuerId,
+          PAYCHEK_IOS_BUNDLE_ID,
+          environment,
+      );
+      const request = {
+        sort: Order.DESCENDING,
+        productTypes: [ProductType.AUTO_RENEWABLE],
+      };
+      let response = null;
+      do {
+        const revision = response?.revision ?? null;
+        response = await client.getTransactionHistory(
+            id,
+            revision,
+            request,
+            GetTransactionHistoryVersion.V2,
+        );
+        const verifier = buildVerifier(environment, PAYCHEK_IOS_BUNDLE_ID);
+        if (!verifier) continue;
+        for (const signed of response.signedTransactions || []) {
+          try {
+            const tx = await verifier.verifyAndDecodeTransaction(signed);
+            const tid = `${tx.transactionId || ""}`.trim();
+            if (tid) {
+              byTxId.set(tid, {tx, environment});
+            }
+          } catch (decodeErr) {
+            console.warn("paychekAppleHistory decode", decodeErr);
+          }
+        }
+      } while (response?.hasMore);
+      if (byTxId.size > 0) break;
+    } catch (e) {
+      lastError = e;
+      console.warn("paychekAppleHistory env", environment, e);
+    }
+  }
+
+  if (byTxId.size === 0 && lastError) throw lastError;
+  return [...byTxId.values()];
+}
+
+/**
+ * Historique App Store pour la console admin (Get Transaction History).
+ *
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} uid
+ * @param {{privateKey?: () => string, keyId?: () => string, issuerId?: () => string}|null} credGetters
+ * @return {Promise<{configured: boolean, payments: object[], error: string|null}>}
+ */
+async function paychekAdminFetchAppleBillingHistory(db, uid, credGetters) {
+  const id = `${uid ?? ""}`.trim();
+  if (!id) {
+    return {configured: false, payments: [], error: null};
+  }
+
+  const entSnap = await db.collection("subscriber_entitlements").doc(id).get();
+  const ent = entSnap.exists ? entSnap.data() || {} : {};
+  const transactionId =
+    `${ent.appleOriginalTransactionId || ent.appleTransactionId || ""}`.trim();
+  const apiCreds = readAppleApiCredentials(credGetters);
+
+  if (!apiCreds) {
+    const fallback = paychekApplePaymentFromStoredEntitlement(ent);
+    return {
+      configured: false,
+      payments: fallback ? [fallback] : [],
+      error: transactionId ?
+        "API App Store non configurée (PAYCHEK_APPLE_IAP_PRIVATE_KEY, KEY_ID, ISSUER_ID)." :
+        null,
+    };
+  }
+
+  if (!transactionId) {
+    return {configured: true, payments: [], error: null};
+  }
+
+  try {
+    const decoded = await paychekFetchAppleTransactionHistoryDecoded(
+        transactionId,
+        apiCreds,
+    );
+    const payments = decoded
+        .map(paychekApplePaymentRowFromTx)
+        .filter(Boolean);
+    payments.sort((a, b) => b.created - a.created);
+    if (payments.length === 0) {
+      const fallback = paychekApplePaymentFromStoredEntitlement(ent);
+      if (fallback) {
+        return {
+          configured: true,
+          payments: [fallback],
+          error: "Aucune transaction App Store — affichage Firestore.",
+        };
+      }
+    }
+    return {configured: true, payments, error: null};
+  } catch (e) {
+    console.error("paychekAdminFetchAppleBillingHistory", e);
+    const fallback = paychekApplePaymentFromStoredEntitlement(ent);
+    return {
+      configured: true,
+      payments: fallback ? [fallback] : [],
+      error: e && e.message ? String(e.message) : "apple_history_failed",
+    };
+  }
+}
+
+/**
  * @param {object} deps
  * @return {object} named Cloud Function exports
  */
@@ -761,6 +1042,8 @@ module.exports = {
   appleTransactionGrantsPro,
   inferApplePeriodEndMillis,
   resolveApplePeriodEndMillis,
+  paychekAdminFetchAppleBillingHistory,
+  paychekAppleCycleHintFromProductId,
   PAYCHEK_IOS_BUNDLE_ID,
   PAYCHEK_APPLE_APP_ID,
   DEFAULT_PRODUCT_IDS,

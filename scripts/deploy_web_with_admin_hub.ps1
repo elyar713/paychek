@@ -39,8 +39,12 @@ if ($stripeUrl.Trim().Length -gt 0) {
 & flutter @mainFlutterArgs
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-# Pages marketing / SEO (sinon absentes si le build web ne les recopie pas).
-$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js', 'privacy.html', 'terms.html', 'admin-hub.html')
+# Pages marketing / SEO + assets landing (js/css) — toujours recopiés depuis web/.
+$seoFiles = @(
+  'sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js',
+  'privacy.html', 'privacy-en.html', 'terms.html', 'admin-hub.html',
+  'blog.html', 'contact.html'
+)
 foreach ($name in $seoFiles) {
   $src = Join-Path (Get-Location) "web\$name"
   $dst = Join-Path (Get-Location) "build\web\$name"
@@ -48,11 +52,12 @@ foreach ($name in $seoFiles) {
     Copy-Item -Force $src $dst
   }
 }
-$webImages = Join-Path (Get-Location) 'web\images'
-$buildImages = Join-Path (Get-Location) 'build\web\images'
-if (Test-Path $webImages) {
-  New-Item -ItemType Directory -Force -Path $buildImages | Out-Null
-  Copy-Item -Path (Join-Path $webImages '*') -Destination $buildImages -Recurse -Force
+foreach ($dir in @('images', 'js', 'css', 'blog-i18n', 'contact-i18n')) {
+  $srcDir = Join-Path (Get-Location) "web\$dir"
+  $dstDir = Join-Path (Get-Location) "build\web\$dir"
+  if (-not (Test-Path $srcDir)) { continue }
+  New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
+  Copy-Item -Path (Join-Path $srcDir '*') -Destination $dstDir -Recurse -Force
 }
 
 $adminDest = Join-Path (Get-Location) 'build\web\admin-hub'

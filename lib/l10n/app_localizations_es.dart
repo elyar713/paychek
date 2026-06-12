@@ -2896,6 +2896,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallRestoreButton => 'Ya tengo una suscripción';
 
   @override
+  String get paywallRestorePurchasesButton => 'Restaurer les achats';
+
+  @override
+  String get paywallRestorePurchasesSuccess => 'Achats restaurés.';
+
+  @override
   String get paywallStoreNotConfigured =>
       'Falta el enlace de Stripe. Admin → Config → URL de pago (https://…), activa la facturación e inténtalo de nuevo (sesión iniciada).';
 
@@ -4143,6 +4149,36 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsDataResetSuccess =>
       'Datos locales borrados. Reinicia la app si es necesario.';
+
+  @override
+  String get settingsDeleteAccountSection => 'Compte';
+
+  @override
+  String get settingsDeleteAccountDescription =>
+      'Supprime définitivement ton compte Paychek et tes données cloud (journal, profil, abonnement côté app). Action irréversible.';
+
+  @override
+  String get settingsDeleteAccountButton => 'Supprimer mon compte';
+
+  @override
+  String get settingsDeleteAccountDialogTitle => 'Supprimer le compte ?';
+
+  @override
+  String get settingsDeleteAccountDialogBody =>
+      'Ton compte et tes données Paychek seront supprimés de façon permanente. Tu ne pourras pas annuler cette action.';
+
+  @override
+  String get settingsDeleteAccountDialogCancel => 'Annuler';
+
+  @override
+  String get settingsDeleteAccountDialogConfirm => 'Supprimer définitivement';
+
+  @override
+  String get settingsDeleteAccountSuccess => 'Compte supprimé.';
+
+  @override
+  String get settingsDeleteAccountErrorRecentLogin =>
+      'Pour des raisons de sécurité, déconnecte-toi puis reconnecte-toi, et réessaie.';
 
   @override
   String get validate => 'Confirmar';

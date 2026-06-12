@@ -1,6 +1,7 @@
 import 'dart:async' show StreamSubscription, Timer, unawaited;
 import 'dart:math' as math;
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -18,6 +19,9 @@ import 'paychek_gold_upgrade_sheet.dart';
 import 'paychek_google_entitlement_sync.dart';
 import 'paychek_subscription_platform.dart';
 import 'subscription_launch_helper.dart';
+import 'paywall/paychek_restore_purchases_button.dart';
+import 'account_logout.dart';
+import 'paychek_delete_account.dart';
 import 'paychek_user_firestore.dart';
 import 'reglage_profile_prefs.dart';
 import 'trial_access_prefs.dart'
@@ -503,6 +507,17 @@ class _ReglageProfileViewPageState extends State<ReglageProfileViewPage>
                 l10n: l10n,
                 isWebUi: isWebUi,
                 onNonProSubscribe: _openSubscriptionCheckout,
+              ),
+              PaychekRestorePurchasesButton(
+                onAfterRestore: (_) async {
+                  await _loadEntitlement();
+                },
+              ),
+              const SizedBox(height: 24),
+              _DeleteAccountSection(
+                l10n: l10n,
+                isWebUi: isWebUi,
+                onDeleted: widget.onBack,
               ),
               const SizedBox(height: 8),
             ],
@@ -1246,6 +1261,158 @@ class _ProfileEditCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DeleteAccountSection extends StatefulWidget {
+  const _DeleteAccountSection({
+    required this.l10n,
+    required this.isWebUi,
+    this.onDeleted,
+  });
+
+  final AppLocalizations l10n;
+  final bool isWebUi;
+  final VoidCallback? onDeleted;
+
+  @override
+  State<_DeleteAccountSection> createState() => _DeleteAccountSectionState();
+}
+
+class _DeleteAccountSectionState extends State<_DeleteAccountSection> {
+  bool _busy = false;
+
+  Future<void> _confirmAndDelete() async {
+    final l10n = widget.l10n;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1C),
+        title: Text(
+          l10n.settingsDeleteAccountDialogTitle,
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            l10n.settingsDeleteAccountDialogBody,
+            style: GoogleFonts.plusJakartaSans(
+              color: const Color(0xFFB0B0B4),
+              height: 1.45,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.settingsDeleteAccountDialogCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              l10n.settingsDeleteAccountDialogConfirm,
+              style: const TextStyle(color: Color(0xFFEF4444)),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await deletePaychekUserAccountFully();
+      if (!mounted) return;
+      await applyLocalLogout(context);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.settingsDeleteAccountSuccess),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      widget.onDeleted?.call();
+    } on FirebaseFunctionsException catch (e) {
+      if (!mounted) return;
+      final msg = paychekDeleteAccountErrorMessage(e);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            msg == 'requires-recent-login'
+                ? l10n.settingsDeleteAccountErrorRecentLogin
+                : l10n.accountAuthErrorGeneric,
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.accountAuthErrorGeneric),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    if (FirebaseAuth.instance.currentUser == null) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionHeading(
+          text: l10n.settingsDeleteAccountSection,
+          isWebUi: widget.isWebUi,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          l10n.settingsDeleteAccountDescription,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            height: 1.4,
+            color: widget.isWebUi
+                ? PaychekWebTokens.textGray600
+                : DashboardTokens.labelGrey,
+          ),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: _busy ? null : _confirmAndDelete,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFFEF4444),
+            side: const BorderSide(color: Color(0xFFEF4444)),
+            minimumSize: const Size.fromHeight(48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: _busy
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(
+                  l10n.settingsDeleteAccountButton,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }

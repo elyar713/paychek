@@ -30,8 +30,28 @@ String get kGoogleOAuthWebClientId {
   return kGoogleOAuthWebClientIdDefault;
 }
 
+/// Meta Developer → appli Facebook (même ID que Android/iOS).
+const String kPaychekFacebookAppId = '967493382672804';
+
 /// Bundle iOS Paychek (audience du jeton Apple en flux natif).
 const String kPaychekIosBundleId = 'pro.paychek.app';
+
+/// Services ID **web** Apple (≠ Bundle iOS `pro.paychek.app`).
+/// Apple Developer → Identifiers → Services ID → Sign in with Apple :
+/// domaines `paychek.pro`, return URL [kPaychekFirebaseAppleRedirectUri].
+/// Firebase Console → Auth → Apple → **ID de service** = cette valeur.
+const String kPaychekAppleWebServicesId = 'pro.paychek.signin';
+
+const String _kAppleWebServicesIdFromEnv = String.fromEnvironment(
+  'PAYCHEK_APPLE_WEB_SERVICES_ID',
+  defaultValue: '',
+);
+
+String get kPaychekAppleWebServicesIdForAuth {
+  final fromEnv = _kAppleWebServicesIdFromEnv.trim();
+  if (fromEnv.isNotEmpty) return fromEnv;
+  return kPaychekAppleWebServicesId;
+}
 
 /// Callback OAuth Apple pour Firebase (web + flux iOS « Services ID »).
 const String kPaychekFirebaseAppleRedirectUri =
@@ -44,7 +64,7 @@ const String _kAppleServicesIdFromEnv = String.fromEnvironment(
 
 /// Aligné sur Firebase Console → Auth → Apple → **ID de service**.
 /// `pro.paychek.app` = Bundle ID iOS (flux natif). Laisser vide = idem.
-/// Pour le web uniquement : `pro.paychek.web` (flux OAuth sur iOS).
+/// Pour le web uniquement : `pro.paychek.signin` (flux OAuth sur iOS si Firebase aligné).
 const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.app';
 
 /// **Services ID** Firebase (Auth → Apple). Diffère du Bundle ID `pro.paychek.app` :

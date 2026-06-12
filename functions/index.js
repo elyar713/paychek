@@ -83,6 +83,17 @@ const paychekGooglePlayServiceAccountJson = defineSecret(
     "PAYCHEK_GOOGLE_PLAY_SERVICE_ACCOUNT_JSON",
 );
 
+/** Clé API App Store Connect (.p8) — historique transactions admin. */
+const paychekAppleIapPrivateKey = defineSecret("PAYCHEK_APPLE_IAP_PRIVATE_KEY");
+const paychekAppleIapKeyId = defineString("PAYCHEK_APPLE_IAP_KEY_ID", {
+  default: "",
+  description: "Key ID App Store Connect API (Users and Access → Keys)",
+});
+const paychekAppleIapIssuerId = defineString("PAYCHEK_APPLE_IAP_ISSUER_ID", {
+  default: "",
+  description: "Issuer ID App Store Connect (Users and Access)",
+});
+
 const COMPANY_NAME = "Paychek";
 /** Lien Base de connaissances dans l’e-mail automatique — à ajuster selon votre site réel. */
 const KNOWLEDGE_BASE_URL_FR = "https://paychek.pro/";
@@ -4852,6 +4863,273 @@ exports.adminListStripeCheckoutSessions = onCall(
 );
 
 /**
+ * Infère le cycle Paychek depuis un montant USD (catalogue).
+ * @param {number} major
+ * @param {string} currency
+ * @return {string}
+ */
+function paychekCycleHintFromAmountMajor(major, currency) {
+  const c = `${currency ?? ""}`.toLowerCase();
+  if (c && c !== "usd") return "";
+  const near = (a, b) => Math.abs(a - b) < 0.75;
+  if (near(major, 8.99)) return "1 mois";
+  if (near(major, 20.99) || near(major, 20.97)) return "3 mois";
+  if (near(major, 59.99)) return "1 an";
+  return "";
+}
+
+/**
+ * @param {import("stripe").Stripe} stripe
+ * @param {string} paymentIntentId
+ * @return {Promise<{piStatus: string, amountRefunded: number, fullyRefunded: boolean, failureMessage: string}|null>}
+ */
+async function paychekStripeChargeInfo(stripe, paymentIntentId) {
+  const piId = `${paymentIntentId ?? ""}`.trim();
+  if (!piId) return null;
+  try {
+    const pi = await stripe.paymentIntents.retrieve(piId, {
+      expand: ["latest_charge"],
+    });
+    let charge = null;
+    const lc = pi.latest_charge;
+    if (lc && typeof lc === "object" && !Array.isArray(lc)) {
+      charge = lc;
+    } else if (typeof lc === "string" && lc.length > 0) {
+      charge = await stripe.charges.retrieve(lc);
+    }
+    const err = pi.last_payment_error;
+    return {
+      piStatus: `${pi.status ?? ""}`,
+      amountRefunded: charge?.amount_refunded ?? 0,
+      fullyRefunded: charge?.refunded === true,
+      failureMessage: `${charge?.failure_message ?? err?.message ?? ""}`.trim(),
+    };
+  } catch (e) {
+    console.warn("paychekStripeChargeInfo", e);
+    return null;
+  }
+}
+
+/**
+ * @param {import("stripe").Stripe.Checkout.Session} session
+ * @param {{piStatus: string, amountRefunded: number, fullyRefunded: boolean, failureMessage: string}|null} chargeInfo
+ * @return {string}
+ */
+function paychekPaymentDisplayStatus(session, chargeInfo) {
+  if (chargeInfo?.fullyRefunded) return "Remboursé";
+  if ((chargeInfo?.amountRefunded ?? 0) > 0) {
+    return "Remboursé partiellement";
+  }
+  const ps = `${session.payment_status ?? ""}`.toLowerCase();
+  const st = `${session.status ?? ""}`.toLowerCase();
+  if (ps === "paid" || ps === "no_payment_required") return "Réussi";
+  if (st === "expired") return "Expiré";
+  if (ps === "unpaid" && st === "open") return "Non payé";
+  const piSt = `${chargeInfo?.piStatus ?? ""}`.toLowerCase();
+  if (piSt === "canceled") return "Annulé";
+  if (piSt === "requires_payment_method") return "Paiement refusé";
+  if (chargeInfo?.failureMessage) return "Échec paiement";
+  if (ps === "unpaid") return "Non payé";
+  if (st) return st;
+  return ps || "—";
+}
+
+/**
+ * Toutes les Checkout Sessions Stripe liées à un utilisateur (uid, e-mail, client).
+ * @param {import("stripe").Stripe} stripe
+ * @param {string} uid
+ * @param {string} email
+ * @param {string} stripeCustomerId
+ * @return {Promise<import("stripe").Stripe.Checkout.Session[]>}
+ */
+async function paychekCollectUserCheckoutSessions(
+    stripe,
+    uid,
+    email,
+    stripeCustomerId,
+) {
+  /** @type {Map<string, import("stripe").Stripe.Checkout.Session>} */
+  const byId = new Map();
+  const addSession = (s) => {
+    if (s?.id) byId.set(s.id, s);
+  };
+
+  const uidEsc = paychekEscapeStripeSearchValue(uid);
+  if (uidEsc) {
+    try {
+      const found = await stripe.checkout.sessions.search({
+        query: `client_reference_id:'${uidEsc}'`,
+        limit: 25,
+      });
+      for (const s of found.data) addSession(s);
+    } catch (e) {
+      console.warn("adminListUserBillingHistory uid search", e);
+    }
+  }
+
+  const emails = new Set();
+  const em = `${email ?? ""}`.trim();
+  if (em) {
+    emails.add(em);
+    emails.add(em.toLowerCase());
+  }
+  for (const lookup of emails) {
+    const emailEsc = paychekEscapeStripeSearchValue(lookup);
+    if (!emailEsc) continue;
+    try {
+      const byEmail = await stripe.checkout.sessions.search({
+        query: `customer_details.email:'${emailEsc}'`,
+        limit: 25,
+      });
+      for (const s of byEmail.data) addSession(s);
+    } catch (e) {
+      console.warn("adminListUserBillingHistory email search", e);
+    }
+  }
+
+  const customerId = `${stripeCustomerId ?? ""}`.trim();
+  if (customerId) {
+    try {
+      const res = await stripe.checkout.sessions.list({
+        customer: customerId,
+        limit: 25,
+      });
+      for (const s of res.data) addSession(s);
+    } catch (e) {
+      console.warn("adminListUserBillingHistory customer list", e);
+    }
+  }
+
+  return [...byId.values()].sort(
+      (a, b) => (b.created || 0) - (a.created || 0),
+  );
+}
+
+const appleIapBilling = require("./apple_iap");
+const googlePlayBilling = require("./google_play_iap");
+
+/**
+ * Console admin : historique Stripe + App Store + Google Play.
+ */
+exports.adminListUserBillingHistory = onCall(
+    {
+      region: "europe-west1",
+      secrets: [
+        paychekStripeSecretKey,
+        paychekAppleIapPrivateKey,
+        paychekGooglePlayServiceAccountJson,
+      ],
+      timeoutSeconds: 90,
+      memory: "256MiB",
+    },
+    async (request) => {
+      if (!request.auth) {
+        throw new HttpsError("unauthenticated", "Connexion requise.");
+      }
+      if (request.auth.token.admin !== true) {
+        throw new HttpsError(
+            "permission-denied",
+            "Réservé aux administrateurs.",
+        );
+      }
+      const uid = `${request.data?.uid ?? request.data?.targetUserId ?? ""}`.trim();
+      const email = `${request.data?.email ?? ""}`.trim();
+      const stripeCustomerId = `${request.data?.stripeCustomerId ?? ""}`.trim();
+      if (!uid && !email) {
+        throw new HttpsError(
+            "invalid-argument",
+            "uid ou email requis.",
+        );
+      }
+
+      const payments = [];
+      let stripeKeyMode = null;
+      const stripeKey = paychekStripeSecretKey.value().trim();
+      if (stripeKey) {
+        const stripe = new Stripe(stripeKey);
+        stripeKeyMode = paychekStripeKeyMode(stripeKey);
+        const sessions = await paychekCollectUserCheckoutSessions(
+            stripe,
+            uid,
+            email,
+            stripeCustomerId,
+        );
+        for (const s of sessions) {
+          const pi =
+            typeof s.payment_intent === "string" ?
+              s.payment_intent :
+              s.payment_intent?.id || "";
+          const chargeInfo = await paychekStripeChargeInfo(stripe, pi);
+          const cur = `${s.currency ?? "usd"}`.toLowerCase();
+          const cents = typeof s.amount_total === "number" ? s.amount_total : 0;
+          let major = cents / 100;
+          if (["jpy", "krw", "vnd", "clp", "ugx"].includes(cur)) {
+            major = cents;
+          }
+          payments.push({
+            provider: "stripe",
+            checkoutSessionId: s.id,
+            paymentIntentId: pi,
+            amountTotal: cents,
+            amountRefunded: chargeInfo?.amountRefunded ?? 0,
+            currency: cur,
+            paymentStatus: `${s.payment_status ?? ""}`,
+            sessionStatus: `${s.status ?? ""}`,
+            displayStatus: paychekPaymentDisplayStatus(s, chargeInfo),
+            cycleHint: paychekCycleHintFromAmountMajor(major, cur),
+            failureMessage: chargeInfo?.failureMessage || "",
+            email:
+              `${s.customer_details?.email ?? ""}`.trim() ||
+              `${s.customer_email ?? ""}`.trim(),
+            created: typeof s.created === "number" ? s.created : 0,
+          });
+        }
+      }
+
+      let appleConfigured = false;
+      let appleError = null;
+      let googleConfigured = false;
+      let googleError = null;
+      if (uid) {
+        const appleResult = await appleIapBilling.paychekAdminFetchAppleBillingHistory(
+            admin.firestore(),
+            uid,
+            {
+              privateKey: () => paychekAppleIapPrivateKey.value(),
+              keyId: () => paychekAppleIapKeyId.value(),
+              issuerId: () => paychekAppleIapIssuerId.value(),
+            },
+        );
+        appleConfigured = appleResult.configured === true;
+        appleError = appleResult.error || null;
+        payments.push(...(appleResult.payments || []));
+
+        const googleResult =
+          await googlePlayBilling.paychekAdminFetchGoogleBillingHistory(
+              admin.firestore(),
+              uid,
+              paychekGooglePlayServiceAccountJson,
+          );
+        googleConfigured = googleResult.configured === true;
+        googleError = googleResult.error || null;
+        payments.push(...(googleResult.payments || []));
+      }
+
+      payments.sort((a, b) => (b.created || 0) - (a.created || 0));
+
+      return {
+        ok: true,
+        stripeKeyMode,
+        appleConfigured,
+        appleError,
+        googleConfigured,
+        googleError,
+        payments,
+      };
+    },
+);
+
+/**
  * Express : conserve le buffer exact via `verify` (requis Firebase / Cloud Run + Stripe).
  */
 const paychekStripeWebhookApp = express();
@@ -4987,6 +5265,16 @@ const webContact = require("./web_contact");
 Object.assign(
     exports,
     webContact.createWebContactExports({
+      onCall,
+      HttpsError,
+      admin,
+    }),
+);
+
+const accountDeletion = require("./account_deletion");
+Object.assign(
+    exports,
+    accountDeletion.createAccountDeletionExports({
       onCall,
       HttpsError,
       admin,

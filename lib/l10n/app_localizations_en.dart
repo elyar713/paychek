@@ -2863,6 +2863,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallRestoreButton => 'I already subscribed';
 
   @override
+  String get paywallRestorePurchasesButton => 'Restore Purchases';
+
+  @override
+  String get paywallRestorePurchasesSuccess => 'Purchases restored.';
+
+  @override
   String get paywallStoreNotConfigured =>
       'Stripe checkout URL missing. Set it in Admin → Config → Stripe payment link (https://…), enable billing, stay signed in, then retry.';
 
@@ -4106,6 +4112,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsDataResetSuccess =>
       'Local data erased. Close and reopen the app if needed.';
+
+  @override
+  String get settingsDeleteAccountSection => 'Account';
+
+  @override
+  String get settingsDeleteAccountDescription =>
+      'Permanently delete your Paychek account and cloud data (journal, profile, in-app subscription state). This cannot be undone.';
+
+  @override
+  String get settingsDeleteAccountButton => 'Delete my account';
+
+  @override
+  String get settingsDeleteAccountDialogTitle => 'Delete account?';
+
+  @override
+  String get settingsDeleteAccountDialogBody =>
+      'Your account and Paychek data will be permanently deleted. You cannot undo this action.';
+
+  @override
+  String get settingsDeleteAccountDialogCancel => 'Cancel';
+
+  @override
+  String get settingsDeleteAccountDialogConfirm => 'Delete permanently';
+
+  @override
+  String get settingsDeleteAccountSuccess => 'Account deleted.';
+
+  @override
+  String get settingsDeleteAccountErrorRecentLogin =>
+      'For security, sign out, sign in again, then retry.';
 
   @override
   String get validate => 'Confirm';

@@ -5296,6 +5296,18 @@ abstract class AppLocalizations {
   /// **'J’ai déjà un abonnement'**
   String get paywallRestoreButton;
 
+  /// No description provided for @paywallRestorePurchasesButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer les achats'**
+  String get paywallRestorePurchasesButton;
+
+  /// No description provided for @paywallRestorePurchasesSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Achats restaurés.'**
+  String get paywallRestorePurchasesSuccess;
+
   /// No description provided for @paywallStoreNotConfigured.
   ///
   /// In fr, this message translates to:
@@ -7581,6 +7593,60 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Données locales effacées. Redémarrage de l’app recommandé.'**
   String get settingsDataResetSuccess;
+
+  /// No description provided for @settingsDeleteAccountSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get settingsDeleteAccountSection;
+
+  /// No description provided for @settingsDeleteAccountDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprime définitivement ton compte Paychek et tes données cloud (journal, profil, abonnement côté app). Action irréversible.'**
+  String get settingsDeleteAccountDescription;
+
+  /// No description provided for @settingsDeleteAccountButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer mon compte'**
+  String get settingsDeleteAccountButton;
+
+  /// No description provided for @settingsDeleteAccountDialogTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte ?'**
+  String get settingsDeleteAccountDialogTitle;
+
+  /// No description provided for @settingsDeleteAccountDialogBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton compte et tes données Paychek seront supprimés de façon permanente. Tu ne pourras pas annuler cette action.'**
+  String get settingsDeleteAccountDialogBody;
+
+  /// No description provided for @settingsDeleteAccountDialogCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get settingsDeleteAccountDialogCancel;
+
+  /// No description provided for @settingsDeleteAccountDialogConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer définitivement'**
+  String get settingsDeleteAccountDialogConfirm;
+
+  /// No description provided for @settingsDeleteAccountSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte supprimé.'**
+  String get settingsDeleteAccountSuccess;
+
+  /// No description provided for @settingsDeleteAccountErrorRecentLogin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour des raisons de sécurité, déconnecte-toi puis reconnecte-toi, et réessaie.'**
+  String get settingsDeleteAccountErrorRecentLogin;
 
   /// No description provided for @validate.
   ///
