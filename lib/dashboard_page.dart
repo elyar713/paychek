@@ -71,6 +71,7 @@ import 'reglage/paychek_google_entitlement_sync.dart';
 import 'reglage/paychek_google_play_iap_service.dart';
 import 'reglage/paychek_subscription_platform.dart';
 import 'reglage/trial_paywall_overlay.dart';
+import 'reglage/trading_week_scope.dart';
 import 'reglage/lite_freemium_page_lock.dart';
 import 'reglage/paychek_gold_upgrade_sheet.dart';
 
@@ -130,6 +131,9 @@ class _DashboardPageState extends State<DashboardPage>
   final ValueNotifier<String?> _openTradeIdNotifier = ValueNotifier<String?>(null);
   final ValueNotifier<String?> _openTradeDayKeyNotifier =
       ValueNotifier<String?>(null);
+
+  TradingWeekController? _boundTradingWeek;
+
   /// Aperçu accueil : rapport épinglé → sinon 1er rapport stocké → sinon `null` (titre seul).
   AnalyseReportSnapshot? _analyseHomePreview;
 
@@ -214,6 +218,24 @@ class _DashboardPageState extends State<DashboardPage>
         );
       },
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final tw = TradingWeekScope.of(context);
+    if (_boundTradingWeek != tw) {
+      _boundTradingWeek?.removeListener(_onTradingWeekChanged);
+      _boundTradingWeek = tw;
+      tw.addListener(_onTradingWeekChanged);
+      _checklistController.applyTradingDaysPerWeek(tw.tradingDaysPerWeek);
+    }
+  }
+
+  void _onTradingWeekChanged() {
+    final tw = _boundTradingWeek;
+    if (tw == null) return;
+    _checklistController.applyTradingDaysPerWeek(tw.tradingDaysPerWeek);
   }
 
   @override
@@ -473,6 +495,7 @@ class _DashboardPageState extends State<DashboardPage>
 
   @override
   void dispose() {
+    _boundTradingWeek?.removeListener(_onTradingWeekChanged);
     _entitlementReloadDebounce?.cancel();
     unawaited(_subscriberEntitlementSub?.cancel());
     WidgetsBinding.instance.removeObserver(this);
@@ -494,6 +517,7 @@ class _DashboardPageState extends State<DashboardPage>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       MentalStateController.instance.onAppForegroundForCalendar();
+      _checklistController.onAppForegroundForDayRoll();
       unawaited(_syncStripeEntitlementAndReloadGate());
     }
   }

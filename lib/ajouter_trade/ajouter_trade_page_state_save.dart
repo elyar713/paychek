@@ -211,7 +211,7 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
       ),
       checklistRingPercent: widget.checklistController
               .hasChecklistCheckedOnDay(entryDay)
-          ? widget.checklistController.completionPercentOnDay(entryDay)
+          ? (widget.checklistController.completionPercentOnDay(entryDay) ?? 0)
           : 0,
       mentalRingScore: mentalHistorical ?? 0,
       strategieRespectPct: _strategieRespectPct,

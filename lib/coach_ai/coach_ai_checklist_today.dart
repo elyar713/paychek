@@ -1,3 +1,4 @@
+import '../reglage/trading_week_prefs.dart';
 import '../checklist/checklist_models.dart';
 import '../checklist/checklist_page_controller.dart';
 import 'coach_ai_response_format.dart';
@@ -66,6 +67,8 @@ abstract final class CoachAiChecklistToday {
   static Future<ChecklistTodaySnapshot> buildTodaySnapshot() async {
     final controller = ChecklistPageController();
     await controller.hydrateFromStorage();
+    final tradingDays = await TradingWeekPrefs.load();
+    controller.applyTradingDaysPerWeek(tradingDays);
     final today = DateTime.now();
     final uncheckedIds = controller
         .uncheckedEntriesForDay(today)
@@ -77,7 +80,7 @@ abstract final class CoachAiChecklistToday {
       if (!checklistSectionIsActive(section)) continue;
       final items = <ChecklistTodayItem>[];
       for (final item in section.items) {
-        if (!item.isDueOnDay(today)) continue;
+        if (!item.isDueOnDay(today, tradingDays)) continue;
         items.add(
           ChecklistTodayItem(
             label: item.label,
@@ -91,7 +94,7 @@ abstract final class CoachAiChecklistToday {
     }
 
     return ChecklistTodaySnapshot(
-      percent: controller.completionPercentOnDay(today),
+      percent: controller.completionPercentOnDay(today) ?? 0,
       totalDue: controller.totalItemsDueToday,
       checkedDue: controller.checkedItemsDueToday,
       sections: sections,

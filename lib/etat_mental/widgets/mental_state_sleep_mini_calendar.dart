@@ -6,17 +6,20 @@ import '../../l10n/app_localizations_month.dart';
 import '../mental_state_controller.dart';
 import '../mental_state_date_utils.dart';
 import '../mental_state_tokens.dart';
+import '../../trade/trade_week_utils.dart';
 
 /// Mini-calendrier du mois avec % **score global** (anneau) par jour — historique local.
 class MentalStateSleepMiniCalendar extends StatefulWidget {
   const MentalStateSleepMiniCalendar({
     super.key,
     required this.controller,
+    this.tradingDaysPerWeek = 7,
     this.selectedDay,
     this.onDayTap,
   });
 
   final MentalStateController controller;
+  final int tradingDaysPerWeek;
   final DateTime? selectedDay;
   final void Function(DateTime date)? onDayTap;
 
@@ -87,13 +90,20 @@ class _MentalStateSleepMiniCalendarState
         for (var day = 1; day <= daysInMonth; day++) {
           final date = DateTime(y, m, day);
           final d = MentalStateDateUtils.dateOnly(date);
+          final tradingDay = isTradingWeekdayLocal(
+            d,
+            tradingDaysPerWeek: widget.tradingDaysPerWeek,
+          );
+          final pct = c.overallScoreForCalendarDay(date);
           cells.add(_DayCell(
             date: date,
             today: today,
+            isNonTradingDay: !tradingDay,
             isSelected: selected != null &&
                 MentalStateDateUtils.isSameDate(d, selected),
-            pct: c.overallScoreForCalendarDay(date),
-            onTap: widget.onDayTap == null
+            pct: pct,
+            onTap: widget.onDayTap == null ||
+                    (!tradingDay && pct == null)
                 ? null
                 : () => widget.onDayTap!(date),
           ));
@@ -187,6 +197,7 @@ class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.date,
     required this.today,
+    this.isNonTradingDay = false,
     required this.isSelected,
     required this.pct,
     this.onTap,
@@ -194,6 +205,7 @@ class _DayCell extends StatelessWidget {
 
   final DateTime date;
   final DateTime today;
+  final bool isNonTradingDay;
   final bool isSelected;
   final double? pct;
   final VoidCallback? onTap;
@@ -243,7 +255,9 @@ class _DayCell extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: isFuture
                         ? const Color(0xFF3D3D3D)
-                        : const Color(0xFFB5B5B5),
+                        : (isNonTradingDay && pct == null)
+                            ? const Color(0xFF3A3A3A)
+                            : const Color(0xFFB5B5B5),
                   ),
                 ),
                 const SizedBox(height: 2),

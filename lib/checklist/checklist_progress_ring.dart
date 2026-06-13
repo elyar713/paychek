@@ -19,10 +19,14 @@ class ChecklistProgressRing extends StatelessWidget {
     this.strokeWidth,
     this.onTap,
     this.hideInnerClLabel = false,
+    this.centerPrimaryOverride,
   });
 
-  /// 0â€“100.
+  /// 0–100.
   final int percent;
+
+  /// Remplace le libellé central (ex. « — » jour hors semaine 5j).
+  final String? centerPrimaryOverride;
 
   /// Masque le « CL » sous le pourcentage (libellé affiché à l’extérieur du widget).
   final bool hideInnerClLabel;
@@ -94,7 +98,8 @@ class ChecklistProgressRing extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                ChecklistPrompts.progressRingPercentLabel(p),
+                centerPrimaryOverride ??
+                    ChecklistPrompts.progressRingPercentLabel(p),
                 style: pctStyle,
               ),
               if (!hideInnerClLabel) SizedBox(height: labelGap),

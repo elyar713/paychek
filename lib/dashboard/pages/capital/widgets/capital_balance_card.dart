@@ -6,6 +6,7 @@ import '../../../../analyse/analyse_report_snapshot.dart';
 import '../../../../checklist/checklist_page_controller.dart';
 import '../../../../checklist/checklist_progress_ring.dart';
 import '../../../../etat_mental/mental_state_controller.dart';
+import '../../../../etat_mental/mental_state_date_utils.dart';
 import '../../../../etat_mental/mental_state_tokens.dart';
 import '../../../../questionnaire/user_capital_scope.dart';
 import '../../../../reglage/trading_week_scope.dart';
@@ -89,8 +90,17 @@ class CapitalBalanceCard extends StatelessWidget {
             return ListenableBuilder(
               listenable: MentalStateController.instance,
               builder: (context, _) {
-                final emScore = MentalStateController.instance.overallScore;
-                final emPct = '${emScore.round()}%';
+                final mentalC = MentalStateController.instance;
+                final emAnchor = MentalStateDateUtils.liveScoreAnchorCalendarDate(
+                  DateTime.now(),
+                  mentalC.mentalDayStart,
+                  mentalC.mentalDayEnd,
+                );
+                final emLive = mentalC.overallScoreForCalendarDay(emAnchor);
+                final emPct =
+                    emLive != null ? '${emLive.round()}%' : '—';
+                final emProgress =
+                    emLive != null ? emLive / 100.0 : 0.0;
                 final tradesStore = TradeJournalScope.of(context);
                 return ListenableBuilder(
                   listenable: Listenable.merge([tradesStore, portfolioStore, store]),
@@ -243,12 +253,16 @@ class CapitalBalanceCard extends StatelessWidget {
                                 ),
                                 _webRingCaption(
                                   ring: DonutRing(
-                                    progress: emScore / 100.0,
+                                    progress: emProgress,
                                     centerPrimary: emPct,
                                     centerSecondary: l.dashboardRingState,
                                     size: rw,
                                     strokeWidth: 4,
-                                    ringColor: PaychekWebTokens.accentMint,
+                                    ringColor: emLive != null
+                                        ? MentalStateTokens.ringStrokeForScore(
+                                            emLive,
+                                          )
+                                        : PaychekWebTokens.accentMint,
                                     trackColor: trackWeb,
                                     showInnerSecondary: false,
                                     onTap: onOpenEtatMental,
@@ -257,7 +271,10 @@ class CapitalBalanceCard extends StatelessWidget {
                                 ),
                                 _webRingCaption(
                                   ring: ChecklistProgressRing(
-                                    percent: checklistPct,
+                                    percent: checklistPct ?? 0,
+                                    centerPrimaryOverride: checklistPct != null
+                                        ? null
+                                        : '—',
                                     size: rw,
                                     strokeWidth: 4,
                                     hideInnerClLabel: true,
@@ -431,8 +448,11 @@ class CapitalBalanceCard extends StatelessWidget {
                           _CapitalBalanceMobileRingsRow(
                             ringSize: ringSize,
                             win: win,
-                            emScore: emScore,
+                            emProgress: emProgress,
                             emPct: emPct,
+                            emRingColor: emLive != null
+                                ? MentalStateTokens.ringStrokeForScore(emLive)
+                                : null,
                             checklistPct: checklistPct,
                             analyseSnapshot: analyseSnap,
                             onOpenPerformance: onOpenPerformance,
@@ -541,8 +561,9 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
   const _CapitalBalanceMobileRingsRow({
     required this.ringSize,
     required this.win,
-    required this.emScore,
+    required this.emProgress,
     required this.emPct,
+    this.emRingColor,
     required this.checklistPct,
     this.analyseSnapshot,
     required this.onOpenPerformance,
@@ -553,9 +574,10 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
 
   final double ringSize;
   final int win;
-  final double emScore;
+  final double emProgress;
   final String emPct;
-  final int checklistPct;
+  final Color? emRingColor;
+  final int? checklistPct;
   final AnalyseReportSnapshot? analyseSnapshot;
   final VoidCallback onOpenPerformance;
   final VoidCallback onOpenEtatMental;
@@ -577,16 +599,18 @@ class _CapitalBalanceMobileRingsRow extends StatelessWidget {
         onTap: onOpenPerformance,
       ),
       DonutRing(
-        progress: emScore / 100.0,
+        progress: emProgress,
         centerPrimary: emPct,
         centerSecondary: l.dashboardRingState,
         size: ringSize,
         strokeWidth: stroke,
-        ringColor: MentalStateTokens.ringStrokeForScore(emScore),
+        ringColor: emRingColor,
         onTap: onOpenEtatMental,
       ),
       ChecklistProgressRing(
-        percent: checklistPct,
+        percent: checklistPct ?? 0,
+        centerPrimaryOverride:
+            checklistPct != null ? null : '—',
         size: ringSize,
         strokeWidth: stroke,
         onTap: onOpenChecklist,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../reglage/trading_week_scope.dart';
 import '../../l10n/app_localizations.dart';
 import '../mental_state_controller.dart';
 import '../mental_state_date_utils.dart';
@@ -291,10 +292,15 @@ class MentalStateGlobalScoreCalendarSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        MentalStateSleepMiniCalendar(
-          controller: controller,
-          selectedDay: selectedDay,
-          onDayTap: (date) async {
+        ListenableBuilder(
+          listenable: TradingWeekScope.of(context),
+          builder: (context, _) {
+            return MentalStateSleepMiniCalendar(
+              controller: controller,
+              tradingDaysPerWeek:
+                  TradingWeekScope.of(context).tradingDaysPerWeek,
+              selectedDay: selectedDay,
+              onDayTap: (date) async {
             final d = MentalStateDateUtils.dateOnly(date);
             final anchor = MentalStateDateUtils.liveScoreAnchorCalendarDate(
               DateTime.now(),
@@ -307,6 +313,8 @@ class MentalStateGlobalScoreCalendarSection extends StatelessWidget {
             if (onDaySelected != null) {
               onDaySelected!(date);
             }
+          },
+            );
           },
         ),
       ],

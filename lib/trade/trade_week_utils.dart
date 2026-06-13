@@ -15,6 +15,17 @@ DateTime tradeWeekMondayLocal(DateTime dt) {
   return d.subtract(Duration(days: d.weekday - 1));
 }
 
+/// `true` si [day] compte dans la semaine selon le réglage (**5** = lun–ven, **7** = lun–dim).
+bool isTradingWeekdayLocal(
+  DateTime day, {
+  int tradingDaysPerWeek = 7,
+}) {
+  assert(tradingDaysPerWeek == 5 || tradingDaysPerWeek == 7);
+  if (tradingDaysPerWeek == 7) return true;
+  final w = day.weekday;
+  return w >= DateTime.monday && w <= DateTime.friday;
+}
+
 /// Jours de la semaine **actuelle** (lun→…) : **5** (lun–ven) ou **7** (lun–dim), date locale.
 List<DateTime> tradeCurrentWeekDaysLocal({int tradingDaysPerWeek = 7}) {
   assert(tradingDaysPerWeek == 5 || tradingDaysPerWeek == 7);

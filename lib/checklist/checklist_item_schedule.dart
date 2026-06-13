@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../trade/trade_week_utils.dart';
+
 /// Fréquence par défaut d’un élément de checklist.
 enum ChecklistScheduleMode {
   daily,
@@ -77,8 +79,17 @@ class ChecklistItemSchedule {
       DateTime(d.year, d.month, d.day);
 
   /// `true` si ce rappel concerne le jour [on] (défaut : aujourd’hui).
-  static bool isDueOnDay(ChecklistItemSchedule s, [DateTime? on]) {
+  ///
+  /// [tradingDaysPerWeek] : **5** exclut sam–dim pour tous les modes (réglage Réglages).
+  static bool isDueOnDay(
+    ChecklistItemSchedule s, [
+    DateTime? on,
+    int tradingDaysPerWeek = 7,
+  ]) {
     final day = _dateOnly(on ?? DateTime.now());
+    if (!isTradingWeekdayLocal(day, tradingDaysPerWeek: tradingDaysPerWeek)) {
+      return false;
+    }
     switch (s.displayMode) {
       case ChecklistScheduleMode.daily:
         return true;

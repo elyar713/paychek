@@ -17,6 +17,8 @@ import 'checklist_notification_service.dart';
 import '../shared/paychek_demo_graduation_prefs.dart';
 import '../shared/paychek_frame_callbacks.dart';
 import 'checklist_reorder_entries.dart';
+import '../reglage/trading_week_prefs.dart';
+import '../trade/trade_week_utils.dart';
 import 'widgets/checklist_delete_section_dialog.dart';
 
 /// État et actions de [ChecklistPage] (hors arbre de widgets).
@@ -53,6 +55,34 @@ class ChecklistPageController extends ChangeNotifier {
   bool _checklistDemoGraduated = false;
   Map<int, ChecklistDailyDaySnapshot> _snapshotsByDay = {};
 
+  /// **5** (lun–ven) ou **7** (lun–dim) — aligné sur [TradingWeekPrefs].
+  int _tradingDaysPerWeek = 7;
+
+  int get tradingDaysPerWeek => _tradingDaysPerWeek;
+
+  /// Applique le réglage semaine (Réglages ou sync cloud).
+  void applyTradingDaysPerWeek(int days) {
+    if (days != 5 && days != 7) return;
+    if (_tradingDaysPerWeek == days) return;
+    _tradingDaysPerWeek = days;
+    _refreshCompletionPeriods(silent: true);
+    notifyListeners();
+    _snapshotTodayCompletion();
+  }
+
+  bool _isItemDueOnDay(ChecklistItemData item, [DateTime? day]) =>
+      item.isDueOnDay(day, _tradingDaysPerWeek);
+
+  bool _isChecklistActiveOnDay(DateTime day) =>
+      isTradingWeekdayLocal(day, tradingDaysPerWeek: _tradingDaysPerWeek);
+
+  /// À rappeler au premier plan : clôture hier + décoche si nouveau jour.
+  void onAppForegroundForDayRoll() {
+    if (!_hydrated) return;
+    _refreshCompletionPeriods(silent: true);
+    notifyListeners();
+  }
+
   /// Dernier jour calendaire traité (clôture 23:59 → snapshot).
   DateTime? _calendarAnchorDay;
 
@@ -69,7 +99,7 @@ class ChecklistPageController extends ChangeNotifier {
     if (_isHistoricalDay(day)) {
       if (item.isCompletedForCalendarDay(day)) return true;
       // Anciennes coches sans checkedAt (avant clôture journalière).
-      if (item.checked && item.checkedAt == null && item.isDueOnDay(day)) {
+      if (item.checked && item.checkedAt == null && _isItemDueOnDay(item, day)) {
         return true;
       }
       return false;
@@ -81,6 +111,7 @@ class ChecklistPageController extends ChangeNotifier {
   Future<void> hydrateFromStorage() async {
     _checklistDemoGraduated =
         await PaychekDemoGraduationPrefs.isChecklistGraduated();
+    _tradingDaysPerWeek = await TradingWeekPrefs.load();
     final raw = await ChecklistSectionsStorage.load();
     final data = await checklistSectionsAfterGraduationFilter(raw);
     if (data != null && data.isNotEmpty) {
@@ -203,7 +234,7 @@ class ChecklistPageController extends ChangeNotifier {
     for (final s in _sections) {
       if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
-        if (i.isDueOnDay(day)) n++;
+        if (_isItemDueOnDay(i, day)) n++;
       }
     }
     return n;
@@ -215,7 +246,7 @@ class ChecklistPageController extends ChangeNotifier {
     for (final s in _sections) {
       if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
-        if (i.isDueOnDay(on) && _itemDoneOnDay(i, on)) n++;
+        if (_isItemDueOnDay(i, on) && _itemDoneOnDay(i, on)) n++;
       }
     }
     return n;
@@ -225,11 +256,16 @@ class ChecklistPageController extends ChangeNotifier {
 
   int get checkedItemsDueToday => itemsDueOnDayCheckedCount();
 
-  /// Anneau du jour : uniquement les critères concernés aujourd’hui.
-  int get checklistCompletionPercent => completionPercentOnDay(DateTime.now());
+  /// Anneau du jour : uniquement les critères concernés aujourd’hui (jours ouvrés si 5j).
+  int? get checklistCompletionPercent {
+    final today = DateTime.now();
+    if (!_isChecklistActiveOnDay(today)) return null;
+    return completionPercentOnDay(today);
+  }
 
   /// % checklist pour un jour donné (critères dus ce jour-là).
-  int completionPercentOnDay(DateTime day) {
+  int? completionPercentOnDay(DateTime day) {
+    if (!_isChecklistActiveOnDay(day)) return null;
     final total = itemsDueOnDayCount(day);
     if (total == 0) return 100;
     return ((100 * itemsDueOnDayCheckedCount(day)) / total).round().clamp(0, 100);
@@ -261,7 +297,7 @@ class ChecklistPageController extends ChangeNotifier {
     for (final s in _sections) {
       if (!checklistSectionIsActive(s)) continue;
       for (final i in s.items) {
-        if (i.isDueOnDay(day) && !_itemDoneOnDay(i, day)) {
+        if (_isItemDueOnDay(i, day) && !_itemDoneOnDay(i, day)) {
           out.add(
             ChecklistUncheckedDayEntry(
               sectionId: s.id,
@@ -371,6 +407,7 @@ class ChecklistPageController extends ChangeNotifier {
 
   void _writeDaySnapshot(DateTime day) {
     final d = _dateOnly(day);
+    if (!_isChecklistActiveOnDay(d)) return;
     final due = itemsDueOnDayCount(d);
     if (due == 0) return;
     final k = ChecklistDailyCompletionStorage.dayKey(d);
@@ -433,6 +470,7 @@ class ChecklistPageController extends ChangeNotifier {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     if (d.isAfter(today)) return null;
+    if (!_isChecklistActiveOnDay(d)) return null;
 
     final due = itemsDueOnDayCount(d);
     final checked = itemsDueOnDayCheckedCount(d);
@@ -441,7 +479,7 @@ class ChecklistPageController extends ChangeNotifier {
     if (d == today) {
       if (!hasTrades && checked == 0 && due == 0) return null;
       if (checked == 0) return 0;
-      return completionPercentOnDay(d);
+      return completionPercentOnDay(d)!;
     }
 
     final k = ChecklistDailyCompletionStorage.dayKey(d);
@@ -464,6 +502,13 @@ class ChecklistPageController extends ChangeNotifier {
     final k = ChecklistDailyCompletionStorage.dayKey(
       DateTime(now.year, now.month, now.day),
     );
+    if (!_isChecklistActiveOnDay(now)) {
+      if (_snapshotsByDay.containsKey(k)) {
+        _snapshotsByDay.remove(k);
+        unawaited(ChecklistDailyCompletionStorage.save(_snapshotsByDay));
+      }
+      return;
+    }
     final checked = itemsDueOnDayCheckedCount(now);
     final due = itemsDueOnDayCount(now);
     final uncheckedEntries = _uncheckedEntriesForDay(now);
@@ -489,6 +534,7 @@ class ChecklistPageController extends ChangeNotifier {
       return;
     }
     final pct = completionPercentOnDay(now);
+    if (pct == null) return;
     final next = ChecklistDailyDaySnapshot(
       percent: pct,
       uncheckedEntries: uncheckedEntries,

@@ -528,15 +528,22 @@ class MentalStateController extends ChangeNotifier {
   /// À rappeler au premier plan ([AppLifecycleState.resumed]) : replanifie la frontière et rattrape un changement de période.
   void onAppForegroundForCalendar() {
     final key = _currentMentalDayKey();
-    if (_lastForegroundMentalDayKey != null &&
-        _lastForegroundMentalDayKey != key) {
-      // Ne pas réécrire la période passée avec les curseurs du jour courant.
-      _snapshotTodayOverallForCalendar();
-      super.notifyListeners();
-      _schedulePersistCalendar();
+    final prev = _lastForegroundMentalDayKey;
+    if (prev != null && prev != key) {
+      _catchUpMentalPeriodBoundary(prev);
     }
     _lastForegroundMentalDayKey = key;
     _scheduleMidnightCalendarTimer();
+    notifyListeners();
+  }
+
+  /// Clôture une période manquée (app en arrière-plan à la frontière).
+  void _catchUpMentalPeriodBoundary(String endedKey) {
+    if (!_touchedDays.contains(endedKey)) return;
+    _overallScoreByDay[endedKey] =
+        _overallScoreByDay[endedKey] ?? overallScore;
+    _snapshotByDay[endedKey] ??= _daySnapshotForPersist(endedKey);
+    _schedulePersistCalendar();
   }
 
   @override

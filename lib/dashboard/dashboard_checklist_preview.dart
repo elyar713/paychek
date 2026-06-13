@@ -60,12 +60,14 @@ class DashboardChecklistPreview extends StatelessWidget {
   /// Lignes non cochées **du jour** (rappel = aujourd’hui), ordre sections / items.
   static List<_DashboardChecklistPreviewEntry> _orderedUncheckedEntriesToday(
     List<ChecklistSectionData> sections,
+    int tradingDaysPerWeek,
   ) {
     final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
       if (!checklistSectionIsActive(section)) continue;
       for (final item in section.items) {
-        if (!item.checked && item.isDueOnDay()) {
+        if (!item.checked &&
+            item.isDueOnDay(null, tradingDaysPerWeek)) {
           out.add((sectionId: section.id, item: item));
         }
       }
@@ -76,12 +78,14 @@ class DashboardChecklistPreview extends StatelessWidget {
 
   static List<_DashboardChecklistPreviewEntry> _orderedCheckedEntriesToday(
     List<ChecklistSectionData> sections,
+    int tradingDaysPerWeek,
   ) {
     final out = <_DashboardChecklistPreviewEntry>[];
     for (final section in sections) {
       if (!checklistSectionIsActive(section)) continue;
       for (final item in section.items) {
-        if (item.checked && item.isDueOnDay()) {
+        if (item.checked &&
+            item.isDueOnDay(null, tradingDaysPerWeek)) {
           out.add((sectionId: section.id, item: item));
         }
       }
@@ -98,18 +102,20 @@ class DashboardChecklistPreview extends StatelessWidget {
   /// Web : critères du jour — non cochés puis cochés, tri date+heure la plus proche.
   static List<_DashboardChecklistPreviewEntry> _webEntriesTodayUncheckedThenChecked(
     List<ChecklistSectionData> sections,
+    int tradingDaysPerWeek,
   ) {
     return [
-      ..._orderedUncheckedEntriesToday(sections),
-      ..._orderedCheckedEntriesToday(sections),
+      ..._orderedUncheckedEntriesToday(sections, tradingDaysPerWeek),
+      ..._orderedCheckedEntriesToday(sections, tradingDaysPerWeek),
     ];
   }
 
   static List<_DashboardChecklistPreviewEntry> _previewEntriesSlice(
     List<ChecklistSectionData> sections, {
+    required int tradingDaysPerWeek,
     required bool limitPreviewRows,
   }) {
-    final all = _orderedUncheckedEntriesToday(sections);
+    final all = _orderedUncheckedEntriesToday(sections, tradingDaysPerWeek);
     if (!limitPreviewRows) return all;
     if (all.length <= _kDashboardChecklistPreviewMaxUncheckedRowsMobile) return all;
     return all.sublist(0, _kDashboardChecklistPreviewMaxUncheckedRowsMobile);
@@ -122,7 +128,11 @@ class DashboardChecklistPreview extends StatelessWidget {
     required bool liteInteractionLocked,
     required VoidCallback? onLiteInteractionLockedTap,
   }) {
-    final entries = _previewEntriesSlice(sections, limitPreviewRows: true);
+    final entries = _previewEntriesSlice(
+      sections,
+      tradingDaysPerWeek: controller.tradingDaysPerWeek,
+      limitPreviewRows: true,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -163,7 +173,11 @@ class DashboardChecklistPreview extends StatelessWidget {
     required bool liteInteractionLocked,
     required VoidCallback? onLiteInteractionLockedTap,
   }) {
-    final entries = _webEntriesTodayUncheckedThenChecked(sections);
+    final entries =
+        _webEntriesTodayUncheckedThenChecked(
+      sections,
+      controller.tradingDaysPerWeek,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

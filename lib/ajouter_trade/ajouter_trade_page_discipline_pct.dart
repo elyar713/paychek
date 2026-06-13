@@ -17,7 +17,9 @@ extension _AjouterTradeDisciplinePct on _AjouterTradePageState {
 
   int get _checklistRingPercent =>
       widget.checklistController.hasChecklistCheckedOnDay(_tradeEntryDateOnly)
-          ? widget.checklistController.completionPercentOnDay(_tradeEntryDateOnly)
+          ? (widget.checklistController
+                  .completionPercentOnDay(_tradeEntryDateOnly) ??
+              0)
           : 0;
 
   double get _mentalRingScore {

@@ -266,7 +266,11 @@ class ChecklistPageView extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 6, bottom: 20),
                         child: Center(
                           child: ChecklistProgressRing(
-                            percent: c.checklistCompletionPercent,
+                            percent: c.checklistCompletionPercent ?? 0,
+                            centerPrimaryOverride:
+                                c.checklistCompletionPercent != null
+                                    ? null
+                                    : '—',
                             size: _heroRingSize,
                           ),
                         ),

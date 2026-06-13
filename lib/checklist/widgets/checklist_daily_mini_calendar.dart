@@ -5,6 +5,7 @@ import '../../calendrier/calendrier_utils.dart' as cal;
 import '../../l10n/app_localizations.dart';
 import '../../l10n/app_localizations_month.dart';
 import '../../trade/trade_models.dart';
+import '../../trade/trade_week_utils.dart';
 import '../checklist_calendar_day_colors.dart';
 import '../checklist_page_controller.dart';
 
@@ -113,24 +114,35 @@ class _ChecklistDailyMiniCalendarState extends State<ChecklistDailyMiniCalendar>
             final date = DateTime(y, m, day);
             final isFuture = _dateOnly(date).isAfter(today);
             final dayOnly = _dateOnly(date);
+            final tradingDay = isTradingWeekdayLocal(
+              dayOnly,
+              tradingDaysPerWeek: c.tradingDaysPerWeek,
+            );
             cells.add(
               _DayCell(
                 date: date,
                 today: today,
                 isFuture: isFuture,
+                isNonTradingDay: !tradingDay,
                 isSelected: dayOnly == _dateOnly(widget.selectedDay),
-                pct: c.completionPercentForCalendarDay(
-                  date,
-                  tradeCount: tradeCountByDay[cal.dayKey(date)] ?? 0,
-                ),
-                dayStyle: checklistCalendarDayStyle(
-                  date: date,
-                  pnlByDay: pnlByDay,
-                  tradeCountByDay: tradeCountByDay,
-                  hasChecklistChecked: c.hasChecklistCheckedOnDay(date),
-                  isFuture: isFuture,
-                ),
-                onTap: isFuture ? null : () => widget.onDaySelected(date),
+                pct: tradingDay
+                    ? c.completionPercentForCalendarDay(
+                        date,
+                        tradeCount: tradeCountByDay[cal.dayKey(date)] ?? 0,
+                      )
+                    : null,
+                dayStyle: tradingDay
+                    ? checklistCalendarDayStyle(
+                        date: date,
+                        pnlByDay: pnlByDay,
+                        tradeCountByDay: tradeCountByDay,
+                        hasChecklistChecked: c.hasChecklistCheckedOnDay(date),
+                        isFuture: isFuture,
+                      )
+                    : ChecklistCalendarDayStyle.inactive(isFuture: isFuture),
+                onTap: isFuture || !tradingDay
+                    ? null
+                    : () => widget.onDaySelected(date),
               ),
             );
           }
@@ -221,6 +233,7 @@ class _DayCell extends StatelessWidget {
     required this.date,
     required this.today,
     required this.isFuture,
+    this.isNonTradingDay = false,
     required this.isSelected,
     required this.pct,
     required this.dayStyle,
@@ -230,6 +243,7 @@ class _DayCell extends StatelessWidget {
   final DateTime date;
   final DateTime today;
   final bool isFuture;
+  final bool isNonTradingDay;
   final bool isSelected;
   final int? pct;
   final ChecklistCalendarDayStyle dayStyle;
@@ -251,8 +265,10 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = DateTime(date.year, date.month, date.day);
     final isToday = _sameDate(d, today);
-    final showPct = !isFuture && pct != null;
-    final labelColor = dayStyle.labelColor;
+    final showPct = !isFuture && !isNonTradingDay && pct != null;
+    final labelColor = isNonTradingDay
+        ? const Color(0xFF3A3A3A)
+        : dayStyle.labelColor;
 
     final borderWidth = isSelected ? 1.25 : (isToday ? 1.1 : 0.85);
 

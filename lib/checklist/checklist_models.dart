@@ -48,10 +48,11 @@ class ChecklistItemData {
   }
 
   /// Rappel actif pour [day] (défaut : aujourd’hui).
-  bool isDueOnDay([DateTime? day]) =>
+  bool isDueOnDay([DateTime? day, int tradingDaysPerWeek = 7]) =>
       ChecklistItemSchedule.isDueOnDay(
         ChecklistItemSchedule.effectiveSchedule(schedule),
         day,
+        tradingDaysPerWeek,
       );
 }
 

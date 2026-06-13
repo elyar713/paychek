@@ -44,7 +44,7 @@ int _checklistPctForEntryDay(DateTime entryAt) {
   if (c == null || !c.hasChecklistCheckedOnDay(tradeEntryDateOnly(entryAt))) {
     return 0;
   }
-  return c.completionPercentOnDay(tradeEntryDateOnly(entryAt));
+  return c.completionPercentOnDay(tradeEntryDateOnly(entryAt)) ?? 0;
 }
 
 int _etatPctForEntryDay(DateTime entryAt) {

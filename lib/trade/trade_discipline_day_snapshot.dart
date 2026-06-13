@@ -61,7 +61,7 @@ TradeDisciplineDaySnapshot resolveTradeDisciplineForEntryDay({
         tradeCount: 1,
       ) ??
       checklist.completionPercentOnDay(day);
-  final checklistPct = checklistRaw.toDouble().clamp(0.0, 100.0);
+  final checklistPct = (checklistRaw ?? 0).toDouble().clamp(0.0, 100.0);
 
   final mental = MentalStateController.instance;
   final historical = mental.overallScoreForCalendarDay(day);
