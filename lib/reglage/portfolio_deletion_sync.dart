@@ -20,19 +20,21 @@ abstract final class PortfolioDeletionSync {
     final portfolio = UserPortfolioScope.of(context);
     if (!portfolio.canRemovePortfolio(portfolioId)) return false;
 
-    return TradeJournalFirestoreSync.runWithRemoteApplySuppressed(() async {
-      final journal = TradeJournalScope.of(context);
-      final capital = UserCapitalScope.of(context);
+    return CapitalPortfolioFirestoreSync.runWithRemoteApplySuppressed(() async {
+      return TradeJournalFirestoreSync.runWithRemoteApplySuppressed(() async {
+        final journal = TradeJournalScope.of(context);
+        final capital = UserCapitalScope.of(context);
 
-      journal.removeAllForPortfolio(portfolioId);
-      final journalItems = List<TradeListItem>.from(journal.items);
-      await TradeJournalStorage.save(journalItems);
-      await TradeJournalFirestoreSync.pushIfSignedIn(journalItems);
+        journal.removeAllForPortfolio(portfolioId);
+        final journalItems = List<TradeListItem>.from(journal.items);
+        await TradeJournalStorage.save(journalItems);
+        await TradeJournalFirestoreSync.pushIfSignedIn(journalItems);
 
-      await portfolio.remove(portfolioId);
-      await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, portfolio);
+        await portfolio.remove(portfolioId);
+        await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, portfolio);
 
-      return true;
+        return true;
+      });
     });
   }
 }

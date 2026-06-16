@@ -6,6 +6,7 @@ import '../dashboard/dashboard_tokens.dart';
 import '../l10n/app_localizations.dart';
 import '../questionnaire/trading_currency.dart';
 import '../questionnaire/user_capital_scope.dart';
+import 'capital_portfolio_firestore_sync.dart';
 import 'reglage_portfolio_editor_widgets.dart';
 import 'user_portfolio_models.dart';
 import 'user_portfolio_store.dart';
@@ -157,11 +158,11 @@ class _ReglageSinglePortfolioEditorSheetState
     }
     setState(() => _error = null);
 
+    final capital = UserCapitalScope.of(context);
     final id = widget.existing?.id ?? '${DateTime.now().microsecondsSinceEpoch}';
     final isDefault = id == kDefaultPortfolioId;
 
     if (isDefault) {
-      final capital = UserCapitalScope.of(context);
       try {
         if (_useCustom) {
           await capital.setCapitalCustom(
@@ -176,6 +177,7 @@ class _ReglageSinglePortfolioEditorSheetState
           );
         }
         await widget.store.syncDefaultFromCapital(capital, displayName: name);
+        await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, widget.store);
       } on ArgumentError {
         setState(() => _error = l.errorInvalidAmount);
         return;
@@ -190,6 +192,7 @@ class _ReglageSinglePortfolioEditorSheetState
         customCurrencySymbol: _useCustom ? _customSymbol : '',
       );
       await widget.store.upsert(p);
+      await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, widget.store);
     }
     if (mounted) Navigator.of(context).pop();
   }

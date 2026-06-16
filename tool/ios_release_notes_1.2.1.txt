@@ -14,6 +14,6 @@
 
 --- Notes internes (build) ---
 Version affichée : 1.2.1
-Build number : 42
+Build number : 61
 Bundle ID : pro.paychek.app
 Commande Mac : ./tool/build_ios_release.sh

@@ -95,6 +95,33 @@ extension _AjouterTradePageStatePsych on _AjouterTradePageState {
       ),
     );
     if (!mounted || source == null) return;
+
+    if (source == ImageSource.gallery &&
+        defaultTargetPlatform == TargetPlatform.android) {
+      try {
+        final picked = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: false,
+        );
+        if (!mounted || picked == null || picked.files.isEmpty) return;
+        final f = picked.files.first;
+        if (f.path != null && f.path!.isNotEmpty) {
+          setState(() {
+            _tradeScreenshot = XFile(f.path!);
+            _tradeScreenshotBytes = null;
+          });
+          return;
+        }
+        final bytes = f.bytes;
+        if (bytes == null || bytes.isEmpty) return;
+        setState(() {
+          _tradeScreenshotBytes = bytes;
+          _tradeScreenshot = null;
+        });
+      } catch (_) {}
+      return;
+    }
+
     final picker = ImagePicker();
     final image = await picker.pickImage(
       source: source,

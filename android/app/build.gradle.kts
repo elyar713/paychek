@@ -104,6 +104,35 @@ flutter {
 // Sinon findByName renvoie null → aucune vérif. → AAB encore signé debug → erreur rouge Play Console.
 afterEvaluate {
     val app = extensions.getByType(AppExtension::class.java)
+
+    // Garde-fou Play Console : refuser une release si READ_MEDIA_* réapparaît via un plugin.
+    tasks.matching { it.name == "processReleaseMainManifest" }.configureEach {
+        doLast {
+            val buildDir = layout.buildDirectory.get().asFile
+            val candidates = listOf(
+                buildDir.resolve("intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"),
+                buildDir.resolve("intermediates/merged_manifest/release/processReleaseMainManifest/AndroidManifest.xml"),
+            )
+            val manifestFile = candidates.firstOrNull { it.isFile }
+                ?: return@doLast
+            val text = manifestFile.readText(Charsets.UTF_8)
+            val forbidden = listOf(
+                "READ_MEDIA_IMAGES",
+                "READ_MEDIA_VIDEO",
+                "READ_MEDIA_AUDIO",
+                "READ_EXTERNAL_STORAGE",
+                "WRITE_EXTERNAL_STORAGE",
+            )
+            val found = forbidden.filter { text.contains(it) }
+            if (found.isNotEmpty()) {
+                throw GradleException(
+                    "Politique Google Play photos/vidéos : permissions interdites dans le manifest fusionné : $found. " +
+                        "Vérifiez android/app/src/main/AndroidManifest.xml (tools:node=\"remove\").",
+                )
+            }
+        }
+    }
+
     listOf("bundleRelease", "assembleRelease").forEach { taskName ->
         tasks.findByName(taskName)?.doFirst {
             if (!keystorePropertiesFile.isFile) {

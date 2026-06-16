@@ -20,6 +20,20 @@ abstract final class CapitalPortfolioFirestoreSync {
   static const _kBundleRev = 'capital_portfolio_bundle_rev_v1';
 
   static int _suppressPush = 0;
+  static int _suppressRemoteApply = 0;
+
+  /// Pendant suppression / écriture portefeuille : ignore les snapshots cloud
+  /// qui réinjecteraient un portefeuille supprimé localement.
+  static Future<T> runWithRemoteApplySuppressed<T>(
+    Future<T> Function() action,
+  ) async {
+    _suppressRemoteApply++;
+    try {
+      return await action();
+    } finally {
+      _suppressRemoteApply--;
+    }
+  }
 
   /// Bloque les [pushIfSignedIn] pendant un rechargement de compte (évite d’écraser
   /// le cloud avec un capital vide entre `load()` et `mergeFromCloud()`).
@@ -82,26 +96,10 @@ abstract final class CapitalPortfolioFirestoreSync {
         return;
       }
       if (cloudRev < localRev) {
-        await PaychekFirestorePushGuard.adoptCloudWhenLocalRevAhead(
-          localRev: localRev,
-          cloudRev: cloudRev,
-          label: 'CapitalPortfolioFirestoreSync',
-          applyCloud: () async {
-            final capRaw = data['capital'];
-            final capMap =
-                capRaw is Map ? Map<String, dynamic>.from(capRaw) : null;
-            await capital.applyFromFirestoreSnapshot(capMap);
-            final rawList = data['portfolios'];
-            final list = rawList is List ? rawList : <dynamic>[];
-            final activeId = data['activePortfolioId'] as String?;
-            await portfolio.applyFromFirestoreSnapshot(
-              capital,
-              list,
-              activeId,
-            );
-          },
-          writeLocalRev: _writeLocalRev,
-        );
+        // Local plus récent (ex. suppression portefeuille) → pousser, ne pas
+        // réadopter un cloud obsolète qui contiendrait encore l’ancien portfolio.
+        await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+        return;
       }
     } catch (e, st) {
       debugPrint('[Paychek] CapitalPortfolioFirestoreSync.merge: $e\n$st');
@@ -116,6 +114,7 @@ abstract final class CapitalPortfolioFirestoreSync {
     UserCapitalStore capital,
     UserPortfolioStore portfolio,
   ) async {
+    if (_suppressRemoteApply > 0) return;
     final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
     if (cloudRev <= 0) return;
     _suppressPush++;
