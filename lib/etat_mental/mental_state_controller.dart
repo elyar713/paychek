@@ -477,9 +477,20 @@ class MentalStateController extends ChangeNotifier {
     _persistCalendarDebounce?.cancel();
     _persistCalendarDebounce = Timer(const Duration(milliseconds: 500), () {
       _persistCalendarDebounce = null;
-      _persistOverallScoresByDay();
-      MentalStateStorage.saveBundleMap(toCloudBundle());
+      unawaited(_persistCalendarAndBundleNow());
     });
+  }
+
+  /// Écrit tout de suite prefs + bundle (suppression d’une routine, etc.).
+  Future<void> persistNow() async {
+    _persistCalendarDebounce?.cancel();
+    _persistCalendarDebounce = null;
+    await _persistCalendarAndBundleNow();
+  }
+
+  Future<void> _persistCalendarAndBundleNow() async {
+    await _persistOverallScoresByDay();
+    await MentalStateStorage.saveBundleMap(toCloudBundle());
   }
 
   /// Annule le timer de frontière jour (tests widget sans attendre minuit).
@@ -569,6 +580,7 @@ class MentalStateController extends ChangeNotifier {
   void clearAllFactors() {
     factors.clear();
     touch();
+    unawaited(persistNow());
   }
 
   Future<void> loadSharePreferences() async {
@@ -730,7 +742,7 @@ class MentalStateController extends ChangeNotifier {
         final m = MentalStateStorage.decodeMetric(e);
         if (m != null) out.add(m);
       }
-      if (out.isNotEmpty) factors = out;
+      factors = out;
     }
     final rawM = bundle['moment'];
     if (rawM is List) {
@@ -739,7 +751,7 @@ class MentalStateController extends ChangeNotifier {
         final m = MentalStateStorage.decodeMetric(e);
         if (m != null) out.add(m);
       }
-      if (out.isNotEmpty) moment = out;
+      moment = out;
     }
     final rawE = bundle['emotions'];
     if (rawE is List) {
@@ -748,7 +760,7 @@ class MentalStateController extends ChangeNotifier {
         final x = MentalStateStorage.decodeEmotion(e);
         if (x != null) out.add(x);
       }
-      if (out.isNotEmpty) emotions = out;
+      emotions = out;
     }
 
     // Nettoyage : retirer des sélections les ids absents.

@@ -48,6 +48,35 @@ class _PaychekUsersTableScrollBodyState
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final compact = constraints.maxWidth < AdminLayout.compactBreakpoint;
+        if (compact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+                  itemCount: widget.users.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (ctx, index) {
+                    final u = widget.users[index];
+                    return _ExpandableUserRow(
+                      key: ValueKey<String>(u.id),
+                      u: u,
+                      df: widget.df,
+                      scaffoldContext: widget.scaffoldContext,
+                      lnLabel: _namePart(u.lastName),
+                      fnLabel: _namePart(u.firstName),
+                      compact: true,
+                    );
+                  },
+                ),
+              ),
+              widget.paginationFooter,
+            ],
+          );
+        }
+
         final needHScroll = constraints.maxWidth < _rowMinWidth;
         final tableW =
             needHScroll ? _rowMinWidth : constraints.maxWidth;
@@ -390,6 +419,140 @@ class _ModernUserCollapsedCells extends StatelessWidget {
   }
 }
 
+class _MobileUserCollapsedCells extends StatelessWidget {
+  const _MobileUserCollapsedCells({
+    required this.u,
+    required this.fnLabel,
+    required this.lnLabel,
+    required this.trailing,
+  });
+
+  final AdminUserRow u;
+  final String fnLabel;
+  final String lnLabel;
+  final Widget trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final bodyName = GoogleFonts.plusJakartaSans(
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+      color: Colors.white.withValues(alpha: 0.95),
+    );
+    final bodySmall = GoogleFonts.plusJakartaSans(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: _UsersUi.dim,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _UsersUi.inputBg,
+                  border: Border.all(
+                    color: _UsersUi.border.withValues(alpha: 0.9),
+                  ),
+                ),
+                child: Text(
+                  u.subscriptionTier.adminChipLabel,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: u.subscriptionTier == PaychekSubscriptionTier.pro
+                        ? const Color(0xFF34D399)
+                        : const Color(0xFF60A5FA),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              _UserEngagementDot(u: u),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$fnLabel $lnLabel'.trim(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: bodyName,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      u.email,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              trailing,
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _metaChip(
+                Icons.translate_rounded,
+                _adminPreferredLanguageDisplay(u.appLanguageCode),
+              ),
+              _metaChip(
+                Icons.calendar_today_outlined,
+                DateFormat('dd/MM/yyyy', 'fr_FR').format(
+                  paychekAdminDisplayDueDateUtc(u).toLocal(),
+                ),
+              ),
+              Text(
+                paychekAdminTrialDaysRemainingShort(u),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color:
+                      u.hasPaidPlan ? const Color(0xFF34D399) : _UsersUi.dim,
+                ),
+              ),
+              _ModernPaymentCell(raw: u.paymentMethod),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _metaChip(IconData icon, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: _UsersUi.dim),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Colors.white.withValues(alpha: 0.85),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ExpandableUserRow extends StatefulWidget {
   const _ExpandableUserRow({
     super.key,
@@ -398,6 +561,7 @@ class _ExpandableUserRow extends StatefulWidget {
     required this.scaffoldContext,
     required this.fnLabel,
     required this.lnLabel,
+    this.compact = false,
   });
 
   final AdminUserRow u;
@@ -405,6 +569,7 @@ class _ExpandableUserRow extends StatefulWidget {
   final BuildContext scaffoldContext;
   final String fnLabel;
   final String lnLabel;
+  final bool compact;
 
   @override
   State<_ExpandableUserRow> createState() => _ExpandableUserRowState();
@@ -445,7 +610,27 @@ class _ExpandableUserRowState extends State<_ExpandableUserRow>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final collapsed = widget.compact
+        ? _MobileUserCollapsedCells(
+            u: widget.u,
+            fnLabel: widget.fnLabel,
+            lnLabel: widget.lnLabel,
+            trailing: RotationTransition(
+              turns: _chevronCtrl,
+              child: Icon(Icons.expand_more, color: _UsersUi.dim),
+            ),
+          )
+        : _ModernUserCollapsedCells(
+            u: widget.u,
+            fnLabel: widget.fnLabel,
+            lnLabel: widget.lnLabel,
+            trailing: RotationTransition(
+              turns: _chevronCtrl,
+              child: Icon(Icons.expand_more, color: _UsersUi.dim),
+            ),
+          );
+
+    final shell = Material(
       color: Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -456,18 +641,21 @@ class _ExpandableUserRowState extends State<_ExpandableUserRow>
             hoverColor: Colors.white.withValues(alpha: 0.035),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              color: _expanded
-                  ? _UsersUi.inputBg.withValues(alpha: 0.55)
-                  : Colors.transparent,
-              child: _ModernUserCollapsedCells(
-                u: widget.u,
-                fnLabel: widget.fnLabel,
-                lnLabel: widget.lnLabel,
-                trailing: RotationTransition(
-                  turns: _chevronCtrl,
-                  child: Icon(Icons.expand_more, color: _UsersUi.dim),
-                ),
+              decoration: BoxDecoration(
+                color: _expanded
+                    ? _UsersUi.inputBg.withValues(alpha: 0.55)
+                    : (widget.compact
+                        ? _UsersUi.inputBg.withValues(alpha: 0.35)
+                        : Colors.transparent),
+                borderRadius:
+                    widget.compact ? BorderRadius.circular(12) : null,
+                border: widget.compact
+                    ? Border.all(
+                        color: _UsersUi.border.withValues(alpha: 0.55),
+                      )
+                    : null,
               ),
+              child: collapsed,
             ),
           ),
           AnimatedSize(
@@ -486,6 +674,8 @@ class _ExpandableUserRowState extends State<_ExpandableUserRow>
         ],
       ),
     );
+
+    return shell;
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'paychek_prefs_scope.dart';
+import 'capital_portfolio_local_rev.dart';
 import '../questionnaire/trading_currency.dart';
 import '../questionnaire/user_capital_store.dart';
 import 'user_portfolio_models.dart';
@@ -224,6 +225,7 @@ class UserPortfolioStore extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
+    await CapitalPortfolioLocalRev.bump();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
       _prefsKey,

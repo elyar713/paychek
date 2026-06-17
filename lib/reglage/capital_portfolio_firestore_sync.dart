@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../questionnaire/user_capital_store.dart';
+import 'capital_portfolio_local_rev.dart';
 import 'paychek_firestore_push_guard.dart';
-import 'paychek_prefs_scope.dart';
 import 'paychek_user_firestore.dart';
+import 'user_portfolio_models.dart';
 import 'user_portfolio_store.dart';
 
 /// Sync cloud du capital + liste de portefeuilles (web + mobile, même compte).
@@ -17,7 +19,6 @@ abstract final class CapitalPortfolioFirestoreSync {
   CapitalPortfolioFirestoreSync._();
 
   static const _docId = 'capital_portfolio_v1';
-  static const _kBundleRev = 'capital_portfolio_bundle_rev_v1';
 
   static int _suppressPush = 0;
   static int _suppressRemoteApply = 0;
@@ -40,7 +41,8 @@ abstract final class CapitalPortfolioFirestoreSync {
   static Future<T> runWithPushSuppressed<T>(Future<T> Function() action) async =>
       PaychekFirestorePushGuard.runSuppressed(action);
 
-  static String _revPrefsKey() => paychekScopedPrefsKey(_kBundleRev);
+  /// À appeler dès qu’on persiste capital ou portefeuilles en local.
+  static Future<void> bumpLocalRevision() => CapitalPortfolioLocalRev.bump();
 
   static DocumentReference<Map<String, dynamic>> _doc(User u) =>
       FirebaseFirestore.instance
@@ -49,14 +51,44 @@ abstract final class CapitalPortfolioFirestoreSync {
           .collection('sync_data')
           .doc(_docId);
 
-  static Future<int> _readLocalRev() async {
-    final p = await SharedPreferences.getInstance();
-    return p.getInt(_revPrefsKey()) ?? 0;
+  static Future<int> _readLocalRev() => CapitalPortfolioLocalRev.read();
+
+  static Future<void> _writeLocalRev(int rev) =>
+      CapitalPortfolioLocalRev.write(rev);
+
+  static List<Map<String, dynamic>> _normalizedPortfolioMaps(List<dynamic> raw) {
+    final out = <Map<String, dynamic>>[];
+    for (final e in raw) {
+      if (e is! Map) continue;
+      try {
+        out.add(UserPortfolio.fromJson(Map<String, dynamic>.from(e)).toJson());
+      } catch (_) {}
+    }
+    out.sort((a, b) => '${a['id']}'.compareTo('${b['id']}'));
+    return out;
   }
 
-  static Future<void> _writeLocalRev(int rev) async {
-    final p = await SharedPreferences.getInstance();
-    await p.setInt(_revPrefsKey(), rev);
+  static bool _snapshotMatchesLocal(
+    Map<String, dynamic> data,
+    UserPortfolioStore portfolio,
+  ) {
+    final rawList = data['portfolios'];
+    final list = rawList is List ? rawList : <dynamic>[];
+    final cloudMaps = _normalizedPortfolioMaps(list);
+    final localMaps = portfolio.items.map((e) => e.toJson()).toList()
+      ..sort((a, b) => '${a['id']}'.compareTo('${b['id']}'));
+    if (jsonEncode(cloudMaps) != jsonEncode(localMaps)) return false;
+    final activeId = data['activePortfolioId'] as String?;
+    return activeId == portfolio.activePortfolioId;
+  }
+
+  static Future<void> _pushLocalIfSignedIn(
+    UserCapitalStore capital,
+    UserPortfolioStore portfolio,
+  ) async {
+    final u = FirebaseAuth.instance.currentUser;
+    if (u == null) return;
+    await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
   }
 
   /// Fusionne le cloud dans [capital] / [portfolio] si le doc est plus récent.
@@ -101,6 +133,9 @@ abstract final class CapitalPortfolioFirestoreSync {
         await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
         return;
       }
+      if (!_snapshotMatchesLocal(data, portfolio)) {
+        await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+      }
     } catch (e, st) {
       debugPrint('[Paychek] CapitalPortfolioFirestoreSync.merge: $e\n$st');
     } finally {
@@ -120,7 +155,12 @@ abstract final class CapitalPortfolioFirestoreSync {
     _suppressPush++;
     try {
       final localRev = await _readLocalRev();
-      if (cloudRev <= localRev) return;
+      if (cloudRev < localRev) return;
+      if (cloudRev == localRev) {
+        if (_snapshotMatchesLocal(data, portfolio)) return;
+        await _pushLocalIfSignedIn(capital, portfolio);
+        return;
+      }
       final capRaw = data['capital'];
       final capMap = capRaw is Map ? Map<String, dynamic>.from(capRaw) : null;
       await capital.applyFromFirestoreSnapshot(capMap);

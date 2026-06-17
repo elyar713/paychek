@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -124,6 +126,7 @@ class MentalStateMomentSection extends StatelessWidget {
                         c.equalizeMomentWeights();
                       }
                       c.touch();
+                      unawaited(c.persistNow());
                     },
                     onWeight: () async {
                       final wSnap = List<double>.from(c.moment.map((m) => m.weight));

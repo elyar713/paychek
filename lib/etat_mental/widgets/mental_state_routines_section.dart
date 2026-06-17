@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -89,6 +91,7 @@ class MentalStateRoutinesSection extends StatelessWidget {
                   c.equalizeFactorWeights();
                 }
                 c.touch();
+                unawaited(c.persistNow());
               },
               onWeight: () async {
                 final wSnap = List<double>.from(c.factors.map((f) => f.weight));

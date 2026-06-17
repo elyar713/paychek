@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import '../reglage/capital_portfolio_local_rev.dart';
 import 'trading_currency.dart';
 
 /// Capital saisi : montant + devise — source unique pour l’app.
@@ -120,6 +121,7 @@ class UserCapitalStore extends ChangeNotifier {
     await prefs.remove(_prefsKeyCustomName);
     await prefs.remove(_prefsKeyCustomSymbol);
     await prefs.remove(_legacyKeyEuros);
+    await CapitalPortfolioLocalRev.bump();
     notifyListeners();
   }
 
@@ -149,6 +151,7 @@ class UserCapitalStore extends ChangeNotifier {
     await prefs.setString(_prefsKeyCustomName, resolvedName);
     await prefs.setString(_prefsKeyCustomSymbol, resolvedSymbol);
     await prefs.remove(_legacyKeyEuros);
+    await CapitalPortfolioLocalRev.bump();
     notifyListeners();
   }
 

@@ -22,6 +22,7 @@ import 'admin_stripe_refund.dart';
 import 'admin_subscription_trace.dart';
 import 'admin_user_billing_summary.dart';
 import 'admin_support_ticket_detail_page.dart';
+import 'admin_layout.dart';
 import 'admin_theme.dart';
 import 'admin_user_engagement.dart';
 
@@ -314,7 +315,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                          padding: AdminLayout.pagePadding(context),
                           child: _FirestoreError(message: '${snap.error}'),
                         ),
                       ),
@@ -406,7 +407,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       _AdminUsersIntegratedShellHeader(statsBody: statsStrip),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                          padding: AdminLayout.pagePadding(context),
                           child: Center(
                             child: Padding(
                               padding: const EdgeInsets.all(24),
@@ -445,7 +446,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     _AdminUsersIntegratedShellHeader(statsBody: statsStrip),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                        padding: AdminLayout.pagePadding(context),
                         child: Container(
                           decoration: BoxDecoration(
                             color: _UsersUi.panel,

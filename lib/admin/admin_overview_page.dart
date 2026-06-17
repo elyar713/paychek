@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import 'admin_layout.dart';
 import 'admin_models.dart';
 import 'admin_overview_data.dart';
 import 'admin_overview_payment_glyphs.dart';
@@ -170,9 +171,10 @@ class _AdminOverviewPageState extends State<AdminOverviewPage>
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1400),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 28,
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              AdminLayout.isMobile(context) ? 14 : 24,
+                          vertical: AdminLayout.isMobile(context) ? 16 : 28,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -464,12 +466,13 @@ class _OverviewHeader extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, c) {
           final narrow = c.maxWidth < 560;
+          final shellMobile = AdminLayout.isMobile(context);
           final title = Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
                 Icons.grid_view_rounded,
-                size: 26,
+                size: shellMobile ? 22 : 26,
                 color: _OverviewUi.blue,
               ),
               const SizedBox(width: 10),
@@ -477,7 +480,7 @@ class _OverviewHeader extends StatelessWidget {
                 child: Text(
                   'Dashboard',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 28,
+                    fontSize: shellMobile ? 22 : 28,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                     letterSpacing: -0.5,
@@ -519,6 +522,14 @@ class _OverviewHeader extends StatelessWidget {
               ],
             ),
           );
+          if (shellMobile) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                meta,
+              ],
+            );
+          }
           if (narrow) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,

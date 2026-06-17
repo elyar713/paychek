@@ -12,6 +12,7 @@ import 'admin_profile_page.dart';
 import 'admin_superadmin_gate.dart';
 import 'admin_support_page.dart';
 import 'admin_team_page.dart';
+import 'admin_layout.dart';
 import 'admin_theme.dart';
 import 'admin_users_page.dart';
 
@@ -75,6 +76,69 @@ class AdminShell extends StatefulWidget {
 
 class _AdminShellState extends State<AdminShell> {
   int _index = 0;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void _selectTab(int i, BuildContext context) {
+    setState(() => _index = i);
+    if (AdminLayout.isMobile(context)) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Widget _pageChrome(BuildContext context, _PaychekShellTab current) {
+    final embedPageTitleBar =
+        current.page is AdminUsersPage || current.page is AdminOverviewPage;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AdminTheme.cardElevated.withValues(alpha: 0.35),
+            AdminTheme.bg,
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (!embedPageTitleBar && !AdminLayout.isMobile(context))
+            Container(
+              padding: AdminLayout.shellHeaderPadding(context),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: AdminTheme.border.withValues(alpha: 0.65),
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    current.title,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 26,
+                          letterSpacing: -0.4,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          Expanded(child: current.page),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,73 +164,64 @@ class _AdminShellState extends State<AdminShell> {
 
         final safeIdx = _index.clamp(0, n - 1).toInt();
         final current = tabs[safeIdx];
-        final embedPageTitleBar =
-            current.page is AdminUsersPage || current.page is AdminOverviewPage;
+        final mobile = AdminLayout.isMobile(context);
+
+        final nav = _SidebarNav(
+          tabs: tabs,
+          selectedIndex: safeIdx,
+          onSelect: (i) => _selectTab(i, context),
+          onLogout: _onLogout,
+        );
+
+        if (mobile) {
+          return Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: AdminTheme.bg,
+            drawer: Drawer(
+              backgroundColor: AdminTheme.sidebarBg,
+              width: 300,
+              child: SafeArea(child: nav),
+            ),
+            appBar: AppBar(
+              leading: IconButton(
+                tooltip: 'Menu',
+                icon: const Icon(Icons.menu_rounded),
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+              title: Text(
+                current.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  tooltip: 'Profil administrateur',
+                  icon: const Icon(Icons.person_outline_rounded),
+                  onPressed: () {
+                    Navigator.of(context).push<void>(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const AdminProfilePage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            body: _pageChrome(context, current),
+          );
+        }
 
         return Scaffold(
           body: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Sidebar(
-                tabs: tabs,
-                selectedIndex: safeIdx,
-                onSelect: (i) => setState(() => _index = i),
-                onLogout: _onLogout,
+              SizedBox(
+                width: AdminLayout.sidebarWidth,
+                child: nav,
               ),
-              Expanded(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AdminTheme.cardElevated.withValues(alpha: 0.35),
-                        AdminTheme.bg,
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (!embedPageTitleBar)
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(28, 22, 28, 18),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: AdminTheme.border.withValues(alpha: 0.65),
-                              ),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 18,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                current.title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 26,
-                                      letterSpacing: -0.4,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      Expanded(child: current.page),
-                    ],
-                  ),
-                ),
-              ),
+              Expanded(child: _pageChrome(context, current)),
             ],
           ),
         );
@@ -179,8 +234,8 @@ class _AdminShellState extends State<AdminShell> {
   }
 }
 
-class _Sidebar extends StatelessWidget {
-  const _Sidebar({
+class _SidebarNav extends StatelessWidget {
+  const _SidebarNav({
     required this.tabs,
     required this.selectedIndex,
     required this.onSelect,
@@ -194,7 +249,6 @@ class _Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const w = 260.0;
     return Material(
       color: AdminTheme.sidebarBg,
       child: Container(
@@ -205,8 +259,6 @@ class _Sidebar extends StatelessWidget {
             ),
           ),
         ),
-        child: SizedBox(
-        width: w,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -346,7 +398,6 @@ class _Sidebar extends StatelessWidget {
           ],
         ),
       ),
-    ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../reglage/paychek_support_ticket_submit.dart';
+import 'admin_layout.dart';
 import 'admin_support_inbox_quick_reply.dart';
 import 'admin_support_ticket_detail_page.dart';
 import 'admin_theme.dart';
@@ -375,8 +376,10 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final innerW = constraints.maxWidth;
-                        final stacked = innerW < 840;
+                        final mobileInbox =
+                            innerW < AdminLayout.compactBreakpoint;
                         const leftFixed = 380.0;
+                        final stacked = !mobileInbox && innerW < 840;
                         final leftW = stacked
                             ? innerW
                             : leftFixed.clamp(260.0, innerW * 0.42);
@@ -400,30 +403,69 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                           borderColor: headerBorder,
                         );
 
-                        final body = stacked
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(flex: 11, child: left),
-                                  const SizedBox(height: 12),
-                                  Expanded(flex: 14, child: right),
-                                ],
-                              )
-                            : Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  SizedBox(width: leftW, child: left),
-                                  VerticalDivider(
-                                    width: 1,
-                                    thickness: 1,
-                                    color: headerBorder,
+                        Widget body;
+                        if (mobileInbox) {
+                          if (effectiveId != null && selectedDoc != null) {
+                            body = Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Material(
+                                  color: AdminTheme.supportPanel,
+                                  child: ListTile(
+                                    dense: true,
+                                    leading: IconButton(
+                                      tooltip: 'Retour à la liste',
+                                      icon: const Icon(Icons.arrow_back_rounded),
+                                      onPressed: () => setState(
+                                        () => _selectedTicketId = null,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      'Ticket',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(fontWeight: FontWeight.w800),
+                                    ),
                                   ),
-                                  Expanded(child: right),
-                                ],
-                              );
+                                ),
+                                Expanded(child: right),
+                              ],
+                            );
+                          } else {
+                            body = left;
+                          }
+                        } else if (stacked) {
+                          body = Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(flex: 11, child: left),
+                              const SizedBox(height: 12),
+                              Expanded(flex: 14, child: right),
+                            ],
+                          );
+                        } else {
+                          body = Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(width: leftW, child: left),
+                              VerticalDivider(
+                                width: 1,
+                                thickness: 1,
+                                color: headerBorder,
+                              ),
+                              Expanded(child: right),
+                            ],
+                          );
+                        }
 
                         return Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          padding: EdgeInsets.fromLTRB(
+                            mobileInbox ? 0 : 16,
+                            0,
+                            mobileInbox ? 0 : 16,
+                            mobileInbox ? 0 : 16,
+                          ),
                           child: body,
                         );
                       },

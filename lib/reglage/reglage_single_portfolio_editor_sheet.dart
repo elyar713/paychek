@@ -161,40 +161,48 @@ class _ReglageSinglePortfolioEditorSheetState
     final capital = UserCapitalScope.of(context);
     final id = widget.existing?.id ?? '${DateTime.now().microsecondsSinceEpoch}';
     final isDefault = id == kDefaultPortfolioId;
+    var saveFailed = false;
 
-    if (isDefault) {
-      try {
-        if (_useCustom) {
-          await capital.setCapitalCustom(
-            amount: value,
-            name: _customName,
-            symbol: _customSymbol,
+    await CapitalPortfolioFirestoreSync.runWithRemoteApplySuppressed(() async {
+      if (isDefault) {
+        try {
+          if (_useCustom) {
+            await capital.setCapitalCustom(
+              amount: value,
+              name: _customName,
+              symbol: _customSymbol,
+            );
+          } else {
+            await capital.setCapital(
+              amount: value,
+              currencyCode: _currency.code,
+            );
+          }
+          await widget.store.syncDefaultFromCapital(capital, displayName: name);
+          await CapitalPortfolioFirestoreSync.pushIfSignedIn(
+            capital,
+            widget.store,
           );
-        } else {
-          await capital.setCapital(
-            amount: value,
-            currencyCode: _currency.code,
-          );
+        } on ArgumentError {
+          saveFailed = true;
+          if (mounted) setState(() => _error = l.errorInvalidAmount);
         }
-        await widget.store.syncDefaultFromCapital(capital, displayName: name);
+      } else {
+        final p = UserPortfolio(
+          id: id,
+          name: name,
+          capitalAmount: value,
+          currencyCode: _useCustom ? kCustomCurrencyCode : _currency.code,
+          customCurrencyName: _useCustom ? _customName : '',
+          customCurrencySymbol: _useCustom ? _customSymbol : '',
+        );
+        await widget.store.upsert(p);
         await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, widget.store);
-      } on ArgumentError {
-        setState(() => _error = l.errorInvalidAmount);
-        return;
       }
-    } else {
-      final p = UserPortfolio(
-        id: id,
-        name: name,
-        capitalAmount: value,
-        currencyCode: _useCustom ? kCustomCurrencyCode : _currency.code,
-        customCurrencyName: _useCustom ? _customName : '',
-        customCurrencySymbol: _useCustom ? _customSymbol : '',
-      );
-      await widget.store.upsert(p);
-      await CapitalPortfolioFirestoreSync.pushIfSignedIn(capital, widget.store);
-    }
-    if (mounted) Navigator.of(context).pop();
+    });
+
+    if (!mounted || saveFailed) return;
+    Navigator.of(context).pop();
   }
 
   @override

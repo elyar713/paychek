@@ -7,42 +7,51 @@ class _AdminUsersIntegratedShellHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(28, 22, 28, 18),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: AdminTheme.border.withValues(alpha: 0.65),
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'Utilisateurs',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 26,
-                  letterSpacing: -0.4,
-                ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: statsBody,
+    return LayoutBuilder(
+      builder: (context, c) {
+        final mobile = c.maxWidth < AdminLayout.mobileBreakpoint;
+        final padding = AdminLayout.shellHeaderPadding(context);
+        return Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: AdminTheme.border.withValues(alpha: 0.65),
+              ),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.35),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-        ],
-      ),
+          child: mobile
+              ? statsBody
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Utilisateurs',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 26,
+                                letterSpacing: -0.4,
+                              ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: statsBody,
+                      ),
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 }
@@ -257,6 +266,22 @@ class _UsersStatsRow extends StatelessWidget {
       return LayoutBuilder(
         builder: (context, c) {
           final w = c.maxWidth;
+          if (w < AdminLayout.mobileBreakpoint) {
+            final cols = w >= 360 ? 2 : 1;
+            final gapWrap = 8.0;
+            final cardW = cols <= 1 ? w : (w - (cols - 1) * gapWrap) / cols;
+            return Wrap(
+              spacing: gapWrap,
+              runSpacing: gapWrap,
+              children: [
+                for (final e in entries)
+                  SizedBox(
+                    width: cardW,
+                    child: statTile(e, inline: false),
+                  ),
+              ],
+            );
+          }
           final slot =
               ((w - (count - 1) * gap) / count).clamp(72.0, double.infinity);
 

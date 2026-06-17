@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -448,6 +449,7 @@ class _MentalStatePageState extends State<MentalStatePage> {
       _c.selectedEmotionIds.add(_c.emotions.first.id);
     }
     _c.touch();
+    unawaited(_c.persistNow());
   }
 
   void _afterPopGoDashboard() {

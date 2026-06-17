@@ -11,7 +11,7 @@ abstract final class HelpCenterLaunchLinks {
       'https://play.google.com/store/apps/details?id=pro.paychek.app';
 
   static const String appStoreListing =
-      'https://apps.apple.com/app/paychek/id0000000000';
+      'https://apps.apple.com/app/id6773015424';
 
   /// PWA / site web (affiché sous « Version web » dans le centre d’aide).
   static const String webAppCanonical = kPaychekPublicWebsiteUrl;
