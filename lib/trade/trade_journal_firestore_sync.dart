@@ -14,7 +14,7 @@ import 'trade_models.dart';
 /// Sync cloud du journal de trades (même compte Firebase sur web + mobile).
 ///
 /// Document unique : `paychek_users/{uid}/sync_data/journal_trades_v1`.
-/// Les captures ne sont pas envoyées en base64 (taille) ; elles restent en prefs locale.
+/// Les captures ne sont pas envoyées en base64 (taille) ; chemin Storage + prefs locale.
 abstract final class TradeJournalFirestoreSync {
   TradeJournalFirestoreSync._();
 
@@ -194,6 +194,13 @@ abstract final class TradeJournalFirestoreSync {
         final bytes = t.screenshotBytes ?? c.screenshotBytes;
         if (bytes != null && bytes.isNotEmpty) {
           winner = winner.copyWith(screenshotBytes: bytes);
+        }
+      }
+      if (winner.screenshotStoragePath == null ||
+          winner.screenshotStoragePath!.trim().isEmpty) {
+        final path = t.screenshotStoragePath ?? c.screenshotStoragePath;
+        if (path != null && path.trim().isNotEmpty) {
+          winner = winner.copyWith(screenshotStoragePath: path.trim());
         }
       }
       if (winner.linkedAnalysePdfBytes == null ||

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -50,6 +51,7 @@ import '../trade/trade_journal_scope.dart';
 import '../trade/trade_session_mindset.dart';
 import 'ajouter_trade_discipline_prefs_storage.dart';
 import '../trade/trade_journal_store.dart';
+import '../trade/trade_screenshot_storage.dart';
 import '../trade/trade_lite_monthly_limit.dart';
 import '../trade/trade_models.dart';
 import '../web/paychek_web_tokens.dart';

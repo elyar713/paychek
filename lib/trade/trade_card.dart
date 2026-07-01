@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../ajouter_trade/ajouter_trade_page_non_respect_labels.dart';
@@ -14,6 +11,7 @@ import 'trade_date_format.dart';
 import 'trade_linked_analyse_pdf.dart';
 import 'trade_models.dart';
 import 'trade_plan_analysis.dart';
+import 'trade_screenshot_image.dart';
 import 'trade_session.dart';
 import 'trade_tokens.dart';
 

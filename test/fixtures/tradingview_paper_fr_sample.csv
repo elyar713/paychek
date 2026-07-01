@@ -1,0 +1,6 @@
+Symbole,Côté,Type,Quantité,Prix limite,Prix d'arrêt,Prix de remplissage,Take profit,Stop Loss,Instruction,Statut,Heure de placement,ID d'ordre,ID de niveau,Expiration,Levier,Marge
+CME_MINI:MNQ1!,Buy,Limite,1,30825,,30823.25,30988,30744.75,,Rempli,2026-06-22 15:36:08,3208533453,,2026-06-23 15:36:06,500:1,"123,30 USD"
+CME_MINI:MNQ1!,Sell,Stop Loss,1,,30744.75,30743.5,,,,Rempli,2026-06-22 15:36:21,3208536485,,2026-08-23 15:36:06,,
+CME_MINI:MNQ1!,Sell,Prise de profits,1,30973.75,,,,,,Annulé,2026-06-22 15:36:41,3208540807,,2026-08-23 15:36:06,,
+CME_MINI:MNQ1!,Buy,Marché,1,,,30696.75,,,,Rempli,2026-06-22 16:39:46,3209139870,,2026-07-22 16:39:46,500:1,"122,79 USD"
+CME_MINI:MNQ1!,Sell,Marché,1,,,30641,,,,Rempli,2026-06-22 16:43:41,3209168638,,2026-07-22 16:43:41,500:1,"122,56 USD"

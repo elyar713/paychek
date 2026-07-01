@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ajouter_trade/ajouter_trade_asset_class.dart';
@@ -13,6 +14,7 @@ import 'trade_journal_plan_migration.dart';
 import 'trade_journal_strategie_migration.dart';
 import 'trade_journal_checklist_etat_migration.dart';
 import 'trade_models.dart';
+import 'trade_screenshot_storage.dart';
 
 const _kBase = 'trade_journal_items_v1';
 const _jsonRootV = 1;
@@ -40,9 +42,11 @@ Map<String, dynamic> _encodeTrade(TradeListItem t) {
     'apresNews': t.apresNews,
     'quantiteLabel': t.quantiteLabel,
     'screenshotPath': t.screenshotPath,
-    'screenshotBytesB64': t.screenshotBytes != null
-        ? base64Encode(t.screenshotBytes!)
-        : null,
+    'screenshotStoragePath': t.screenshotStoragePath,
+    if (!kIsWeb)
+      'screenshotBytesB64': t.screenshotBytes != null
+          ? base64Encode(t.screenshotBytes!)
+          : null,
     'prixEntreeLabel': t.prixEntreeLabel,
     'prixSortieLabel': t.prixSortieLabel,
     'checklistPct': t.checklistPct,
@@ -180,6 +184,7 @@ TradeListItem? _decodeTrade(Map<String, dynamic> m) {
       quantiteLabel: m['quantiteLabel'] as String?,
       screenshotPath: m['screenshotPath'] as String?,
       screenshotBytes: screenshotBytes,
+      screenshotStoragePath: m['screenshotStoragePath'] as String?,
       prixEntreeLabel: m['prixEntreeLabel'] as String?,
       prixSortieLabel: m['prixSortieLabel'] as String?,
       checklistPct: (m['checklistPct'] as num?)?.toDouble() ?? 0,
@@ -227,6 +232,8 @@ Map<String, dynamic> tradeJournalTradeToMapForFirestore(TradeListItem t) {
   final m = Map<String, dynamic>.from(_encodeTrade(t));
   m.remove('screenshotBytesB64');
   m.remove('linkedAnalysePdfBytesB64');
+  // Chemin disque local : inutile sur un autre appareil.
+  m.remove('screenshotPath');
   return m;
 }
 
@@ -239,6 +246,15 @@ abstract final class TradeJournalStorage {
     String? firebaseUidOverride,
   }) async {
     final p = await SharedPreferences.getInstance();
+    for (final t in items) {
+      if (t.screenshotBytes != null && t.screenshotBytes!.isNotEmpty) {
+        await TradeScreenshotLocalPrefs.save(
+          t.id,
+          t.screenshotBytes!,
+          firebaseUidOverride: firebaseUidOverride,
+        );
+      }
+    }
     final payload = <String, dynamic>{
       'v': _jsonRootV,
       'items': items.map(_encodeTrade).toList(),
@@ -261,7 +277,20 @@ abstract final class TradeJournalStorage {
       for (final e in list) {
         if (e is! Map) continue;
         final t = _decodeTrade(Map<String, dynamic>.from(e));
-        if (t != null) out.add(t);
+        if (t != null) {
+          var hydrated = t;
+          if (hydrated.screenshotBytes == null ||
+              hydrated.screenshotBytes!.isEmpty) {
+            final localBytes = await TradeScreenshotLocalPrefs.load(
+              hydrated.id,
+              firebaseUidOverride: firebaseUidOverride,
+            );
+            if (localBytes != null && localBytes.isNotEmpty) {
+              hydrated = hydrated.copyWith(screenshotBytes: localBytes);
+            }
+          }
+          out.add(hydrated);
+        }
       }
       var migrated = applyJournalMindsetTalentMigration(out);
       migrated = applyJournalPlanExplicitMigration(migrated);

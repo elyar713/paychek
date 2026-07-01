@@ -8,6 +8,31 @@ service firebase.storage {
         || ct == 'application/octet-stream';
     }
 
+    match /trade_screenshots/{userId}/{fileName} {
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size <= 5 * 1024 * 1024
+        && (
+          request.resource.contentType == null
+          || request.resource.contentType.size() == 0
+          || request.resource.contentType.matches('image/.*')
+        )
+        && fileName.matches('^[a-zA-Z0-9._-]{1,200}$');
+
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size <= 5 * 1024 * 1024
+        && (
+          request.resource.contentType == null
+          || request.resource.contentType.size() == 0
+          || request.resource.contentType.matches('image/.*')
+        );
+
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
     match /support_attachments/{userId}/{ticketId}/{fileName} {
       // Création : utilisateur connecté uniquement sous son dossier, taille et type contrôlés.
       allow create: if request.auth != null

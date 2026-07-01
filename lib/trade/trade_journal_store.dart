@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'trade_journal_firestore_sync.dart';
 import 'trade_journal_storage.dart';
 import 'trade_models.dart';
+import 'trade_screenshot_storage.dart';
 
 /// Journal en mémoire des trades enregistrés depuis "Ajouter un trade".
 ///
@@ -56,10 +57,35 @@ class TradeJournalStore extends ChangeNotifier {
     _saveDebounce = Timer(const Duration(milliseconds: 400), () {
       final copy = List<TradeListItem>.from(_items);
       unawaited(() async {
-        await TradeJournalStorage.save(copy);
-        await TradeJournalFirestoreSync.pushIfSignedIn(copy);
+        final synced = await _syncScreenshotsBeforePersist(copy);
+        await TradeJournalStorage.save(synced);
+        await TradeJournalFirestoreSync.pushIfSignedIn(synced);
       }());
     });
+  }
+
+  Future<List<TradeListItem>> _syncScreenshotsBeforePersist(
+    List<TradeListItem> items,
+  ) async {
+    final out = <TradeListItem>[];
+    var storeChanged = false;
+    for (final t in items) {
+      final uploaded = await TradeScreenshotCloud.ensureUploaded(t);
+      out.add(uploaded);
+      if (uploaded.screenshotStoragePath != t.screenshotStoragePath) {
+        storeChanged = true;
+      }
+    }
+    if (storeChanged && !_suppressPersist) {
+      _suppressPersist = true;
+      for (final t in out) {
+        final idx = _items.indexWhere((e) => e.id == t.id);
+        if (idx >= 0) _items[idx] = t;
+      }
+      _suppressPersist = false;
+      notifyListeners();
+    }
+    return out;
   }
 
   void add(TradeListItem item) {
@@ -124,8 +150,9 @@ class TradeJournalStore extends ChangeNotifier {
     if (!remoteMirrorOnly) {
       final copy = List<TradeListItem>.from(_items);
       unawaited(() async {
-        await TradeJournalStorage.save(copy);
-        await TradeJournalFirestoreSync.pushIfSignedIn(copy);
+        final synced = await _syncScreenshotsBeforePersist(copy);
+        await TradeJournalStorage.save(synced);
+        await TradeJournalFirestoreSync.pushIfSignedIn(synced);
       }());
     }
     super.dispose();

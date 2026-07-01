@@ -28,6 +28,7 @@ class TradeListItem {
     this.quantiteLabel,
     this.screenshotPath,
     this.screenshotBytes,
+    this.screenshotStoragePath,
     this.prixEntreeLabel,
     this.prixSortieLabel,
     required this.checklistPct,
@@ -91,6 +92,9 @@ class TradeListItem {
   final String? quantiteLabel;
   final String? screenshotPath;
   final Uint8List? screenshotBytes;
+
+  /// Chemin Firebase Storage (`trade_screenshots/{uid}/{tradeId}.jpg`) — sync cloud web.
+  final String? screenshotStoragePath;
   final String? prixEntreeLabel;
   final String? prixSortieLabel;
   final double checklistPct;
@@ -161,6 +165,7 @@ class TradeListItem {
     bool? etatLinkedExplicit,
     Uint8List? screenshotBytes,
     String? screenshotPath,
+    String? screenshotStoragePath,
     Uint8List? linkedAnalysePdfBytes,
     String? linkedAnalysePdfFileName,
   }) {
@@ -180,6 +185,8 @@ class TradeListItem {
       quantiteLabel: quantiteLabel,
       screenshotPath: screenshotPath ?? this.screenshotPath,
       screenshotBytes: screenshotBytes ?? this.screenshotBytes,
+      screenshotStoragePath:
+          screenshotStoragePath ?? this.screenshotStoragePath,
       prixEntreeLabel: prixEntreeLabel,
       prixSortieLabel: prixSortieLabel,
       checklistPct: checklistPct,

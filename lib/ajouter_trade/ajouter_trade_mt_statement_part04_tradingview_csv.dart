@@ -33,12 +33,14 @@ List<MtStatementTradeRow> parseTradingViewOrdersCsv(String csvContent) {
     'CÃ´tÃ©',
     'Côté',
     'Side',
-    'Type',
     'direction',
     'Direction',
     'Order side',
   ]);
   final idxQty = _tvColumnIndex(header, const <String>[
+    'QuantitÃ©',
+    'Quantité',
+    'Quantite',
     'QtÃ©',
     'Qté',
     'Qty',
@@ -99,6 +101,7 @@ List<MtStatementTradeRow> parseTradingViewOrdersCsv(String csvContent) {
   ]);
   final idxOrderId = _tvColumnIndex(header, const <String>[
     "ID d'ordre",
+    "ID d\u2019ordre",
     'Order ID',
     'Order id',
     'OrderId',

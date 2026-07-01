@@ -106,6 +106,7 @@ TradeListItem _rebuild(
     quantiteLabel: t.quantiteLabel,
     screenshotPath: t.screenshotPath,
     screenshotBytes: t.screenshotBytes,
+    screenshotStoragePath: t.screenshotStoragePath,
     prixEntreeLabel: t.prixEntreeLabel,
     prixSortieLabel: t.prixSortieLabel,
     checklistPct: t.checklistPct,

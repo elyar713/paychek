@@ -99,7 +99,7 @@ bool _tvStatusMeansFilled(String raw) {
   final s = raw.toLowerCase().trim();
   if (s.isEmpty) return false;
   if (s.contains('partial')) return false;
-  if (s.contains('cancel')) return false;
+  if (s.contains('cancel') || s.contains('annul')) return false;
   if (s.contains('pending')) return false;
   if (s.contains('working')) return false;
   if (s.contains('reject')) return false;

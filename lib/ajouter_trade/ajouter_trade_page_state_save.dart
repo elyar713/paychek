@@ -326,10 +326,11 @@ extension _AjouterTradePageStateSave on _AjouterTradePageState {
     if (capture == null) return false;
 
     final storedReports = await AnalyseReportsStorage.loadAll();
-    final item = _buildTradeItemFromCapture(
+    var item = _buildTradeItemFromCapture(
       capture,
       storedReports: storedReports,
     );
+    item = await TradeScreenshotCloud.ensureUploaded(item);
     final planReport = item.planReport;
 
     final isEdit = capture.editingTradeId != null;

@@ -67,6 +67,7 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
           ? null
           : XFile(t.screenshotPath!);
       _tradeScreenshotBytes = t.screenshotBytes;
+      unawaited(_hydrateEditTradeScreenshot(t));
 
       _tradeLinkedAnalyseReport = t.linkedAnalyseReport;
       _tradeLinkedAnalysePdfBytes = t.linkedAnalysePdfBytes;
@@ -111,5 +112,27 @@ extension _AjouterTradePageStateEdit on _AjouterTradePageState {
       unawaited(_ensureTradeLinkedAnalysePdf());
     }
     _requestGainRecalc();
+  }
+
+  Future<void> _hydrateEditTradeScreenshot(TradeListItem t) async {
+    if (_tradeScreenshotBytes != null && _tradeScreenshotBytes!.isNotEmpty) {
+      return;
+    }
+    final local = await TradeScreenshotLocalPrefs.load(t.id);
+    if (!mounted || _editingTradeId != t.id) return;
+    if (local != null && local.isNotEmpty) {
+      setState(() => _tradeScreenshotBytes = local);
+      return;
+    }
+    final path = t.screenshotStoragePath?.trim();
+    if (path == null || path.isEmpty) return;
+    try {
+      final url = await TradeScreenshotCloud.downloadUrl(path);
+      final resp = await http.get(Uri.parse(url));
+      if (!mounted || _editingTradeId != t.id) return;
+      if (resp.statusCode == 200 && resp.bodyBytes.isNotEmpty) {
+        setState(() => _tradeScreenshotBytes = resp.bodyBytes);
+      }
+    } catch (_) {}
   }
 }

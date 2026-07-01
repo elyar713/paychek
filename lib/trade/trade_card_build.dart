@@ -529,64 +529,19 @@ extension _TradeCardBuild on TradeCard {
                                       item.screenshotBytes!.isNotEmpty;
                                   final hasPath = item.screenshotPath != null &&
                                       item.screenshotPath!.trim().isNotEmpty;
-                                  if (!hasBytes && !hasPath) {
+                                  final hasStoragePath =
+                                      item.screenshotStoragePath != null &&
+                                          item.screenshotStoragePath!
+                                              .trim()
+                                              .isNotEmpty;
+                                  if (!hasBytes &&
+                                      !hasPath &&
+                                      !hasStoragePath) {
                                     return const <Widget>[];
                                   }
                                   return <Widget>[
                                     const SizedBox(height: 12),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: (kIsWeb && hasBytes)
-                                            ? Image.memory(
-                                                item.screenshotBytes!,
-                                                fit: BoxFit.cover,
-                                                width: double.infinity,
-                                              )
-                                            : (kIsWeb && !hasBytes)
-                                                ? ColoredBox(
-                                                    color: TradeTokens.pillInactiveBg,
-                                                    child: Center(
-                                                      child: Text(
-                                                        l.tradeScreenshotUnavailableWeb,
-                                                        style: t.bodySmall?.copyWith(
-                                                          color:
-                                                              TradeTokens.textSecondary,
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Image.file(
-                                                    File(item.screenshotPath!),
-                                                    fit: BoxFit.cover,
-                                                    width: double.infinity,
-                                                    errorBuilder:
-                                                        (context, error, stack) {
-                                                      return ColoredBox(
-                                                        color: TradeTokens
-                                                            .pillInactiveBg,
-                                                        child: Center(
-                                                          child: Text(
-                                                            l.tradeScreenshotLoadError,
-                                                            style: t.bodySmall
-                                                                ?.copyWith(
-                                                                  color: TradeTokens
-                                                                      .textSecondary,
-                                                                  fontSize: 11,
-                                                                  fontWeight:
-                                                                      FontWeight.w600,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                      ),
-                                    ),
+                                    TradeScreenshotImage(item: item),
                                   ];
                                 }(),
                                 ...() {
