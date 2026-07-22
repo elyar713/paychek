@@ -7,12 +7,9 @@ import 'package:flutter/foundation.dart'
     show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'reglage/paychek_apple_iap_service.dart';
-import 'reglage/social_auth_config.dart';
 import 'reglage/social_auth_service.dart';
 import 'reglage/social_auth_web_context_stub.dart'
     if (dart.library.html) 'reglage/social_auth_web_context_web.dart';
@@ -129,16 +126,12 @@ Future<void> main() async {
     }
   }
 
-  // Sur le Web, [GoogleSignIn.initialize] peut lancer UnimplementedError ; pas nécessaire ici.
+  // Sur le Web, GoogleSignIn.initialize n’est pas nécessaire (popup/redirect Firebase).
   if (!kIsWeb && isGoogleSignInAvailableOnThisPlatform()) {
     try {
-      await GoogleSignIn.instance.initialize(
-        serverClientId: kGoogleOAuthWebClientId.isNotEmpty
-            ? kGoogleOAuthWebClientId
-            : null,
-      );
+      await ensureGoogleSignInInitialized();
     } catch (e, st) {
-      debugPrint('[Paychek] GoogleSignIn.initialize failed: $e\n$st');
+      debugPrint('[Paychek] GoogleSignIn init failed: $e\n$st');
     }
   }
 
@@ -283,6 +276,14 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
     MentalStateController.instance.addListener(_scheduleMentalStateCloudPush);
     StrategieSetupsStore.notifier.addListener(_scheduleStrategieCloudPush);
     StrategieSetupUsageStore.notifier.addListener(_scheduleStrategieCloudPush);
+
+    CapitalPortfolioFirestoreSync.shouldDeferRemoteApply = () =>
+        _capitalPortfolioCloudPushDebounce?.isActive ?? false;
+    MentalStateFirestoreSync.shouldDeferRemoteApply = () =>
+        MentalStateController.instance.hasUnsavedEdits ||
+        (_mentalStateCloudPushDebounce?.isActive ?? false);
+    StrategieFirestoreSync.shouldDeferRemoteApply = () =>
+        _strategieCloudPushDebounce?.isActive ?? false;
   }
 
   void _attachFirebaseAuthAccountListener() {
@@ -479,6 +480,10 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
 
   void _scheduleMentalStateCloudPush() {
     if (!mounted) return;
+    final ctrl = MentalStateController.instance;
+    // Snapshot cloud → notifyListeners : ne pas re-pousser / bumper le rev.
+    if (ctrl.isApplyingFromCloud) return;
+    unawaited(MentalStateFirestoreSync.markLocalEditPending());
     _mentalStateCloudPushDebounce?.cancel();
     _mentalStateCloudPushDebounce = Timer(
       const Duration(milliseconds: 400),
@@ -492,6 +497,7 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
 
   void _scheduleStrategieCloudPush() {
     if (!mounted) return;
+    unawaited(StrategieFirestoreSync.markLocalEditPending());
     _strategieCloudPushDebounce?.cancel();
     _strategieCloudPushDebounce = Timer(
       const Duration(milliseconds: 900),
@@ -719,6 +725,9 @@ class _PaychekAppState extends State<PaychekApp> with WidgetsBindingObserver {
     MentalStateController.instance.removeListener(_scheduleMentalStateCloudPush);
     StrategieSetupsStore.notifier.removeListener(_scheduleStrategieCloudPush);
     StrategieSetupUsageStore.notifier.removeListener(_scheduleStrategieCloudPush);
+    CapitalPortfolioFirestoreSync.shouldDeferRemoteApply = null;
+    MentalStateFirestoreSync.shouldDeferRemoteApply = null;
+    StrategieFirestoreSync.shouldDeferRemoteApply = null;
     _dashboardHomeLayoutStore?.removeListener(_scheduleDashboardLayoutCloudPush);
     _dashboardHomeLayoutStore?.dispose();
     super.dispose();

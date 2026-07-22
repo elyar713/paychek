@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_prefs_scope.dart';
+import '../reglage/paychek_sync_local_pending.dart';
 import '../reglage/paychek_user_firestore.dart';
 import 'mental_state_controller.dart';
 import 'mental_state_storage.dart';
@@ -20,6 +21,16 @@ abstract final class MentalStateFirestoreSync {
   static const _kRevBase = 'mental_state_rev_v1';
 
   static int _suppressPush = 0;
+
+  /// Édition locale pas encore poussée / en cours de persist.
+  static bool Function()? shouldDeferRemoteApply;
+
+  static Map<String, dynamic>? _pendingRemoteData;
+
+  /// Cooldown après un push : ignore les snapshots echo (évite de réappliquer
+  /// d’anciens pourcentages d’impact juste après un réglage local).
+  static DateTime? _lastPushAt;
+  static const _pushCooldown = Duration(seconds: 5);
 
   /// Dernier `rev` cloud déjà pris en compte sur **cet** appareil (évite qu’un snapshot
   /// ancien traité en retard écrase un état plus récent — web/mobile en parallèle).
@@ -36,11 +47,17 @@ abstract final class MentalStateFirestoreSync {
     if (_syncUid == uid) return;
     _syncUid = uid;
     _lastHandledRemoteRev = 0;
+    _pendingRemoteData = null;
+    _lastPushAt = null;
   }
 
   static void _bumpHandledRemoteRev(int rev) {
     if (rev > _lastHandledRemoteRev) _lastHandledRemoteRev = rev;
   }
+
+  static bool _inPushCooldown() =>
+      _lastPushAt != null &&
+      DateTime.now().difference(_lastPushAt!) < _pushCooldown;
 
   static DocumentReference<Map<String, dynamic>> _doc(User u) =>
       FirebaseFirestore.instance
@@ -59,10 +76,17 @@ abstract final class MentalStateFirestoreSync {
     await p.setInt(_revPrefsKey(), rev);
   }
 
+  /// Avant le debounce push : empêche un snapshot cloud plus ancien d’écraser.
+  static Future<void> markLocalEditPending() =>
+      paychekBumpLocalSyncRev(_revPrefsKey());
+
   static Future<void> mergeFromCloud(MentalStateController ctrl) async {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
     _ensureUidForSync(u.uid);
+    if (shouldDeferRemoteApply?.call() == true || ctrl.hasUnsavedEdits) {
+      return;
+    }
     _suppressPush++;
     try {
       final localRev = await _readLocalRev();
@@ -125,6 +149,48 @@ abstract final class MentalStateFirestoreSync {
       return;
     }
 
+    if (_inPushCooldown()) {
+      return;
+    }
+
+    if (shouldDeferRemoteApply?.call() == true || ctrl.hasUnsavedEdits) {
+      _pendingRemoteData = Map<String, dynamic>.from(data);
+      return;
+    }
+
+    await _applyRemoteOnce(ctrl, data);
+  }
+
+  static Future<void> flushPendingRemoteIfAny(MentalStateController ctrl) async {
+    final pending = _pendingRemoteData;
+    if (pending == null) return;
+    if (_inPushCooldown()) {
+      _pendingRemoteData = null;
+      return;
+    }
+    if (shouldDeferRemoteApply?.call() == true || ctrl.hasUnsavedEdits) return;
+    final pendingRev = (pending['rev'] as num?)?.toInt() ?? 0;
+    if (pendingRev <= _lastHandledRemoteRev) {
+      _pendingRemoteData = null;
+      return;
+    }
+    _pendingRemoteData = null;
+    await _applyRemoteOnce(ctrl, pending);
+  }
+
+  static Future<void> _applyRemoteOnce(
+    MentalStateController ctrl,
+    Map<String, dynamic> data,
+  ) async {
+    final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
+    if (cloudRev <= 0) return;
+    if (cloudRev < _lastHandledRemoteRev) return;
+    if (_inPushCooldown()) return;
+    if (shouldDeferRemoteApply?.call() == true || ctrl.hasUnsavedEdits) {
+      _pendingRemoteData = Map<String, dynamic>.from(data);
+      return;
+    }
+
     _suppressPush++;
     try {
       final localRev = await _readLocalRev();
@@ -153,6 +219,17 @@ abstract final class MentalStateFirestoreSync {
     if (u == null) return;
     try {
       await _pushFull(u, ctrl);
+      ctrl.clearUnsavedAfterPush();
+      // Le push local est la source de vérité : jeter un pending plus ancien
+      // (sinon les % d’impact « se désajustent » juste après le réglage).
+      final pending = _pendingRemoteData;
+      if (pending != null) {
+        final pendingRev = (pending['rev'] as num?)?.toInt() ?? 0;
+        if (pendingRev <= _lastHandledRemoteRev) {
+          _pendingRemoteData = null;
+        }
+      }
+      await flushPendingRemoteIfAny(ctrl);
     } catch (e, st) {
       debugPrint('[Paychek] MentalStateFirestoreSync.push: $e\n$st');
     }
@@ -181,6 +258,8 @@ abstract final class MentalStateFirestoreSync {
     });
     await _writeLocalRev(nextRev);
     _bumpHandledRemoteRev(nextRev);
+    _lastPushAt = DateTime.now();
+    // Echo Firestore du doc qu’on vient d’écrire : ne pas le réappliquer plus tard.
+    _pendingRemoteData = null;
   }
 }
-

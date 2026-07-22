@@ -77,6 +77,25 @@ class MentalStateController extends ChangeNotifier {
   final Set<String> _touchedDays = <String>{};
 
   Timer? _persistCalendarDebounce;
+  bool _dirtyUnsaved = false;
+  bool _persistingBundle = false;
+  bool _applyingFromCloud = false;
+
+  /// true pendant debounce / écriture locale — le cloud ne doit pas écraser.
+  bool get hasUnsavedEdits =>
+      _dirtyUnsaved ||
+      _persistingBundle ||
+      _applyingFromCloud ||
+      (_persistCalendarDebounce?.isActive ?? false);
+
+  /// true pendant [applyFromCloudBundle] (évite un re-push echo depuis main).
+  bool get isApplyingFromCloud => _applyingFromCloud;
+
+  /// Après un push cloud réussi : l’état mémoire est déjà la source de vérité.
+  /// On laisse finir le persist local sans rebloquer indéfiniment les snapshots.
+  void clearUnsavedAfterPush() {
+    _dirtyUnsaved = false;
+  }
 
   /// Minuteur : à chaque fin de période ([we]), enregistrement du snapshot.
   Timer? _midnightCalendarTimer;
@@ -474,6 +493,7 @@ class MentalStateController extends ChangeNotifier {
   }
 
   void _schedulePersistCalendar() {
+    _dirtyUnsaved = true;
     _persistCalendarDebounce?.cancel();
     _persistCalendarDebounce = Timer(const Duration(milliseconds: 500), () {
       _persistCalendarDebounce = null;
@@ -483,14 +503,20 @@ class MentalStateController extends ChangeNotifier {
 
   /// Écrit tout de suite prefs + bundle (suppression d’une routine, etc.).
   Future<void> persistNow() async {
+    _dirtyUnsaved = true;
     _persistCalendarDebounce?.cancel();
     _persistCalendarDebounce = null;
     await _persistCalendarAndBundleNow();
   }
 
   Future<void> _persistCalendarAndBundleNow() async {
-    await _persistOverallScoresByDay();
-    await MentalStateStorage.saveBundleMap(toCloudBundle());
+    _persistingBundle = true;
+    try {
+      await _persistOverallScoresByDay();
+      await MentalStateStorage.saveBundleMap(toCloudBundle());
+    } finally {
+      _persistingBundle = false;
+    }
   }
 
   /// Annule le timer de frontière jour (tests widget sans attendre minuit).
@@ -560,8 +586,11 @@ class MentalStateController extends ChangeNotifier {
   @override
   void notifyListeners() {
     _snapshotTodayOverallForCalendar();
+    // Dirty avant les listeners (push cloud) pour bloquer tout snapshot concurrent.
+    if (!_applyingFromCloud) {
+      _schedulePersistCalendar();
+    }
     super.notifyListeners();
-    _schedulePersistCalendar();
   }
 
   /// Syncs default metric/emotion labels from [AppLocalizations] when locale changes.
@@ -680,7 +709,16 @@ class MentalStateController extends ChangeNotifier {
   }
 
   Future<void> applyFromCloudBundle(Map<String, dynamic> bundle) async {
-    await _applyBundleMap(bundle, persist: true);
+    _applyingFromCloud = true;
+    try {
+      await _applyBundleMap(bundle, persist: true);
+    } finally {
+      _applyingFromCloud = false;
+    }
+    // Bundle cloud déjà aligné : ne pas traiter comme édition locale non poussée.
+    _persistCalendarDebounce?.cancel();
+    _persistCalendarDebounce = null;
+    _dirtyUnsaved = false;
   }
 
   Future<void> _applyBundleMap(
@@ -818,10 +856,11 @@ class MentalStateController extends ChangeNotifier {
     _reconcileTouchedDaysFromScores();
 
     if (persist) {
-      await MentalStateStorage.saveBundleMap(bundle);
-      // On garde les prefs existantes (fenêtre de journée + share flags) déjà persistes,
-      // mais on force un persist calendrier.
-      _schedulePersistCalendar();
+      // Persister l’état mémoire (calendrier local préservé), pas le raw cloud.
+      await MentalStateStorage.saveBundleMap(toCloudBundle());
+      if (!_applyingFromCloud) {
+        _schedulePersistCalendar();
+      }
     }
     notifyListeners();
   }
