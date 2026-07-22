@@ -146,7 +146,7 @@ abstract final class AnalyseFirestoreSync {
 
     // Local rev (cache) : s'aligne sur le rev cloud.
     await _writeLocalRev(nextRev);
-    AnalyseRealtimeNotifier.bump();
+    // Pas de bump après son propre push (évite reload UI qui écrase un draft).
   }
 
   static Future<void> _applyCloudPayload(Map<String, dynamic> data) async {

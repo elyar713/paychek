@@ -132,7 +132,8 @@ abstract final class TradeJournalFirestoreSync {
         checklistEtatMigrate;
     if (changed) {
       store.replaceAll(merged);
-      await TradeJournalStorage.save(merged);
+      // [replaceAll] peut avoir réintégré des trades mémoire absents de [merged].
+      await TradeJournalStorage.save(List<TradeListItem>.from(store.items));
     }
     // Hydratation : pousser seulement si l’union diffère du contenu cloud (ex. trades locaux
     // absents du cloud). Si le merge n’a fait qu’importer le cloud, un `set` serait inutile
@@ -172,8 +173,11 @@ abstract final class TradeJournalFirestoreSync {
     List<TradeListItem> local,
     List<TradeListItem> cloud,
   ) {
+    final localIds = <String>{for (final t in local) t.id};
     final byId = <String, TradeListItem>{};
     for (final t in cloud) {
+      // Si le local a du contenu mais ne contient pas cet id → l'utilisateur l'a supprimé.
+      if (local.isNotEmpty && !localIds.contains(t.id)) continue;
       byId[t.id] = t;
     }
     for (final t in local) {
@@ -188,7 +192,7 @@ abstract final class TradeJournalFirestoreSync {
       } else if (c.syncRev > t.syncRev) {
         winner = c;
       } else {
-        winner = c;
+        winner = t;
       }
       if ((winner.screenshotBytes == null || winner.screenshotBytes!.isEmpty)) {
         final bytes = t.screenshotBytes ?? c.screenshotBytes;

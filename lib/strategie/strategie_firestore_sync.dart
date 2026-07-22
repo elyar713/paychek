@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../reglage/paychek_firestore_push_guard.dart';
 import '../reglage/paychek_prefs_scope.dart';
+import '../reglage/paychek_sync_local_pending.dart';
 import '../reglage/paychek_user_firestore.dart';
 import 'strategie_gestion_risque_storage.dart';
 import 'strategie_horaires_sessions_storage.dart';
@@ -27,6 +28,9 @@ abstract final class StrategieFirestoreSync {
 
   static int _suppressPush = 0;
 
+  static bool Function()? shouldDeferRemoteApply;
+  static Map<String, dynamic>? _pendingRemoteData;
+
   static String _revPrefsKey() => paychekScopedPrefsKey(_kRevBase);
 
   static DocumentReference<Map<String, dynamic>> _doc(User u) =>
@@ -45,6 +49,9 @@ abstract final class StrategieFirestoreSync {
     final p = await SharedPreferences.getInstance();
     await p.setInt(_revPrefsKey(), rev);
   }
+
+  static Future<void> markLocalEditPending() =>
+      paychekBumpLocalSyncRev(_revPrefsKey());
 
   static Future<void> mergeFromCloud() async {
     final u = FirebaseAuth.instance.currentUser;
@@ -91,6 +98,24 @@ abstract final class StrategieFirestoreSync {
   static Future<void> handleRemoteSnapshot(Map<String, dynamic> data) async {
     final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
     if (cloudRev <= 0) return;
+    if (shouldDeferRemoteApply?.call() == true) {
+      _pendingRemoteData = Map<String, dynamic>.from(data);
+      return;
+    }
+    await _applyRemoteSnapshot(data);
+  }
+
+  static Future<void> flushPendingRemoteIfAny() async {
+    final pending = _pendingRemoteData;
+    if (pending == null) return;
+    if (shouldDeferRemoteApply?.call() == true) return;
+    _pendingRemoteData = null;
+    await _applyRemoteSnapshot(pending);
+  }
+
+  static Future<void> _applyRemoteSnapshot(Map<String, dynamic> data) async {
+    final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
+    if (cloudRev <= 0) return;
     _suppressPush++;
     try {
       await StrategieSetupsStore.ensureLoaded();
@@ -100,6 +125,7 @@ abstract final class StrategieFirestoreSync {
       if (cloudRev <= localRev) return;
       await _applyCloudPayload(data);
       await _writeLocalRev(cloudRev);
+      StrategieRealtimeNotifier.bump();
     } catch (e, st) {
       debugPrint('[Paychek] StrategieFirestoreSync.remote: $e\n$st');
     } finally {
@@ -122,6 +148,7 @@ abstract final class StrategieFirestoreSync {
         riskOverride: riskOverride,
         sessionsOverride: sessionsOverride,
       );
+      await flushPendingRemoteIfAny();
     } catch (e, st) {
       debugPrint('[Paychek] StrategieFirestoreSync.push: $e\n$st');
     }
@@ -179,7 +206,7 @@ abstract final class StrategieFirestoreSync {
 
     await _doc(u).set(payload);
     await _writeLocalRev(rev);
-    StrategieRealtimeNotifier.bump();
+    // Pas de bump : recharge UI depuis le disque écraserait des edits en mémoire.
   }
 
   static Future<void> _applyCloudPayload(Map<String, dynamic> data) async {

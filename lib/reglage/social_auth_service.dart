@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -64,50 +65,154 @@ Future<UserCredential?> _webSignInWithAuthProvider(AuthProvider provider) async 
   }
 }
 
+Completer<void>? _googleInitCompleter;
+
+/// Initialise Google Sign-In une seule fois (évite les échecs « déjà init » / idToken null).
+Future<void> ensureGoogleSignInInitialized() async {
+  if (kIsWeb) return;
+  if (!isGoogleSignInAvailableOnThisPlatform()) return;
+
+  final existing = _googleInitCompleter;
+  if (existing != null) {
+    await existing.future;
+    return;
+  }
+  final c = Completer<void>();
+  _googleInitCompleter = c;
+  try {
+    final webClientId = kGoogleOAuthWebClientId.trim();
+    await GoogleSignIn.instance.initialize(
+      serverClientId: webClientId.isNotEmpty ? webClientId : null,
+    );
+    c.complete();
+  } catch (e, st) {
+    _googleInitCompleter = null;
+    c.completeError(e, st);
+    rethrow;
+  }
+}
+
+Future<UserCredential?> _firebaseFromGoogleAccount(GoogleSignInAccount account) async {
+  final idToken = account.authentication.idToken;
+  if (idToken == null || idToken.isEmpty) {
+    debugPrint(
+      '[Paychek] Google Sign-In: idToken null — vérifie serverClientId (ID client OAuth Web) '
+      'dans lib/reglage/social_auth_config.dart et google-services.json / GoogleService-Info.plist.',
+    );
+    throw StateError('google_web_client_id');
+  }
+  final credential = GoogleAuthProvider.credential(idToken: idToken);
+  return FirebaseAuth.instance.signInWithCredential(credential);
+}
+
+/// Ancienne restauration One Tap — désactivée (ouvrait le sélecteur Google de force).
+/// La session Firebase Auth native suffit au démarrage.
+Future<bool> paychekTryRestoreGoogleFirebaseSession() async {
+  return false;
+}
+
 /// Connexion Google → Firebase. Retourne `null` si l’utilisateur a annulé.
+///
+/// N’appelle **jamais** One Tap / restore automatique : uniquement sur action
+/// utilisateur (bouton Google).
 Future<UserCredential?> signInWithGoogle() async {
   if (kIsWeb) {
     return _webSignInWithAuthProvider(GoogleAuthProvider());
   }
 
-  bool supported;
-  try {
-    supported = GoogleSignIn.instance.supportsAuthenticate();
-  } catch (_) {
-    supported = false;
-  }
-  if (!supported) {
+  if (!isGoogleSignInAvailableOnThisPlatform()) {
     throw UnsupportedError('google_sign_in');
   }
 
-  final webClientId = kGoogleOAuthWebClientId.trim();
-  if (webClientId.isNotEmpty) {
-    try {
-      await GoogleSignIn.instance.initialize(serverClientId: webClientId);
-    } catch (e, st) {
-      debugPrint('[Paychek] GoogleSignIn.initialize before authenticate: $e\n$st');
-    }
+  await ensureGoogleSignInInitialized();
+
+  Future<GoogleSignInAccount> authenticateOnce() {
+    return GoogleSignIn.instance.authenticate(
+      scopeHint: const ['email', 'profile'],
+    );
   }
 
   try {
-    final account = await GoogleSignIn.instance.authenticate(
-      scopeHint: const ['email', 'profile'],
-    );
-    final auth = account.authentication;
-    final idToken = auth.idToken;
-    if (idToken == null) {
+    GoogleSignInAccount account;
+    try {
+      account = await authenticateOnce();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled ||
+          e.code == GoogleSignInExceptionCode.interrupted) {
+        return null;
+      }
+      if (e.code == GoogleSignInExceptionCode.clientConfigurationError ||
+          e.code == GoogleSignInExceptionCode.providerConfigurationError) {
+        throw StateError('google_android_sha1');
+      }
       debugPrint(
-        '[Paychek] Google Sign-In: idToken null — vérifie serverClientId (ID client OAuth Web) '
-        'dans lib/reglage/social_auth_config.dart et google-services.json / GoogleService-Info.plist.',
+        '[Paychek] Google authenticate failed (${e.code} ${e.description}), '
+        'signOut + retry…',
       );
-      throw StateError('google_web_client_id');
+      try {
+        await GoogleSignIn.instance.signOut().timeout(const Duration(seconds: 3));
+      } catch (_) {}
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      try {
+        account = await authenticateOnce();
+      } on GoogleSignInException catch (e2) {
+        if (e2.code == GoogleSignInExceptionCode.canceled ||
+            e2.code == GoogleSignInExceptionCode.interrupted) {
+          return null;
+        }
+        if (e2.code == GoogleSignInExceptionCode.clientConfigurationError ||
+            e2.code == GoogleSignInExceptionCode.providerConfigurationError) {
+          throw StateError('google_android_sha1');
+        }
+        return _signInWithGoogleFirebaseProvider(cause: e2);
+      }
     }
-    final credential = GoogleAuthProvider.credential(idToken: idToken);
-    return FirebaseAuth.instance.signInWithCredential(credential);
+
+    try {
+      return await _firebaseFromGoogleAccount(account);
+    } on StateError catch (e) {
+      if (e.message != 'google_web_client_id') rethrow;
+      return _signInWithGoogleFirebaseProvider(cause: e);
+    }
   } on GoogleSignInException catch (e) {
     if (e.code == GoogleSignInExceptionCode.canceled ||
         e.code == GoogleSignInExceptionCode.interrupted) {
       return null;
+    }
+    if (e.code == GoogleSignInExceptionCode.clientConfigurationError ||
+        e.code == GoogleSignInExceptionCode.providerConfigurationError) {
+      throw StateError('google_android_sha1');
+    }
+    rethrow;
+  }
+}
+
+/// Fallback Android : [FirebaseAuth.signInWithProvider] (ne dépend pas du plugin
+/// `google_sign_in` pour le picker). SHA-1 Firebase toujours requis.
+Future<UserCredential?> _signInWithGoogleFirebaseProvider({Object? cause}) async {
+  debugPrint(
+    '[Paychek] Google plugin path failed ($cause) → Firebase signInWithProvider',
+  );
+  try {
+    final provider = GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    return await FirebaseAuth.instance.signInWithProvider(provider);
+  } on FirebaseAuthException catch (e) {
+    if (_isFirebaseWebPopupCancelled(e)) return null;
+    final code = e.code.toLowerCase();
+    if (code.contains('canceled') ||
+        code.contains('cancelled') ||
+        code.contains('web-context-cancelled')) {
+      return null;
+    }
+    // Erreur typique SHA-1 manquant / mauvais client OAuth.
+    if (code.contains('developer') ||
+        code.contains('invalid-credential') ||
+        code.contains('internal-error') ||
+        '${e.message}'.toLowerCase().contains('error 10') ||
+        '${e.message}'.toLowerCase().contains('12500')) {
+      throw StateError('google_android_sha1');
     }
     rethrow;
   }
@@ -307,10 +412,23 @@ Future<void> signOutEverywhere() async {
       debugPrint('[Paychek] FacebookAuth.logOut: $e\n$st');
     }
   }
+  // Déconnexion Google pour ne pas auto-reconnecter un autre utilisateur sur l’appareil.
   try {
     if (!kIsWeb && isGoogleSignInAvailableOnThisPlatform()) {
+      await ensureGoogleSignInInitialized();
       await GoogleSignIn.instance.signOut().timeout(netTimeout);
     }
+  } catch (e, st) {
+    debugPrint('[Paychek] GoogleSignIn signOut: $e\n$st');
+  }
+}
+
+/// Alias explicite (suppression de compte).
+Future<void> signOutGoogleCompletely() async {
+  if (kIsWeb || !isGoogleSignInAvailableOnThisPlatform()) return;
+  try {
+    await ensureGoogleSignInInitialized();
+    await GoogleSignIn.instance.signOut().timeout(const Duration(seconds: 5));
   } catch (e, st) {
     debugPrint('[Paychek] GoogleSignIn signOut: $e\n$st');
   }

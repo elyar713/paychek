@@ -1070,7 +1070,7 @@
   "accountSocialAppleUnavailableDesktop": "Sign in with Apple is not available in the Windows/Linux desktop app. Use the web app (Chrome), iPhone, iPad, or Mac.",
   "accountSocialGoogleUnavailableDesktop": "Google sign-in is not available on this computer target. Use Chrome, Android, or iOS.",
   "accountSocialFacebookUnavailableDesktop": "Facebook sign-in is not available in the Windows/Linux desktop app. Use the web app (Chrome), Android, iOS, or macOS.",
-  "accountSocialGoogleWebClientMissing": "For Google on phone or tablet: set the Web OAuth client ID in lib/reglage/social_auth_config.dart. On Android, add your app’s SHA-1 fingerprint in Firebase (Project settings → your Android app).",
+  "accountSocialGoogleWebClientMissing": "Google sign-in failed: add SHA-1 fingerprints (upload + Play App Signing + debug) in Firebase → Project settings → Android app pro.paychek.app, then re-download google-services.json.",
   "paywallTitle": "Your free trial has ended",
   "paywallHeadlineBefore": "Your free trial ",
   "paywallHeadlineAccent": "has ended",

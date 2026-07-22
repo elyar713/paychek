@@ -3472,6 +3472,21 @@ async function paychekRevokeProEntitlement(db, uid, opts = {}) {
   const entData = entSnap.exists ? entSnap.data() || {} : {};
   const entProvider = `${entData.provider ?? ""}`.trim();
 
+  // Cadeau admin encore valide : ne pas révoquer (sync Play / Apple ne doit pas l’effacer).
+  const adminComp = entData.adminCompPeriodEnd;
+  if (
+    adminComp &&
+    typeof adminComp.toMillis === "function" &&
+    adminComp.toMillis() > Date.now()
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (cadeau admin actif)",
+        uid,
+        new Date(adminComp.toMillis()).toISOString(),
+    );
+    return false;
+  }
+
   if (provider && entProvider && entProvider !== provider) {
     console.log(
         "paychekRevokeProEntitlement: ignoré (autre fournisseur)",
@@ -3482,9 +3497,37 @@ async function paychekRevokeProEntitlement(db, uid, opts = {}) {
     return false;
   }
 
+  // Abonnement / cadeau admin actif (provider admin + fin future).
+  if (
+    entProvider === "admin" &&
+    entData.active === true &&
+    entData.currentPeriodEnd &&
+    typeof entData.currentPeriodEnd.toMillis === "function" &&
+    entData.currentPeriodEnd.toMillis() > Date.now()
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (provider admin, période future)",
+        uid,
+    );
+    return false;
+  }
+
   const userRef = db.collection("paychek_users").doc(uid);
   const userSnap = await userRef.get();
   const userData = userSnap.exists ? userSnap.data() || {} : {};
+  const userAdminComp = userData.adminCompPeriodEnd;
+  if (
+    userAdminComp &&
+    typeof userAdminComp.toMillis === "function" &&
+    userAdminComp.toMillis() > Date.now()
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (cadeau admin user actif)",
+        uid,
+        new Date(userAdminComp.toMillis()).toISOString(),
+    );
+    return false;
+  }
   const paymentMethod = `${userData.paymentMethod ?? ""}`.trim();
   if (
     provider === "google_play" &&
@@ -3492,6 +3535,30 @@ async function paychekRevokeProEntitlement(db, uid, opts = {}) {
   ) {
     console.log(
         "paychekRevokeProEntitlement: ignoré (abonnement Stripe)",
+        uid,
+    );
+    return false;
+  }
+  if (
+    provider === "google_play" &&
+    paymentMethod === "admin"
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (paymentMethod admin)",
+        uid,
+    );
+    return false;
+  }
+
+  // Fin Pro future + paymentMethod admin (même sans adminCompPeriodEnd).
+  if (
+    paymentMethod === "admin" &&
+    userData.subscriptionCurrentPeriodEnd &&
+    typeof userData.subscriptionCurrentPeriodEnd.toMillis === "function" &&
+    userData.subscriptionCurrentPeriodEnd.toMillis() > Date.now()
+  ) {
+    console.log(
+        "paychekRevokeProEntitlement: ignoré (Fin Pro admin future)",
         uid,
     );
     return false;
@@ -3535,29 +3602,74 @@ async function paychekPatchSubscriberPeriodEnd(
   }
   const forceReplace = opts.forceReplace === true;
   const entRef = db.collection("subscriber_entitlements").doc(uid);
-  const snap = await entRef.get();
+  const userRef = db.collection("paychek_users").doc(uid);
+  const [snap, userSnap] = await Promise.all([entRef.get(), userRef.get()]);
+  const entData = snap.exists ? snap.data() || {} : {};
+  const userData = userSnap.exists ? userSnap.data() || {} : {};
   const prevEnd =
-    snap.exists &&
-    snap.data() &&
-    snap.data().currentPeriodEnd &&
-    typeof snap.data().currentPeriodEnd.toMillis === "function" ?
-      snap.data().currentPeriodEnd :
+    entData.currentPeriodEnd &&
+    typeof entData.currentPeriodEnd.toMillis === "function" ?
+      entData.currentPeriodEnd :
       null;
+  const adminCompEnt =
+    entData.adminCompPeriodEnd &&
+    typeof entData.adminCompPeriodEnd.toMillis === "function" ?
+      entData.adminCompPeriodEnd :
+      null;
+  const adminCompUser =
+    userData.adminCompPeriodEnd &&
+    typeof userData.adminCompPeriodEnd.toMillis === "function" ?
+      userData.adminCompPeriodEnd :
+      null;
+  const effectiveAdminComp = (() => {
+    const now = Date.now();
+    const candidates = [adminCompEnt, adminCompUser].filter(
+        (t) => t && t.toMillis() > now,
+    );
+    if (candidates.length === 0) return null;
+    return candidates.reduce((a, b) =>
+      a.toMillis() >= b.toMillis() ? a : b,
+    );
+  })();
+
   let merged = currentPeriodEnd;
   if (!forceReplace && prevEnd) {
     merged = admin.firestore.Timestamp.fromMillis(
         Math.max(prevEnd.toMillis(), currentPeriodEnd.toMillis()),
     );
   }
-  const userSnap = await db.collection("paychek_users").doc(uid).get();
+  // Ne jamais raccourcir sous un cadeau admin encore valide.
+  if (effectiveAdminComp) {
+    merged = admin.firestore.Timestamp.fromMillis(
+        Math.max(merged.toMillis(), effectiveAdminComp.toMillis()),
+    );
+  }
+  // Provider admin + fin future : ignore forceReplace qui raccourcirait.
+  const paymentAdmin =
+    `${userData.paymentMethod || ""}`.trim().toLowerCase() === "admin";
+  if (
+    forceReplace &&
+    (`${entData.provider || ""}`.trim() === "admin" ||
+      paymentAdmin ||
+      effectiveAdminComp) &&
+    ((prevEnd &&
+      prevEnd.toMillis() > Date.now() &&
+      currentPeriodEnd.toMillis() < prevEnd.toMillis()) ||
+      (effectiveAdminComp &&
+        currentPeriodEnd.toMillis() < effectiveAdminComp.toMillis()))
+  ) {
+    console.log(
+        "paychekPatchSubscriberPeriodEnd: ignore forceReplace (admin gift)",
+        uid,
+    );
+    return;
+  }
+
   const userPrev =
-    userSnap.exists &&
-    userSnap.data() &&
-    userSnap.data().subscriptionCurrentPeriodEnd &&
-    typeof userSnap.data().subscriptionCurrentPeriodEnd.toMillis === "function" ?
-      userSnap.data().subscriptionCurrentPeriodEnd :
+    userData.subscriptionCurrentPeriodEnd &&
+    typeof userData.subscriptionCurrentPeriodEnd.toMillis === "function" ?
+      userData.subscriptionCurrentPeriodEnd :
       null;
-  const userData = userSnap.exists ? userSnap.data() || {} : {};
   const tier = `${userData.subscriptionTier || ""}`.trim().toLowerCase();
   const needsTierMirror =
     tier !== "pro" || userData.isPremium !== true;
@@ -3582,22 +3694,24 @@ async function paychekPatchSubscriberPeriodEnd(
       {
         currentPeriodEnd: merged,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        ...(effectiveAdminComp ?
+          {adminCompPeriodEnd: effectiveAdminComp} :
+          {}),
       },
       {merge: true},
   );
   const userPatch = {
     subscriptionCurrentPeriodEnd: merged,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    ...(effectiveAdminComp ?
+      {adminCompPeriodEnd: effectiveAdminComp} :
+      {}),
   };
   if (needsTierMirror) {
     userPatch.subscriptionTier = "pro";
     userPatch.isPremium = true;
   }
-  batch.set(
-      db.collection("paychek_users").doc(uid),
-      userPatch,
-      {merge: true},
-  );
+  batch.set(userRef, userPatch, {merge: true});
   await batch.commit();
 }
 
@@ -3847,6 +3961,25 @@ async function paychekGrantProEntitlement(db, uid, opts) {
     }
   }
 
+  // Préserver un cadeau admin encore valide (ne pas raccourcir Fin Pro).
+  const entSnapForAdmin = prevSnapForMerge || (await entRef.get());
+  const entForAdmin = entSnapForAdmin.exists ? entSnapForAdmin.data() || {} : {};
+  const adminCompEnd =
+    entForAdmin.adminCompPeriodEnd &&
+    typeof entForAdmin.adminCompPeriodEnd.toMillis === "function" ?
+      entForAdmin.adminCompPeriodEnd :
+      null;
+  const adminGiftLive =
+    adminCompEnd && adminCompEnd.toMillis() > Date.now();
+  if (adminGiftLive) {
+    if (
+      !mergedPeriodEnd ||
+      mergedPeriodEnd.toMillis() < adminCompEnd.toMillis()
+    ) {
+      mergedPeriodEnd = adminCompEnd;
+    }
+  }
+
   const batch = db.batch();
   batch.set(
       entRef,
@@ -3872,6 +4005,7 @@ async function paychekGrantProEntitlement(db, uid, opts) {
         ...(googlePlayProductId ? {googlePlayProductId} : {}),
         ...(googlePlayOrderId ? {googlePlayOrderId} : {}),
         ...(mergedPeriodEnd ? {currentPeriodEnd: mergedPeriodEnd} : {}),
+        ...(adminGiftLive ? {adminCompPeriodEnd: adminCompEnd} : {}),
       },
       {merge: true},
   );
@@ -3890,15 +4024,18 @@ async function paychekGrantProEntitlement(db, uid, opts) {
   if (mergedPeriodEnd) {
     userPatch.subscriptionCurrentPeriodEnd = mergedPeriodEnd;
   }
+  if (adminGiftLive) {
+    userPatch.adminCompPeriodEnd = adminCompEnd;
+  }
   if (provider) {
     userPatch.paymentProvider = provider;
-  }
-  if (provider === "stripe") {
-    userPatch.paymentMethod = "stripe";
-  } else if (provider === "apple_iap" || provider === "apple") {
-    userPatch.paymentMethod = "apple_iap";
-  } else if (provider === "google_play") {
-    userPatch.paymentMethod = "google_play";
+    if (provider === "stripe") {
+      userPatch.paymentMethod = "stripe";
+    } else if (provider === "apple_iap" || provider === "apple") {
+      userPatch.paymentMethod = "apple_iap";
+    } else if (provider === "google_play") {
+      userPatch.paymentMethod = "google_play";
+    }
   }
   if (stripeCustomerId) {
     userPatch.stripeCustomerId = stripeCustomerId;
@@ -3907,7 +4044,7 @@ async function paychekGrantProEntitlement(db, uid, opts) {
 
   await batch.commit();
 
-  if (provider === "apple_iap" || provider === "apple") {
+  if (!adminGiftLive && (provider === "apple_iap" || provider === "apple")) {
     const claimKey =
       appleTransactionId ?
         `apple:${appleTransactionId}` :

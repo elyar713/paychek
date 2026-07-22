@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import '../ajouter_trade/ajouter_trade_csv_section.dart';
 import '../reglage/paychek_csv_import_log.dart';
 import '../reglage/paychek_support_ticket_submit.dart';
-import '../reglage/paychek_subscription_period_resolver.dart';
 import '../reglage/paychek_user_firestore.dart';
 import '../reglage/trial_access_prefs.dart';
 import 'admin_firestore_users.dart';

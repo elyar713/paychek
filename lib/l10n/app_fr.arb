@@ -1070,7 +1070,7 @@
   "accountSocialAppleUnavailableDesktop": "La connexion Apple n’est pas disponible dans l’app bureau Windows/Linux. Utilise l’app Web (Chrome), un iPhone, un iPad ou un Mac.",
   "accountSocialGoogleUnavailableDesktop": "Connexion Google indisponible sur cette cible (Windows/Linux). Utilise Chrome, Android ou iOS.",
   "accountSocialFacebookUnavailableDesktop": "Connexion Facebook indisponible dans l’app bureau Windows/Linux. Utilise l’app Web (Chrome), Android, iOS ou macOS.",
-  "accountSocialGoogleWebClientMissing": "Pour Google sur téléphone ou tablette : renseigne l’ID client OAuth Web dans lib/reglage/social_auth_config.dart. Sur Android, ajoute l’empreinte SHA-1 de l’app dans Firebase (Paramètres du projet → ton appli Android).",
+  "accountSocialGoogleWebClientMissing": "Connexion Google impossible : ajoute les empreintes SHA-1 (upload + Play App Signing + debug) dans Firebase → Paramètres du projet → app Android pro.paychek.app, puis re-télécharge google-services.json.",
   "paywallTitle": "Ta période d’essai est terminée",
   "paywallHeadlineBefore": "Ton essai gratuit ",
   "paywallHeadlineAccent": "est terminé",

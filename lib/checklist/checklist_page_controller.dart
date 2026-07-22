@@ -48,17 +48,28 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   List<ChecklistSectionData> _sections;
-
   Timer? _saveDebounce;
   Timer? _notificationSyncDebounce;
   bool _hydrated = false;
   bool _checklistDemoGraduated = false;
   Map<int, ChecklistDailyDaySnapshot> _snapshotsByDay = {};
 
+  /// Mémoire plus récente que le dernier persist terminé (évite reload qui « saute »).
+  bool _memoryAheadOfDisk = false;
+  bool _persisting = false;
+  int _persistEpoch = 0;
+
   /// **5** (lun–ven) ou **7** (lun–dim) — aligné sur [TradingWeekPrefs].
   int _tradingDaysPerWeek = 7;
 
   int get tradingDaysPerWeek => _tradingDaysPerWeek;
+
+  /// true si une édition locale n’est pas encore écrite / pendant édition texte.
+  bool get hasUnsavedChecklistEdits =>
+      isEditingChecklist ||
+      _memoryAheadOfDisk ||
+      _persisting ||
+      (_saveDebounce?.isActive ?? false);
 
   /// Applique le réglage semaine (Réglages ou sync cloud).
   void applyTradingDaysPerWeek(int days) {
@@ -109,6 +120,7 @@ class ChecklistPageController extends ChangeNotifier {
 
   /// Charge l’état persisté ; à appeler une fois au démarrage (ex. [DashboardPage]).
   Future<void> hydrateFromStorage() async {
+    ChecklistFirestoreSync.shouldDeferRemoteApply = () => hasUnsavedChecklistEdits;
     _checklistDemoGraduated =
         await PaychekDemoGraduationPrefs.isChecklistGraduated();
     _tradingDaysPerWeek = await TradingWeekPrefs.load();
@@ -136,10 +148,19 @@ class ChecklistPageController extends ChangeNotifier {
 
   void _persistSoon() {
     if (!_hydrated) return;
+    _memoryAheadOfDisk = true;
     _saveDebounce?.cancel();
     _saveDebounce = Timer(const Duration(milliseconds: 350), () {
       unawaited(_persistToDiskAndCloud());
     });
+  }
+
+  /// Persistance immédiate (horaires) — évite un reload cloud avant le debounce.
+  void _persistNow() {
+    if (!_hydrated) return;
+    _memoryAheadOfDisk = true;
+    _saveDebounce?.cancel();
+    unawaited(_persistToDiskAndCloud());
   }
 
   /// Retire les lignes démo dès la première saisie texte sur un élément (pas au coche).
@@ -158,9 +179,24 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   Future<void> _persistToDiskAndCloud() async {
-    _sections = checklistEnsureProtectedSections(_sections);
-    await ChecklistSectionsStorage.save(_sections);
-    await ChecklistFirestoreSync.pushIfSignedIn();
+    if (_disposed || !_hydrated) return;
+    final epoch = ++_persistEpoch;
+    _persisting = true;
+    try {
+      _sections = checklistEnsureProtectedSections(_sections);
+      await ChecklistSectionsStorage.save(_sections);
+      await ChecklistFirestoreSync.pushIfSignedIn();
+      // Une mutation plus récente a démarré pendant l’await → rester dirty.
+      if (epoch == _persistEpoch && !(_saveDebounce?.isActive ?? false)) {
+        _memoryAheadOfDisk = false;
+      }
+      await ChecklistFirestoreSync.flushPendingRemoteIfAny();
+      _flushDeferredReloadIfNeeded();
+    } finally {
+      if (epoch == _persistEpoch) {
+        _persisting = false;
+      }
+    }
   }
 
   String? editingSectionId;
@@ -597,14 +633,14 @@ class ChecklistPageController extends ChangeNotifier {
   }
 
   void _flushDeferredReloadIfNeeded() {
-    if (!_reloadDeferred || isEditingChecklist) return;
+    if (!_reloadDeferred || hasUnsavedChecklistEdits) return;
     _reloadDeferred = false;
     unawaited(reloadFromStorage());
   }
 
   /// Recharge depuis les prefs (ex. snapshot Firestore appliqué sur un autre appareil).
   Future<void> reloadFromStorage() async {
-    if (isEditingChecklist) {
+    if (hasUnsavedChecklistEdits) {
       _reloadDeferred = true;
       return;
     }
@@ -656,6 +692,7 @@ class ChecklistPageController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    ChecklistFirestoreSync.shouldDeferRemoteApply = null;
     _saveDebounce?.cancel();
     _notificationSyncDebounce?.cancel();
     if (_hydrated) {
@@ -841,7 +878,7 @@ class ChecklistPageController extends ChangeNotifier {
       return section.copyWith(items: nextItems);
     }).toList();
     _notifyChecklistChanged();
-    _persistSoon();
+    _persistNow();
   }
 
   ChecklistItemSchedule scheduleForItem(String sectionId, String itemId) {

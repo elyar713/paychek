@@ -1,5 +1,45 @@
 part of 'admin_users_page.dart';
 
+/// Canal store réel (jamais `admin`) à partir user + entitlement.
+String? _adminInferStorePaymentChannel(
+  Map<String, dynamic>? user,
+  Map<String, dynamic>? ent,
+) {
+  String norm(String? raw) {
+    final t = (raw ?? '').trim().toLowerCase();
+    if (t == 'google') return 'google_play';
+    if (t == 'apple') return 'apple_iap';
+    return t;
+  }
+
+  bool isStore(String v) =>
+      v == 'google_play' || v == 'apple_iap' || v == 'stripe';
+
+  final pm = norm(user?['paymentMethod']?.toString());
+  if (isStore(pm)) return pm;
+
+  final provider = norm(
+    (ent?['provider'] ?? user?['paymentProvider'])?.toString(),
+  );
+  if (isStore(provider)) return provider;
+
+  final googleToken =
+      '${ent?['googlePlayPurchaseToken'] ?? ''}'.trim();
+  if (googleToken.isNotEmpty) return 'google_play';
+
+  final appleTx =
+      '${ent?['appleTransactionId'] ?? ent?['appleOriginalTransactionId'] ?? ''}'
+          .trim();
+  if (appleTx.isNotEmpty) return 'apple_iap';
+
+  final stripeId =
+      '${user?['stripeCustomerId'] ?? ent?['stripeCustomerId'] ?? ent?['stripeSubscriptionId'] ?? ent?['stripeCheckoutSessionId'] ?? ''}'
+          .trim();
+  if (stripeId.isNotEmpty) return 'stripe';
+
+  return null;
+}
+
 class _AdminPlatformAccessControl extends StatefulWidget {
   const _AdminPlatformAccessControl({
     required this.userId,
@@ -196,7 +236,7 @@ class _AdminTrialFreemiumOverrideControlState
       messenger?.showSnackBar(
         const SnackBar(
           content: Text(
-            'Date freemium enregistrée — l’app utilisera cette fin d’accès plein.',
+            'Freemium enregistré (Premium inchangé).',
           ),
         ),
       );
@@ -277,12 +317,22 @@ class _AdminTrialFreemiumOverrideControlState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'RÉGLAGE FREEMIUM',
+              'RÉGLAGE FREEMIUM (ESSAI)',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF64748B),
                 letterSpacing: 0.55,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Indépendant du Premium : changer cette date ne modifie pas '
+              'l’abonnement Pro / cadeau admin.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: const Color(0xFF94A3B8),
               ),
             ),
             const SizedBox(height: 8),
@@ -352,6 +402,314 @@ class _AdminTrialFreemiumOverrideControlState
                     onPressed: _saving ? null : _clearOverride,
                     child: const Text('Supprimer l’override'),
                   ),
+              ],
+            ),
+            if (_saving) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: scheme.primary,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Offre **Premium (Pro)** pour N jours (geste support / feedback) — pas le freemium.
+class _AdminGrantSubscriptionDaysControl extends StatefulWidget {
+  const _AdminGrantSubscriptionDaysControl({
+    required this.userId,
+    required this.currentPeriodEnd,
+    required this.isPro,
+    required this.df,
+    required this.scaffoldContext,
+  });
+
+  final String userId;
+  final DateTime? currentPeriodEnd;
+  final bool isPro;
+  final DateFormat df;
+  final BuildContext scaffoldContext;
+
+  @override
+  State<_AdminGrantSubscriptionDaysControl> createState() =>
+      _AdminGrantSubscriptionDaysControlState();
+}
+
+class _AdminGrantSubscriptionDaysControlState
+    extends State<_AdminGrantSubscriptionDaysControl> {
+  bool _saving = false;
+
+  /// Relit la fin Pro cloud (évite une prop stale du tableau).
+  Future<DateTime> _resolveBaseEndUtc() async {
+    final now = DateTime.now().toUtc();
+    DateTime? best = widget.currentPeriodEnd?.toUtc();
+    try {
+      final userSnap = await FirebaseFirestore.instance
+          .collection(kPaychekUsersCollection)
+          .doc(widget.userId)
+          .get();
+      final entSnap = await FirebaseFirestore.instance
+          .collection(kPaychekSubscriberEntitlementsCollection)
+          .doc(widget.userId)
+          .get();
+      final fromUser = paychekParseFirestoreInstantUtc(
+        userSnap.data()?[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
+      );
+      final fromEnt = paychekParseFirestoreInstantUtc(
+        entSnap.data()?['currentPeriodEnd'],
+      );
+      for (final c in [fromUser, fromEnt, best]) {
+        if (c == null) continue;
+        if (best == null || c.isAfter(best)) best = c;
+      }
+    } catch (_) {}
+    if (best != null && best.isAfter(now)) return best;
+    return now;
+  }
+
+  Future<void> _grantDays(int days) async {
+    if (_saving || days < 1) return;
+    final snackCtx = widget.scaffoldContext;
+    final messenger = ScaffoldMessenger.maybeOf(snackCtx);
+    final baseEnd = await _resolveBaseEndUtc();
+    if (!mounted) return;
+    final preview = baseEnd.add(Duration(days: days));
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(
+            'Offrir $days jour${days > 1 ? 's' : ''} Premium (Pro) ?',
+          ),
+          content: Text(
+            'Active uniquement le Premium (Pro).\n'
+            'Le freemium / essai 7 j n’est pas modifié.\n\n'
+            'Fin Premium :\n'
+            '${widget.df.format(preview.toLocal())}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Annuler'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Activer Premium'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirm != true || !mounted) return;
+
+    setState(() => _saving = true);
+    try {
+      final newEnd = baseEnd.add(Duration(days: days));
+      final batch = FirebaseFirestore.instance.batch();
+      final userRef = FirebaseFirestore.instance
+          .collection(kPaychekUsersCollection)
+          .doc(widget.userId);
+      final entRef = FirebaseFirestore.instance
+          .collection(kPaychekSubscriberEntitlementsCollection)
+          .doc(widget.userId);
+
+      final userSnap = await userRef.get();
+      final entSnap = await entRef.get();
+      final storeChannel = _adminInferStorePaymentChannel(
+        userSnap.data(),
+        entSnap.data(),
+      );
+
+      // Premium uniquement — ne jamais lire/écrire trialFreemiumOverrideUntil.
+      // Cadeau : ne force jamais paymentMethod=admin ; restaure Google/Apple/Stripe si connu.
+      final userPatch = <String, dynamic>{
+        'subscriptionTier': PaychekSubscriptionTier.pro.firestoreValue,
+        'isPremium': true,
+        kPaychekUserFieldSubscriptionCurrentPeriodEnd:
+            Timestamp.fromDate(newEnd),
+        'adminCompPeriodEnd': Timestamp.fromDate(newEnd),
+        kPaychekUserFieldSubscriptionProSinceUtc:
+            FieldValue.serverTimestamp(),
+        kPaychekUserFieldSubscriptionTierUpdatedAt:
+            FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      if (storeChannel != null) {
+        userPatch['paymentMethod'] = storeChannel;
+        userPatch['paymentProvider'] = storeChannel;
+      }
+
+      final entPatch = <String, dynamic>{
+        'active': true,
+        'currentPeriodEnd': Timestamp.fromDate(newEnd),
+        'adminCompPeriodEnd': Timestamp.fromDate(newEnd),
+        'proSinceUtc': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'adminGrantDays': days,
+        'adminGrantAt': FieldValue.serverTimestamp(),
+      };
+      if (storeChannel != null) {
+        entPatch['provider'] = storeChannel;
+      }
+
+      batch.set(userRef, userPatch, SetOptions(merge: true));
+      batch.set(entRef, entPatch, SetOptions(merge: true));
+
+      await batch.commit();
+
+      // Vérifie que l’écriture a bien pris (évite un faux succès UI).
+      final verify = await entRef.get();
+      final writtenEnd = paychekParseFirestoreInstantUtc(
+        verify.data()?['currentPeriodEnd'],
+      );
+      if (writtenEnd == null ||
+          writtenEnd.difference(newEnd).abs() > const Duration(minutes: 2)) {
+        throw StateError(
+          'Écriture Premium non confirmée dans Firestore '
+          '(vérifie le claim admin).',
+        );
+      }
+
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Premium +$days j (freemium inchangé) → fin '
+            '${widget.df.format(newEnd.toLocal())}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!snackCtx.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Échec : $e'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _grantCustomDays() async {
+    final ctrl = TextEditingController(text: '3');
+    final days = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Jours Premium (Pro)'),
+        content: TextField(
+          controller: ctrl,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Nombre de jours Premium',
+            hintText: '3',
+          ),
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onSubmitted: (v) {
+            final n = int.tryParse(v.trim());
+            if (n != null && n > 0) Navigator.pop(ctx, n);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final n = int.tryParse(ctrl.text.trim());
+              if (n != null && n > 0) Navigator.pop(ctx, n);
+            },
+            child: const Text('Continuer'),
+          ),
+        ],
+      ),
+    );
+    ctrl.dispose();
+    if (days == null || !mounted) return;
+    await _grantDays(days);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final end = widget.currentPeriodEnd;
+
+    return AbsorbPointer(
+      absorbing: _saving,
+      child: Opacity(
+        opacity: _saving ? 0.55 : 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'OFFRIR PREMIUM (PRO)',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF34D399),
+                letterSpacing: 0.55,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              end == null
+                  ? (widget.isPro
+                      ? 'Pro sans date de fin → le cadeau part d’aujourd’hui'
+                      : 'Compte Lite / freemium → passera en Premium')
+                  : 'Fin Premium actuelle : ${widget.df.format(end.toLocal())}',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFE2E8F0),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Active le plan Premium (badge Pro) uniquement.\n'
+              'Ne touche pas au freemium / essai (date d’essai inchangée).\n'
+              'Ex. +3 j Premium pour un feedback.',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                height: 1.35,
+                color: const Color(0xFF94A3B8),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilledButton(
+                  onPressed: _saving ? null : () => _grantDays(3),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF34D399),
+                    foregroundColor: const Color(0xFF0A0A0A),
+                  ),
+                  child: const Text('+3 j Premium'),
+                ),
+                FilledButton.tonal(
+                  onPressed: _saving ? null : () => _grantDays(7),
+                  child: const Text('+7 j Premium'),
+                ),
+                FilledButton.tonal(
+                  onPressed: _saving ? null : () => _grantDays(30),
+                  child: const Text('+30 j Premium'),
+                ),
+                OutlinedButton(
+                  onPressed: _saving ? null : _grantCustomDays,
+                  child: const Text('Autre…'),
+                ),
               ],
             ),
             if (_saving) ...[

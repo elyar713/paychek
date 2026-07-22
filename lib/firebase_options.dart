@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDsNtrvdvIYEub-XTMNWD0YFU0VqLzRxuk',
-    appId: '1:738203717325:android:da54e7c83f0bdc5336e384',
+    appId: '1:738203717325:android:34496c3172aeea4a36e384',
     messagingSenderId: '738203717325',
     projectId: 'paychek-trading',
     storageBucket: 'paychek-trading.firebasestorage.app',

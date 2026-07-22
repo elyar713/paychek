@@ -86,6 +86,13 @@ AdminUserRow adminUserRowFromFirestore(
   final subscriptionCurrentPeriodEnd = paychekParseFirestoreInstantUtc(
     d[kPaychekUserFieldSubscriptionCurrentPeriodEnd],
   );
+  final adminCompPeriodEnd = paychekParseFirestoreInstantUtc(
+    d['adminCompPeriodEnd'],
+  );
+  final effectivePeriodEnd = _adminLatestPeriodEndUtc(
+    subscriptionCurrentPeriodEnd,
+    adminCompPeriodEnd,
+  );
 
   final subscriptionProSinceUtc = paychekParseFirestoreInstantUtc(
     d[kPaychekUserFieldSubscriptionProSinceUtc],
@@ -129,7 +136,7 @@ AdminUserRow adminUserRowFromFirestore(
     lastSeenAt: lastSeenAt,
     appOpenDatesUtc: appOpenDatesUtc,
     subscriptionTierUpdatedAt: subscriptionTierUpdatedAt,
-    subscriptionCurrentPeriodEnd: subscriptionCurrentPeriodEnd,
+    subscriptionCurrentPeriodEnd: effectivePeriodEnd,
     subscriptionProSinceUtc: subscriptionProSinceUtc,
   );
 }
@@ -155,6 +162,10 @@ AdminUserRow adminUserRowMergeEntitlementData(
   final entPeriod = paychekParseFirestoreInstantUtc(entData['currentPeriodEnd']);
   if (entPeriod != null) {
     periodEnd = _adminLatestPeriodEndUtc(periodEnd, entPeriod);
+  }
+  final adminComp = paychekParseFirestoreInstantUtc(entData['adminCompPeriodEnd']);
+  if (adminComp != null) {
+    periodEnd = _adminLatestPeriodEndUtc(periodEnd, adminComp);
   }
   DateTime? proSince = u.subscriptionProSinceUtc;
   for (final key in ['proSinceUtc', 'proSince']) {

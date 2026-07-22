@@ -82,4 +82,8 @@ firebase deploy --only hosting:paychek-trading
 Write-Host ''
 Write-Host 'Paychek (racine) : build/web'
 Write-Host 'Admin            : build/web/admin-hub/'
-Write-Host 'URL admin        : https://paychek-trading.web.app/admin-hub/  (pas admin-hub.html)'
+Write-Host 'URL admin        : https://paychek-trading.web.app/admin-hub/'
+Write-Host '                 : https://paychek.pro/admin-hub/'
+Write-Host ''
+Write-Host 'Si paychek.pro montre une ancienne UI : Ctrl+Shift+R (vider cache).' -ForegroundColor Yellow
+Write-Host 'Les assets /admin-hub/** sont en no-cache apres ce deploy.' -ForegroundColor Yellow

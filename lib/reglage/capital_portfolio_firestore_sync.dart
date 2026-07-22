@@ -23,6 +23,9 @@ abstract final class CapitalPortfolioFirestoreSync {
   static int _suppressPush = 0;
   static int _suppressRemoteApply = 0;
 
+  static bool Function()? shouldDeferRemoteApply;
+  static Map<String, dynamic>? _pendingRemoteData;
+
   /// Pendant suppression / écriture portefeuille : ignore les snapshots cloud
   /// qui réinjecteraient un portefeuille supprimé localement.
   static Future<T> runWithRemoteApplySuppressed<T>(
@@ -56,6 +59,29 @@ abstract final class CapitalPortfolioFirestoreSync {
   static Future<void> _writeLocalRev(int rev) =>
       CapitalPortfolioLocalRev.write(rev);
 
+  static double? _cloudCapitalAmount(Map<String, dynamic>? data) {
+    if (data == null) return null;
+    final capRaw = data['capital'];
+    if (capRaw is! Map) return null;
+    final amt = (capRaw['amount'] as num?)?.toDouble();
+    if (amt == null || amt.isNaN || amt.isInfinite || amt < 0) return null;
+    return amt;
+  }
+
+  /// Local « vide » typique après réinstall / nouveau device (pas de capital saisi).
+  static bool _localCapitalMissing(UserCapitalStore capital) =>
+      capital.capitalAmount == null;
+
+  /// Cloud a un capital à restaurer, local n’en a pas → prioriser le cloud
+  /// (réinstall, backup Android avec rev locale stale, etc.).
+  static bool _shouldAdoptCloudCapital(
+    UserCapitalStore capital,
+    Map<String, dynamic> data,
+  ) {
+    if (!_localCapitalMissing(capital)) return false;
+    return _cloudCapitalAmount(data) != null;
+  }
+
   static List<Map<String, dynamic>> _normalizedPortfolioMaps(List<dynamic> raw) {
     final out = <Map<String, dynamic>>[];
     for (final e in raw) {
@@ -82,13 +108,30 @@ abstract final class CapitalPortfolioFirestoreSync {
     return activeId == portfolio.activePortfolioId;
   }
 
+  static Future<void> _applyCloudBundle(
+    Map<String, dynamic> data,
+    UserCapitalStore capital,
+    UserPortfolioStore portfolio, {
+    required int cloudRev,
+  }) async {
+    final capRaw = data['capital'];
+    final capMap = capRaw is Map ? Map<String, dynamic>.from(capRaw) : null;
+    await capital.applyFromFirestoreSnapshot(capMap);
+    final rawList = data['portfolios'];
+    final list = rawList is List ? rawList : <dynamic>[];
+    final activeId = data['activePortfolioId'] as String?;
+    await portfolio.applyFromFirestoreSnapshot(capital, list, activeId);
+    await _writeLocalRev(cloudRev);
+  }
+
   static Future<void> _pushLocalIfSignedIn(
     UserCapitalStore capital,
     UserPortfolioStore portfolio,
   ) async {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
-    await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+    // Ne jamais pousser un capital local vide par-dessus un cloud rempli.
+    await _pushFull(u, capital, portfolio, allowWipeCloudCapital: false);
   }
 
   /// Fusionne le cloud dans [capital] / [portfolio] si le doc est plus récent.
@@ -104,37 +147,73 @@ abstract final class CapitalPortfolioFirestoreSync {
       final localRev = await _readLocalRev();
       final snap = await _doc(u).get();
       if (!snap.exists) {
-        await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+        // Premier sync : ne pousser que si on a vraiment un capital local.
+        if (!_localCapitalMissing(capital)) {
+          await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+        }
         return;
       }
       final data = snap.data();
       if (data == null) return;
       final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
 
-      if (cloudRev > localRev) {
-        final capRaw = data['capital'];
-        final capMap =
-            capRaw is Map ? Map<String, dynamic>.from(capRaw) : null;
-        await capital.applyFromFirestoreSnapshot(capMap);
-        final rawList = data['portfolios'];
-        final list = rawList is List ? rawList : <dynamic>[];
-        final activeId = data['activePortfolioId'] as String?;
-        await portfolio.applyFromFirestoreSnapshot(
-          capital,
-          list,
-          activeId,
+      // Réinstall / device neuf : capital local absent → toujours reprendre le cloud.
+      if (_shouldAdoptCloudCapital(capital, data)) {
+        debugPrint(
+          '[Paychek] CapitalPortfolioFirestoreSync.merge: adopt cloud capital '
+          '(local empty, cloud=${_cloudCapitalAmount(data)}).',
         );
-        await _writeLocalRev(cloudRev);
+        await _applyCloudBundle(
+          data,
+          capital,
+          portfolio,
+          cloudRev: cloudRev > 0 ? cloudRev : localRev,
+        );
+        return;
+      }
+
+      if (cloudRev > localRev) {
+        await _applyCloudBundle(
+          data,
+          capital,
+          portfolio,
+          cloudRev: cloudRev,
+        );
         return;
       }
       if (cloudRev < localRev) {
-        // Local plus récent (ex. suppression portefeuille) → pousser, ne pas
-        // réadopter un cloud obsolète qui contiendrait encore l’ancien portfolio.
-        await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+        // Local plus récent (ex. suppression portefeuille) → pousser, sans wipe capital.
+        final pushed = await _pushFull(
+          u,
+          capital,
+          portfolio,
+          allowWipeCloudCapital: false,
+        );
+        if (!pushed && _shouldAdoptCloudCapital(capital, data)) {
+          await _applyCloudBundle(
+            data,
+            capital,
+            portfolio,
+            cloudRev: cloudRev,
+          );
+        }
         return;
       }
       if (!_snapshotMatchesLocal(data, portfolio)) {
-        await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+        final pushed = await _pushFull(
+          u,
+          capital,
+          portfolio,
+          allowWipeCloudCapital: false,
+        );
+        if (!pushed && _shouldAdoptCloudCapital(capital, data)) {
+          await _applyCloudBundle(
+            data,
+            capital,
+            portfolio,
+            cloudRev: cloudRev,
+          );
+        }
       }
     } catch (e, st) {
       debugPrint('[Paychek] CapitalPortfolioFirestoreSync.merge: $e\n$st');
@@ -150,25 +229,67 @@ abstract final class CapitalPortfolioFirestoreSync {
     UserPortfolioStore portfolio,
   ) async {
     if (_suppressRemoteApply > 0) return;
+    if (shouldDeferRemoteApply?.call() == true) {
+      _pendingRemoteData = Map<String, dynamic>.from(data);
+      return;
+    }
+    await _handleRemoteSnapshotBody(data, capital, portfolio);
+  }
+
+  static Future<void> flushPendingRemoteIfAny(
+    UserCapitalStore capital,
+    UserPortfolioStore portfolio,
+  ) async {
+    final pending = _pendingRemoteData;
+    if (pending == null) return;
+    if (shouldDeferRemoteApply?.call() == true) return;
+    _pendingRemoteData = null;
+    await _handleRemoteSnapshotBody(pending, capital, portfolio);
+  }
+
+  static Future<void> _handleRemoteSnapshotBody(
+    Map<String, dynamic> data,
+    UserCapitalStore capital,
+    UserPortfolioStore portfolio,
+  ) async {
     final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
     if (cloudRev <= 0) return;
     _suppressPush++;
     try {
       final localRev = await _readLocalRev();
+      if (_shouldAdoptCloudCapital(capital, data)) {
+        await _applyCloudBundle(
+          data,
+          capital,
+          portfolio,
+          cloudRev: cloudRev,
+        );
+        return;
+      }
       if (cloudRev < localRev) return;
       if (cloudRev == localRev) {
         if (_snapshotMatchesLocal(data, portfolio)) return;
+        // Divergence portefeuilles à même rev : ne pas écraser un capital cloud
+        // avec un local vide (réinstall / race).
+        if (_localCapitalMissing(capital) &&
+            _cloudCapitalAmount(data) != null) {
+          await _applyCloudBundle(
+            data,
+            capital,
+            portfolio,
+            cloudRev: cloudRev,
+          );
+          return;
+        }
         await _pushLocalIfSignedIn(capital, portfolio);
         return;
       }
-      final capRaw = data['capital'];
-      final capMap = capRaw is Map ? Map<String, dynamic>.from(capRaw) : null;
-      await capital.applyFromFirestoreSnapshot(capMap);
-      final rawList = data['portfolios'];
-      final list = rawList is List ? rawList : <dynamic>[];
-      final activeId = data['activePortfolioId'] as String?;
-      await portfolio.applyFromFirestoreSnapshot(capital, list, activeId);
-      await _writeLocalRev(cloudRev);
+      await _applyCloudBundle(
+        data,
+        capital,
+        portfolio,
+        cloudRev: cloudRev,
+      );
     } catch (e, st) {
       debugPrint('[Paychek] CapitalPortfolioFirestoreSync.remote: $e\n$st');
     } finally {
@@ -185,12 +306,14 @@ abstract final class CapitalPortfolioFirestoreSync {
     if (u == null) return;
     try {
       await _pushFull(u, capital, portfolio, allowWipeCloudCapital: true);
+      await flushPendingRemoteIfAny(capital, portfolio);
     } catch (e, st) {
       debugPrint('[Paychek] CapitalPortfolioFirestoreSync.push: $e\n$st');
     }
   }
 
-  static Future<void> _pushFull(
+  /// `true` si le document cloud a été écrit.
+  static Future<bool> _pushFull(
     User u,
     UserCapitalStore capital,
     UserPortfolioStore portfolio, {
@@ -204,23 +327,15 @@ abstract final class CapitalPortfolioFirestoreSync {
         : 0;
 
     if (!allowWipeCloudCapital &&
-        capital.capitalAmount == null &&
+        _localCapitalMissing(capital) &&
         snap.exists &&
-        cloudData != null) {
-      final capRaw = cloudData['capital'];
-      if (capRaw is Map) {
-        final cloudAmt = (capRaw['amount'] as num?)?.toDouble();
-        if (cloudAmt != null &&
-            !cloudAmt.isNaN &&
-            !cloudAmt.isInfinite &&
-            cloudAmt >= 0) {
-          debugPrint(
-            '[Paychek] CapitalPortfolioFirestoreSync.push skipped: '
-            'local capital empty but cloud has $cloudAmt.',
-          );
-          return;
-        }
-      }
+        cloudData != null &&
+        _cloudCapitalAmount(cloudData) != null) {
+      debugPrint(
+        '[Paychek] CapitalPortfolioFirestoreSync.push skipped: '
+        'local capital empty but cloud has ${_cloudCapitalAmount(cloudData)}.',
+      );
+      return false;
     }
     final now = DateTime.now().microsecondsSinceEpoch;
     var rev = now;
@@ -245,5 +360,6 @@ abstract final class CapitalPortfolioFirestoreSync {
       'updatedAt': FieldValue.serverTimestamp(),
     });
     await _writeLocalRev(rev);
+    return true;
   }
 }

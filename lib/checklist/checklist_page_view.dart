@@ -118,6 +118,7 @@ class ChecklistPageView extends StatelessWidget {
                 titleEditController: c.sectionTitleEditController,
                 titleFocusNode: c.sectionTitleFocusNode,
                 onTitleSubmitted: c.commitSectionTitleEdit,
+                onTitleCancelled: c.cancelSectionEdit,
                 onTitleInteraction: c.markSectionEditInteraction,
                 onMenuSelected: (v) => onSectionMenu(section.id, v),
                 children: [

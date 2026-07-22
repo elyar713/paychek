@@ -58,9 +58,11 @@ DateTime? paychekResolveStoredSubscriptionPeriodEndUtc({
     resolved = null;
   }
 
+  // Ancienne échéance d’essai (7 j) encore écrite comme `currentPeriodEnd` —
+  // l’ignorer seulement si elle est ≈ la fin d’essai (pas un cadeau Premium court).
   if (resolved != null && trialEndUtc != null) {
-    final margin = const Duration(hours: 36);
-    if (!resolved.isAfter(trialEndUtc.add(margin))) {
+    final delta = resolved.difference(trialEndUtc).abs();
+    if (delta <= const Duration(hours: 36)) {
       resolved = null;
     }
   }

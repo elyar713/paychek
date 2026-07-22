@@ -22,6 +22,7 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
     this.titleEditController,
     this.titleFocusNode,
     this.onTitleSubmitted,
+    this.onTitleCancelled,
     this.onTitleInteraction,
     this.reorderDragIndex,
   });
@@ -32,16 +33,14 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
   final ValueChanged<bool>? onSectionEnabledChanged;
   final bool allowDelete;
 
-  /// Ã‰dition inline du titre (sans dialog).
   final bool editingTitle;
   final TextEditingController? titleEditController;
   final FocusNode? titleFocusNode;
   final VoidCallback? onTitleSubmitted;
+  final VoidCallback? onTitleCancelled;
 
-  /// Tap ou saisie sur le champ titre (compte comme Â« interaction Â» pour valider).
   final VoidCallback? onTitleInteraction;
 
-  /// Index dans la liste aplatie [ReorderableListView] (poignée de glissement).
   final int? reorderDragIndex;
 
   @override
@@ -97,7 +96,25 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                   style: ChecklistTokens.sectionTitleOnCardStyle,
                 ),
         ),
-        if (onSectionEnabledChanged != null)
+        if (editingTitle) ...[
+          IconButton(
+            onPressed: onTitleCancelled,
+            icon: const Icon(Icons.close, size: 20, color: Color(0xFFE57373)),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            splashRadius: 18,
+            tooltip: 'Cancelar',
+          ),
+          IconButton(
+            onPressed: onTitleSubmitted,
+            icon: const Icon(Icons.check, size: 20, color: Color(0xFF4CAF50)),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            splashRadius: 18,
+            tooltip: 'Confirmar',
+          ),
+        ],
+        if (!editingTitle && onSectionEnabledChanged != null)
           ChecklistSectionEnableToggle(
             value: sectionEnabled,
             onChanged: onSectionEnabledChanged!,
@@ -105,9 +122,9 @@ class ChecklistSectionHeaderRow extends StatelessWidget {
                 ? l.checklistSectionToggleOff
                 : l.checklistSectionToggleOn,
           ),
-        if (onSectionEnabledChanged != null && onMenuSelected != null)
+        if (!editingTitle && onSectionEnabledChanged != null && onMenuSelected != null)
           const SizedBox(width: 2),
-        if (onMenuSelected != null)
+        if (!editingTitle && onMenuSelected != null)
           PopupMenuButton<String>(
             icon: const Icon(
               Icons.more_horiz_rounded,

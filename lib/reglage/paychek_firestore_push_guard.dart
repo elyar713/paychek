@@ -17,13 +17,13 @@ abstract final class PaychekFirestorePushGuard {
     }
   }
 
-  /// Pull cloud au démarrage / reprise : aucun push local tant que la fusion n’est pas finie.
+  /// Pull cloud au démarrage / reprise : aucun push local tant que la fusion n'est pas finie.
   static Future<void> runCloudHydration(Future<void> Function() merge) async {
     await runSuppressed(merge);
   }
 
-  /// Au merge : `localRev` > `cloudRev` indique souvent une rev locale stale (push accidentel).
-  /// On adopte le cloud et on réaligne la rev locale — ne pas repousser l’ancien état mobile.
+  /// Au merge : `localRev` > `cloudRev` → le local est plus récent (éditions non poussées).
+  /// On garde le local et on laisse le push suivant aligner le cloud.
   static Future<void> adoptCloudWhenLocalRevAhead({
     required int localRev,
     required int cloudRev,
@@ -34,10 +34,7 @@ abstract final class PaychekFirestorePushGuard {
   }) async {
     if (cloudRev >= localRev) return;
     debugPrint(
-      '[Paychek] $label: localRev=$localRev > cloudRev=$cloudRev — adopt cloud.',
+      '[Paychek] $label: localRev=$localRev > cloudRev=$cloudRev — keep local, push will follow.',
     );
-    await applyCloud();
-    await writeLocalRev(cloudRev);
-    if (afterApply != null) await afterApply();
   }
 }

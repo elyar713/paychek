@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
+import 'social_auth_service.dart';
 import 'stripe_entitlement_sync.dart';
 
 /// Supprime le compte Firebase Auth + données Firestore (Cloud Function).
@@ -44,4 +45,5 @@ Future<void> deletePaychekUserAccountFully() async {
   } catch (e, st) {
     debugPrint('[Paychek] signOut after account delete: $e\n$st');
   }
+  await signOutGoogleCompletely();
 }

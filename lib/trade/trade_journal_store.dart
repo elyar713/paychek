@@ -40,15 +40,67 @@ class TradeJournalStore extends ChangeNotifier {
     return null;
   }
 
-  /// Remplace tout le journal (ex. après chargement prefs) sans déclencher de sauvegarde.
+  /// Remplace le journal (hydratation prefs / merge cloud).
+  ///
+  /// Ne laisse pas tomber une sauvegarde debounce en cours : fusionne les items
+  /// mémoire plus récents / absents de [next], puis re-planifie un persist si
+  /// besoin (évite la perte de trades ajoutés pendant un snapshot cloud).
   void replaceAll(List<TradeListItem> next) {
+    final hadPendingPersist = _saveDebounce?.isActive == true;
     _saveDebounce?.cancel();
+
+    final byId = <String, TradeListItem>{for (final t in next) t.id: t};
+    for (final t in _items) {
+      final c = byId[t.id];
+      if (c == null) {
+        byId[t.id] = t;
+        continue;
+      }
+      if (t.syncRev > c.syncRev) {
+        byId[t.id] = t;
+        continue;
+      }
+      var winner = c;
+      if ((winner.screenshotBytes == null || winner.screenshotBytes!.isEmpty) &&
+          t.screenshotBytes != null &&
+          t.screenshotBytes!.isNotEmpty) {
+        winner = winner.copyWith(screenshotBytes: t.screenshotBytes);
+      }
+      if ((winner.screenshotStoragePath == null ||
+              winner.screenshotStoragePath!.trim().isEmpty) &&
+          t.screenshotStoragePath != null &&
+          t.screenshotStoragePath!.trim().isNotEmpty) {
+        winner = winner.copyWith(
+          screenshotStoragePath: t.screenshotStoragePath,
+        );
+      }
+      byId[t.id] = winner;
+    }
+    final merged = byId.values.toList()
+      ..sort((a, b) => b.entreeAt.compareTo(a.entreeAt));
+
+    final grewOrDiverged = merged.length != next.length ||
+        !_sameIdsAndRevs(merged, next);
+
     _suppressPersist = true;
     _items
       ..clear()
-      ..addAll(next);
+      ..addAll(merged);
     _suppressPersist = false;
     notifyListeners();
+
+    if (hadPendingPersist || grewOrDiverged) {
+      _persistSoon();
+    }
+  }
+
+  static bool _sameIdsAndRevs(List<TradeListItem> a, List<TradeListItem> b) {
+    if (a.length != b.length) return false;
+    final bm = {for (final t in b) t.id: t.syncRev};
+    for (final t in a) {
+      if (bm[t.id] != t.syncRev) return false;
+    }
+    return true;
   }
 
   void _persistSoon() {
@@ -70,6 +122,14 @@ class TradeJournalStore extends ChangeNotifier {
     final out = <TradeListItem>[];
     var storeChanged = false;
     for (final t in items) {
+      final alreadyCloud = t.screenshotStoragePath?.trim().isNotEmpty == true;
+      final needsUpload = !alreadyCloud &&
+          ((t.screenshotBytes != null && t.screenshotBytes!.isNotEmpty) ||
+              (t.screenshotPath != null && t.screenshotPath!.trim().isNotEmpty));
+      if (!needsUpload) {
+        out.add(t);
+        continue;
+      }
       final uploaded = await TradeScreenshotCloud.ensureUploaded(t);
       out.add(uploaded);
       if (uploaded.screenshotStoragePath != t.screenshotStoragePath) {

@@ -60,7 +60,9 @@ class UserPortfolioStore extends ChangeNotifier {
     if (raw == null || raw.isEmpty) {
       _items = [];
       notifyListeners();
-      if (seedCapital != null) await ensureDefaultPortfolio(seedCapital);
+      if (seedCapital != null) {
+        await ensureDefaultPortfolio(seedCapital, bump: false);
+      }
       _reconcileActivePortfolioId(prefs.getString(_prefsActiveIdKey));
       await _persistActiveId();
       notifyListeners();
@@ -75,7 +77,9 @@ class UserPortfolioStore extends ChangeNotifier {
       _items = [];
     }
     notifyListeners();
-    if (seedCapital != null) await ensureDefaultPortfolio(seedCapital);
+    if (seedCapital != null) {
+      await ensureDefaultPortfolio(seedCapital, bump: false);
+    }
     _reconcileActivePortfolioId(prefs.getString(_prefsActiveIdKey));
     await _persistActiveId();
     notifyListeners();
@@ -182,7 +186,10 @@ class UserPortfolioStore extends ChangeNotifier {
   }
 
   /// Garantit [kDefaultPortfolioId] : capital / devise alignés sur [UserCapitalStore].
-  Future<void> ensureDefaultPortfolio(UserCapitalStore capital) async {
+  Future<void> ensureDefaultPortfolio(
+    UserCapitalStore capital, {
+    bool bump = true,
+  }) async {
     if (_items.any((e) => e.id == kDefaultPortfolioId)) return;
     final p = UserPortfolio(
       id: kDefaultPortfolioId,
@@ -195,7 +202,7 @@ class UserPortfolioStore extends ChangeNotifier {
           capital.isCustomCurrency ? capital.syncCustomCurrencySymbol : '',
     );
     _items = [p, ..._items];
-    await _persist();
+    await _persist(bump: bump);
   }
 
   /// Après changement du capital global (questionnaire, réglages Capital).
@@ -224,8 +231,10 @@ class UserPortfolioStore extends ChangeNotifier {
     await _persist();
   }
 
-  Future<void> _persist() async {
-    await CapitalPortfolioLocalRev.bump();
+  Future<void> _persist({bool bump = true}) async {
+    if (bump) {
+      await CapitalPortfolioLocalRev.bump();
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
       _prefsKey,

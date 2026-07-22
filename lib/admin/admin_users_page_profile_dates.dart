@@ -5,10 +5,12 @@ class _MaquetteAccountDatesBlock extends StatefulWidget {
   const _MaquetteAccountDatesBlock({
     required this.u,
     required this.df,
+    required this.scaffoldContext,
   });
 
   final AdminUserRow u;
   final DateFormat df;
+  final BuildContext scaffoldContext;
 
   @override
   State<_MaquetteAccountDatesBlock> createState() =>
@@ -146,19 +148,14 @@ class _MaquetteAccountDatesBlockState extends State<_MaquetteAccountDatesBlock> 
 
     final proSinceUtc = u.subscriptionProSinceUtc;
     final anchor = proSinceUtc ?? u.subscriptionTierUpdatedAt;
-    final periodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
-      periodEndUtc: u.subscriptionCurrentPeriodEnd,
-      proSinceUtc: anchor,
-      storeProductId: u.googlePlayProductId,
-      trialEndUtc: trialEndUtc,
-    );
+    // Affichage admin : échéance brute Firestore (déjà mergée user + entitlements).
+    // Ne pas passer par le resolver Play/essai — il masquait les cadeaux Premium.
+    final rawPeriodEnd = u.subscriptionCurrentPeriodEnd?.toUtc();
+    final finProUtc = rawPeriodEnd ??
+        (tierPro ? TrialAccessPrefs.webProLicenseEndUtc(anchor) : null);
     final showProDates = tierPro ||
-        periodEndUtc != null ||
+        rawPeriodEnd != null ||
         proSinceUtc != null;
-    final finProUtc = TrialAccessPrefs.proSubscriptionAdminEndUtc(
-      proSinceUtc: anchor,
-      subscriptionPeriodEndUtc: periodEndUtc,
-    );
     final achatUtc = proSinceUtc ?? u.subscriptionTierUpdatedAt;
     final achatLabel =
         achatUtc != null ? df.format(achatUtc.toLocal()) : '—';
@@ -254,7 +251,8 @@ class _MaquetteAccountDatesBlockState extends State<_MaquetteAccountDatesBlock> 
                     trailing: tierPro && _isGooglePlayPayment(u)
                         ? IconButton(
                             tooltip: 'Resync dates Google Play',
-                            onPressed: _syncingPlay ? null : _resyncGooglePlayDates,
+                            onPressed:
+                                _syncingPlay ? null : _resyncGooglePlayDates,
                             icon: _syncingPlay
                                 ? const SizedBox(
                                     width: 18,
@@ -271,6 +269,16 @@ class _MaquetteAccountDatesBlockState extends State<_MaquetteAccountDatesBlock> 
               ],
             ),
           ],
+          const SizedBox(height: 18),
+          const Divider(height: 1, color: _border),
+          const SizedBox(height: 14),
+          _AdminGrantSubscriptionDaysControl(
+            userId: u.id,
+            currentPeriodEnd: u.subscriptionCurrentPeriodEnd,
+            isPro: u.hasEffectiveProAccess,
+            df: df,
+            scaffoldContext: widget.scaffoldContext,
+          ),
         ],
       ),
     );

@@ -7,12 +7,36 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:738203717325:android:da54e7c83f0bdc5336e384",
+        "mobilesdk_app_id": "1:738203717325:android:34496c3172aeea4a36e384",
         "android_client_info": {
           "package_name": "pro.paychek.app"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "738203717325-vj41pv0lgd430vsbfslhg91chvof2dfl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pro.paychek.app",
+            "certificate_hash": "16bde5066d4fd7ff68f126b1432c3196c9c5b10a"
+          }
+        },
+        {
+          "client_id": "738203717325-c9ojp3fkmi3q183fh312sjckgko1gose.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pro.paychek.app",
+            "certificate_hash": "f7adea36ab6aa761003e9ad8aeb3a2691dec732c"
+          }
+        },
+        {
+          "client_id": "738203717325-vi4hks1bpg4aq2ptpkqbpe3obpkbrj36.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pro.paychek.app",
+            "certificate_hash": "2b30333a606357b73221fd42b0849bf39f232b6b"
+          }
+        },
         {
           "client_id": "738203717325-gke6ohrsg6192u3cnq8po9tbo2uc2jjn.apps.googleusercontent.com",
           "client_type": 3

@@ -337,7 +337,7 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   void _onChecklistCloudTick() {
-    if (_checklistController.isEditingChecklist) return;
+    if (_checklistController.hasUnsavedChecklistEdits) return;
     unawaited(
       _checklistController.reloadFromStorage().then((_) {
         if (mounted) _reconcileJournalDisciplineFromCalendar();

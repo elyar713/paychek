@@ -244,7 +244,11 @@ class _UserExpandedDashboard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          _MaquetteAccountDatesBlock(u: u, df: df),
+          _MaquetteAccountDatesBlock(
+            u: u,
+            df: df,
+            scaffoldContext: scaffoldContext,
+          ),
           const SizedBox(height: 18),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

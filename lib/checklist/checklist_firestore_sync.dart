@@ -21,6 +21,15 @@ abstract final class ChecklistFirestoreSync {
 
   static int _suppressPush = 0;
 
+  /// Édition locale pas encore poussée : ne pas écraser prefs/UI avec un snapshot.
+  static bool Function()? shouldDeferRemoteApply;
+
+  static Map<String, dynamic>? _pendingRemoteData;
+
+  /// Cooldown après un push : ignorer les snapshots echo pendant cette durée.
+  static DateTime? _lastPushAt;
+  static const _pushCooldown = Duration(seconds: 5);
+
   static String _revPrefsKey() => paychekScopedPrefsKey(_kRevBase);
 
   static DocumentReference<Map<String, dynamic>> _doc(User u) =>
@@ -62,10 +71,22 @@ abstract final class ChecklistFirestoreSync {
       final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
 
       if (cloudRev > localRev) {
-        final sections = _sectionsFromData(data);
-        if (sections != null) {
+        final cloudSections = _sectionsFromData(data);
+        final localSections = await ChecklistSectionsStorage.load();
+        final localHasContent = localSections != null &&
+            localSections.isNotEmpty &&
+            localSections.any((s) => s.items.isNotEmpty);
+        if (localHasContent) {
+          debugPrint(
+            '[Paychek] ChecklistFirestoreSync.merge: local has content, '
+            'push local over cloud (localRev=$localRev cloudRev=$cloudRev).',
+          );
+          await _pushFull(u);
+          return;
+        }
+        if (cloudSections != null) {
           await ChecklistSectionsStorage.save(
-            checklistEnsureProtectedSections(sections),
+            checklistEnsureProtectedSections(cloudSections),
           );
           await _writeLocalRev(cloudRev);
           ChecklistRealtimeNotifier.bump();
@@ -73,21 +94,7 @@ abstract final class ChecklistFirestoreSync {
         return;
       }
       if (cloudRev < localRev) {
-        await PaychekFirestorePushGuard.adoptCloudWhenLocalRevAhead(
-          localRev: localRev,
-          cloudRev: cloudRev,
-          label: 'ChecklistFirestoreSync',
-          applyCloud: () async {
-            final sections = _sectionsFromData(data);
-            if (sections != null) {
-              await ChecklistSectionsStorage.save(
-                checklistEnsureProtectedSections(sections),
-              );
-            }
-          },
-          writeLocalRev: _writeLocalRev,
-          afterApply: () async => ChecklistRealtimeNotifier.bump(),
-        );
+        await _pushFull(u);
       }
     } catch (e, st) {
       debugPrint('[Paychek] ChecklistFirestoreSync.merge: $e\n$st');
@@ -98,6 +105,29 @@ abstract final class ChecklistFirestoreSync {
 
   /// Listener `snapshots()` : applique si `rev` cloud plus récent.
   static Future<void> handleRemoteSnapshot(Map<String, dynamic> data) async {
+    final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
+    if (cloudRev <= 0) return;
+    if (_lastPushAt != null &&
+        DateTime.now().difference(_lastPushAt!) < _pushCooldown) {
+      return;
+    }
+    if (shouldDeferRemoteApply?.call() == true) {
+      _pendingRemoteData = Map<String, dynamic>.from(data);
+      return;
+    }
+    await _applyRemoteData(data);
+  }
+
+  /// Après persistance locale : appliquer un snapshot différé s'il est plus neuf.
+  static Future<void> flushPendingRemoteIfAny() async {
+    final pending = _pendingRemoteData;
+    if (pending == null) return;
+    if (shouldDeferRemoteApply?.call() == true) return;
+    _pendingRemoteData = null;
+    await _applyRemoteData(pending);
+  }
+
+  static Future<void> _applyRemoteData(Map<String, dynamic> data) async {
     final cloudRev = (data['rev'] as num?)?.toInt() ?? 0;
     if (cloudRev <= 0) return;
     _suppressPush++;
@@ -178,7 +208,7 @@ abstract final class ChecklistFirestoreSync {
       'sections': encoded,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    _lastPushAt = DateTime.now();
     await _writeLocalRev(rev);
-    ChecklistRealtimeNotifier.bump();
   }
 }

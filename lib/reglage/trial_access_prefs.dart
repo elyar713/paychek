@@ -279,7 +279,7 @@ abstract final class TrialAccessPrefs {
         );
       }
 
-      final active = data['active'] == true;
+      final activeRaw = data['active'] == true;
       DateTime? periodEndUtc;
       for (final key in ['currentPeriodEnd', 'expiresAt', 'periodEnd']) {
         final parsed = paychekParseFirestoreInstantUtc(data[key]);
@@ -288,6 +288,17 @@ abstract final class TrialAccessPrefs {
           break;
         }
       }
+      final adminComp =
+          paychekParseFirestoreInstantUtc(data['adminCompPeriodEnd']);
+      if (adminComp != null) {
+        if (periodEndUtc == null || adminComp.isAfter(periodEndUtc)) {
+          periodEndUtc = adminComp;
+        }
+      }
+      final nowUtc = DateTime.now().toUtc();
+      final adminGiftLive =
+          adminComp != null && adminComp.isAfter(nowUtc);
+      final active = activeRaw || adminGiftLive;
       DateTime? proSinceUtc;
       for (final key in ['proSinceUtc', 'proSince', 'currentPeriodStart']) {
         final parsed = paychekParseFirestoreInstantUtc(data[key]);
@@ -450,10 +461,12 @@ abstract final class TrialAccessPrefs {
     // Doc existant sans date OU lecture Firestore en échec : ne pas réancrer l’essai
     // (évite un 2e essai de 7 j sur Android quand le réseau/cache diffère de l’iPhone).
 
+    // Ne pas retirer le Pro local juste parce que Firestore n’a pas (encore)
+    // `active` / `docPro` : après achat Play la Cloud Function peut être lente,
+    // et un forceServer trop tôt faisait réapparaître le paywall (« racheter »).
+    // On ne désactive le cache local qu’en cas d’échéance claire (plus bas) ou
+    // via [PaychekEntitlementLocalSync.markSubscriptionInactive].
     final localSub = p.getBool(_kSubscriberActive) ?? false;
-    if (forceServer && localSub && !subRow.active && !row.docPro) {
-      await p.setBool(_kSubscriberActive, false);
-    }
     final ms = p.getInt(_kTrialStartUtcMs);
     final anchorUtc = ms != null
         ? DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true)
@@ -479,11 +492,14 @@ abstract final class TrialAccessPrefs {
             row.trialFreemiumOverrideUntilUtc,
           );
     final storeProductId = subRow.appleProductId ?? subRow.googlePlayProductId;
+    // Premium et freemium sont séparés : ne pas utiliser la fin d’essai pour
+    // « corriger » une échéance Premium (admin gift / abo actif).
+    final premiumLive = subRow.active || row.docPro;
     subscriptionPeriodEndUtc = paychekResolveStoredSubscriptionPeriodEndUtc(
       periodEndUtc: subscriptionPeriodEndUtc,
       proSinceUtc: proSinceForResolve,
       storeProductId: storeProductId,
-      trialEndUtc: trialEndForResolve,
+      trialEndUtc: premiumLive ? null : trialEndForResolve,
       storeEntitlementActive: subRow.active,
     );
 
@@ -512,9 +528,11 @@ abstract final class TrialAccessPrefs {
 
     final effectiveLocalSub = p.getBool(_kSubscriberActive) ?? false;
 
-    // Échéance passée → plus Pro, sauf abonnement store encore actif.
+    // Échéance passée → plus Pro (cadeau admin / abo terminé).
+    // Si le store est encore actif avec une date obsolète, le bloc plus haut
+    // a déjà corrigé [subscriptionPeriodExpired].
     final bool hasLiveSubscription;
-    if (subscriptionPeriodExpired && !subRow.active && !row.docPro) {
+    if (subscriptionPeriodExpired) {
       hasLiveSubscription = false;
     } else {
       hasLiveSubscription =

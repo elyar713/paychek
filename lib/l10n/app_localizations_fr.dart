@@ -2721,7 +2721,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get accountSocialGoogleWebClientMissing =>
-      'Pour Google sur téléphone ou tablette : renseigne l’ID client OAuth Web dans lib/reglage/social_auth_config.dart. Sur Android, ajoute l’empreinte SHA-1 de l’app dans Firebase (Paramètres du projet → ton appli Android).';
+      'Connexion Google impossible : ajoute les empreintes SHA-1 (upload + Play App Signing + debug) dans Firebase → Paramètres du projet → app Android pro.paychek.app, puis re-télécharge google-services.json.';
 
   @override
   String get paywallTitle => 'Ta période d’essai est terminée';

@@ -18,7 +18,7 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
           kPaychekUserFieldSubscriptionTierUpdatedAt:
               FieldValue.serverTimestamp(),
           if (tier == PaychekSubscriptionTier.pro) ...<String, dynamic>{
-            'paymentMethod': 'admin',
+            // Ne pas forcer paymentMethod=admin (garder Google/Apple/Stripe).
             kPaychekUserFieldSubscriptionProSinceUtc:
                 FieldValue.serverTimestamp(),
           } else ...<String, dynamic>{
@@ -38,7 +38,6 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
           await entRef.set(
             <String, dynamic>{
               'active': true,
-              'provider': 'admin',
               'updatedAt': FieldValue.serverTimestamp(),
               'proSinceUtc': FieldValue.serverTimestamp(),
             },
@@ -48,7 +47,6 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
           await entRef.set(
             <String, dynamic>{
               'active': false,
-              'provider': 'admin',
               'updatedAt': FieldValue.serverTimestamp(),
             },
             SetOptions(merge: true),

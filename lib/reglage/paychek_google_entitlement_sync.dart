@@ -38,6 +38,8 @@ abstract final class PaychekGoogleEntitlementSync {
         final data = result.data;
         if (data is Map && data['active'] == true) {
           lastFailureMessage = null;
+          // Pro local immédiat (évite paywall « racheter » pendant la sync Firestore).
+          await PaychekEntitlementLocalSync.markPurchaseVerified();
           await PaychekEntitlementLocalSync.refreshEntitlementFromServer(
             purchaseActive: true,
           );
@@ -99,6 +101,7 @@ abstract final class PaychekGoogleEntitlementSync {
           .call<Object?>(payload);
       final data = result.data;
       if (data is Map && data['active'] == true) {
+        await PaychekEntitlementLocalSync.markPurchaseVerified();
         await PaychekEntitlementLocalSync.refreshEntitlementFromServer(
           purchaseActive: true,
         );

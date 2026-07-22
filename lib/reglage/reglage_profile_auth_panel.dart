@@ -330,8 +330,17 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     }
     if (error is StateError) {
       final m = error.message;
-      if (m == 'google_web_client_id' || m == 'google_no_id_token') {
+      if (m == 'google_web_client_id' ||
+          m == 'google_no_id_token' ||
+          m == 'google_android_sha1' ||
+          m.startsWith('google_sign_in_failed:')) {
         _snack(l10n.accountSocialGoogleWebClientMissing);
+        unawaited(_alertAuthDiagnostic(
+          'Google Android',
+          m == 'google_android_sha1' || m.startsWith('google_sign_in_failed:')
+              ? 'SHA-1 manquant (surtout App signing Play Console).\n$m'
+              : m,
+        ));
         return;
       }
       if (m == 'apple_sign_in_use_google_android') {
@@ -446,6 +455,15 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
     } on GoogleSignInException catch (e) {
       if (!mounted) return;
       final detail = e.description?.trim();
+      if (e.code == GoogleSignInExceptionCode.clientConfigurationError ||
+          e.code == GoogleSignInExceptionCode.providerConfigurationError) {
+        _snack(l10n.accountSocialGoogleWebClientMissing);
+        unawaited(_alertAuthDiagnostic(
+          'Google Sign-In',
+          '${e.code}\n${detail ?? ''}\n\nAjoute le SHA-1 App signing (Play Console) dans Firebase.',
+        ));
+        return;
+      }
       if (detail != null && detail.isNotEmpty) {
         _snack(detail);
       } else {
@@ -453,8 +471,12 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       }
     } catch (e) {
       if (!mounted) return;
-      if (e is StateError && e.message == 'google_web_client_id') {
+      if (e is StateError &&
+          (e.message == 'google_web_client_id' ||
+              e.message == 'google_android_sha1' ||
+              e.message.startsWith('google_sign_in_failed:'))) {
         _snack(l10n.accountSocialGoogleWebClientMissing);
+        unawaited(_alertAuthDiagnostic('Google Android', e.message));
       } else {
         _snackAuthFailure(e, l10n);
       }

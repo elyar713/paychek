@@ -21,6 +21,7 @@ class ChecklistSectionCard extends StatelessWidget {
     this.titleEditController,
     this.titleFocusNode,
     this.onTitleSubmitted,
+    this.onTitleCancelled,
     this.onTitleInteraction,
   });
 
@@ -36,6 +37,7 @@ class ChecklistSectionCard extends StatelessWidget {
   final TextEditingController? titleEditController;
   final FocusNode? titleFocusNode;
   final VoidCallback? onTitleSubmitted;
+  final VoidCallback? onTitleCancelled;
   final VoidCallback? onTitleInteraction;
 
   Widget _buildBody() {
@@ -49,6 +51,7 @@ class ChecklistSectionCard extends StatelessWidget {
       titleEditController: titleEditController,
       titleFocusNode: titleFocusNode,
       onTitleSubmitted: onTitleSubmitted,
+      onTitleCancelled: onTitleCancelled,
       onTitleInteraction: onTitleInteraction,
     );
     const gap = SizedBox(height: ChecklistTokens.sectionHeaderToItemsGap);

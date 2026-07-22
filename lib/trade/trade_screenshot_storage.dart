@@ -98,12 +98,7 @@ abstract final class TradeScreenshotCloud {
     if (u == null) return item;
     final existing = item.screenshotStoragePath?.trim();
     if (existing != null && existing.isNotEmpty) {
-      final bytes = await resolveBytes(item);
-      if (bytes != null &&
-          bytes.isNotEmpty &&
-          (item.screenshotBytes == null || item.screenshotBytes!.isEmpty)) {
-        return item.copyWith(screenshotBytes: bytes);
-      }
+      // Déjà cloud : ne pas relire SharedPreferences à chaque persist (lag).
       return item;
     }
 

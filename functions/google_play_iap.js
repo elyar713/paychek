@@ -445,6 +445,36 @@ async function paychekForceGooglePlayProMirror(db, uid, opts, admin) {
   } = opts;
   const entRef = db.collection("subscriber_entitlements").doc(uid);
   const userRef = db.collection("paychek_users").doc(uid);
+  const [entSnap, userSnap] = await Promise.all([entRef.get(), userRef.get()]);
+  const entData = entSnap.exists ? entSnap.data() || {} : {};
+  const userData = userSnap.exists ? userSnap.data() || {} : {};
+  const pickTs = (data, key) => {
+    const v = data[key];
+    return v && typeof v.toMillis === "function" ? v : null;
+  };
+  // Cadeau admin : entitlement OU miroir user (si sync a déjà raccourci currentPeriodEnd).
+  let adminComp =
+    pickTs(entData, "adminCompPeriodEnd") ||
+    pickTs(userData, "adminCompPeriodEnd");
+  const prevEnd = pickTs(entData, "currentPeriodEnd");
+
+  let periodEnd = currentPeriodEnd;
+  // Ne pas écraser un cadeau admin plus long (Fin Pro qui « revient » après sync).
+  // Le mode de paiement reste google_play — seul adminCompPeriodEnd protège la date.
+  if (adminComp && adminComp.toMillis() > Date.now()) {
+    if (!periodEnd || periodEnd.toMillis() < adminComp.toMillis()) {
+      periodEnd = adminComp;
+    }
+  } else if (
+    `${entData.provider || ""}`.trim() === "admin" &&
+    prevEnd &&
+    prevEnd.toMillis() > Date.now()
+  ) {
+    if (!periodEnd || periodEnd.toMillis() < prevEnd.toMillis()) {
+      periodEnd = prevEnd;
+    }
+  }
+
   const entPatch = {
     active: true,
     provider: "google_play",
@@ -454,7 +484,10 @@ async function paychekForceGooglePlayProMirror(db, uid, opts, admin) {
   };
   if (orderId) entPatch.googlePlayOrderId = orderId;
   if (proSinceUtc) entPatch.proSinceUtc = proSinceUtc;
-  if (currentPeriodEnd) entPatch.currentPeriodEnd = currentPeriodEnd;
+  if (periodEnd) entPatch.currentPeriodEnd = periodEnd;
+  if (adminComp && adminComp.toMillis() > Date.now()) {
+    entPatch.adminCompPeriodEnd = adminComp;
+  }
 
   const userPatch = {
     subscriptionTier: "pro",
@@ -464,8 +497,11 @@ async function paychekForceGooglePlayProMirror(db, uid, opts, admin) {
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
   if (proSinceUtc) userPatch.subscriptionProSinceUtc = proSinceUtc;
-  if (currentPeriodEnd) {
-    userPatch.subscriptionCurrentPeriodEnd = currentPeriodEnd;
+  if (periodEnd) {
+    userPatch.subscriptionCurrentPeriodEnd = periodEnd;
+  }
+  if (adminComp && adminComp.toMillis() > Date.now()) {
+    userPatch.adminCompPeriodEnd = adminComp;
   }
 
   const batch = db.batch();
@@ -476,8 +512,11 @@ async function paychekForceGooglePlayProMirror(db, uid, opts, admin) {
       "[Paychek] forceGooglePlayProMirror",
       uid,
       productId,
-      currentPeriodEnd && currentPeriodEnd.toMillis ?
-        new Date(currentPeriodEnd.toMillis()).toISOString() :
+      adminComp && adminComp.toMillis() > Date.now() ?
+        "(preserve adminComp period)" :
+        "",
+      periodEnd && periodEnd.toMillis ?
+        new Date(periodEnd.toMillis()).toISOString() :
         null,
   );
 }
