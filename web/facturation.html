@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing | Paychek</title>
+    <meta name="description" content="Manage your Paychek Pro subscription, upgrade plans, and open the Stripe customer portal.">
+    <meta name="robots" content="noindex, follow">
+    <meta name="author" content="Paychek">
+    <link rel="canonical" href="https://paychek.pro/facturation.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Paychek">
+    <meta property="og:title" content="Billing | Paychek">
+    <meta property="og:url" content="https://paychek.pro/facturation.html">
+
+    <link rel="stylesheet" href="css/paychek-tailwind.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing-page.css">
+    <link rel="stylesheet" href="css/paychek-account-nav.css">
+    <link rel="stylesheet" href="css/paychek-site-auth.css">
+    <style>
+        .acct-panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .acct-chip {
+            display: inline-block;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #fbbf24; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            padding: 4px 10px; border-radius: 999px;
+        }
+        .acct-badge {
+            display: inline-flex; align-items: center;
+            font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 999px;
+        }
+        .acct-badge--pro {
+            color: #000;
+            background: linear-gradient(135deg, #FFE0B2 0%, #D4A359 50%, #B38038 100%);
+        }
+        .acct-badge--lite {
+            color: #9ca3af;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .acct-row {
+            display: flex; justify-content: space-between; gap: 1rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 14px;
+        }
+        .acct-row:last-child { border-bottom: none; }
+        .acct-row dt { color: #9ca3af; font-weight: 600; }
+        .acct-row dd { color: #fff; font-weight: 600; text-align: right; max-width: 60%; }
+        .btn-secondary:disabled,
+        .btn-secondary[aria-disabled="true"] {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            transform: none;
+        }
+        .btn-secondary:disabled:hover,
+        .btn-secondary[aria-disabled="true"]:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: none;
+        }
+        .plan-pick {
+            width: 100%;
+            text-align: left;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1.25rem;
+            padding: 1.1rem 1.25rem;
+            transition: border-color .2s ease, background .2s ease;
+        }
+        .plan-pick:hover { border-color: rgba(245,158,11,0.35); }
+        .plan-pick.is-selected {
+            border-color: rgba(212,163,89,0.55);
+            background: rgba(212,163,89,0.06);
+        }
+        .plan-pick-badge {
+            font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+            color: #fbbf24;
+        }
+        #billing-status-msg {
+            display: none;
+            margin-top: 1rem;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.45;
+            font-weight: 600;
+        }
+        #billing-status-msg.is-error {
+            display: block;
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        #billing-status-msg.is-info {
+            display: block;
+            color: #fbbf24;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.25);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div class="hero-glow"></div>
+
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="paychek-topnav max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20">
+            <div class="paychek-topnav-side paychek-topnav-side--left">
+                <a href="landing.html" target="_top" class="flex items-center gap-2.5 sm:gap-3 group shrink-0 min-w-0">
+                    <img src="images/paychek-logo.svg" alt="" class="w-8 h-8 sm:w-10 sm:h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
+                    <span class="hidden sm:inline text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+                </a>
+            </div>
+
+            <div class="paychek-topnav-center" role="navigation" aria-label="Products">
+                <a href="landing.html" target="_top" class="paychek-product-link" data-i18n="nav.journal">Journal</a>
+                <a href="safeguard.html" target="_top" class="paychek-product-link" data-i18n="nav.safeguard">Safeguard</a>
+            </div>
+
+            <div class="paychek-topnav-side paychek-topnav-side--right">
+                <div class="relative group paychek-lang-picker-wrap" id="lang-picker-wrap">
+                    <button type="button" class="flex items-center gap-1.5 sm:gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown-menu" onclick="facturationToggleLang(event)">
+                        <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
+                        <span id="lang-trigger-code" class="hidden sm:inline">EN</span>
+                        <i class="fas fa-chevron-down text-[8px] opacity-50 hidden sm:inline" aria-hidden="true"></i>
+                    </button>
+                    <div id="lang-dropdown-menu" class="paychek-lang-menu-panel invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]" role="menu">
+                        <a href="#" onclick="facturationSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
+                            <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
+                        </a>
+                        <a href="#" onclick="facturationSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="fr">
+                            <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
+                        </a>
+                        <a href="#" onclick="facturationSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
+                            <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
+                        </a>
+                        <a href="#" onclick="facturationSelectLang('es', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="es">
+                            <img src="https://flagcdn.com/w40/es.png" alt="" class="flag-icon"> ESPAÑOL
+                        </a>
+                        <a href="#" onclick="facturationSelectLang('pt', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="pt">
+                            <img src="https://flagcdn.com/w40/pt.png" alt="" class="flag-icon"> PORTUGUÊS
+                        </a>
+                        <a href="#" onclick="facturationSelectLang('ko', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="ko">
+                            <img src="https://flagcdn.com/w40/kr.png" alt="" class="flag-icon"> 한국어
+                        </a>
+                    </div>
+                </div>
+                <span class="inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
+                <div id="paychek-account-nav" class="paychek-account-nav-host"></div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-3xl mx-auto px-6 pt-20 sm:pt-24 pb-10 text-center relative z-[1]">
+        <span class="acct-chip" data-i18n="hero.chip">Your account</span>
+        <h1 class="mt-6 text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight" data-i18n-html="hero.titleHtml">
+            Billing & <span class="gradient-text">plans</span>
+        </h1>
+        <p class="mt-5 text-gray-400 text-base leading-relaxed" data-i18n="hero.subtitle">
+            Upgrade to Pro, manage Stripe billing, or see how your plan is billed.
+        </p>
+    </header>
+
+    <main class="relative z-[1] px-6 pb-24">
+        <div id="billing-gate" class="max-w-xl mx-auto acct-panel rounded-3xl p-8 sm:p-10 text-center" hidden>
+            <h2 class="text-xl font-bold text-white" data-i18n="gate.title">Sign in to manage billing</h2>
+            <p class="mt-3 text-sm text-gray-500 leading-relaxed" data-i18n="gate.body">Subscriptions and invoices are tied to your Paychek account.</p>
+            <div class="mt-8 flex flex-wrap justify-center gap-3">
+                <button type="button" class="btn-primary px-8 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="gate.login" data-paychek-auth-open="login">Log in</button>
+                <button type="button" class="btn-secondary px-8 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="gate.signup" data-paychek-auth-open="signup">Sign up</button>
+            </div>
+        </div>
+
+        <div id="billing-loading" class="max-w-xl mx-auto text-center text-gray-500 text-sm py-16" data-i18n="loading">Loading…</div>
+
+        <div id="billing-error" class="max-w-xl mx-auto acct-panel rounded-3xl p-8 text-center text-red-400 text-sm" hidden data-i18n="error">Could not load billing info.</div>
+
+        <div id="billing-content" class="max-w-3xl mx-auto space-y-6" hidden>
+            <section class="acct-panel rounded-3xl p-7 sm:p-9">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-lg font-bold text-white" data-i18n="status.title">Current plan</h2>
+                    <span id="billing-plan-badge" class="acct-badge acct-badge--lite">Lite</span>
+                </div>
+                <dl class="mt-6">
+                    <div class="acct-row">
+                        <dt data-i18n="status.validUntil">Renews / valid until</dt>
+                        <dd id="billing-plan-expiry">—</dd>
+                    </div>
+                    <div class="acct-row">
+                        <dt data-i18n="status.methodLabel">Billed via</dt>
+                        <dd id="billing-plan-method">—</dd>
+                    </div>
+                </dl>
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <button type="button" id="billing-invoice-btn" class="btn-secondary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-2" data-i18n="status.downloadInvoice" disabled aria-disabled="true" title="No invoice available">Download invoice</button>
+                </div>
+            </section>
+
+            <section id="billing-plans-section" class="acct-panel rounded-3xl p-7 sm:p-9">
+                <h2 class="text-lg font-bold text-white" data-i18n="plans.title">Choose a Pro plan</h2>
+                <p class="mt-2 text-sm text-gray-500" data-i18n="plans.subtitle">Same prices as on the Journal landing page (USD).</p>
+                <div class="mt-6 space-y-3" role="radiogroup" aria-label="Plans">
+                    <button type="button" class="plan-pick is-selected" data-cycle="annual" aria-checked="true">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="plan-pick-badge" data-i18n="plans.annualBadge">SAVE 44%</div>
+                                <div class="mt-1 text-white font-bold" data-i18n="plans.annualTitle">1 year</div>
+                                <div class="mt-1 text-xs text-gray-500" data-i18n="plans.annualSaving">About $4.99 / month</div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-white font-extrabold text-lg" data-i18n="plans.annualPrice">$59.99</div>
+                                <div class="text-xs text-gray-500" data-i18n="plans.annualLabel">/ year</div>
+                            </div>
+                        </div>
+                    </button>
+                    <button type="button" class="plan-pick" data-cycle="quarterly" aria-checked="false">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="plan-pick-badge" data-i18n="plans.quarterlyBadge">-22%</div>
+                                <div class="mt-1 text-white font-bold" data-i18n="plans.quarterlyTitle">3 months</div>
+                                <div class="mt-1 text-xs text-gray-500" data-i18n="plans.quarterlySaving">About $6.99 / month</div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-white font-extrabold text-lg" data-i18n="plans.quarterlyPrice">$20.99</div>
+                                <div class="text-xs text-gray-500" data-i18n="plans.quarterlyLabel">/ 3 months</div>
+                            </div>
+                        </div>
+                    </button>
+                    <button type="button" class="plan-pick" data-cycle="monthly" aria-checked="false">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="mt-1 text-white font-bold" data-i18n="plans.monthlyTitle">1 month</div>
+                                <div class="mt-1 text-xs text-gray-500" data-i18n="plans.monthlySaving">Billed monthly</div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-white font-extrabold text-lg" data-i18n="plans.monthlyPrice">$8.99</div>
+                                <div class="text-xs text-gray-500" data-i18n="plans.monthlyLabel">/ month</div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-3 items-center">
+                    <button type="button" id="billing-subscribe-btn" class="btn-primary px-8 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="plans.cta">Subscribe</button>
+                    <a href="landing.html#pricing" target="_top" class="text-[11px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition" data-i18n="plans.compare">Compare features on the Journal page</a>
+                </div>
+            </section>
+
+            <section class="acct-panel rounded-3xl p-7 sm:p-9">
+                <h2 class="text-lg font-bold text-white" data-i18n="manage.title">Manage subscription</h2>
+                <p class="mt-3 text-sm text-gray-500 leading-relaxed" data-i18n="manage.body">
+                    Update your card, download invoices, or cancel — Stripe customer portal (web Pro only).
+                </p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button type="button" id="billing-portal-btn" class="btn-primary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="manage.cta">Open billing portal</button>
+                    <a id="billing-apple-link" href="https://apps.apple.com/account/subscriptions" target="_blank" rel="noopener noreferrer" class="btn-secondary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" data-i18n="manage.appleLink" hidden>Manage App Store subscriptions</a>
+                    <a id="billing-google-link" href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener noreferrer" class="btn-secondary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" data-i18n="manage.googleLink" hidden>Manage Google Play subscriptions</a>
+                </div>
+                <p id="billing-no-stripe" class="mt-4 text-sm text-gray-500" data-i18n="manage.noStripe" hidden>
+                    No Stripe subscription is linked to this account.
+                </p>
+                <div id="billing-status-msg" role="status" aria-live="polite"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="pt-12 pb-12 border-t border-white/5 bg-black relative z-[1]">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.4em]" data-i18n="footer.copyright">© 2026 PAYCHEK — ALL RIGHTS RESERVED.</p>
+            <div class="flex flex-wrap justify-center gap-6 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                <a href="landing.html" target="_top" class="hover:text-white transition" data-i18n="nav.journal">Journal</a>
+                <a href="safeguard.html" target="_top" class="hover:text-white transition" data-i18n="nav.safeguard">Safeguard</a>
+                <a href="licence.html" target="_top" class="hover:text-white transition" data-i18n="footer.license">License</a>
+                <a href="blog.html" target="_top" class="hover:text-white transition" data-i18n="footer.blog">Blog</a>
+                <a href="contact.html" target="_top" class="hover:text-white transition" data-i18n="footer.contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="facturation-i18n.js"></script>
+    <script src="js/paychek-account-entitlement.js"></script>
+    <script src="js/paychek-invoice.js"></script>
+    <script src="js/facturation-page.js"></script>
+    <script src="js/paychek-site-auth.js"></script>
+    <script src="js/paychek-account-nav.js"></script>
+</body>
+</html>

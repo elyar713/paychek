@@ -8,7 +8,10 @@
   },
   "nav": {
     "pricing": "요금제",
-    "openApp": "앱 열기"
+    "openApp": "앱 열기",
+    "journal": "저널",
+    "login": "로그인",
+    "signup": "가입하기"
   },
   "hero": {
     "chip": "규율 있는 트레이더를 위한 블로그",
@@ -63,7 +66,7 @@
   "cta": {
     "title": "프로처럼 저널링할 준비가 되셨나요?",
     "subtitle": "무료로 시작. 7일간 Pro 전 기능, 이후 Lite 유지 가능.",
-    "button": "저널 시작하기"
+    "button": "가입하기"
   },
   "footer": {
     "home": "홈",

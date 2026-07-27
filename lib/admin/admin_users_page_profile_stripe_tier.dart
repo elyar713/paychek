@@ -7,6 +7,20 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
     final messenger = ScaffoldMessenger.maybeOf(snackCtx);
     _profileStripeMutate(() => _saving = true);
     try {
+      DateTime? preservedPeriodEnd;
+      if (tier == PaychekSubscriptionTier.lite) {
+        try {
+          final entSnap = await FirebaseFirestore.instance
+              .collection(kPaychekSubscriberEntitlementsCollection)
+              .doc(widget.userId)
+              .get();
+          preservedPeriodEnd = paychekParseFirestoreInstantUtc(
+            entSnap.data()?['currentPeriodEnd'],
+          );
+        } catch (_) {}
+        preservedPeriodEnd ??= widget.subscriptionCurrentPeriodEnd;
+      }
+
       await FirebaseFirestore.instance
           .collection(kPaychekUsersCollection)
           .doc(widget.userId)
@@ -22,10 +36,12 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
             kPaychekUserFieldSubscriptionProSinceUtc:
                 FieldValue.serverTimestamp(),
           } else ...<String, dynamic>{
-            'paymentMethod': FieldValue.delete(),
-            kPaychekUserFieldSubscriptionCurrentPeriodEnd:
-                FieldValue.delete(),
-            kPaychekUserFieldSubscriptionProSinceUtc: FieldValue.delete(),
+            // Keep billing trail + last period end so licence.html can show Expiré + date.
+            'subscriptionEndedAt': FieldValue.serverTimestamp(),
+            'subscriptionEndReason': 'admin_set_lite',
+            if (preservedPeriodEnd != null)
+              'subscriptionCurrentPeriodEnd':
+                  Timestamp.fromDate(preservedPeriodEnd.toUtc()),
           },
         },
         SetOptions(merge: true),
@@ -48,6 +64,11 @@ extension _AdminProfileStripeTier on _PaychekProfileTierStripeSectionState {
             <String, dynamic>{
               'active': false,
               'updatedAt': FieldValue.serverTimestamp(),
+              'subscriptionEndedAt': FieldValue.serverTimestamp(),
+              'subscriptionEndReason': 'admin_set_lite',
+              if (preservedPeriodEnd != null)
+                'currentPeriodEnd':
+                    Timestamp.fromDate(preservedPeriodEnd.toUtc()),
             },
             SetOptions(merge: true),
           );

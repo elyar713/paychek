@@ -567,15 +567,23 @@ class _ReglageProfileAuthPanelState extends State<ReglageProfileAuthPanel> {
       var detail = 'Code: ${e.code}\n${e.message ?? msg}';
       if (kIsWeb) {
         detail +=
-            '\n\nWeb : Apple Developer → Services ID pro.paychek.signin '
-            'avec domaine paychek.pro et return URL '
-            'https://paychek-trading.firebaseapp.com/__/auth/handler';
+            '\n\nWeb checklist :\n'
+            '1. Firebase → Auth → Apple → Services ID = pro.paychek.signin\n'
+            '2. Apple Developer → Services ID pro.paychek.signin :\n'
+            '   • Domains = paychek.pro\n'
+            '   • Return URLs =\n'
+            '     https://paychek-trading.firebaseapp.com/__/auth/handler\n'
+            '3. Firebase → Auth → Authorized domains : paychek.pro\n'
+            '4. Redéployer le web après changement de code';
       } else if ('${e.message}'.toLowerCase().contains('audience')) {
+        // Firebase Services ID = pro.paychek.signin, mais cette build envoie
+        // encore un jeton Bundle (pro.paychek.app) → installer la build OAuth.
         detail +=
-            '\n\nFix Firebase Console → Authentication → Apple → '
-            'Services ID must be exactly:\npro.paychek.app\n'
-            '(Bundle ID, not a separate Apple Services ID).\n'
-            'Save, wait 1 min, retry.';
+            '\n\nFirebase attend le Services ID pro.paychek.signin.\n'
+            'Cette app utilise encore le flux Bundle pro.paychek.app.\n'
+            '→ Installe la nouvelle build iOS (flux OAuth Services ID),\n'
+            '  puis réessaie. Ne remets PAS Firebase sur pro.paychek.app\n'
+            '  si tu veux que le web fonctionne aussi.';
       }
       unawaited(_alertAuthDiagnostic('Sign in with Apple', detail));
     } catch (e) {

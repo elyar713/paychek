@@ -42,8 +42,11 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 # Pages marketing / SEO + assets landing (js/css) — toujours recopiés depuis web/.
 $seoFiles = @(
   'sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js',
+  'safeguard.html', 'safeguard-i18n.js',
+  'licence.html', 'licence-i18n.js',
+  'facturation.html', 'facturation-i18n.js',
   'privacy.html', 'privacy-en.html', 'terms.html', 'admin-hub.html',
-  'blog.html', 'contact.html'
+  'blog.html', 'contact.html', 'blog-i18n.js', 'contact-i18n.js'
 )
 foreach ($name in $seoFiles) {
   $src = Join-Path (Get-Location) "web\$name"
@@ -52,7 +55,7 @@ foreach ($name in $seoFiles) {
     Copy-Item -Force $src $dst
   }
 }
-foreach ($dir in @('images', 'js', 'css', 'blog-i18n', 'contact-i18n')) {
+foreach ($dir in @('images', 'js', 'css', 'blog-i18n', 'contact-i18n', 'downloads')) {
   $srcDir = Join-Path (Get-Location) "web\$dir"
   $dstDir = Join-Path (Get-Location) "build\web\$dir"
   if (-not (Test-Path $srcDir)) { continue }

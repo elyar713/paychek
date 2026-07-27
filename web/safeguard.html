@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paychek Safeguard | Discipline for NinjaTrader</title>
+    <meta name="description" content="Paychek Safeguard — NinjaTrader 8 discipline addon. Enable blocks orders outside your rules; monitor when disabled. Session, zones, lots, limits, cooldown, exit/SL. 7-day trial.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Paychek">
+    <link rel="canonical" href="https://paychek.pro/safeguard.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Paychek">
+    <meta property="og:title" content="Paychek Safeguard | Discipline for NinjaTrader">
+    <meta property="og:description" content="NinjaTrader 8 discipline addon: Enable blocks orders outside your plan. Session, zones, lots, daily limits, cooldown, exit/SL.">
+    <meta property="og:url" content="https://paychek.pro/safeguard.html">
+    <meta property="og:locale" content="en_US">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Paychek Safeguard | Discipline for NinjaTrader">
+    <meta name="twitter:description" content="NinjaTrader 8 discipline addon: Enable blocks orders outside your plan.">
+
+    <link rel="stylesheet" href="css/paychek-tailwind.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing-page.css">
+    <link rel="stylesheet" href="css/safeguard-page.css">
+    <link rel="stylesheet" href="css/paychek-account-nav.css">
+    <link rel="stylesheet" href="css/paychek-site-auth.css">
+</head>
+<body class="overflow-x-hidden">
+    <div class="sg-hero-glow" aria-hidden="true"></div>
+
+    <nav class="glass-nav sticky top-0 z-50">
+        <div class="paychek-topnav max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20">
+            <div class="paychek-topnav-side paychek-topnav-side--left">
+                <a href="landing.html" target="_top" class="flex items-center gap-2.5 sm:gap-3 group shrink-0 min-w-0">
+                    <img src="images/paychek-logo.svg" alt="" class="w-8 h-8 sm:w-10 sm:h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
+                    <span class="hidden sm:inline text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+                </a>
+            </div>
+
+            <div class="paychek-topnav-center" role="navigation" aria-label="Products">
+                <a href="landing.html" target="_top" class="paychek-product-link" data-i18n="nav.journal">Journal</a>
+                <a href="safeguard.html" target="_top" class="paychek-product-link is-active" aria-current="page" data-i18n="nav.safeguard">Safeguard</a>
+            </div>
+
+            <div class="paychek-topnav-side paychek-topnav-side--right">
+                <div class="relative group paychek-lang-picker-wrap" id="lang-picker-wrap">
+                    <button type="button" class="flex items-center gap-1.5 sm:gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown-menu" onclick="sgToggleLang(event)">
+                        <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
+                        <span id="lang-trigger-code" class="hidden sm:inline">EN</span>
+                        <i class="fas fa-chevron-down text-[8px] opacity-50 hidden sm:inline" aria-hidden="true"></i>
+                    </button>
+                    <div id="lang-dropdown-menu" class="paychek-lang-menu-panel invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]" role="menu">
+                        <a href="#" onclick="sgSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
+                            <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
+                        </a>
+                        <a href="#" onclick="sgSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="fr">
+                            <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
+                        </a>
+                        <a href="#" onclick="sgSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
+                            <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
+                        </a>
+                        <a href="#" onclick="sgSelectLang('es', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="es">
+                            <img src="https://flagcdn.com/w40/es.png" alt="" class="flag-icon"> ESPAÑOL
+                        </a>
+                        <a href="#" onclick="sgSelectLang('pt', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="pt">
+                            <img src="https://flagcdn.com/w40/pt.png" alt="" class="flag-icon"> PORTUGUÊS
+                        </a>
+                        <a href="#" onclick="sgSelectLang('ko', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="ko">
+                            <img src="https://flagcdn.com/w40/kr.png" alt="" class="flag-icon"> 한국어
+                        </a>
+                    </div>
+                </div>
+                <span class="inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
+                <div id="paychek-account-nav" class="paychek-account-nav-host"></div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="sg-hero">
+        <span class="sg-chip" data-i18n="hero.chip">NinjaTrader 8 discipline addon</span>
+        <h1 class="sg-hero-title" data-i18n-html="hero.titleHtml">
+            <span class="sg-hero-brand">PAYCHEK</span>
+            <span class="sg-hero-product">SAFEGUARD</span>
+        </h1>
+        <p class="sg-hero-line" data-i18n-html="hero.subtitleHtml">
+            Your rules stay on — <strong>Enabled</strong> blocks orders outside the plan; disabled still monitors.
+        </p>
+        <div class="sg-hero-ctas">
+            <a href="licence.html#safeguard" target="_top" class="btn-primary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" data-i18n="hero.ctaPrimary">Start free trial</a>
+            <a href="https://paychek.pro/downloads/PaychekSafeguard-Windows.zip?v=20260727-rebuild" class="btn-secondary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" target="_blank" rel="noopener noreferrer" data-i18n="hero.ctaDownload">Download</a>
+            <button type="button" onclick="paychekOpenSiteAuth('signup')" class="btn-secondary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="hero.ctaAuth">Sign up</button>
+        </div>
+        <div class="sg-hero-footnotes">
+            <p class="sg-hero-meta" data-i18n="hero.platform">Windows · 7-day trial · 1 PC</p>
+            <p class="sg-hero-meta sg-hero-addon" data-i18n="hero.addon">Add-on for NinjaTrader 8</p>
+            <div class="sg-nt-row">
+                <img src="images/ninjatrader-logo.svg" alt="NinjaTrader" width="160" height="22" decoding="async">
+            </div>
+        </div>
+
+        <div class="sg-visual-wrap" aria-hidden="true">
+            <div class="sg-visual">
+                <div class="sg-visual-top">
+                    <div class="sg-visual-caps">
+                        <div class="sg-cap">
+                            <b data-i18n="visual.capital">Capital</b>
+                            <span>$25,000</span>
+                        </div>
+                        <div class="sg-cap">
+                            <b data-i18n="visual.hours">Usage hours</b>
+                            <span>09:30–16:00</span>
+                        </div>
+                    </div>
+                    <span class="sg-enable-pill"><i class="fas fa-shield-halved"></i> <span data-i18n="visual.enabled">Enabled</span></span>
+                </div>
+                <div class="sg-status">
+                    <div class="sg-status-row">
+                        <div>
+                            <div class="sg-status-label" data-i18n="visual.statusLabel">Discipline status</div>
+                            <div class="sg-status-main" data-i18n="visual.statusMain">You can trade</div>
+                        </div>
+                        <span class="sg-status-pill" data-i18n="visual.allowed">Allowed</span>
+                    </div>
+                    <div class="sg-status-reasons">
+                        <div class="sg-reason is-ok"><span class="dot"></span><span data-i18n="visual.r1">Session · inside window</span></div>
+                        <div class="sg-reason is-ok"><span class="dot"></span><span data-i18n="visual.r2">Trade zone · in zone</span></div>
+                        <div class="sg-reason is-ok"><span class="dot"></span><span data-i18n="visual.r3">Max trades / day · 2 left</span></div>
+                        <div class="sg-reason is-off"><span class="dot"></span><span data-i18n="visual.r4">Cooldown · off</span></div>
+                    </div>
+                </div>
+                <div class="sg-rules-mini">
+                    <div class="sg-rule-cell"><b data-i18n="rules.session.title">Session</b><span>09:30–16:00</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.zone.title">Trade zone</b><span data-i18n="visual.on">On</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.lot.title">Max lot</b><span>2</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.trades.title">Max trades/day</b><span>4</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.cooldown.title">Cooldown</b><span>5 min</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.exit.title">Exit / SL</b><span data-i18n="visual.on">On</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.lossTrade.title">Max loss/trade</b><span>$150</span></div>
+                    <div class="sg-rule-cell"><b data-i18n="rules.lossDay.title">Max daily loss</b><span>$400</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="sg-section" id="problem">
+            <div class="sg-section-head">
+                <h2 data-i18n="problem.title">The plan holds — until the click</h2>
+                <p data-i18n="problem.subtitle">Revenge trades, oversized size, trading outside the session: one impulsive order can undo a week of discipline.</p>
+            </div>
+            <div class="sg-problem-grid">
+                <article class="sg-problem-item">
+                    <h3 data-i18n="problem.p1.title">Outside the session</h3>
+                    <p data-i18n="problem.p1.desc">You said you stop at 16:00. Emotion keeps the chart open.</p>
+                </article>
+                <article class="sg-problem-item">
+                    <h3 data-i18n="problem.p2.title">Outside the zone</h3>
+                    <p data-i18n="problem.p2.desc">The setup is gone. The finger still hits Buy.</p>
+                </article>
+                <article class="sg-problem-item">
+                    <h3 data-i18n="problem.p3.title">Past the limit</h3>
+                    <p data-i18n="problem.p3.desc">Max trades or daily loss already hit — yet another order goes through.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="sg-section" id="how">
+            <div class="sg-section-head">
+                <h2 data-i18n="how.title">How it works</h2>
+                <p data-i18n="how.subtitle">Define rules once. Connect NinjaTrader. Choose Enabled when you want orders blocked — or stay in monitoring.</p>
+            </div>
+
+            <div class="sg-modes">
+                <article class="sg-mode is-on">
+                    <span class="sg-mode-tag" data-i18n="how.enable.tag">Enabled</span>
+                    <h3 data-i18n="how.enable.title">Orders can be blocked</h3>
+                    <p data-i18n="how.enable.desc">When Enabled and connected, Safeguard can block entries that break your rules — before they hit the market.</p>
+                </article>
+                <article class="sg-mode is-off">
+                    <span class="sg-mode-tag" data-i18n="how.monitor.tag">Disabled / not connected</span>
+                    <h3 data-i18n="how.monitor.title">Monitoring only</h3>
+                    <p data-i18n="how.monitor.desc">Rules and status still update. You see why a trade would be blocked or accepted — without enforcement.</p>
+                </article>
+            </div>
+
+            <ol class="sg-steps">
+                <li>
+                    <h3 data-i18n="how.s1.title">Set your rules</h3>
+                    <p data-i18n="how.s1.desc">Session, zones, lots, daily limits, cooldown, exit/SL — in the Safeguard app.</p>
+                </li>
+                <li>
+                    <h3 data-i18n="how.s2.title">Install the addon</h3>
+                    <p data-i18n="how.s2.desc">Close NinjaTrader → 2-Install-Addon.bat → F5. To remove: 4-Uninstall-Addon.bat → F5.</p>
+                </li>
+                <li>
+                    <h3 data-i18n="how.s3.title">Enable when ready</h3>
+                    <p data-i18n="how.s3.desc">Flip to Enabled for live protection. Status panel shows allowed vs blocked reasons.</p>
+                </li>
+            </ol>
+        </section>
+
+        <section class="sg-section" id="rules">
+            <div class="sg-section-head">
+                <h2 data-i18n="rules.title">Plan rules</h2>
+                <p data-i18n="rules.subtitle">Eight discipline controls — the same ones in the Safeguard app.</p>
+            </div>
+            <div class="sg-rules-grid">
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-clock"></i></div>
+                    <h3 data-i18n="rules.session.title">Session</h3>
+                    <p data-i18n="rules.session.desc">Allow trading only inside your defined time window and timezone.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-border-all"></i></div>
+                    <h3 data-i18n="rules.zone.title">Trade zone</h3>
+                    <p data-i18n="rules.zone.desc">Entries outside your allowed price zones can be blocked.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-layer-group"></i></div>
+                    <h3 data-i18n="rules.lot.title">Max lot</h3>
+                    <p data-i18n="rules.lot.desc">Cap size per entry so impulse cannot oversize the position.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-hashtag"></i></div>
+                    <h3 data-i18n="rules.trades.title">Max trades / day</h3>
+                    <p data-i18n="rules.trades.desc">When the daily count is done, further entries stop.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-pause"></i></div>
+                    <h3 data-i18n="rules.cooldown.title">Cooldown</h3>
+                    <p data-i18n="rules.cooldown.desc">Enforce a pause between trades so emotion cannot reopen risk.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-shield"></i></div>
+                    <h3 data-i18n="rules.exit.title">Exit / SL discipline</h3>
+                    <p data-i18n="rules.exit.desc">Protect stop-loss behaviour — limit unsafe SL modifications.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-arrow-down"></i></div>
+                    <h3 data-i18n="rules.lossTrade.title">Max loss / trade</h3>
+                    <p data-i18n="rules.lossTrade.desc">Cap risk per trade; can close if floating loss exceeds the limit.</p>
+                </article>
+                <article class="sg-rule">
+                    <div class="sg-rule-ico" aria-hidden="true"><i class="fas fa-calendar-day"></i></div>
+                    <h3 data-i18n="rules.lossDay.title">Max daily loss</h3>
+                    <p data-i18n="rules.lossDay.desc">Hard stop for the day when cumulative loss hits your ceiling.</p>
+                </article>
+            </div>
+
+            <div class="sg-extras">
+                <article class="sg-extra">
+                    <h3 data-i18n="extras.capital.title">Capital</h3>
+                    <p data-i18n="extras.capital.desc">Set account capital used as context for risk limits.</p>
+                </article>
+                <article class="sg-extra">
+                    <h3 data-i18n="extras.hours.title">Usage hours</h3>
+                    <p data-i18n="extras.hours.desc">Define when you intend to trade — aligned with your session rules.</p>
+                </article>
+                <article class="sg-extra">
+                    <h3 data-i18n="extras.status.title">Status &amp; reasons</h3>
+                    <p data-i18n="extras.status.desc">Live status panel: Allowed / Blocked / Monitoring — with rule-by-rule reasons.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="sg-section" id="pricing">
+            <div class="sg-section-head">
+                <h2 data-i18n="pricing.title">Try it. Then go Pro.</h2>
+                <p data-i18n="pricing.subtitle">Start with a free trial on one PC. Upgrade when you want full-year protection.</p>
+            </div>
+            <div class="sg-pricing">
+                <article class="sg-plan">
+                    <div class="sg-plan-name" data-i18n="pricing.trial.name">Trial</div>
+                    <div class="sg-plan-price" data-i18n-html="pricing.trial.priceHtml">7 days <small>free</small></div>
+                    <p class="sg-plan-desc" data-i18n="pricing.trial.desc">Full Safeguard trial for NinjaTrader 8 — one PC per Paychek account.</p>
+                    <ul class="sg-plan-list">
+                        <li data-i18n="pricing.trial.f1">All plan rules</li>
+                        <li data-i18n="pricing.trial.f2">Enable + monitoring</li>
+                        <li data-i18n="pricing.trial.f3">Activate on licence.html</li>
+                    </ul>
+                    <a href="licence.html#safeguard" target="_top" class="btn-primary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="pricing.trial.cta">Activate trial</a>
+                </article>
+                <article class="sg-plan is-pro">
+                    <div class="sg-plan-name" data-i18n="pricing.pro.name">Pro</div>
+                    <div class="sg-plan-price" data-i18n-html="pricing.pro.priceHtml">~$69 <small>/ year</small></div>
+                    <p class="sg-plan-desc" data-i18n="pricing.pro.desc">Annual Pro licence after the trial. Checkout opens when payment is configured on your account.</p>
+                    <ul class="sg-plan-list">
+                        <li data-i18n="pricing.pro.f1">1-year Pro key</li>
+                        <li data-i18n="pricing.pro.f2">Same discipline stack</li>
+                        <li data-i18n="pricing.pro.f3">Managed from your licence page</li>
+                    </ul>
+                    <a href="licence.html#safeguard" target="_top" id="sg-buy-link" class="btn-primary px-6 py-3 rounded-full text-[11px] font-bold uppercase tracking-widest" data-i18n="pricing.pro.cta">Upgrade to Pro</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="sg-cta-band" id="cta">
+            <h2 data-i18n="cta.title">Same brand. Different job.</h2>
+            <p data-i18n="cta.body">Paychek Journal helps you analyze. Paychek Safeguard helps you obey the plan while you trade in NinjaTrader.</p>
+            <div class="sg-hero-ctas">
+                <a href="licence.html#safeguard" target="_top" class="btn-primary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" data-i18n="cta.primary">Try / Activate</a>
+                <a href="https://paychek.pro/downloads/PaychekSafeguard-Windows.zip?v=20260727-rebuild" class="btn-secondary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" target="_blank" rel="noopener noreferrer" data-i18n="cta.download">Download</a>
+                <a href="landing.html" target="_top" class="btn-secondary px-8 py-3.5 rounded-full text-[11px] font-bold uppercase tracking-widest inline-flex" data-i18n="cta.journal">Discover Journal</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="pt-16 pb-12 border-t border-white/5 bg-black relative z-[1]">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <p class="text-gray-700 text-[9px] font-bold uppercase tracking-[0.4em]" data-i18n="footer.copyright">© 2026 PAYCHEK — ALL RIGHTS RESERVED.</p>
+            <div class="flex flex-wrap justify-center gap-6 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                <a href="landing.html" target="_top" class="hover:text-white transition" data-i18n="nav.journal">Journal</a>
+                <a href="safeguard.html" target="_top" class="hover:text-white transition" data-i18n="nav.safeguard">Safeguard</a>
+                <a href="licence.html" target="_top" class="hover:text-white transition" data-i18n="footer.licence">Licence</a>
+                <a href="blog.html" target="_top" class="hover:text-white transition" data-i18n="footer.blog">Blog</a>
+                <a href="contact.html" target="_top" class="hover:text-white transition" data-i18n="footer.contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="safeguard-i18n.js?v=20260727-kit-en"></script>
+    <script src="js/paychek-account-entitlement.js?v=20260727-kit-en"></script>
+    <script src="js/safeguard-page.js?v=20260727-kit-en"></script>
+    <script src="js/paychek-site-auth.js?v=20260727-kit-en"></script>
+    <script src="js/paychek-account-nav.js?v=20260727-kit-en"></script>
+</body>
+</html>

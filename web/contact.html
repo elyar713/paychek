@@ -67,6 +67,8 @@
             border: 1px solid rgba(239, 68, 68, 0.35);
         }
     </style>
+    <link rel="stylesheet" href="css/paychek-account-nav.css">
+    <link rel="stylesheet" href="css/paychek-site-auth.css">
 </head>
 <body>
     <nav class="glass-nav fixed top-0 left-0 right-0 z-50 border-b border-white/5">
@@ -75,9 +77,11 @@
                 <img src="images/paychek-logo.svg" alt="Paychek" class="w-8 h-8 transition-transform group-hover:scale-110" width="32" height="32" decoding="async">
                 <span class="text-lg font-black tracking-tighter text-white uppercase">PAYCHEK</span>
             </a>
-            <a href="landing.html" target="_top" class="text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">
-                <i class="fas fa-arrow-left mr-2"></i><span data-i18n="nav.back">Back</span>
-            </a>
+            <div class="flex items-center gap-3 sm:gap-5">
+                <a href="landing.html" target="_top" class="hidden sm:inline text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">Journal</a>
+                <a href="safeguard.html" target="_top" class="hidden sm:inline text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">Safeguard</a>
+                <div id="paychek-account-nav" class="paychek-account-nav-host"></div>
+            </div>
         </div>
     </nav>
 
@@ -179,5 +183,7 @@
 
     <script src="contact-i18n.js"></script>
     <script src="js/contact-page.js"></script>
+    <script src="js/paychek-site-auth.js"></script>
+    <script src="js/paychek-account-nav.js"></script>
 </body>
 </html>

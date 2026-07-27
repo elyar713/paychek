@@ -73,8 +73,16 @@ class _PostAuthGateState extends State<PostAuthGate> {
   bool _gateResolved = false;
   bool? _needsQuestionnaire;
   bool _resolveInFlight = false;
+  bool _journalFirstOpenedMarked = false;
   DocumentSnapshot<Map<String, dynamic>>? _lastDoc;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSub;
+
+  /// Première entrée journal (web + Android + iOS) → ancre Lite sur licence.html.
+  void _ensureJournalFirstOpenedMarked() {
+    if (_journalFirstOpenedMarked) return;
+    _journalFirstOpenedMarked = true;
+    unawaited(paychekMarkJournalFirstOpenedIfNeeded(widget.user));
+  }
 
   @override
   void initState() {
@@ -188,6 +196,7 @@ class _PostAuthGateState extends State<PostAuthGate> {
   @override
   Widget build(BuildContext context) {
     if (_questionnaireFinishedLocally) {
+      _ensureJournalFirstOpenedMarked();
       return const DashboardPage();
     }
 
@@ -197,6 +206,7 @@ class _PostAuthGateState extends State<PostAuthGate> {
     if (_needsQuestionnaire == true) {
       return _questionnaire();
     }
+    _ensureJournalFirstOpenedMarked();
     return const DashboardPage();
   }
 }

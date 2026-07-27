@@ -7,6 +7,7 @@ class _PaychekProfileTierStripeSection extends StatefulWidget {
     required this.initialTier,
     required this.paymentMethod,
     required this.lastSeenPlatform,
+    this.subscriptionCurrentPeriodEnd,
     required this.scaffoldContext,
   });
 
@@ -15,6 +16,7 @@ class _PaychekProfileTierStripeSection extends StatefulWidget {
   final PaychekSubscriptionTier initialTier;
   final String paymentMethod;
   final String lastSeenPlatform;
+  final DateTime? subscriptionCurrentPeriodEnd;
   final BuildContext scaffoldContext;
 
   @override

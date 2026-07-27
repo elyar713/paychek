@@ -7,8 +7,11 @@
     "ogLocale": "fr_FR"
   },
   "nav": {
+    "journal": "Journal",
     "pricing": "Tarifs",
-    "openApp": "Ouvrir l'app"
+    "openApp": "Ouvrir l'app",
+    "login": "Connexion",
+    "signup": "S'inscrire"
   },
   "hero": {
     "chip": "Le blog des traders disciplinés",
@@ -63,7 +66,7 @@
   "cta": {
     "title": "Prêt à journaliser comme un pro ?",
     "subtitle": "Commencez gratuitement. 7 jours d'accès complet à toutes les fonctionnalités Pro, puis restez en Lite si vous préférez.",
-    "button": "Démarrer mon journal"
+    "button": "S'inscrire"
   },
   "footer": {
     "home": "Accueil",

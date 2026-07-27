@@ -8,7 +8,10 @@
   },
   "nav": {
     "pricing": "Planos",
-    "openApp": "Abrir app"
+    "openApp": "Abrir app",
+    "journal": "Diário",
+    "login": "Entrar",
+    "signup": "Criar conta"
   },
   "hero": {
     "chip": "O blog do trader disciplinado",
@@ -63,7 +66,7 @@
   "cta": {
     "title": "Pronto para journalizar como um pro?",
     "subtitle": "Comece grátis. 7 dias de acesso Pro completo, depois fique no Lite se preferir.",
-    "button": "Iniciar meu diário"
+    "button": "Criar conta"
   },
   "footer": {
     "home": "Início",

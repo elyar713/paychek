@@ -11,9 +11,13 @@
  *                      functions:managePaychekStaffAdmin,functions:paychekStripeWebhook,
  *                      functions:syncPaychekStripeEntitlement,
  *                      functions:adminSyncPaychekStripeEntitlement,
- *                      functions:adminNotifyUserRefundEmail
+ *                      functions:adminNotifyUserRefundEmail,
+ *                      functions:claimSafeguardPurchase,
+ *                      functions:requestSafeguardLicenseCode
  *
- * Webhook `checkout.session.completed` : active Pro + envoie l’e-mail « Accès Pro confirmé » (Resend ou SMTP).
+ * Webhook `checkout.session.completed` :
+ *   - Journal (subscription) → active Pro + e-mail « Accès Pro confirmé »
+ *   - Safeguard (one-time payment) → mint licence Pro 1 an + e-mail clé
  */
 
 /** À synchroniser avec [lib/admin/admin_superadmin_gate.dart]. */
@@ -41,6 +45,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const Stripe = require("stripe");
 const emailI18n = require("./email_i18n");
+const safeguardLicense = require("./safeguard_license");
 
 const paychekSmtpPassword = defineSecret("PAYCHEK_SMTP_PASSWORD");
 
@@ -2177,7 +2182,8 @@ exports.managePaychekStaffAdmin = onCall(
  *
  * Stripe Dashboard → Webhooks → URL :
  *   https://europe-west1-paychek-trading.cloudfunctions.net/paychekStripeWebhook
- * Événement : checkout.session.completed
+ * Événements : checkout.session.completed,
+ *   customer.subscription.updated, customer.subscription.deleted
  */
 
 /**
@@ -3466,6 +3472,7 @@ async function paychekTrialRemainderMsForUid(db, uid) {
 async function paychekRevokeProEntitlement(db, uid, opts = {}) {
   const provider = `${opts.provider ?? ""}`.trim() || null;
   const reason = `${opts.reason ?? "subscription_inactive"}`.trim();
+  const periodEndHint = paychekCoerceFirestoreTimestamp(opts.periodEnd);
 
   const entRef = db.collection("subscriber_entitlements").doc(uid);
   const entSnap = await entRef.get();
@@ -3564,30 +3571,60 @@ async function paychekRevokeProEntitlement(db, uid, opts = {}) {
     return false;
   }
 
+  // Never wipe end dates: keep the latest known period end (ent / user / hint).
+  const candidates = [
+    paychekCoerceFirestoreTimestamp(entData.currentPeriodEnd),
+    paychekCoerceFirestoreTimestamp(userData.subscriptionCurrentPeriodEnd),
+    periodEndHint,
+  ].filter(Boolean);
+  let preservedPeriodEnd = null;
+  for (const ts of candidates) {
+    if (
+      !preservedPeriodEnd ||
+      ts.toMillis() > preservedPeriodEnd.toMillis()
+    ) {
+      preservedPeriodEnd = ts;
+    }
+  }
+
+  const endedAt = admin.firestore.FieldValue.serverTimestamp();
+  const entPatch = {
+    active: false,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    subscriptionEndedAt: endedAt,
+    subscriptionEndReason: reason,
+  };
+  if (preservedPeriodEnd) {
+    entPatch.currentPeriodEnd = preservedPeriodEnd;
+  }
+
+  const userPatch = {
+    subscriptionTier: "lite",
+    isPremium: false,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    subscriptionTierUpdatedAt:
+      admin.firestore.FieldValue.serverTimestamp(),
+    subscriptionEndedAt: endedAt,
+    subscriptionEndReason: reason,
+  };
+  if (preservedPeriodEnd) {
+    // Mirror so licence.html can show the date even if entitlements lag.
+    userPatch.subscriptionCurrentPeriodEnd = preservedPeriodEnd;
+  }
+
   const batch = db.batch();
-  batch.set(
-      entRef,
-      {
-        active: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        subscriptionEndedAt: admin.firestore.FieldValue.serverTimestamp(),
-        subscriptionEndReason: reason,
-      },
-      {merge: true},
-  );
-  batch.set(
-      userRef,
-      {
-        subscriptionTier: "lite",
-        isPremium: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        subscriptionTierUpdatedAt:
-          admin.firestore.FieldValue.serverTimestamp(),
-      },
-      {merge: true},
-  );
+  batch.set(entRef, entPatch, {merge: true});
+  batch.set(userRef, userPatch, {merge: true});
   await batch.commit();
-  console.log("paychekRevokeProEntitlement", uid, reason, provider || entProvider);
+  console.log(
+      "paychekRevokeProEntitlement",
+      uid,
+      reason,
+      provider || entProvider,
+      preservedPeriodEnd ?
+        new Date(preservedPeriodEnd.toMillis()).toISOString() :
+        "(no periodEnd)",
+  );
   return true;
 }
 
@@ -4086,6 +4123,23 @@ async function paychekGrantProEntitlement(db, uid, opts) {
 async function paychekGrantProFromCheckoutSession(db, stripe, uid, session) {
   let {currentPeriodEnd, proSinceUtc} =
     await paychekStripePeriodFromSession(stripe, session);
+  // Always persist an end date — never leave Pro without currentPeriodEnd.
+  // Web Journal Pro defaults to +1 year from proSince when Stripe has no sub period.
+  if (
+    !currentPeriodEnd &&
+    proSinceUtc &&
+    typeof proSinceUtc.toMillis === "function"
+  ) {
+    currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
+        paychekWebProLicenseEndUtcMillis(proSinceUtc),
+    );
+    console.log(
+        "paychekStripe: periodEnd fallback +1y from proSince",
+        uid,
+        session.id,
+        new Date(currentPeriodEnd.toMillis()).toISOString(),
+    );
+  }
   currentPeriodEnd = await paychekApplyTrialRemainderToPeriodEnd(
       db,
       uid,
@@ -4129,6 +4183,11 @@ async function paychekGrantProFromSubscription(
   const proSinceUtc = sub.current_period_start ?
     admin.firestore.Timestamp.fromMillis(sub.current_period_start * 1000) :
     admin.firestore.Timestamp.fromMillis(Date.now());
+  if (!currentPeriodEnd) {
+    currentPeriodEnd = admin.firestore.Timestamp.fromMillis(
+        paychekWebProLicenseEndUtcMillis(proSinceUtc),
+    );
+  }
   currentPeriodEnd = await paychekApplyTrialRemainderToPeriodEnd(
       db,
       uid,
@@ -4145,6 +4204,34 @@ async function paychekGrantProFromSubscription(
     proSinceUtc,
     currentPeriodEnd,
   });
+}
+
+/**
+ * @param {import("stripe").Stripe} stripe
+ * @param {import("stripe").Stripe.Checkout.Session} session
+ * @return {Promise<{active: boolean, sub: import("stripe").Stripe.Subscription|null}>}
+ */
+async function paychekCheckoutSessionSubscriptionState(stripe, session) {
+  const subRef = session.subscription;
+  if (!subRef) {
+    // One-time / no subscription object — treat paid complete session as active grant.
+    return {active: true, sub: null};
+  }
+  try {
+    const sub =
+      typeof subRef === "string" ?
+        await stripe.subscriptions.retrieve(subRef) :
+        /** @type {import("stripe").Stripe.Subscription} */ (subRef);
+    const st = `${sub.status || ""}`.trim().toLowerCase();
+    if (st === "active" || st === "trialing") {
+      return {active: true, sub};
+    }
+    return {active: false, sub};
+  } catch (e) {
+    console.warn("paychekCheckoutSessionSubscriptionState", e);
+    // Fail open only if we cannot read Stripe — keep prior grant behavior.
+    return {active: true, sub: null};
+  }
 }
 
 /**
@@ -4168,6 +4255,46 @@ async function paychekSyncStripeEntitlementForUser(
   const fail = (reason) => ({active: false, reason, stripeKeyMode});
   const ok = (reason) => ({active: true, reason, stripeKeyMode});
 
+  /**
+   * @param {import("stripe").Stripe.Checkout.Session} session
+   * @param {string} okReason
+   * @return {Promise<{active: boolean, reason: string, stripeKeyMode: string}|null>}
+   */
+  async function tryGrantFromSession(session, okReason) {
+    if (!paychekCheckoutSessionIsPaid(session)) return null;
+    if (await safeguardLicense.isSafeguardCheckoutSession(db, stripe, session)) {
+      await safeguardLicense.issuePaidSafeguardFromStripe({
+        db,
+        admin,
+        session,
+        uid,
+        deliveryEmail: paychekCheckoutEmailCandidates(session)[0] || email || "",
+        locale: "en",
+        source: "stripe_sync",
+        passRaw: "",
+        sendPaychekMailOutbound,
+        paychekSmtpIdentity,
+        escapeHtml,
+        outboundErrorMessageForClient,
+      });
+      return null;
+    }
+    const state = await paychekCheckoutSessionSubscriptionState(stripe, session);
+    if (!state.active) {
+      if (state.sub) {
+        await paychekRevokeProFromStripeSubscription(
+            db,
+            state.sub,
+            `stripe_sync_${state.sub.status || "inactive"}`,
+        );
+        return fail(`subscription_${state.sub.status || "inactive"}`);
+      }
+      return null;
+    }
+    await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
+    return ok(okReason);
+  }
+
   const uidEsc = paychekEscapeStripeSearchValue(uid);
   try {
     const found = await stripe.checkout.sessions.search({
@@ -4175,10 +4302,11 @@ async function paychekSyncStripeEntitlementForUser(
       limit: 5,
     });
     for (const session of found.data) {
-      if (paychekCheckoutSessionIsPaid(session)) {
-        await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
-        return ok("checkout_client_reference_id");
-      }
+      const result = await tryGrantFromSession(
+          session,
+          "checkout_client_reference_id",
+      );
+      if (result) return result;
     }
   } catch (e) {
     console.warn("paychekSyncStripe: checkout uid search", e);
@@ -4199,10 +4327,8 @@ async function paychekSyncStripeEntitlementForUser(
         limit: 10,
       });
       for (const session of byEmail.data) {
-        if (paychekCheckoutSessionIsPaid(session)) {
-          await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
-          return ok("checkout_email");
-        }
+        const result = await tryGrantFromSession(session, "checkout_email");
+        if (result) return result;
       }
     } catch (e) {
       console.warn("paychekSyncStripe: checkout email search", e);
@@ -4229,6 +4355,8 @@ async function paychekSyncStripeEntitlementForUser(
         console.warn("paychekSyncStripe: subscriptions.list", e);
         continue;
       }
+      /** @type {import("stripe").Stripe.Subscription|null} */
+      let terminalSub = null;
       for (const sub of subs.data) {
         if (sub.status === "active" || sub.status === "trialing") {
           await paychekGrantProFromSubscription(
@@ -4240,6 +4368,17 @@ async function paychekSyncStripeEntitlementForUser(
           console.log("paychekSyncStripe: actif via subscription", uid, sub.id);
           return ok("subscription_active");
         }
+        if (paychekStripeSubscriptionIsTerminal(sub) && !terminalSub) {
+          terminalSub = sub;
+        }
+      }
+      if (terminalSub) {
+        await paychekRevokeProFromStripeSubscription(
+            db,
+            terminalSub,
+            `stripe_sync_${terminalSub.status || "inactive"}`,
+        );
+        return fail(`subscription_${terminalSub.status || "inactive"}`);
       }
 
       let sessions;
@@ -4253,18 +4392,9 @@ async function paychekSyncStripeEntitlementForUser(
         continue;
       }
       for (const session of sessions.data) {
-        if (
-          session.status === "complete" &&
-          paychekCheckoutSessionIsPaid(session)
-        ) {
-          await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
-          console.log(
-              "paychekSyncStripe: actif via checkout client",
-              uid,
-              session.id,
-          );
-          return ok("checkout_customer");
-        }
+        if (session.status !== "complete") continue;
+        const result = await tryGrantFromSession(session, "checkout_customer");
+        if (result) return result;
       }
     }
   }
@@ -4273,13 +4403,9 @@ async function paychekSyncStripeEntitlementForUser(
     const recent = await stripe.checkout.sessions.list({limit: 50});
     for (const session of recent.data) {
       if (!paychekCheckoutSessionMatchesEmails(session, emails)) continue;
-      if (
-        session.status === "complete" &&
-        paychekCheckoutSessionIsPaid(session)
-      ) {
-        await paychekGrantProFromCheckoutSession(db, stripe, uid, session);
-        return ok("checkout_recent_list");
-      }
+      if (session.status !== "complete") continue;
+      const result = await tryGrantFromSession(session, "checkout_recent_list");
+      if (result) return result;
     }
   } catch (e) {
     console.warn("paychekSyncStripe: recent checkout list", e);
@@ -4316,17 +4442,191 @@ async function paychekSyncStripeEntitlementForUser(
 }
 
 /**
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {string} customerId
+ * @return {Promise<string>}
+ */
+async function paychekResolveUidFromStripeCustomerId(db, customerId) {
+  const cid = `${customerId || ""}`.trim();
+  if (!cid) return "";
+  try {
+    const users = await db.collection("paychek_users")
+        .where("stripeCustomerId", "==", cid)
+        .limit(1)
+        .get();
+    if (!users.empty) return users.docs[0].id;
+  } catch (e) {
+    console.warn("paychekResolveUidFromStripeCustomerId: users", e);
+  }
+  try {
+    const ents = await db.collection("subscriber_entitlements")
+        .where("stripeCustomerId", "==", cid)
+        .limit(1)
+        .get();
+    if (!ents.empty) return ents.docs[0].id;
+  } catch (e) {
+    console.warn("paychekResolveUidFromStripeCustomerId: ents", e);
+  }
+  return "";
+}
+
+/**
+ * @param {import("stripe").Stripe.Subscription} sub
+ * @return {boolean}
+ */
+function paychekStripeSubscriptionIsTerminal(sub) {
+  const st = `${sub && sub.status || ""}`.trim().toLowerCase();
+  return (
+    st === "canceled" ||
+    st === "unpaid" ||
+    st === "incomplete_expired"
+  );
+}
+
+/**
+ * Expire / cancel Stripe → Lite, keeping current_period_end for licence.html.
+ * @param {FirebaseFirestore.Firestore} db
+ * @param {import("stripe").Stripe.Subscription} sub
+ * @param {string} reason
+ */
+async function paychekRevokeProFromStripeSubscription(db, sub, reason) {
+  const customerId =
+    typeof sub.customer === "string" ?
+      sub.customer :
+      (sub.customer && sub.customer.id) || "";
+  const uid = await paychekResolveUidFromStripeCustomerId(db, customerId);
+  if (!uid) {
+    console.warn(
+        "paychekStripeWebhook: uid introuvable pour customer",
+        customerId,
+        sub.id,
+    );
+    return false;
+  }
+  let periodEnd = null;
+  if (typeof sub.current_period_end === "number" && sub.current_period_end > 0) {
+    periodEnd = admin.firestore.Timestamp.fromMillis(
+        sub.current_period_end * 1000,
+    );
+  }
+  if (periodEnd) {
+    await paychekPatchSubscriberPeriodEnd(db, uid, periodEnd, {
+      forceReplace: true,
+    });
+  }
+  return paychekRevokeProEntitlement(db, uid, {
+    provider: "stripe",
+    reason: reason || "stripe_subscription_inactive",
+    periodEnd,
+  });
+}
+
+/**
  * @param {import("stripe").Stripe} stripe
  * @param {import("stripe").Stripe.Event} event
  * @param {string} passRaw secret SMTP (vide si Resend seul)
  */
 async function paychekHandleStripeEvent(stripe, event, passRaw) {
+  const db = admin.firestore();
+
+  // Subscription ended / unpaid — keep period end, mark Lite.
+  if (
+    event.type === "customer.subscription.deleted" ||
+    event.type === "customer.subscription.updated"
+  ) {
+    const sub = /** @type {import("stripe").Stripe.Subscription} */ (
+      event.data.object
+    );
+    if (
+      event.type === "customer.subscription.deleted" ||
+      paychekStripeSubscriptionIsTerminal(sub)
+    ) {
+      await paychekRevokeProFromStripeSubscription(
+          db,
+          sub,
+          event.type === "customer.subscription.deleted" ?
+            "stripe_subscription_deleted" :
+            `stripe_subscription_${sub.status || "inactive"}`,
+      );
+    } else if (
+      sub.status === "active" ||
+      sub.status === "trialing"
+    ) {
+      const customerId =
+        typeof sub.customer === "string" ?
+          sub.customer :
+          (sub.customer && sub.customer.id) || "";
+      const uid = await paychekResolveUidFromStripeCustomerId(db, customerId);
+      if (uid) {
+        await paychekGrantProFromSubscription(db, uid, sub, customerId);
+      }
+    }
+    return;
+  }
+
   if (event.type !== "checkout.session.completed") return;
 
   const session = /** @type {import("stripe").Stripe.Checkout.Session} */ (
     event.data.object
   );
-  const db = admin.firestore();
+
+  // Safeguard one-time Payment Link → mint Pro key (do NOT grant Journal Pro).
+  let isSafeguard = false;
+  try {
+    isSafeguard = await safeguardLicense.isSafeguardCheckoutSession(
+        db,
+        stripe,
+        session,
+    );
+  } catch (e) {
+    console.warn("paychekStripeWebhook: safeguard detect", e);
+  }
+  if (isSafeguard) {
+    if (!paychekCheckoutSessionIsPaid(session)) {
+      console.warn(
+          "paychekStripeWebhook: Safeguard session non payée",
+          session.id,
+          session.payment_status,
+      );
+      return;
+    }
+    const uid = await paychekResolveUidFromCheckoutSession(db, session, stripe);
+    if (!uid) {
+      console.warn(
+          "paychekStripeWebhook: Safeguard uid introuvable — mint by email only",
+          session.id,
+          paychekCheckoutEmailCandidates(session),
+      );
+    }
+    try {
+      const result = await safeguardLicense.issuePaidSafeguardFromStripe({
+        db,
+        admin,
+        session,
+        uid: uid || "",
+        deliveryEmail: paychekCheckoutEmailCandidates(session)[0] || "",
+        locale: "en",
+        source: "stripe_webhook",
+        passRaw,
+        sendPaychekMailOutbound,
+        paychekSmtpIdentity,
+        escapeHtml,
+        outboundErrorMessageForClient,
+      });
+      console.log(
+          "paychekStripeWebhook: Safeguard Pro",
+          session.id,
+          uid || "(no uid)",
+          result && result.status,
+          result && result.licenseKey,
+      );
+    } catch (e) {
+      console.error("paychekStripeWebhook: Safeguard mint", e);
+      throw e;
+    }
+    return;
+  }
+
   const uid = await paychekResolveUidFromCheckoutSession(db, session, stripe);
   if (!uid) {
     console.warn(
@@ -5415,5 +5715,21 @@ Object.assign(
       onCall,
       HttpsError,
       admin,
+    }),
+);
+
+const safeguardLicenseModule = require("./safeguard_license");
+Object.assign(
+    exports,
+    safeguardLicenseModule.createSafeguardLicenseExports({
+      onCall,
+      HttpsError,
+      admin,
+      paychekSmtpPassword,
+      paychekStripeSecretKey,
+      sendPaychekMailOutbound,
+      paychekSmtpIdentity,
+      outboundErrorMessageForClient,
+      escapeHtml,
     }),
 );

@@ -105,7 +105,7 @@ L(
 );
 L('');
 L(
-  'function refreshNav(s){ if(!s||!s.nav)return; var row=document.querySelector("nav div.hidden.lg\\\\:flex"); if(row){var links=row.querySelectorAll("a");var keys=["preview","process","pricing","faq"];for(var i=0;i<keys.length&&i<links.length;i++){var k=keys[i]; if(s.nav[k]!=null) links[i].textContent=s.nav[k];}}var loginBtn=document.querySelector("nav button[onclick*=\\\\\\"login\\\\\\"]");var signupBtn=document.querySelector("nav button[onclick*=\\\\\\"signup\\\\\\"]"); if(loginBtn&&s.nav.login!=null)loginBtn.textContent=s.nav.login; if(signupBtn&&s.nav.signup!=null){while(signupBtn.firstChild)signupBtn.removeChild(signupBtn.firstChild); signupBtn.textContent=s.nav.signup;}}'
+  'function refreshNav(s){ if(!s||!s.nav)return; var loginBtn=document.querySelector("nav [data-paychek-auth=\\\\\\"login\\\\\\"]")||document.querySelector("nav button[onclick*=\\\\\\"login\\\\\\"]");var signupBtn=document.querySelector("nav [data-paychek-auth=\\\\\\"signup\\\\\\"]")||document.querySelector("nav button[onclick*=\\\\\\"signup\\\\\\"]"); if(loginBtn&&s.nav.login!=null)loginBtn.textContent=s.nav.login; if(signupBtn&&s.nav.signup!=null){while(signupBtn.firstChild)signupBtn.removeChild(signupBtn.firstChild); signupBtn.textContent=s.nav.signup;}}'
 );
 
 L('');

@@ -9,6 +9,7 @@ import 'admin_coach_lab_page.dart';
 import 'admin_config_page.dart';
 import 'admin_overview_page.dart';
 import 'admin_profile_page.dart';
+import 'admin_safeguard_page.dart';
 import 'admin_superadmin_gate.dart';
 import 'admin_support_page.dart';
 import 'admin_team_page.dart';
@@ -43,6 +44,11 @@ List<_PaychekShellTab> _shellTabs(bool superadmin) => [
         title: 'Facturation',
         icon: Icons.credit_card_outlined,
         page: const AdminBillingPage(),
+      ),
+      _PaychekShellTab(
+        title: 'Safeguard',
+        icon: Icons.security_outlined,
+        page: const AdminSafeguardPage(),
       ),
       _PaychekShellTab(
         title: 'Configuration',

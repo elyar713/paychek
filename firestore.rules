@@ -14,7 +14,7 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Facturation web (Stripe) : Payment Links (mensuel / trimestriel / annuel) — écriture admin.
+    // Facturation web (Stripe) : Payment Links Journal + Safeguard — écriture admin.
     match /paychek_app_config/billing {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && request.auth.token.admin == true
@@ -24,6 +24,7 @@ service cloud.firestore {
           'stripeCheckoutUrlQuarterly',
           'stripeCheckoutUrlAnnual',
           'stripeBillingEnabled',
+          'safeguardPaymentUrl',
           'updatedAt',
         ])
         && (!('stripeCheckoutUrl' in request.resource.data) || (
@@ -56,6 +57,14 @@ service cloud.firestore {
           && (
             request.resource.data.stripeCheckoutUrlAnnual == ''
             || request.resource.data.stripeCheckoutUrlAnnual.matches('^https://.+')
+          )
+        ))
+        && (!('safeguardPaymentUrl' in request.resource.data) || (
+          request.resource.data.safeguardPaymentUrl is string
+          && request.resource.data.safeguardPaymentUrl.size() < 2100
+          && (
+            request.resource.data.safeguardPaymentUrl == ''
+            || request.resource.data.safeguardPaymentUrl.matches('^https://.+')
           )
         ))
         && (!('stripeBillingEnabled' in request.resource.data)
@@ -235,7 +244,7 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         (request.auth.uid == userId || request.auth.token.admin == true);
 
-      // Champ `trialFreemiumOverrideUntil` : réservé à l’admin (création / mise à jour).
+      // Champs essai Journal / Safeguard et abonnement : réservés admin / Cloud Functions.
       allow create: if request.auth != null && (
         request.auth.token.admin == true
         || (
@@ -244,6 +253,9 @@ service cloud.firestore {
             'trialFreemiumOverrideUntil',
             'subscriptionCurrentPeriodEnd',
             'subscriptionProSinceUtc',
+            'safeguardTrialClaimedAt',
+            'safeguardTrialLicenseId',
+            'safeguardTrialExpiresAt',
           ])
         )
       );
@@ -256,6 +268,9 @@ service cloud.firestore {
             'trialFreemiumOverrideUntil',
             'subscriptionCurrentPeriodEnd',
             'subscriptionProSinceUtc',
+            'safeguardTrialClaimedAt',
+            'safeguardTrialLicenseId',
+            'safeguardTrialExpiresAt',
           ])
         )
       );
@@ -274,6 +289,61 @@ service cloud.firestore {
         allow read, create, update, delete: if request.auth != null &&
           request.auth.uid == userId;
       }
+    }
+
+    // Licences Paychek Safeguard (desktop).
+    // Admin : lecture / écriture. Client authentifié : lecture seule de sa propre
+    // licence (userId ou userEmail lié à la clé admin).
+    match /safeguard_licenses/{licenseId} {
+      allow read: if request.auth != null && (
+        request.auth.token.admin == true
+        || resource.data.userId == request.auth.uid
+        || (
+          resource.data.userEmail is string
+          && request.auth.token.email is string
+          && resource.data.userEmail == request.auth.token.email.lower()
+        )
+      );
+      allow create, update: if request.auth != null
+        && request.auth.token.admin == true;
+      allow delete: if false;
+    }
+
+    // Demandes d’activation Safeguard (créées uniquement via Cloud Function admin SDK).
+    match /safeguard_activation_requests/{requestId} {
+      allow read: if request.auth != null && (
+        request.auth.token.admin == true
+        || resource.data.userId == request.auth.uid
+      );
+      allow create, update, delete: if false;
+    }
+
+    match /safeguard_activation_rate/{userId} {
+      allow read, write: if false;
+    }
+
+    // Essai Safeguard 7 jours — écrit uniquement via Cloud Functions (Admin SDK).
+    match /safeguard_trial_claims/{userId} {
+      allow read: if request.auth != null && (
+        request.auth.token.admin == true
+        || request.auth.uid == userId
+      );
+      allow create, update, delete: if false;
+    }
+
+    // HWID / machine fingerprint → un seul essai gratuit Safeguard (Admin SDK only).
+    match /safeguard_trial_machines/{machineHash} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow create, update, delete: if false;
+    }
+
+    // Idempotence achats Stripe Safeguard (écrit uniquement via Cloud Functions).
+    match /safeguard_stripe_purchases/{sessionId} {
+      allow read: if request.auth != null && (
+        request.auth.token.admin == true
+        || resource.data.userId == request.auth.uid
+      );
+      allow create, update, delete: if false;
     }
   }
 }

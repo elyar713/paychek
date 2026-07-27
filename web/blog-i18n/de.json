@@ -8,7 +8,10 @@
   },
   "nav": {
     "pricing": "Preise",
-    "openApp": "App öffnen"
+    "openApp": "App öffnen",
+    "journal": "Journal",
+    "login": "Anmelden",
+    "signup": "Registrieren"
   },
   "hero": {
     "chip": "Der Blog für disziplinierte Trader",
@@ -63,7 +66,7 @@
   "cta": {
     "title": "Bereit, wie ein Profi zu journalisieren?",
     "subtitle": "Kostenlos starten. 7 Tage voller Pro-Zugang, danach Lite wenn Sie möchten.",
-    "button": "Mein Journal starten"
+    "button": "Registrieren"
   },
   "footer": {
     "home": "Startseite",

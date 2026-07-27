@@ -110,7 +110,9 @@ Erreur **« ID d’app non valide »** sur la page Meta → l’App ID dans l’
 
 ## 5. Apple — connexion web
 
-Erreur Apple **« Invalid client id or web redirect url »** : le web ne peut pas utiliser le Bundle iOS `pro.paychek.app` comme client OAuth. Il faut un **Services ID web** distinct.
+Sur le web, Paychek utilise **Firebase** (`signInWithPopup` / `signInWithRedirect` + `AppleAuthProvider`), comme Google — **pas** le popup Apple JS direct.
+
+Erreur Apple **« Invalid client id or web redirect url »** : le web ne peut pas utiliser le Bundle iOS `pro.paychek.app` comme client OAuth. Il faut un **Services ID web** distinct, et Firebase doit l’utiliser.
 
 ### 1. Apple Developer (developer.apple.com)
 
@@ -129,7 +131,7 @@ Cocher **Sign in with Apple** → **Configure** :
 | Domains | `paychek.pro` |
 | Return URLs | `https://paychek-trading.firebaseapp.com/__/auth/handler` |
 
-Enregistrer.
+Enregistrer (et **Save** une 2ᵉ fois sur l’écran Services ID).
 
 ### 2. Firebase Console
 
@@ -137,12 +139,20 @@ Enregistrer.
 
 | Champ | Valeur |
 |-------|--------|
-| **Services ID** | `pro.paychek.signin` (pas `pro.paychek.app`) |
+| **Services ID** | `pro.paychek.signin` (**pas** `pro.paychek.app`) |
 | Team ID, Key ID, clé `.p8` | inchangés (même clé Apple) |
 
 **Enregistrer.**
 
-> iOS natif : si Firebase passe à `pro.paychek.signin`, l’app utilise le flux OAuth Services ID (déjà géré dans le code).
+> **Conflit historique :** `pro.paychek.app` dans Firebase = iOS natif OK, **web cassé**.
+> La bonne config unique = `pro.paychek.signin` : web OK + iOS via flux OAuth Services ID
+> (déjà dans le code ; rebuild / release iOS après le changement Console).
+
+### 3. Test
+
+1. https://paychek.pro/?auth=login (fenêtre principale, pas iframe)
+2. Clic Apple → popup / redirect Apple
+3. Si erreur : lire le dialogue rouge (code Firebase)
 
 ---
 

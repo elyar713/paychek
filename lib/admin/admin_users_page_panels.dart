@@ -775,3 +775,294 @@ class _BillingStripePanelState extends State<_BillingStripePanel> {
     );
   }
 }
+
+/// Ligne Safeguard (Inactive / Lite / Pro) sous la facturation — fiche utilisateur.
+class _AdminUserSafeguardStatusCard extends StatefulWidget {
+  const _AdminUserSafeguardStatusCard({
+    required this.userId,
+    required this.email,
+  });
+
+  final String userId;
+  final String email;
+
+  @override
+  State<_AdminUserSafeguardStatusCard> createState() =>
+      _AdminUserSafeguardStatusCardState();
+}
+
+class _AdminUserSafeguardStatusCardState
+    extends State<_AdminUserSafeguardStatusCard> {
+  bool _loading = true;
+  bool _saving = false;
+  AdminSafeguardStatus _status = AdminSafeguardStatus.empty;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_load());
+  }
+
+  @override
+  void didUpdateWidget(covariant _AdminUserSafeguardStatusCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userId != widget.userId ||
+        oldWidget.email != widget.email) {
+      unawaited(_load());
+    }
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final s = await loadAdminSafeguardStatus(
+        userId: widget.userId,
+        email: widget.email,
+      );
+      if (!mounted) return;
+      setState(() {
+        _status = s;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _status = AdminSafeguardStatus.empty;
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _copyKey(BuildContext context) async {
+    final key = _status.licenseKey.trim();
+    if (key.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: key));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Safeguard key copied.')),
+    );
+  }
+
+  Future<void> _toggleRevoke(BuildContext context) async {
+    final lic = _status.license;
+    if (lic == null) return;
+    setState(() => _saving = true);
+    try {
+      if (lic.revoked) {
+        await unrevokeSafeguardLicense(lic.key);
+      } else {
+        await revokeSafeguardLicense(lic.key);
+      }
+      if (!mounted) return;
+      await _load();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            lic.revoked
+                ? 'Safeguard license restored.'
+                : 'Safeguard license revoked.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade900,
+          content: Text('Safeguard action failed: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Widget _metaPair(String label, String value, {bool monospace = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF64748B),
+            letterSpacing: 0.45,
+          ),
+        ),
+        const SizedBox(height: 4),
+        SelectableText(
+          value,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            height: 1.3,
+          ).copyWith(fontFamily: monospace ? 'monospace' : null),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final badge = _status.badge;
+    final df = DateFormat('dd MMM yyyy');
+    final expiryLabel = _status.expiryAt != null
+        ? df.format(_status.expiryAt!.toLocal())
+        : '—';
+    final createdLabel = _status.createdAt != null
+        ? df.format(_status.createdAt!.toLocal())
+        : '—';
+    final hasLicense = _status.license != null || _status.licenseKey.isNotEmpty;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0A0A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.shield_outlined,
+                size: 18,
+                color: badge.color,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'SAFEGUARD',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: const Color(0xFFE2E8F0),
+                ),
+              ),
+              const Spacer(),
+              if (_loading || _saving)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: badge.gradientColors,
+                    ),
+                  ),
+                  child: Text(
+                    badge.label.toUpperCase(),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.08 * 11,
+                      color: badge.foreground,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (!_loading) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 18,
+              runSpacing: 14,
+              children: [
+                SizedBox(width: 180, child: _metaPair('Type', _status.planLabel)),
+                SizedBox(
+                  width: 140,
+                  child: _metaPair('Activation', _status.activationLabel),
+                ),
+                SizedBox(width: 150, child: _metaPair('Expiry', expiryLabel)),
+                SizedBox(width: 150, child: _metaPair('Created', createdLabel)),
+                SizedBox(
+                  width: 150,
+                  child: _metaPair('Source', _status.sourceLabel),
+                ),
+                SizedBox(
+                  width: 220,
+                  child: _metaPair(
+                    'Linked email',
+                    _status.linkedEmail.isEmpty ? '—' : _status.linkedEmail,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            _metaPair(
+              'Key',
+              hasLicense ? _status.licenseKey : 'No linked license',
+              monospace: hasLicense,
+            ),
+            if (_status.trialClaimed && badge == AdminSafeguardBadge.lite) ...[
+              const SizedBox(height: 10),
+              Text(
+                '7-day trial already claimed for this account.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AdminTheme.textMuted,
+                ),
+              ),
+            ],
+            if (_status.revokedOnly) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Only revoked licenses found for this user.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFF59E0B),
+                ),
+              ),
+            ],
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: hasLicense ? () => _copyKey(context) : null,
+                  icon: const Icon(Icons.copy_rounded, size: 16),
+                  label: const Text('Copy key'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _loading || _saving ? null : () => _load(),
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: const Text('Refresh'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _status.license == null || _saving
+                      ? null
+                      : () => _toggleRevoke(context),
+                  icon: Icon(
+                    _status.license?.revoked == true
+                        ? Icons.restart_alt_rounded
+                        : Icons.block_rounded,
+                    size: 16,
+                  ),
+                  label: Text(
+                    _status.license?.revoked == true ? 'Restore' : 'Revoke',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

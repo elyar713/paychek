@@ -1,0 +1,159 @@
+.paychek-account-nav-host {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.paychek-account-root {
+  display: flex;
+  align-items: center;
+}
+
+/* `hidden` is overridden by display:flex below — force hide */
+.paychek-account-guest[hidden],
+.paychek-account-user[hidden],
+.paychek-account-menu[hidden] {
+  display: none !important;
+}
+
+.paychek-account-guest {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.paychek-account-login {
+  display: inline;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  white-space: nowrap;
+  padding-inline: 0.25rem;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.paychek-account-login:hover {
+  color: #fff;
+}
+
+.paychek-account-signup,
+.paychek-account-guest .paychek-nav-signup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.125rem;
+  padding: 0 0.75rem;
+  border: none;
+  border-radius: 0.7rem;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@media (min-width: 640px) {
+  .paychek-account-login {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+  }
+  .paychek-account-signup,
+  .paychek-account-guest .paychek-nav-signup {
+    height: 2.5rem;
+    padding: 0 1.15rem;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+}
+
+.paychek-account-user {
+  position: relative;
+  display: block;
+}
+
+.paychek-account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.125rem;
+  padding: 0 0.75rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .paychek-account-trigger {
+    height: 2.5rem;
+    padding: 0 1rem;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+}
+
+.paychek-account-trigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.paychek-account-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.45rem);
+  min-width: 14rem;
+  padding: 0.35rem 0;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0a0a0a;
+  box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.9);
+  z-index: 80;
+  display: block;
+}
+
+.paychek-account-menu a,
+.paychek-account-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 1rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d1d5db;
+  background: transparent;
+  border: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.paychek-account-menu a:hover,
+.paychek-account-menu button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.paychek-account-menu button[data-paychek-action="logout"] {
+  color: #f87171;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}

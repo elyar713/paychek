@@ -137,7 +137,7 @@ abstract final class _UmCol {
   static const double user = 278;
   static const double details = 152;
   static const double due = 136;
-  static const double pay = 124;
+  static const double pay = 172;
   static const double trail = 48;
 }
 
@@ -254,6 +254,112 @@ class _ModernPaymentCell extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InlineSafeguardBadge extends StatefulWidget {
+  const _InlineSafeguardBadge({
+    required this.userId,
+    required this.email,
+  });
+
+  final String userId;
+  final String email;
+
+  @override
+  State<_InlineSafeguardBadge> createState() => _InlineSafeguardBadgeState();
+}
+
+class _InlineSafeguardBadgeState extends State<_InlineSafeguardBadge> {
+  late Future<AdminSafeguardStatus> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = loadAdminSafeguardStatus(
+      userId: widget.userId,
+      email: widget.email,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _InlineSafeguardBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userId != widget.userId || oldWidget.email != widget.email) {
+      _future = loadAdminSafeguardStatus(
+        userId: widget.userId,
+        email: widget.email,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<AdminSafeguardStatus>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 10,
+                height: 10,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.6,
+                  color: _UsersUi.dim.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Safeguard',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: _UsersUi.dim,
+                ),
+              ),
+            ],
+          );
+        }
+
+        final badge = snap.data?.badge ?? AdminSafeguardBadge.inactive;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Safeguard',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: _UsersUi.dim,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: badge.gradientColors,
+                ),
+              ),
+              child: Text(
+                badge.label.toUpperCase(),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.08 * 9,
+                  color: badge.foreground,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -410,7 +516,14 @@ class _ModernUserCollapsedCells extends StatelessWidget {
           ),
           SizedBox(
             width: _UmCol.pay,
-            child: _ModernPaymentCell(raw: u.paymentMethod),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ModernPaymentCell(raw: u.paymentMethod),
+                const SizedBox(height: 8),
+                _InlineSafeguardBadge(userId: u.id, email: u.email),
+              ],
+            ),
           ),
           SizedBox(width: _UmCol.trail, child: trailing),
         ],
@@ -527,6 +640,7 @@ class _MobileUserCollapsedCells extends StatelessWidget {
                 ),
               ),
               _ModernPaymentCell(raw: u.paymentMethod),
+              _InlineSafeguardBadge(userId: u.id, email: u.email),
             ],
           ),
         ],

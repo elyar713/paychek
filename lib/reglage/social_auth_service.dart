@@ -310,8 +310,22 @@ Future<UserCredential?> _signInWithAppleNativeProvider() async {
 
 /// Apple → Firebase.
 Future<UserCredential?> signInWithApple() async {
+  // Web : même chemin que Google (Firebase popup / redirect).
+  // Le package sign_in_with_apple + AppleID.auth.popup avec redirectUri =
+  // Firebase handler casse le retour popup (« Invalid client id or web redirect url »).
   if (kIsWeb) {
-    return _signInWithAppleOAuthServicesFlow(kPaychekAppleWebServicesIdForAuth);
+    final provider = AppleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('name');
+    try {
+      return await _webSignInWithAuthProvider(provider);
+    } on FirebaseAuthException catch (e) {
+      if (_isFirebaseWebPopupCancelled(e)) return null;
+      debugPrint(
+        '[Paychek] Apple web FirebaseAuthException: ${e.code} ${e.message}',
+      );
+      rethrow;
+    }
   }
 
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -329,6 +343,10 @@ Future<UserCredential?> signInWithApple() async {
     throw UnsupportedError('apple_sign_in_native');
   }
 
+  // Firebase n’a qu’un seul « Services ID » pour web + mobile.
+  // On utilise toujours le Services ID OAuth (`pro.paychek.signin`) sur iOS/macOS
+  // pour que Firebase puisse rester sur cette valeur (requis pour le web).
+  // Flux natif Bundle ID uniquement si Firebase est encore sur `pro.paychek.app`.
   final servicesId = kPaychekAppleFirebaseServicesId.trim();
   final useOAuthServicesFlow = servicesId.isNotEmpty &&
       servicesId != kPaychekIosBundleId;
@@ -347,10 +365,13 @@ Future<UserCredential?> signInWithApple() async {
     if (_isFirebaseWebPopupCancelled(e)) {
       return null;
     }
-    // Mismatch audience : Firebase attend le Services ID OAuth, pas le Bundle ID.
-    if (_isAppleAudienceMismatch(e) && servicesId.isNotEmpty) {
-      debugPrint('[Paychek] Apple native audience mismatch → OAuth Services ID flow');
-      return _signInWithAppleOAuthServicesFlow(servicesId);
+    // Ancien Firebase = Bundle ID → natif OK ; nouveau = Services ID → OAuth.
+    if (_isAppleAudienceMismatch(e)) {
+      final oauthId = kPaychekAppleWebServicesIdForAuth;
+      debugPrint(
+        '[Paychek] Apple audience mismatch → OAuth Services ID $oauthId',
+      );
+      return _signInWithAppleOAuthServicesFlow(oauthId);
     }
     debugPrint(
       '[Paychek] Apple Sign-In FirebaseAuthException: ${e.code} ${e.message}',
@@ -360,9 +381,8 @@ Future<UserCredential?> signInWithApple() async {
 }
 
 bool isAppleSignInAvailableOnThisPlatform() {
-  // Web : désactivé tant que Firebase reste sur pro.paychek.app (build iOS en revue).
-  // Réactiver après App Store + Firebase aligné sur pro.paychek.signin.
-  if (kIsWeb) return false;
+  // Web : Services ID `pro.paychek.signin` + return URL Firebase handler.
+  if (kIsWeb) return true;
   switch (defaultTargetPlatform) {
     case TargetPlatform.iOS:
     case TargetPlatform.macOS:

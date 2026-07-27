@@ -54,7 +54,9 @@ class WebLandingAuthQueryHost extends StatelessWidget {
               onClose: overlay
                   ? paychekCloseAuthOverlay
                   : paychekReturnToLandingIfAuthCancelled,
-              onAuthSuccess: overlay ? paychekCompleteAuthOverlaySuccess : () {},
+              onAuthSuccess: overlay
+                  ? paychekCompleteAuthOverlaySuccess
+                  : paychekReturnToLandingAfterLogin,
             ),
           ),
         ],

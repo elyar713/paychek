@@ -28,6 +28,11 @@ const String kPaychekUserFieldTrialFreemiumOverrideUntil =
 /// Sert à l’admin (pastille d’activité sur 7 jours). Taille bornée côté client.
 const String kPaychekUserFieldAppOpenDatesUtcV1 = 'appOpenDatesUtcV1';
 
+/// Première ouverture du Trading Journal ([PostAuthGate] → dashboard).
+/// Web (`/?app=1`), Android et iOS : même champ `paychek_users/{uid}`.
+/// Affiché sur licence.html pour le plan Lite (« Actif depuis »). Écrit une seule fois.
+const String kPaychekUserFieldJournalFirstOpenedAt = 'journalFirstOpenedAt';
+
 /// Horodatage du dernier changement de plan (`subscriptionTier` / `isPremium`) par l’**admin**.
 /// Les apps ne l’écrivent pas (hors console admin). Sert d’ancrage pour une licence Pro affichée (+1 an).
 const String kPaychekUserFieldSubscriptionTierUpdatedAt =
@@ -157,6 +162,32 @@ Future<void> paychekMergeAppLanguageFromFirestore(User user) async {
     }
   } catch (e, st) {
     debugPrint('[Paychek] paychekMergeAppLanguageFromFirestore: $e\n$st');
+  }
+}
+
+/// Persiste [kPaychekUserFieldJournalFirstOpenedAt] si absent (première entrée journal).
+Future<void> paychekMarkJournalFirstOpenedIfNeeded(User user) async {
+  try {
+    final ref = FirebaseFirestore.instance
+        .collection(kPaychekUsersCollection)
+        .doc(user.uid);
+    final snap = await ref.get();
+    final existing = paychekParseFirestoreInstantUtc(
+      snap.data()?[kPaychekUserFieldJournalFirstOpenedAt],
+    );
+    if (existing != null && paychekIsPlausibleUserInstant(existing)) {
+      return;
+    }
+    final now = FieldValue.serverTimestamp();
+    await ref.set(
+      <String, dynamic>{
+        kPaychekUserFieldJournalFirstOpenedAt: now,
+        'updatedAt': now,
+      },
+      SetOptions(merge: true),
+    );
+  } catch (e, st) {
+    debugPrint('[Paychek] paychekMarkJournalFirstOpenedIfNeeded: $e\n$st');
   }
 }
 

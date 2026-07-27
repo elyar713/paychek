@@ -768,7 +768,22 @@ function createAppleIapExports(deps) {
           expiresMs,
           now: Date.now(),
         });
-        return {active: false, reason: "expired_or_revoked"};
+        const db = admin.firestore();
+        if (typeof paychekRevokeProEntitlement === "function") {
+          await paychekRevokeProEntitlement(db, request.auth.uid, {
+            provider: "apple_iap",
+            reason: "apple_expired_or_revoked",
+            periodEnd:
+              expiresMs != null ?
+                admin.firestore.Timestamp.fromMillis(expiresMs) :
+                null,
+          });
+        }
+        return {
+          active: false,
+          reason: "expired_or_revoked",
+          currentPeriodEndMillis: expiresMs,
+        };
       }
 
       const db = admin.firestore();

@@ -1,4 +1,4 @@
-// PAYCHEK landing-page.js — auth OAuth : redirection top-level /?auth= (pas iframe overlay).
+// PAYCHEK landing-page.js — auth marketing via modale HTML Firebase (paychek-site-auth.js).
 const previewData = {
     'dashboard': {
         title: 'Dashboard',
@@ -218,23 +218,15 @@ function paychekIsEmbeddedInApp() {
 
 var _paychekAuthOverlayEsc = null;
 
-/** Overlay auth sur la landing (évite écran noir plein page). */
+/** Overlay auth legacy (désactivé) — l’auth marketing est HTML via paychek-site-auth.js. */
 function paychekEnsureAuthOverlay() {
-    var el = document.getElementById('paychek-auth-overlay');
-    if (el) return el;
-    el = document.createElement('div');
-    el.id = 'paychek-auth-overlay';
-    el.className = 'paychek-auth-overlay';
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'true');
-    el.innerHTML =
-        '<div class="paychek-auth-overlay-backdrop" aria-hidden="true"></div>' +
-        '<iframe class="paychek-auth-overlay-frame" title="PAYCHEK — connexion" src="about:blank"></iframe>';
-    document.body.appendChild(el);
-    return el;
+    return document.getElementById('paychek-auth-overlay');
 }
 
 function paychekCloseAuthOverlay() {
+    if (typeof window.paychekCloseSiteAuth === 'function') {
+        window.paychekCloseSiteAuth();
+    }
     var overlay = document.getElementById('paychek-auth-overlay');
     if (!overlay) return;
     overlay.classList.remove('is-open');
@@ -245,12 +237,12 @@ function paychekCloseAuthOverlay() {
 }
 
 function paychekOpenAuthOverlay(mode) {
-    var m = (mode === 'login' || mode === 'signin' || mode === 'connexion')
-        ? 'login'
-        : 'signup';
-    var base = window.location.origin || '';
-    // Fenêtre principale : Firebase OAuth (Google / Apple / Facebook) bloque les popups en iframe.
-    window.location.href = base + '/?auth=' + encodeURIComponent(m);
+    if (typeof window.paychekOpenSiteAuth === 'function') {
+        window.paychekOpenSiteAuth(mode);
+        return;
+    }
+    // Fallback sans site-auth : reste sur landing (ne pas booter Flutter).
+    console.warn('[paychek] paychek-site-auth.js manquant');
 }
 
 function paychekOnAuthOverlayMessage(event) {
@@ -268,7 +260,7 @@ function paychekOnAuthOverlayMessage(event) {
     }
 }
 
-/** Hors iframe Flutter : overlay auth ; en iframe : postMessage vers l’app. */
+/** Hors iframe Flutter : modale HTML ; en iframe : postMessage vers l’app. */
 function paychekGoToAppAuth(mode) {
     if (paychekIsEmbeddedInApp()) {
         paychekPostToFlutterHost(JSON.stringify({ type: 'paychek-auth', mode: mode }));
@@ -509,6 +501,9 @@ function landingSelectLang(code, ev) {
     applyLandingLocaleUI(normalized);
     if (typeof applyLandingTranslations === 'function') {
         applyLandingTranslations(normalized);
+    }
+    if (typeof paychekRefreshAccountNavLabels === 'function') {
+        paychekRefreshAccountNavLabels();
     }
     paychekNotifyParentLocale(normalized);
     paychekCloseLangMenu();

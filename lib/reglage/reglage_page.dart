@@ -58,6 +58,7 @@ class ReglagePage extends StatefulWidget {
     this.onOpenHelpCenter,
     this.onOpenCgvTerms,
     this.onOpenPrivacyPolicy,
+    this.initialOpenAccount = false,
   });
 
   final VoidCallback onClose;
@@ -77,6 +78,9 @@ class ReglagePage extends StatefulWidget {
   /// Ouvre la politique de confidentialité **dans le shell** (mobile uniquement).
   final VoidCallback? onOpenPrivacyPolicy;
 
+  /// Deep link web : ouvrir directement la vue Compte.
+  final bool initialOpenAccount;
+
   @override
   State<ReglagePage> createState() => _ReglagePageState();
 }
@@ -95,6 +99,9 @@ class _ReglagePageState extends State<ReglagePage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialOpenAccount) {
+      _webAccountOpen = true;
+    }
     _loadProfile();
     _loadAccountEntitlement();
   }

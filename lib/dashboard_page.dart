@@ -34,6 +34,8 @@ import 'web/paychek_web_tokens.dart';
 import 'web/plus_web_left_rail.dart';
 import 'web/web_dashboard_body.dart';
 import 'web/web_dashboard_config.dart';
+import 'web/web_return_to_landing_stub.dart'
+    if (dart.library.html) 'web/web_return_to_landing_web.dart';
 import 'shared/paychek_frame_callbacks.dart';
 import 'ajouter_trade/ajouter_trade_page.dart';
 import 'calendrier/calendrier_page.dart';
@@ -106,6 +108,9 @@ class _DashboardPageState extends State<DashboardPage>
 
   /// Réglages au-dessus du contenu, barre du bas toujours visible.
   bool _reglageOverlayOpen = false;
+
+  /// Deep link web `?open=account|license` → ouvrir Compte dans Réglages.
+  bool _webOpenAccountPending = false;
 
   /// Null pendant le tout premier calcul ; après : règles d’accès Pro / Lite / essai.
   TrialGateVm? _trialGate;
@@ -260,6 +265,29 @@ class _DashboardPageState extends State<DashboardPage>
     ChecklistRealtimeNotifier.tick.addListener(_onChecklistCloudTick);
     unawaited(_bootstrapTrialGateAndEntitlement());
     _bindSubscriberEntitlementListener();
+    if (kIsWeb) {
+      PaychekFrameCallbacks.runPostFrame(() {
+        if (!mounted) return;
+        _consumeWebOpenDeepLink();
+      });
+    }
+  }
+
+  void _consumeWebOpenDeepLink() {
+    final open = paychekWebAppOpenTarget();
+    paychekStripWebAppEntryQueryFromUrl();
+    if (open == null) return;
+    if (open == 'billing') {
+      _showVoluntaryGoldUpgradeSheet();
+      return;
+    }
+    if (open == 'account' || open == 'license') {
+      setState(() {
+        _plusMenuOpen = false;
+        _reglageOverlayOpen = true;
+        _webOpenAccountPending = true;
+      });
+    }
   }
 
   /// Android : sync Play **avant** le statut affiché (évite Pro fantôme avec date 2027).
@@ -874,8 +902,12 @@ class _DashboardPageState extends State<DashboardPage>
                   top: 0,
                   bottom: overlayBottom,
                   child: ReglagePage(
+                    initialOpenAccount: _webOpenAccountPending,
                     onClose: () {
-                      setState(() => _reglageOverlayOpen = false);
+                      setState(() {
+                        _reglageOverlayOpen = false;
+                        _webOpenAccountPending = false;
+                      });
                       unawaited(_reloadTrialGate());
                     },
                     onGoToDashboard: () {

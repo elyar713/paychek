@@ -2,40 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- URL directe /landing.html → racine (paychek.pro/). En iframe Flutter : pas de redirection. -->
-    <script>
-        (function () {
-            try {
-                if (window.parent !== window) return;
-                var path = window.location.pathname || '';
-                if (!/\/landing\.html$/i.test(path)) return;
-                var params = new URLSearchParams(window.location.search || '');
-                if (params.get('stay') === '1') return;
-                var target = (window.location.origin || '') + '/'
-                    + (window.location.search || '')
-                    + (window.location.hash || '');
-                window.location.replace(target);
-            } catch (e) {}
-        })();
-    </script>
-    <link rel="canonical" href="https://paychek.pro/">
-    <script>
-        (function () {
-            try {
-                if (new URLSearchParams(window.location.search || '').get('stay') === '1') {
-                    var m = document.createElement('meta');
-                    m.name = 'robots';
-                    m.content = 'noindex, follow';
-                    document.head.appendChild(m);
-                }
-            } catch (e) {}
-        })();
-    </script>
+    <!-- Journal marketing = HTML direct (comme Safeguard). Ne pas rediriger vers /
+         sinon Flutter boot → lag, puis retour landing.html?stay=1. -->
+    <link rel="canonical" href="https://paychek.pro/landing.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAYCHEK | Transformez vos données en profits</title>
     <link rel="stylesheet" href="css/paychek-tailwind.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/landing-page.css">
+    <link rel="stylesheet" href="css/paychek-account-nav.css">
+    <link rel="stylesheet" href="css/paychek-site-auth.css">
 </head>
 <body class="overflow-x-hidden">
 
@@ -43,55 +19,57 @@
 
     <!-- Navigation -->
     <nav class="glass-nav sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-3 group cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                <img src="images/paychek-logo.svg" alt="" class="w-10 h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
-                <span class="text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+        <div class="paychek-topnav max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20">
+            <div class="paychek-topnav-side paychek-topnav-side--left">
+                <a href="landing.html" target="_top" class="flex items-center gap-2.5 sm:gap-3 group shrink-0 min-w-0">
+                    <img src="images/paychek-logo.svg" alt="" class="w-8 h-8 sm:w-10 sm:h-10 shrink-0" width="40" height="40" decoding="async" aria-hidden="true">
+                    <span class="hidden sm:inline text-2xl font-black tracking-tighter text-white uppercase">PAYCHEK</span>
+                </a>
             </div>
 
-            <div class="hidden lg:flex space-x-10 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
-                <a href="#preview-section" class="hover:text-white transition" data-i18n="nav.preview">Aperçu</a>
-                <a href="#processus" class="hover:text-white transition" data-i18n="nav.process">Processus</a>
-                <a href="#pricing" class="hover:text-white transition" data-i18n="nav.pricing">Tarifs</a>
-                <a href="#faq" class="hover:text-white transition" data-i18n="nav.faq">FAQ</a>
+            <div class="paychek-topnav-center" role="navigation" aria-label="Products">
+                <a href="landing.html" target="_top" class="paychek-product-link is-active" aria-current="page" data-i18n="nav.journal">Journal</a>
+                <a href="safeguard.html" target="_top" class="paychek-product-link" data-i18n="nav.safeguard">Safeguard</a>
             </div>
 
-            <div class="flex items-center gap-4 sm:gap-5 shrink-0">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <div class="relative group paychek-lang-picker-wrap" id="lang-picker-wrap">
-                        <button type="button" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown-menu" onclick="paychekToggleLangMenu(event)">
-                            <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
-                            <span id="lang-trigger-code">EN</span>
-                            <i class="fas fa-chevron-down text-[8px] opacity-50" aria-hidden="true"></i>
-                        </button>
-                        <div id="lang-dropdown-menu" class="paychek-lang-menu-panel invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]" role="menu">
-                            <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
-                                <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
-                            </a>
-                            <a href="#" onclick="landingSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="fr">
-                                <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
-                            </a>
-                            <a href="#" onclick="landingSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
-                                <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
-                            </a>
-                            <a href="#" onclick="landingSelectLang('es', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="es">
-                                <img src="https://flagcdn.com/w40/es.png" alt="" class="flag-icon"> ESPAÑOL
-                            </a>
-                            <a href="#" onclick="landingSelectLang('pt', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="pt">
-                                <img src="https://flagcdn.com/w40/pt.png" alt="" class="flag-icon"> PORTUGUÊS
-                            </a>
-                            <a href="#" onclick="landingSelectLang('ko', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="ko">
-                                <img src="https://flagcdn.com/w40/kr.png" alt="" class="flag-icon"> 한국어
-                            </a>
-                        </div>
-                    </div>
-                    <span class="hidden sm:inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
-                    <button type="button" data-paychek-auth="login" onclick="paychekNotifyParentAuth('login')" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition whitespace-nowrap" data-i18n="nav.login">Connexion</button>
-                    <button type="button" data-paychek-auth="signup" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap" data-i18n="nav.signup">
-                        S'inscrire
+            <div class="paychek-topnav-side paychek-topnav-side--right">
+                <div class="relative group paychek-lang-picker-wrap" id="lang-picker-wrap">
+                    <button type="button" class="flex items-center gap-1.5 sm:gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition" id="lang-trigger-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown-menu" onclick="paychekToggleLangMenu(event)">
+                        <img id="lang-trigger-flag" src="https://flagcdn.com/w40/us.png" alt="EN" class="flag-icon">
+                        <span id="lang-trigger-code" class="hidden sm:inline">EN</span>
+                        <i class="fas fa-chevron-down text-[8px] opacity-50 hidden sm:inline" aria-hidden="true"></i>
                     </button>
+                    <div id="lang-dropdown-menu" class="paychek-lang-menu-panel invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-card-black border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-[60]" role="menu">
+                        <a href="#" onclick="landingSelectLang('en', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/5 transition" data-landing-lang="en">
+                            <img src="https://flagcdn.com/w40/us.png" alt="" class="flag-icon"> ENGLISH
+                        </a>
+                        <a href="#" onclick="landingSelectLang('fr', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="fr">
+                            <img src="https://flagcdn.com/w40/fr.png" alt="" class="flag-icon"> FRANÇAIS
+                        </a>
+                        <a href="#" onclick="landingSelectLang('de', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="de">
+                            <img src="https://flagcdn.com/w40/de.png" alt="" class="flag-icon"> DEUTSCH
+                        </a>
+                        <a href="#" onclick="landingSelectLang('es', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="es">
+                            <img src="https://flagcdn.com/w40/es.png" alt="" class="flag-icon"> ESPAÑOL
+                        </a>
+                        <a href="#" onclick="landingSelectLang('pt', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="pt">
+                            <img src="https://flagcdn.com/w40/pt.png" alt="" class="flag-icon"> PORTUGUÊS
+                        </a>
+                        <a href="#" onclick="landingSelectLang('ko', event); return false;" class="flex items-center gap-3 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition border-t border-white/5" data-landing-lang="ko">
+                            <img src="https://flagcdn.com/w40/kr.png" alt="" class="flag-icon"> 한국어
+                        </a>
+                    </div>
                 </div>
+                <span class="inline-block w-px h-7 shrink-0 bg-white/15" aria-hidden="true"></span>
+                <div id="paychek-account-nav" class="paychek-account-nav-host"></div>
             </div>
+        </div>
+
+        <div class="hidden xl:flex justify-center items-center gap-10 pb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500" data-paychek-section-nav>
+            <a href="#preview-section" class="hover:text-white transition" data-i18n="nav.preview">Aperçu</a>
+            <a href="#processus" class="hover:text-white transition" data-i18n="nav.process">Processus</a>
+            <a href="#pricing" class="hover:text-white transition" data-i18n="nav.pricing">Tarifs</a>
+            <a href="#faq" class="hover:text-white transition" data-i18n="nav.faq">FAQ</a>
         </div>
     </nav>
 
@@ -112,7 +90,7 @@
             Le journal de trading conçu pour transformer votre <span class="text-white font-semibold">discipline</span> en <span class="font-semibold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent">avantage statistique</span>
         </p>
         <div class="flex flex-col sm:flex-row gap-5 justify-center mb-32">
-            <button type="button" onclick="paychekNotifyParentAuth('signup')" class="btn-primary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest" data-i18n="hero.ctaStart">
+            <button type="button" onclick="paychekStartJournalOrAuth()" class="btn-primary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest" data-i18n="hero.ctaStart">
                 Démarrer mon journal
             </button>
             <button onclick="document.getElementById('preview-section').scrollIntoView({behavior: 'smooth'})" class="btn-secondary px-10 py-5 rounded-full font-bold text-xs uppercase tracking-widest hover:text-white" data-i18n="hero.ctaExplore">
@@ -447,6 +425,8 @@
                     <div class="flex flex-col gap-5">
                         <h6 class="text-[10px] font-black uppercase tracking-[0.4em] text-white" data-i18n="footer.columnProduct">Produit</h6>
                         <ul class="flex flex-col gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                            <li><a href="landing.html" target="_top" data-i18n="footer.journal">Journal</a></li>
+                            <li><a href="safeguard.html" target="_top" data-i18n="footer.safeguard">Safeguard</a></li>
                             <li><a href="#preview-section" data-i18n="footer.feat">Fonctionnalités</a></li>
                             <li><a href="#pricing" data-i18n="footer.pricing">Tarifs</a></li>
                             <li><a href="#faq" data-i18n="footer.faq">FAQ</a></li>
@@ -495,33 +475,9 @@
         </div>
     </div>
 
-    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm" onclick="if(event.target===this)toggleModal('login-modal')">
-        <div class="bg-card-black border border-white/10 w-full max-w-md rounded-[2.5rem] p-10 relative" onclick="event.stopPropagation()">
-            <button onclick="toggleModal('login-modal')" class="absolute top-8 right-8 text-gray-500 hover:text-white transition"><i class="fas fa-times"></i></button>
-            <h2 class="text-2xl font-bold mb-8 text-white">Connexion</h2>
-            <div class="space-y-4">
-                <input type="email" placeholder="Email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
-                <input type="password" placeholder="Mot de passe" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
-                <button type="button" class="w-full btn-primary py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest mt-4" onclick="paychekNotifyParentAuth('login'); toggleModal('login-modal');">Entrer</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="signup-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm" onclick="if(event.target===this)toggleModal('signup-modal')">
-        <div class="bg-card-black border border-white/10 w-full max-w-md rounded-[2.5rem] p-10 relative" onclick="event.stopPropagation()">
-            <button onclick="toggleModal('signup-modal')" class="absolute top-8 right-8 text-gray-500 hover:text-white transition"><i class="fas fa-times"></i></button>
-            <h2 class="text-2xl font-bold mb-4 text-white">Inscription</h2>
-            <p class="text-[9px] text-blue-500 font-bold uppercase tracking-widest mb-8"><i class="fas fa-gift mr-2"></i> Votre essai de 7 jours sera activé automatiquement</p>
-            <div class="space-y-4">
-                <input type="text" placeholder="Nom complet" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
-                <input type="email" placeholder="Email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
-                <input type="password" placeholder="Mot de passe" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 transition text-white text-xs">
-                <button type="button" class="w-full btn-primary py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest mt-4" onclick="paychekNotifyParentAuth('signup'); toggleModal('signup-modal');">Créer mon compte</button>
-            </div>
-        </div>
-    </div>
-
     <script src="landing-i18n.js"></script>
+    <script src="js/paychek-site-auth.js"></script>
     <script src="js/landing-page.js"></script>
+    <script src="js/paychek-account-nav.js"></script>
 </body>
 </html>

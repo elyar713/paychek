@@ -18,7 +18,8 @@ import 'web_landing_unauthenticated.dart';
 import 'web_return_to_landing_stub.dart'
     if (dart.library.html) 'web_return_to_landing_web.dart';
 
-/// Web : landing HTML si déconnecté, app si session Firebase active.
+/// Web : landing HTML si déconnecté ; après login reste sur le site
+/// (sauf `/?app=1` → journal).
 class WebAuthGate extends StatefulWidget {
   const WebAuthGate({super.key});
 
@@ -136,6 +137,12 @@ class _WebAuthGateState extends State<WebAuthGate> {
       builder: (context, snap) {
         final user = snap.data ?? FirebaseAuth.instance.currentUser;
         if (user != null) {
+          if (kIsWeb && !paychekWebAppEntryRequested()) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              paychekReturnToLandingAfterLogin();
+            });
+            return const ColoredBox(color: Colors.black);
+          }
           return PostAuthGate(key: ValueKey(user.uid), user: user);
         }
 

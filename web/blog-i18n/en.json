@@ -8,7 +8,10 @@
   },
   "nav": {
     "pricing": "Pricing",
-    "openApp": "Open app"
+    "openApp": "Open app",
+    "journal": "Journal",
+    "login": "Log in",
+    "signup": "Sign up"
   },
   "hero": {
     "chip": "The disciplined trader's blog",
@@ -63,7 +66,7 @@
   "cta": {
     "title": "Ready to journal like a pro?",
     "subtitle": "Start free. 7 days of full Pro access, then stay on Lite if you prefer.",
-    "button": "Start my journal"
+    "button": "Sign up"
   },
   "footer": {
     "home": "Home",

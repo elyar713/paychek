@@ -10,7 +10,14 @@ flutter build web --release --no-wasm-dry-run
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 # Fichiers marketing / SEO : toujours recopier (évite build Flutter stale + cache navigateur).
-$seoFiles = @('sitemap.xml', 'robots.txt', 'landing.html', 'privacy.html', 'terms.html', 'contact.html', 'blog.html', 'contact-i18n.js', 'landing-i18n.js')
+$seoFiles = @(
+  'sitemap.xml', 'robots.txt', 'landing.html', 'landing-i18n.js',
+  'safeguard.html', 'safeguard-i18n.js',
+  'licence.html', 'licence-i18n.js',
+  'facturation.html', 'facturation-i18n.js',
+  'privacy.html', 'privacy-en.html', 'terms.html',
+  'contact.html', 'blog.html', 'contact-i18n.js', 'blog-i18n.js'
+)
 foreach ($name in $seoFiles) {
   $src = Join-Path $root "web\$name"
   $dst = Join-Path $root "build\web\$name"
@@ -22,7 +29,7 @@ foreach ($name in $seoFiles) {
   Write-Host ">> copie web\$name -> build\web\" -ForegroundColor DarkGray
 }
 
-$marketingDirs = @('css', 'js', 'images')
+$marketingDirs = @('css', 'js', 'images', 'downloads')
 foreach ($dir in $marketingDirs) {
   $srcDir = Join-Path $root "web\$dir"
   $dstDir = Join-Path $root "build\web\$dir"

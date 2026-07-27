@@ -63,11 +63,16 @@ const String _kAppleServicesIdFromEnv = String.fromEnvironment(
 );
 
 /// Aligné sur Firebase Console → Auth → Apple → **ID de service**.
-/// `pro.paychek.app` = Bundle ID iOS (flux natif). Laisser vide = idem.
-/// Pour le web uniquement : `pro.paychek.signin` (flux OAuth sur iOS si Firebase aligné).
-const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.app';
+///
+/// Un seul champ Firebase pour **web + iOS**. Il doit être le Services ID OAuth
+/// `pro.paychek.signin` (pas le Bundle `pro.paychek.app`) :
+/// - web : Apple refuse le Bundle comme `client_id`
+/// - iOS : flux OAuth Services ID (audience du jeton = `pro.paychek.signin`)
+///
+/// Ancien choix `pro.paychek.app` = mobile OK mais web cassé.
+const String kPaychekAppleFirebaseServicesIdDefault = 'pro.paychek.signin';
 
-/// **Services ID** Firebase (Auth → Apple). Diffère du Bundle ID `pro.paychek.app` :
+/// **Services ID** Firebase (Auth → Apple). ≠ Bundle ID `pro.paychek.app`.
 /// iOS utilise le flux OAuth avec ce Services ID pour matcher l’audience du jeton.
 ///
 /// Surcharge CI : `--dart-define=PAYCHEK_APPLE_SERVICES_ID=xxx`

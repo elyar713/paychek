@@ -2,6 +2,32 @@
 <html lang="fr">
 <head>
   <style>html,body{margin:0;background:#000000;height:100%;}</style>
+  <!-- Marketing : / sans app|open|overlay → landing HTML (évite le boot Flutter / lag).
+       Anciens liens /?auth=login|signup → landing HTML (modale Firebase), pas Flutter. -->
+  <script>
+    (function () {
+      try {
+        var q = window.location.search || '';
+        var path = window.location.pathname || '/';
+        var host = window.location.hostname || '';
+        if (host === 'localhost' || host === '127.0.0.1') return;
+        if (path !== '/' && path !== '') return;
+        var hash = window.location.hash || '';
+        var origin = window.location.origin || '';
+        var authMatch = q.match(/[?&]auth=([^&]*)/i);
+        var keepFlutter = /[?&](app|open|overlay)=/i.test(q);
+        if (authMatch && !keepFlutter) {
+          var mode = decodeURIComponent(authMatch[1] || 'login');
+          window.location.replace(
+            origin + '/landing.html?auth=' + encodeURIComponent(mode) + hash,
+          );
+          return;
+        }
+        if (keepFlutter) return;
+        window.location.replace(origin + '/landing.html' + hash);
+      } catch (e) {}
+    })();
+  </script>
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
@@ -22,7 +48,7 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Paychek — journal de trading, checklist, état mental et analyse de performance. Master the mind, Master the trade.">
   <meta id="paychek-robots" name="robots" content="index, follow">
-  <link rel="canonical" href="https://paychek.pro/">
+  <link rel="canonical" href="https://paychek.pro/landing.html">
   <script>
     (function () {
       try {
@@ -66,6 +92,8 @@
     };
   </script>
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+  <!-- Sign in with Apple (web) — Services ID pro.paychek.signin -->
+  <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 </head>
 <body>
   <div id="fb-root"></div>

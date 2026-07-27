@@ -3,7 +3,11 @@
     "title": "문의 및 피드백 | Paychek",
     "description": "Paychek 문의: 지원, 제품 피드백, 제안 및 제휴 프로그램. 모든 메시지에 답변드립니다."
   },
-  "nav": { "back": "돌아가기" },
+  "nav": {
+    "back": "돌아가기",
+    "login": "로그인",
+    "signup": "가입하기"
+  },
   "hero": {
     "chip": "모든 메시지를 읽습니다",
     "titleHtml": "문의 & <span class=\"gradient-text\">피드백</span>",

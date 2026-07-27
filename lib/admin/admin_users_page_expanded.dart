@@ -313,6 +313,7 @@ class _UserExpandedDashboard extends StatelessWidget {
             initialTier: u.subscriptionTier,
             paymentMethod: u.paymentMethod,
             lastSeenPlatform: u.lastSeenPlatform,
+            subscriptionCurrentPeriodEnd: u.subscriptionCurrentPeriodEnd,
             scaffoldContext: scaffoldContext,
           ),
           const SizedBox(height: 18),
@@ -436,6 +437,11 @@ class _UserExpandedDashboard extends StatelessWidget {
                   importsCard,
                   const SizedBox(height: 22),
                   billingCard,
+                  const SizedBox(height: 22),
+                  _AdminUserSafeguardStatusCard(
+                    userId: u.id,
+                    email: u.email,
+                  ),
                 ],
               );
 

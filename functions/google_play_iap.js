@@ -1071,6 +1071,10 @@ function createGooglePlayIapExports(deps) {
     await paychekRevokeProEntitlement(db, uid, {
       provider: "google_play",
       reason: "google_play_expired_or_inactive",
+      periodEnd:
+        playExpiryMs != null && Number.isFinite(playExpiryMs) ?
+          admin.firestore.Timestamp.fromMillis(playExpiryMs) :
+          null,
     });
     const stateLabel = sub && sub.subscriptionState ?
       `${sub.subscriptionState}` :

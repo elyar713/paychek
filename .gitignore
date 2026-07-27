@@ -67,6 +67,10 @@ smtp_pw.txt
 # Local copy for pdfrx + flutter test PDF debugging (never commit)
 /pdfium.dll
 
+# Safeguard Windows installer (large binary; staged into web/downloads for hosting)
+web/downloads/*.zip
+!web/downloads/README.md
+
 # Symbolication related
 app.*.symbols
 
@@ -77,3 +81,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local temp captures / video frames (never commit)
+.tmp_video_*/
+.tmp_presentation/
+.tmp_client_*/

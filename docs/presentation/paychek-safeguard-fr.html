@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paychek Safeguard — Documentation produit (FR)</title>
+  <style>
+    :root {
+      --bg: #0b0f0e;
+      --bg-elev: #121816;
+      --text: #e8eee9;
+      --muted: #9aaaa0;
+      --line: #24302a;
+      --accent: #3dff8a;
+      --warn: #f0b429;
+      --danger: #ff5c5c;
+      --slide-w: 1280px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #1a1a1a;
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans", system-ui, sans-serif;
+    }
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      padding: 10px 16px; background: #111; border-bottom: 1px solid #333; font-size: 13px;
+    }
+    .toolbar button, .toolbar a.btn {
+      background: #222; color: var(--text); border: 1px solid #444; border-radius: 6px;
+      padding: 6px 12px; cursor: pointer; text-decoration: none;
+    }
+    .toolbar button:hover, .toolbar a.btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toolbar .hint { color: #888; margin-left: auto; }
+    .deck { display: flex; flex-direction: column; gap: 28px; padding: 28px; align-items: center; }
+    .slide {
+      width: min(100%, var(--slide-w)); aspect-ratio: 16 / 9; background: var(--bg);
+      border: 1px solid var(--line); border-radius: 10px; padding: 44px 52px;
+      position: relative; overflow: hidden; page-break-after: always; break-after: page;
+    }
+    .slide::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--accent); }
+    .kicker {
+      color: var(--accent); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      font-weight: 700; margin: 0 0 12px;
+    }
+    h1 { font-size: 40px; line-height: 1.15; margin: 0 0 14px; font-weight: 700; max-width: 18ch; }
+    h2 { font-size: 28px; margin: 0 0 14px; font-weight: 700; }
+    .lead { font-size: 18px; color: var(--muted); line-height: 1.45; max-width: 46ch; margin: 0; }
+    .body { font-size: 16px; line-height: 1.5; color: var(--text); margin: 0; }
+    ul.clean { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    ul.clean li {
+      padding-left: 16px; position: relative; font-size: 16px; line-height: 1.4; color: var(--text);
+    }
+    ul.clean li::before {
+      content: ""; position: absolute; left: 0; top: 0.55em; width: 7px; height: 7px;
+      background: var(--accent); border-radius: 1px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 28px; align-items: center; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .card {
+      background: var(--bg-elev); border: 1px solid var(--line); border-radius: 8px; padding: 14px 14px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 14px; color: var(--accent); letter-spacing: 0.04em; }
+    .card p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .media {
+      background: #080a09; border: 1px dashed #355; border-radius: 8px; min-height: 260px;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px;
+    }
+    .media img { max-width: 100%; max-height: 360px; object-fit: contain; border-radius: 4px; }
+    .media .placeholder { color: #5a6b60; text-align: center; font-size: 13px; padding: 16px; line-height: 1.5; }
+    .footer-meta {
+      position: absolute; left: 52px; right: 52px; bottom: 18px;
+      display: flex; justify-content: space-between; color: #66776d; font-size: 11px;
+    }
+    .warn-box {
+      margin-top: 14px; border: 1px solid #5a4520; background: #1a150c; border-radius: 8px; padding: 14px 16px;
+    }
+    .warn-box strong { color: var(--warn); }
+    .warn-box ul { margin: 8px 0 0; padding-left: 18px; }
+    .warn-box li { color: #d4c7a0; font-size: 13px; line-height: 1.45; margin: 4px 0; }
+    .cover { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+    .cover .brand {
+      font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 16px; font-weight: 700;
+    }
+    .cover h1 { font-size: 48px; max-width: 14ch; }
+    .cover .lead { font-size: 20px; max-width: 40ch; }
+    .steps { display: grid; gap: 12px; }
+    .steps .step { display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; }
+    .steps .num {
+      width: 38px; height: 38px; border: 1px solid var(--accent); color: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 8px;
+    }
+    .steps h3 { margin: 0 0 3px; font-size: 16px; }
+    .steps p { margin: 0; color: var(--muted); font-size: 13px; }
+    .toc ol { margin: 8px 0 0; padding-left: 22px; columns: 2; column-gap: 40px; }
+    .toc li { font-size: 14px; margin: 6px 0; color: var(--muted); break-inside: avoid; }
+    .toc li strong { color: var(--text); }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none !important; }
+      .deck { padding: 0; gap: 0; }
+      .slide { width: 100%; height: 100vh; aspect-ratio: auto; border: none; border-radius: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <strong>Paychek Safeguard — Doc produit FR</strong>
+    <button type="button" onclick="window.print()">Exporter PDF</button>
+    <a class="btn" href="#sommaire">Sommaire</a>
+    <span class="hint">Documentation complète · FR d’abord · puis 6 langues</span>
+  </div>
+
+  <div class="deck">
+
+    <!-- 01 Cover -->
+    <section class="slide cover" id="s1">
+      <div class="brand">Paychek</div>
+      <h1>Paychek Safeguard</h1>
+      <p class="lead">Documentation produit — discipline de trading en temps réel pour NinjaTrader 8 (Windows).</p>
+      <p class="body" style="margin-top:20px;color:var(--muted);font-size:14px;">Logiciel local + addon NT · règles · blocage · zones · licence</p>
+      <div class="footer-meta"><span>Documentation produit</span><span>FR · 01</span></div>
+    </section>
+
+    <!-- 02 Sommaire -->
+    <section class="slide toc" id="sommaire">
+      <p class="kicker">Sommaire</p>
+      <h2>Contenu du document</h2>
+      <ol>
+        <li><strong>Qu’est-ce que Safeguard</strong></li>
+        <li><strong>Architecture</strong> (PC + NT)</li>
+        <li><strong>Installation</strong></li>
+        <li><strong>Logiciel Windows</strong> (UI)</li>
+        <li><strong>Addon NinjaTrader</strong></li>
+        <li><strong>Engage / niveaux de discipline</strong></li>
+        <li><strong>Session</strong></li>
+        <li><strong>Max trades / jour</strong></li>
+        <li><strong>Max lot</strong></li>
+        <li><strong>Trade cooldown</strong></li>
+        <li><strong>Max loss / trade</strong></li>
+        <li><strong>Max daily loss</strong></li>
+        <li><strong>Trade zone</strong></li>
+        <li><strong>Exit / Stop loss</strong></li>
+        <li><strong>Capital &amp; usage hours</strong></li>
+        <li><strong>Licence</strong></li>
+        <li><strong>Workflow quotidien</strong></li>
+        <li><strong>Prérequis &amp; limites</strong></li>
+        <li><strong>Avertissements</strong></li>
+      </ol>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>02</span></div>
+    </section>
+
+    <!-- 03 What -->
+    <section class="slide" id="s3">
+      <p class="kicker">Produit</p>
+      <h2>Qu’est-ce que Paychek Safeguard ?</h2>
+      <p class="lead" style="margin-bottom:18px;">Un garde-fou local : vos règles de discipline deviennent des contraintes techniques pendant le trading.</p>
+      <ul class="clean">
+        <li>Définit les règles dans le logiciel Windows (Safeguard)</li>
+        <li>L’addon NinjaTrader applique / affiche le statut en temps réel</li>
+        <li>Si une règle est violée → trading blocked (ordres refusés quand Blocking on)</li>
+        <li>Fonctionne en local (127.0.0.1) — le PC doit rester allumé</li>
+      </ul>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>03</span></div>
+    </section>
+
+    <!-- 04 Architecture -->
+    <section class="slide" id="s4">
+      <p class="kicker">Architecture</p>
+      <h2>Deux composants, un lien local</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>1. Logiciel Windows</h3>
+          <p>UI Safeguard : plateforme, capital, usage hours, plan de règles, engage discipline, licence. Serveur local HTTP.</p>
+        </div>
+        <div class="card">
+          <h3>2. Addon NinjaTrader 8</h3>
+          <p>Fenêtre Discipline : Connected, OK / BLOCKED, compteurs, Sync zones, Blocking on.</p>
+        </div>
+        <div class="card">
+          <h3>3. Lien temps réel</h3>
+          <p>Webhooks / heartbeat sur 127.0.0.1:8080. Secret partagé. Sans Safeguard ouvert = pas de garde-fou.</p>
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>04</span></div>
+    </section>
+
+    <!-- 05 Install -->
+    <section class="slide" id="s5">
+      <p class="kicker">Installation</p>
+      <h2>Kit Windows — 3 fichiers utilisateur</h2>
+      <div class="grid-2">
+        <div class="steps">
+          <div class="step"><div class="num">1</div><div>
+            <h3>2-Install-Addon.bat</h3>
+            <p>Ferme NT → installe les sources addon → rouvre NT → Compile (F5).</p>
+          </div></div>
+          <div class="step"><div class="num">2</div><div>
+            <h3>3-Open-Safeguard.bat</h3>
+            <p>Démarre le serveur local + UI. Le serveur reste actif même si l’UI est fermée (STOP.bat pour arrêter).</p>
+          </div></div>
+          <div class="step"><div class="num">3</div><div>
+            <h3>NT → New → Paychek Safeguard</h3>
+            <p>Fenêtre Discipline → Connected → activer licence PAYC → Engage discipline.</p>
+          </div></div>
+        </div>
+        <div class="media">
+          <img src="assets/02-install-addon-framed.png" alt="2-Install-Addon" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>05</span></div>
+    </section>
+
+    <!-- 06 UI overview -->
+    <section class="slide" id="s6">
+      <p class="kicker">Logiciel Windows</p>
+      <h2>Interface Safeguard</h2>
+      <div class="grid-2">
+        <ul class="clean">
+          <li><strong>Trading platform</strong> — NinjaTrader + statut lié</li>
+          <li><strong>Capital</strong> — base pour % de risque</li>
+          <li><strong>Usage hours</strong> — plage d’utilisation du logiciel</li>
+          <li><strong>Discipline status</strong> — OK / Trading blocked + raisons</li>
+          <li><strong>Plan rules</strong> — toutes les règles du plan</li>
+          <li><strong>Licence</strong> — Lite / Pro / essai, Upgrade, Clear license</li>
+        </ul>
+        <div class="media">
+          <img src="assets/07-safeguard-ui-blocked.png" alt="UI Safeguard" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>06</span></div>
+    </section>
+
+    <!-- 07 Addon overview -->
+    <section class="slide" id="s7">
+      <p class="kicker">Addon NinjaTrader</p>
+      <h2>Fenêtre Discipline</h2>
+      <div class="grid-2">
+        <ul class="clean">
+          <li><strong>Connected to Safeguard</strong> — lien actif</li>
+          <li><strong>OK / BLOCKED</strong> — autorisé ou règle violée</li>
+          <li>Compteurs live : trades, intervalle, lot, session, daily loss</li>
+          <li><strong>ADDON Blocking on</strong> — refus des ordres non conformes</li>
+          <li><strong>Sync to Paychek</strong> — envoi des zones chart</li>
+          <li>Pinned / Refresh</li>
+        </ul>
+        <div class="media">
+          <img src="assets/06-addon-rules-active.png" alt="Addon Discipline" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>07</span></div>
+    </section>
+
+    <!-- 08 Engage -->
+    <section class="slide" id="s8">
+      <p class="kicker">Discipline</p>
+      <div class="grid-2">
+        <div>
+          <h2>Engage &amp; niveaux</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li><strong>Strict</strong> — pas de désactivation avant l’heure limite (ex. 22:00)</li>
+            <li><strong>Hybrid</strong> — désactivation après délai (ex. 20 min)</li>
+            <li><strong>Tolerant</strong> — désactivation immédiate</li>
+            <li>Enabled = plan actif · Disabled = pause / monitoring</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-discipline-level.png" alt="Discipline level — Strict / Hybrid / Tolerant" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>08</span></div>
+    </section>
+
+    <!-- 09 Feature map -->
+    <section class="slide" id="s9">
+      <p class="kicker">Fonctionnalités</p>
+      <h2>Carte des règles (plan)</h2>
+      <div class="grid-3">
+        <div class="card"><h3>Session</h3><p>Horaires de trading (fuseau, ex. Europe/Paris).</p></div>
+        <div class="card"><h3>Max trades / day</h3><p>Nombre max d’ouvertures par jour / session.</p></div>
+        <div class="card"><h3>Max lot size</h3><p>Taille max de contrat / lot.</p></div>
+        <div class="card"><h3>Trade cooldown</h3><p>Attente après trade / après perte.</p></div>
+        <div class="card"><h3>Max loss / trade</h3><p>Risque max par trade (€ et %).</p></div>
+        <div class="card"><h3>Max daily loss</h3><p>Perte journalière max (€ et %).</p></div>
+        <div class="card"><h3>Trade zone</h3><p>Zone prix sur chart ; hors zone = block.</p></div>
+        <div class="card"><h3>Exit / SL</h3><p>SL-only, quotas de modif, breakeven.</p></div>
+        <div class="card"><h3>Capital / Usage</h3><p>Capital de référence + plage d’usage logiciel.</p></div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>09</span></div>
+    </section>
+
+    <!-- 10 Session -->
+    <section class="slide" id="s10">
+      <p class="kicker">Règle · Session</p>
+      <div class="grid-2">
+        <div>
+          <h2>Fenêtre de trading</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li>Heure début → fin (ex. 09:00 → 18:00)</li>
+            <li>Format 12h / 24h</li>
+            <li>Fuseau (ex. Europe/Paris)</li>
+            <li>Hors session → trading bloqué si Enabled</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-session.png" alt="Session settings" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>10</span></div>
+    </section>
+
+    <!-- 11 Max trades -->
+    <section class="slide" id="s11">
+      <p class="kicker">Règle · Max trades</p>
+      <div class="grid-2">
+        <div>
+          <h2>Quota de trades / jour</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li><strong>Max trades / day</strong> — plafond d’ouvertures (ex. 5)</li>
+            <li>Compteur <strong>Trades taken today</strong> + restants dans l’addon</li>
+            <li>Quota atteint → nouveaux trades bloqués</li>
+            <li>Anti-overtrading après une série</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-max-trades.png" alt="Max trades settings" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>11</span></div>
+    </section>
+
+    <!-- 12 Max lot -->
+    <section class="slide" id="s12">
+      <p class="kicker">Règle · Max lot</p>
+      <div class="grid-2">
+        <div>
+          <h2>Taille maximale</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li><strong>Max lot size</strong> — plafond par entrée (ex. 3)</li>
+            <li>Empêche de « size up » émotionnellement</li>
+            <li>Visible dans NinjaTrader après Save / Enabled</li>
+            <li>Statut addon : Active · max N contract(s)</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-max-lot.png" alt="Max lot size settings" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>12</span></div>
+    </section>
+
+        <!-- 13 Cooldown -->
+    <section class="slide" id="s13">
+      <p class="kicker">Règle · Trade cooldown</p>
+      <div class="grid-2">
+        <div>
+          <h2>Intervalle entre trades</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li>Durée configurable (ex. 15 min)</li>
+            <li><strong>After loss</strong> ou <strong>Every trade</strong></li>
+            <li>Visible dans NinjaTrader après Save / Enabled</li>
+            <li>Anti revenge trading</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-cooldown.png" alt="Trade cooldown settings" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>13</span></div>
+    </section>
+
+<!-- 14 Max loss trade -->
+    <section class="slide" id="s14">
+      <p class="kicker">Règle · Max loss / trade</p>
+      <div class="grid-2">
+        <div>
+          <h2>Risque par trade</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li>Montant (€) + pourcentage (%)</li>
+            <li>Ex. 200 € · 10 % du capital</li>
+            <li>Avec Ninja + Enabled : ferme si perte flottante dépasse le seuil</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-max-loss-trade.png" alt="Max loss per trade" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>14</span></div>
+    </section>
+
+    <!-- 15 Daily loss -->
+    <section class="slide" id="s15">
+      <p class="kicker">Règle · Max daily loss</p>
+      <div class="grid-2">
+        <div>
+          <h2>Perte journalière max</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li>Montant + % (ex. 400 € · 20 %)</li>
+            <li>Auto-calc possible (ex. 2 trades × 200 €)</li>
+            <li>Compteur live : Day’s loss vs Max</li>
+            <li>Seuil atteint → stop trading du jour</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-daily-loss.png" alt="Max daily loss settings" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>15</span></div>
+    </section>
+
+    <!-- 16 Zone -->
+    <section class="slide" id="s16">
+      <p class="kicker">Règle · Trade zone</p>
+      <h2>Zone de prix sur le chart</h2>
+      <div class="grid-2">
+        <ul class="clean">
+          <li>Dessin de zone Paychek sur le chart NT</li>
+          <li><strong>Sync to Paychek</strong> pour l’envoyer au logiciel</li>
+          <li>Hors zone → BLOCKED (prix outside trade zone)</li>
+          <li>Direction possible (ex. Sell only)</li>
+          <li>Live price affiché dans l’addon</li>
+        </ul>
+        <div class="media">
+          <img src="assets/06b-addon-blocked-zone.png" alt="Zone + blocked" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>16</span></div>
+    </section>
+
+    <!-- 17 Exit SL -->
+    <section class="slide" id="s17">
+      <p class="kicker">Règle · Exit / Stop loss</p>
+      <div class="grid-2">
+        <div>
+          <h2>Stop losses synchronisés</h2>
+          <ul class="clean" style="margin-top:10px;">
+            <li><strong>Quota</strong> — nb de modifs SL (0 = verrouillé dès le départ)</li>
+            <li><strong>Breakeven</strong> — après quota : SL seulement à BE ou mieux</li>
+            <li>Mode SL-only (pas de close manuel selon config)</li>
+          </ul>
+        </div>
+        <div class="media">
+          <img src="assets/ui-exit-sl.png" alt="Exit / SL synchronized stop losses" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>17</span></div>
+    </section>
+
+    <!-- 18 Capital usage -->
+    <section class="slide" id="s18">
+      <p class="kicker">Réglages globaux</p>
+      <h2>Capital &amp; Usage hours</h2>
+      <div class="grid-4">
+        <div class="card">
+          <h3>Capital</h3>
+          <p>Montant de référence (ex. 2000 €) pour calculer les % de risque / daily loss.</p>
+        </div>
+        <div class="card">
+          <h3>Usage hours</h3>
+          <p>Plage d’utilisation du logiciel (ex. 09:00–22:00), distincte de la session de trading.</p>
+        </div>
+        <div class="card">
+          <h3>Plateforme</h3>
+          <p>Sélecteur NinjaTrader + indicateur Connected / Disconnected.</p>
+        </div>
+        <div class="card">
+          <h3>Auto-refresh</h3>
+          <p>UI rafraîchit le statut périodiquement (ex. toutes les 30 s).</p>
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>18</span></div>
+    </section>
+
+    <!-- 19 License -->
+    <section class="slide" id="s19">
+      <p class="kicker">Licence</p>
+      <h2>Activation PAYC</h2>
+      <div class="grid-2">
+        <ul class="clean">
+          <li>Après achat, e-mail avec clé <strong>PAYC-…</strong> + date d’échéance</li>
+          <li>Saisir la clé dans Safeguard (1 PC)</li>
+          <li>Plans : essai / Lite / Pro (paychek.pro)</li>
+          <li>Actions : Upgrade, Clear license</li>
+          <li>Une nouvelle clé remplace l’essai précédent</li>
+        </ul>
+        <div class="media">
+          <img src="assets/ui-license-email.png" alt="E-mail licence Safeguard Pro (clé masquée)" />
+        </div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>19</span></div>
+    </section>
+
+    <!-- 20 Daily workflow -->
+    <section class="slide" id="s20">
+      <p class="kicker">Usage</p>
+      <h2>Workflow quotidien</h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div><h3>Ouvrir Safeguard</h3><p>3-Open-Safeguard.bat — vérifier Connected + licence.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h3>Configurer le plan</h3><p>Session, quotas, zone, SL, capital — puis Engage discipline.</p></div></div>
+        <div class="step"><div class="num">3</div><div><h3>NinjaTrader</h3><p>Fenêtre Paychek Safeguard — Connected / OK — trader.</p></div></div>
+        <div class="step"><div class="num">4</div><div><h3>Fin de journée</h3><p>Optionnel : Pause. Arrêt serveur : _technique\STOP.bat.</p></div></div>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>20</span></div>
+    </section>
+
+    <!-- 21 Requirements -->
+    <section class="slide" id="s21">
+      <p class="kicker">Prérequis</p>
+      <h2>Environnement supporté</h2>
+      <ul class="clean">
+        <li>Windows 10 / 11</li>
+        <li>NinjaTrader 8</li>
+        <li>Kit PaychekSafeguard-Windows.zip (paychek.pro)</li>
+        <li>Safeguard démarré pendant le trading</li>
+        <li>Réseau local libre sur le port (défaut 8080)</li>
+      </ul>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>21</span></div>
+    </section>
+
+    <!-- 22 Warnings -->
+    <section class="slide" id="s22">
+      <p class="kicker">Avertissements</p>
+      <h2>Précisions importantes</h2>
+      <div class="warn-box">
+        <strong>À lire avant utilisation</strong>
+        <ul>
+          <li>Pas un conseil en investissement — outil de discipline / risque.</li>
+          <li>Le trading comporte un risque de perte en capital.</li>
+          <li>Ne remplace pas broker, prop firm, ni risk management personnel.</li>
+          <li>Nécessite NT8 + Safeguard ouvert (serveur local).</li>
+          <li>Captures illustratives — l’UI peut évoluer.</li>
+          <li>Compatibilité / résultats non garantis (PC, data, VPS, version NT).</li>
+        </ul>
+      </div>
+      <div class="footer-meta"><span>Paychek Safeguard</span><span>22</span></div>
+    </section>
+
+    <!-- 23 CTA -->
+    <section class="slide cover" id="s23">
+      <div class="brand">Paychek</div>
+      <h1>paychek.pro</h1>
+      <p class="lead">Téléchargement, licence et support — Paychek Safeguard pour NinjaTrader.</p>
+      <div class="footer-meta"><span>Documentation produit FR</span><span>23</span></div>
+    </section>
+
+    <!-- Internal -->
+    <section class="slide no-print" id="slide-captures">
+      <p class="kicker">Production</p>
+      <h2>État captures</h2>
+      <ul class="clean" style="margin-top:12px;">
+        <li>OK — UI réglages : Session, Cooldown, Loss/trade, Daily loss, Exit/SL</li>
+        <li>OK — Discipline level (Strict / Hybrid / Tolerant)</li>
+        <li>OK — Overview blocked + addon + zone</li>
+      </ul>
+      <p class="lead" style="margin-top:20px;font-size:15px;">Retirer cette slide du PDF final.</p>
+      <div class="footer-meta"><span>Interne</span><span>•</span></div>
+    </section>
+
+  </div>
+</body>
+</html>

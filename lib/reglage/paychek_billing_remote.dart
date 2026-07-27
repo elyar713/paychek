@@ -21,6 +21,9 @@ const String kFieldStripeCheckoutUrlQuarterly = 'stripeCheckoutUrlQuarterly';
 const String kFieldStripeCheckoutUrlAnnual = 'stripeCheckoutUrlAnnual';
 const String kFieldStripeBillingEnabled = 'stripeBillingEnabled';
 
+/// Payment Link Stripe Safeguard (~69 \$ / an) — indépendant des liens Journal.
+const String kFieldSafeguardPaymentUrl = 'safeguardPaymentUrl';
+
 class PaychekStripeCheckoutUrls {
   const PaychekStripeCheckoutUrls({
     this.monthly,
@@ -173,5 +176,22 @@ abstract final class PaychekBillingRemote {
       compileLegacyAnnual: compileTimeUrl,
     );
     return urls?.annual ?? urls?.monthly ?? urls?.quarterly;
+  }
+
+  /// Lien paiement Safeguard (`paychek_app_config/billing.safeguardPaymentUrl`).
+  static Future<String?> resolveSafeguardPaymentUrl() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection(kPaychekAppConfigCollection)
+          .doc(kPaychekBillingDocId)
+          .get();
+      if (!snap.exists) return null;
+      final url = '${snap.data()?[kFieldSafeguardPaymentUrl] ?? ''}'.trim();
+      if (url.isEmpty || !url.startsWith('https://')) return null;
+      return url;
+    } catch (e, st) {
+      debugPrint('[PaychekBillingRemote] safeguardPaymentUrl $e\n$st');
+      return null;
+    }
   }
 }

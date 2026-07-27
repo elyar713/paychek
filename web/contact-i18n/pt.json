@@ -3,7 +3,11 @@
     "title": "Contacto e feedback | Paychek",
     "description": "Contacte a Paychek: suporte, feedback, sugestões e programa de afiliados. Respondemos a cada mensagem."
   },
-  "nav": { "back": "Voltar" },
+  "nav": {
+    "back": "Voltar",
+    "login": "Entrar",
+    "signup": "Criar conta"
+  },
   "hero": {
     "chip": "Lemos cada mensagem",
     "titleHtml": "Contacto & <span class=\"gradient-text\">Feedback</span>",

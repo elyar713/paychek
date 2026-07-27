@@ -20,6 +20,8 @@ import 'admin_stripe_entitlement_sync.dart';
 import 'admin_stripe_refund.dart';
 import 'admin_subscription_trace.dart';
 import 'admin_user_billing_summary.dart';
+import 'admin_safeguard_status.dart';
+import 'admin_safeguard_licenses.dart';
 import 'admin_support_ticket_detail_page.dart';
 import 'admin_layout.dart';
 import 'admin_theme.dart';

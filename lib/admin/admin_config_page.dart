@@ -40,6 +40,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
   final _stripeCheckoutMonthlyCtrl = TextEditingController();
   final _stripeCheckoutQuarterlyCtrl = TextEditingController();
   final _stripeCheckoutAnnualCtrl = TextEditingController();
+  final _safeguardPaymentUrlCtrl = TextEditingController();
   bool _stripeBillingEnabled = true;
   bool _stripeBillingLoading = false;
   bool _stripeBillingSaving = false;
@@ -71,6 +72,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
     _stripeCheckoutMonthlyCtrl.dispose();
     _stripeCheckoutQuarterlyCtrl.dispose();
     _stripeCheckoutAnnualCtrl.dispose();
+    _safeguardPaymentUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -213,6 +215,8 @@ class _AdminConfigPageState extends State<AdminConfigPage>
           annual = '${d[kFieldStripeCheckoutUrl] ?? ''}'.trim();
         }
         _stripeCheckoutAnnualCtrl.text = annual;
+        _safeguardPaymentUrlCtrl.text =
+            '${d[kFieldSafeguardPaymentUrl] ?? ''}'.trim();
         final en = d[kFieldStripeBillingEnabled];
         _stripeBillingEnabled = en is! bool || en == true;
       }
@@ -239,6 +243,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
     final monthly = _stripeCheckoutMonthlyCtrl.text.trim();
     final quarterly = _stripeCheckoutQuarterlyCtrl.text.trim();
     final annual = _stripeCheckoutAnnualCtrl.text.trim();
+    final safeguardPaymentUrl = _safeguardPaymentUrlCtrl.text.trim();
     final pk = _stripePublishableKeyCtrl.text.trim();
     final sk = _stripeSecretKeyCtrl.text.trim();
     final aiAgentApiKey = _aiAgentApiKeyCtrl.text.trim();
@@ -246,6 +251,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
       ('Mensuel', monthly),
       ('Trimestriel', quarterly),
       ('Annuel', annual),
+      ('Safeguard', safeguardPaymentUrl),
     ]) {
       if (!_isHttpsCheckoutUrl(entry.$2)) {
         if (mounted) {
@@ -309,6 +315,7 @@ class _AdminConfigPageState extends State<AdminConfigPage>
             kFieldStripeCheckoutUrlQuarterly: quarterly,
             kFieldStripeCheckoutUrlAnnual: annual,
             kFieldStripeCheckoutUrl: annual,
+            kFieldSafeguardPaymentUrl: safeguardPaymentUrl,
             kFieldStripeBillingEnabled: _stripeBillingEnabled,
             'updatedAt': now,
           },
@@ -766,8 +773,12 @@ class _AdminConfigPageState extends State<AdminConfigPage>
             ),
             const SizedBox(height: 6),
             Text(
-              'Un lien buy.stripe.com par tarif (mensuel 8,99 \$ · '
-              'trimestriel 20,97 \$ · annuel 59,99 \$).',
+              'Journal : un lien buy.stripe.com par tarif (mensuel 8,99 \$ · '
+              'trimestriel 20,97 \$ · annuel 59,99 \$). '
+              'Safeguard : lien one-time annuel séparé (~69 \$). '
+              'Sur le Payment Link Safeguard (Stripe) : After payment → '
+              'https://paychek.pro/licence.html?safeguard=paid&session_id='
+              '{CHECKOUT_SESSION_ID}',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
                 height: 1.35,
@@ -808,6 +819,13 @@ class _AdminConfigPageState extends State<AdminConfigPage>
                 title: 'Annuel',
                 subtitle: '59,99 \$ / an',
                 controller: _stripeCheckoutAnnualCtrl,
+                hint: 'https://buy.stripe.com/…',
+              ),
+              const SizedBox(height: 14),
+              _stripePaymentLinkField(
+                title: 'Lien paiement Safeguard',
+                subtitle: '≈ 69 \$ / an — desktop NinjaTrader',
+                controller: _safeguardPaymentUrlCtrl,
                 hint: 'https://buy.stripe.com/…',
               ),
               const SizedBox(height: 18),

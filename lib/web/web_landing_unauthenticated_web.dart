@@ -66,7 +66,7 @@ class _WebLandingUnauthenticatedWebState
       if (path.isNotEmpty && path != '/') return false;
       final search = html.window.location.search ?? '';
       if (search.contains('auth=')) return false;
-      html.window.location.replace('landing.html?stay=1${html.window.location.hash}');
+      html.window.location.replace('landing.html${html.window.location.hash}');
       return true;
     } catch (_) {
       return false;

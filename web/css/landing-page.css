@@ -64,6 +64,119 @@ body > footer {
     overflow: visible;
 }
 
+/* 3-column header: logo | Journal+Safeguard (true center) | actions */
+.paychek-topnav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.5rem;
+    position: relative;
+}
+
+.paychek-topnav-side {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.paychek-topnav-side--left {
+    justify-content: flex-start;
+}
+
+.paychek-topnav-side--right {
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .paychek-topnav {
+        column-gap: 1rem;
+    }
+    .paychek-topnav-side--right {
+        gap: 0.75rem;
+    }
+}
+
+.paychek-topnav-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 1;
+}
+
+@media (min-width: 640px) {
+    .paychek-topnav-center {
+        gap: 1.75rem;
+    }
+}
+
+.paychek-product-link {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #6b7280;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.paychek-product-link:hover {
+    color: #fff;
+}
+
+.paychek-product-link.is-active {
+    color: #fff;
+}
+
+/* Mobile: 2 rows — logo + actions, then Journal | Safeguard centered */
+@media (max-width: 639px) {
+    .paychek-topnav {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "logo actions"
+            "products products";
+        row-gap: 0.4rem;
+        column-gap: 0.5rem;
+        height: auto !important;
+        min-height: 0;
+        padding-top: 0.7rem;
+        padding-bottom: 0.55rem;
+    }
+
+    .paychek-topnav-side--left {
+        grid-area: logo;
+    }
+
+    .paychek-topnav-side--right {
+        grid-area: actions;
+        gap: 0.4rem;
+    }
+
+    .paychek-topnav-center {
+        grid-area: products;
+        gap: 1.75rem;
+        padding-top: 0.15rem;
+        padding-bottom: 0.1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .paychek-topnav-side--right > span[aria-hidden="true"] {
+        display: none;
+    }
+
+    .paychek-topnav-side--right [data-paychek-auth="login"] {
+        font-size: 9px;
+        letter-spacing: 0.14em;
+        padding-inline: 0.15rem;
+    }
+
+    .paychek-product-link {
+        letter-spacing: 0.18em;
+        font-size: 10px;
+    }
+}
+
 .btn-primary {
     background: #ffffff;
     color: #000000;
@@ -74,6 +187,58 @@ body > footer {
     background: #f8fafc;
     transform: translateY(-2px);
     box-shadow: 0 10px 20px -10px rgba(255, 255, 255, 0.3);
+}
+
+/* Nav CTA — proportions stables, pas une pastille écrasée */
+.paychek-nav-signup {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.375rem;
+    padding: 0 1.15rem;
+    border: none;
+    border-radius: 0.7rem;
+    background: #ffffff;
+    color: #0a0a0a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.paychek-nav-signup:hover {
+    background: #f4f4f5;
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 8px 18px -10px rgba(255, 255, 255, 0.35);
+}
+
+.paychek-nav-signup:active {
+    transform: translateY(0);
+    background: #e4e4e7;
+}
+
+@media (max-width: 639px) {
+    .paychek-nav-signup {
+        height: 2.125rem;
+        padding: 0 0.75rem;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+    }
+}
+
+@media (min-width: 640px) {
+    .paychek-nav-signup {
+        height: 2.5rem;
+        padding: 0 1.35rem;
+        letter-spacing: 0.14em;
+    }
 }
 
 .btn-secondary {
@@ -87,6 +252,21 @@ body > footer {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
+}
+
+.btn-secondary:disabled,
+.btn-secondary[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+}
+
+.btn-secondary:disabled:hover,
+.btn-secondary[aria-disabled="true"]:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
 }
 
 .explorer-tab {
